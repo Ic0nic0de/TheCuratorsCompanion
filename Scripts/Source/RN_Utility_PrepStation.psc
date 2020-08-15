@@ -19,9 +19,10 @@ ObjectReference Property DBM_AutoSortDropOff Auto
 
 ObjectReference Property PlayerRef auto
 
-formlist property RN_TokenFormlist_NoShipment auto
+formlist property RN_TokenFormlist auto
 
 formlist property dbmMaster auto
+formlist property dbmDisp auto
 
 Int OPButton
 Int SCButton
@@ -83,43 +84,48 @@ function Transfer()
 
 		if RN_MCM.PrepTransfer == 0
 		
-			Int Index = RN_TokenFormlist_NoShipment.GetSize()
+			Int Index = RN_TokenFormlist.GetSize()
 			While Index
 				Index -= 1
-				ObjectReference _Container = RN_TokenFormlist_NoShipment.GetAt(Index) as ObjectReference		
-				Int Index2 = _Container.GetNumItems()
-				While Index2
-					Index2 -= 1
-					Form ItemRelic = _Container.GetNthForm(Index2)
-					if dbmMaster.HasForm(ItemRelic)
-						_Container.RemoveItem(ItemRelic, _Container.GetItemCount(ItemRelic), false, DBM_AutoSortDropOff)
-					endif
-				endWhile
+				ObjectReference _Container = RN_TokenFormlist.GetAt(Index) as ObjectReference
+				if _Container != PlayerRef
+					Int Index2 = _Container.GetNumItems()
+					While Index2
+						Index2 -= 1
+						Form ItemRelic = _Container.GetNthForm(Index2)
+						if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
+							_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
+						endif
+					endWhile
+				endIf
 			endWhile
 		
 		elseif RN_MCM.PrepTransfer == 1
 			
-			RN_TokenFormlist_NoShipment.AddForm(PlayerRef)
-			
-			Int Index = RN_TokenFormlist_NoShipment.GetSize()
+			Int Index = RN_TokenFormlist.GetSize()
 			While Index
 				Index -= 1
-				ObjectReference _Container = RN_TokenFormlist_NoShipment.GetAt(Index) as ObjectReference		
+				ObjectReference _Container = RN_TokenFormlist.GetAt(Index) as ObjectReference		
 				Int Index2 = _Container.GetNumItems()
 				While Index2
 					Index2 -= 1
 					Form ItemRelic = _Container.GetNthForm(Index2)
-					if dbmMaster.HasForm(ItemRelic)
-						_Container.RemoveItem(ItemRelic, _Container.GetItemCount(ItemRelic), false, DBM_AutoSortDropOff)
+					if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
+						_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
 					endif
 				endWhile
 			endWhile
-			
-			RN_TokenFormlist_NoShipment.RemoveAddedForm(PlayerRef)
 		
 		elseif RN_MCM.PrepTransfer == 2
-			
-			RN_Storage_Container.RemoveAllItems(DBM_AutoSortDropOff, False, True)
+	
+			Int Index = RN_Storage_Container.GetNumItems()
+			While Index
+				Index -= 1
+				Form ItemRelic = RN_Storage_Container.GetNthForm(Index)
+				if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
+					RN_Storage_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
+				endif
+			endWhile
 		
 		endIf
 		

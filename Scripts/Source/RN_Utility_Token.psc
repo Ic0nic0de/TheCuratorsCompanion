@@ -12,6 +12,7 @@ message property TCC_TokenMax auto
 
 Formlist property RN_TokenFormlist auto
 Formlist property RN_TokenFormlist_NoShipment auto
+Formlist property RN_TokenFormlistExcluded auto
 
 ObjectReference property PlayerRef auto
 ObjectReference property RN_Storage_Container auto
@@ -33,7 +34,7 @@ ReferenceAlias property RN_Alias_Found auto
 					
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)
 	
-	if akOldContainer == PlayerRef && akNewContainer && !RN_TokenFormlist.HasForm(akNewContainer)
+	if akOldContainer == PlayerRef && akNewContainer && !RN_TokenFormlist.HasForm(akNewContainer) && !RN_TokenFormlistExcluded.HasForm(akNewContainer)
 	
 		if CustomContainer.GetValue() as Int == 6               
 			
@@ -79,7 +80,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 
 		endIf
 		
-	elseIf akOldContainer == PlayerRef && akNewContainer && RN_TokenFormlist.HasForm(akOldContainer)
+	elseIf akOldContainer == PlayerRef && akNewContainer && RN_TokenFormlist.HasForm(akOldContainer) && !RN_TokenFormlistExcluded.HasForm(akNewContainer)
 		
 		if akNewContainer != RN_Storage_Container
 		

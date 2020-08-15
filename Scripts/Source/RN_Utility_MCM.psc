@@ -3057,7 +3057,7 @@ endState
 String function SetPrepStationOptions()	
 
 	if PrepTransfer == 0
-		Status_Return = "All Custom Storage"
+		Status_Return = "Custom Storage"
 		
 	elseif PrepTransfer == 1
 		Status_Return = "Custom Storage & Player"
@@ -3075,7 +3075,7 @@ endFunction
 String function GetPrepStationOptions()
 	
 	if PrepTransfer == 0
-		Status_Return = "All Custom Storage"
+		Status_Return = "Custom Storage"
 		
 	elseif PrepTransfer == 1
 		Status_Return = "Custom Storage & Player"
