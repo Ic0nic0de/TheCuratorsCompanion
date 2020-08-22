@@ -340,6 +340,20 @@ Function Maintenance()
 	
 	RN_Debug_Access.SetValue(Utility.RandomInt(0, 250))
 	RN_Debug_Randomiser.SetValue(Utility.RandomInt(251, 500))
+
+	RN_Quest_Listener_Total.SetValue(0)
+	RN_Exploration_Listener_Total.SetValue(0)
+	
+	RN_Quest_Listener_Total.Mod(DBM_RN_QuestDisplays.GetSize())
+	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
+	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
+	
+	if (RN_Mod.XX_ForgottenL)
+		RN_Quest_Listener_Total.Mod(3) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood] [+1 The Forgotten City] 
+	else
+		RN_Quest_Listener_Total.Mod(2) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood]
+	endIf
+	
 	
 	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
 		if !bMoreHUDListsCreated

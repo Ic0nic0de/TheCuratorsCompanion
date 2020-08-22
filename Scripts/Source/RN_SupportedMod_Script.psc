@@ -90,12 +90,20 @@ endEvent
 Event onPlayerLoadGame()
 
 	RegisterForModEvent(_ModSetup, "_onModSetup")	
-	RegisterForModEvent(_ModScan, "_onModScan")	
+	RegisterForModEvent(_ModScan, "_onModScan")
+	
+	if _displayList_Merged
+		_displayTotal.SetValue(_displayList_Merged.GetSize())
+	else
+		_displayTotal.SetValue(_displaysArray[0].GetSize())
+	endIf
+	
+	_displayCount.SetValue(_displayList_Enabled.GetSize())	
 endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, automatic Call from (RN_Utility_Script)		
+Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)		
 	
 	if !_setupDone
 
@@ -158,7 +166,7 @@ endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event _onModScan(string eventName, string strArg, float numArg, Form sender) ;; automatic Call from (RN_Utility_Script)
+Event _onModScan(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 	
 	If MCM.DevDebugVal
 		Trace("_onModScan() Event Received for: " + _modName)
