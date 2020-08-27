@@ -25,7 +25,7 @@ formlist property RN_TokenFormlist auto
 
 formlist property dbmMaster auto
 formlist property dbmDisp auto
-formlist property RN_ExcludedItems_Custom auto
+
 formlist property RN_ExcludedItems_Generic auto
 
 Int OPButton
@@ -97,11 +97,10 @@ function Transfer()
 					While Index2
 						Index2 -= 1
 						Form ItemRelic = _Container.GetNthForm(Index2)
-						if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
-							if !RN_ExcludedItems_Custom.HasForm(ItemRelic) || !RN_ExcludedItems_Generic.HasForm(ItemRelic)
+						Bool Transferable = dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic)
+						if Transferable
 							_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
-							endIf
-						endif
+						endIf
 					endWhile
 				endIf
 			endWhile
@@ -116,11 +115,10 @@ function Transfer()
 				While Index2
 					Index2 -= 1
 					Form ItemRelic = _Container.GetNthForm(Index2)
-					if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
-						if !RN_ExcludedItems_Custom.HasForm(ItemRelic) || !RN_ExcludedItems_Generic.HasForm(ItemRelic)
+					Bool Transferable = dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic)
+					if Transferable
 						_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
-						endIf
-					endif
+					endIf
 				endWhile
 			endWhile
 		
@@ -130,11 +128,10 @@ function Transfer()
 			While Index
 				Index -= 1
 				Form ItemRelic = RN_Storage_Container.GetNthForm(Index)
-				if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
-					if !RN_ExcludedItems_Custom.HasForm(ItemRelic) || !RN_ExcludedItems_Generic.HasForm(ItemRelic)
-						RN_Storage_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
-					endIf
-				endif
+				Bool Transferable = dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic)
+				if Transferable
+					RN_Storage_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
+				endIf
 			endWhile
 		
 		endIf
