@@ -710,7 +710,7 @@ Event InitMCMStrings()
 
 	MCM_Strings = new string[28]
 	MCM_Strings[0] = "Developed By (Ic0n)Ic0de"
-	MCM_Strings[1] = "Version 1.1.2"
+	MCM_Strings[1] = "Version 1.1.3"
 	MCM_Strings[2] = "<font color='#750e0e'>Invalid Version</font>"
 	MCM_Strings[3] = "<font color='#750e0e'>Not Found</font>"
 	MCM_Strings[4] = "Complete"

@@ -15,6 +15,8 @@ GlobalVariable Property DBM_SortWait Auto
 
 ObjectReference Property RN_Storage_Container Auto
 
+Objectreference Property RN_Excluded_Act Auto
+
 ObjectReference Property DBM_AutoSortDropOff Auto
 
 ObjectReference Property PlayerRef auto
@@ -23,6 +25,8 @@ formlist property RN_TokenFormlist auto
 
 formlist property dbmMaster auto
 formlist property dbmDisp auto
+formlist property RN_ExcludedItems_Custom auto
+formlist property RN_ExcludedItems_Generic auto
 
 Int OPButton
 Int SCButton
@@ -94,7 +98,9 @@ function Transfer()
 						Index2 -= 1
 						Form ItemRelic = _Container.GetNthForm(Index2)
 						if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
+							if !RN_ExcludedItems_Custom.HasForm(ItemRelic) || !RN_ExcludedItems_Generic.HasForm(ItemRelic)
 							_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
+							endIf
 						endif
 					endWhile
 				endIf
@@ -111,7 +117,9 @@ function Transfer()
 					Index2 -= 1
 					Form ItemRelic = _Container.GetNthForm(Index2)
 					if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
+						if !RN_ExcludedItems_Custom.HasForm(ItemRelic) || !RN_ExcludedItems_Generic.HasForm(ItemRelic)
 						_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
+						endIf
 					endif
 				endWhile
 			endWhile
@@ -123,7 +131,9 @@ function Transfer()
 				Index -= 1
 				Form ItemRelic = RN_Storage_Container.GetNthForm(Index)
 				if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic)
-					RN_Storage_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
+					if !RN_ExcludedItems_Custom.HasForm(ItemRelic) || !RN_ExcludedItems_Generic.HasForm(ItemRelic)
+						RN_Storage_Container.RemoveItem(ItemRelic, 1, false, DBM_AutoSortDropOff)
+					endIf
 				endif
 			endWhile
 		
@@ -132,6 +142,10 @@ function Transfer()
 		TransferComplete.Show()
 		
 	elseif TRButton == 1
+		
+		RN_Excluded_Act.Activate(Game.GetPlayer())
+
+	elseif TRButton == 2
 	
 		OptionsMenu()
 		
