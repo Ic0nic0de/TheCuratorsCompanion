@@ -60,6 +60,7 @@ Bool Property XX_SkyUI Auto
 Bool Property XX_LAL Auto
 Bool Property XX_RelicHunterL Auto
 Bool Property XX_SkyrimSewers Auto
+Bool Property XX_3DNPC Auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -110,7 +111,7 @@ Event CheckSupportedMods()
 	XX_WyrmstoothL = Game.GetModByName("LOTD_TCC_Wyrmstooth.esp") != 255
 	XX_UndergroundL = Game.GetModByName("LOTD_TCC_Underground.esp") != 255
 	XX_UndergroundESPL = Game.GetModByName("LOTD_TCC_UndergroundESP.esp") != 255
-	
+	XX_3DNPC = Game.GetModByName("LOTD_TCC_3DNPC.esp") != 255
 	
 	XX_FissL = Game.GetModByName("Fiss.esp") != 255
 	XX_SkyUI = Game.GetModByName("SkyUI_SE.esp") != 255	

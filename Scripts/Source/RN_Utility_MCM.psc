@@ -412,6 +412,11 @@ globalvariable property DBM_MC_GV_ZTW auto
 globalvariable property GV_ZIA_Count auto
 globalvariable property GV_ZIA auto
 
+;; Globals for set completion - Mods - (3DNPC)
+globalvariable property DBM_MC_GV_3DNPC auto
+globalvariable property GV_3DNPC_Count auto
+globalvariable property GV_3DNPC auto
+
 ;; Globals for set completion - Museum
 globalvariable property DBM_GV_SectionDragonbornHall auto
 globalvariable property DBM_GV_SectionHallOfHeroes auto
@@ -1648,6 +1653,16 @@ Event AddCompletedModsPage()
 						AddTextOption("Immersive Weapons", self.GetCurrentCount(GV_IW_Count, GV_IW), 0)
 					endIf
 				endIf
+
+				if (RN_Mod.XX_3DNPC)			
+					if (DBM_MC_GV_3DNPC.GetValue()) == 1
+						AddTextOption("Interesting NPC's", MCM_Strings[4], 1)
+					else
+						AddTextOption("Interesting NPC's", self.GetCurrentCount(GV_3DNPC_Count, GV_3DNPC), 0)
+					endIf
+				endIf
+
+
 
 				if (RN_Mod.XX_JaysusL) || (RN_Mod.XX_JaysusCraftL)
 					if (DBM_MC_GV_Jaysus.GetValue()) == 1

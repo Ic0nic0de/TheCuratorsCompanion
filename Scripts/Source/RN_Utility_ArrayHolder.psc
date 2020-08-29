@@ -22,7 +22,7 @@ String[] Property _ModUpdate auto
 
 Event CreatePatchArray()
 
-	_bPatches = new bool[44]
+	_bPatches = new bool[45]
 	_bPatches[0] = RN_Mod.XX_AetheriumL
 	_bPatches[1] = RN_Mod.XX_AmuletsSkyrimL
 	_bPatches[2] = RN_Mod.XX_ArtifactsSkyrimL
@@ -67,4 +67,5 @@ Event CreatePatchArray()
 	_bPatches[41] = RN_Mod.XX_WintersunL
 	_bPatches[42] = RN_Mod.XX_WyrmstoothL
 	_bPatches[43] = RN_Mod.XX_ZimThaneL || RN_Mod.XX_ZimThaneOnlyL
+	_bPatches[44] = RN_Mod.XX_3DNPC
 endEvent

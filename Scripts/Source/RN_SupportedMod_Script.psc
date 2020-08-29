@@ -68,6 +68,7 @@ bool _setupDone = false
 
 ;;AddForm to quest display listener. 
 ObjectReference property _questDisplay auto
+ObjectReference[] property _questDisplayAlt auto
 
 ;;Shrine Display Properties
 Formlist property DBM_RN_ExplorationDisplays auto
@@ -148,6 +149,16 @@ Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;
 		if _questDisplay
 			DBM_RN_QuestDisplays.AddForm(_questDisplay)
 		endIf
+		
+		if _questDisplayAlt
+			Index = _questDisplayAlt.Length
+			while Index > 0
+				Index -= 1		
+				DBM_RN_QuestDisplays.AddForm(_questDisplayAlt[Index])
+			EndWhile
+		endIf
+
+
 						
 		RN_Setup_Done.Mod(1)
 		
