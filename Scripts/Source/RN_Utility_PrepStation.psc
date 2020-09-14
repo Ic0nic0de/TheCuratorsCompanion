@@ -66,13 +66,13 @@ function Scan()
 	
 	elseif SCButton == 1
 		RN_Utility.ScanMuseum()
-
-	elseif SCButton == 2
-		RN_Utility.ScanArmory()
 		
-	elseif SCButton == 3
+	elseif SCButton == 2
 		RN_Utility.ScanMods()
 
+	elseif SCButton == 3
+		RN_Utility.ScanCreations()
+		
 	elseif SCButton == 4
 		OptionsMenu()
 	endIf

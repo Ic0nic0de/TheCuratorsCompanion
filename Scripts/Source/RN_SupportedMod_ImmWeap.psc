@@ -81,6 +81,10 @@ formlist property DBM_SectionHOHImmersiveWeapons_Enabled auto
 formlist property DBM_SectionArmory_IW_Displays_Merged auto;; Total amount of available displays from merged Formlist.
 formlist property DBM_SectionArmory_IW_Displays_Enabled auto ;; Total amount of enabled Displays from merged formlist.
 
+formlist property DBM_SectionDaedricGallery_Merged auto
+formlist property DBM_SectionArmory_Displays_Merged auto
+formlist property DBM_SectionHOH_Merged auto
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties --------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -190,6 +194,9 @@ GlobalVariable Property iModComplete Auto
 GlobalVariable Property RN_Setup_Done Auto
 GlobalVariable Property RN_Scan_Done Auto
 
+globalvariable property RN_SupportedModCount auto
+Bool _setupDone
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -213,63 +220,101 @@ endEvent
 ;;-- Events ---------------------------------------	
 
 Event OnRunIWSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (DBM_RN_SetupScript)
+
+	if !_setupDone
 	
-	;;Merge Formlist.	
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsAncientNordicItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsBladesItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsDaedricItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsDawnguardItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsDragonItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsDwarvenItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsEbonyItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsElvenItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsFalmerItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsGlassItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsIronItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsOrcishItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsSteelItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsWolfItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionDaedricGalleryImmersiveWeaponsItems, Supported_Items_Merged, dbmNew, dbmMaster)
-	_onConsolidateItems(DBM_SectionHOHImmersiveWeaponsItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		If MCM.DevDebugVal
+			Trace("_onModSetup() Event Received for: Immersive Weapons")
+		endIf
+		
+		;;Merge Formlist.	
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsAncientNordicItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsBladesItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsDaedricItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsDawnguardItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsDragonItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsDwarvenItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsEbonyItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsElvenItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsFalmerItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsGlassItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsIronItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsOrcishItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsSteelItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsWolfItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionDaedricGalleryImmersiveWeaponsItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		_onConsolidateItems(DBM_SectionHOHImmersiveWeaponsItems, Supported_Items_Merged, dbmNew, dbmMaster)
+		
+		;;Generates a total available display count (used for Section / Set Completion along with the original Display Formlists)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsAncientNordic, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsBlades, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDaedric, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDawnguard, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDragon, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDwarven, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsEbony, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsElven, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsFalmer, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsGlass, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsIron, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsOrcish, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsSteel, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsWolf, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionDaedricGalleryImmersiveWeapons, DBM_SectionArmory_IW_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionHOHImmersiveWeapons, DBM_SectionArmory_IW_Displays_Merged)
+		
+		;;Consolidate into room lists
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsAncientNordic, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsBlades, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDaedric, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDawnguard, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDragon, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDwarven, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsEbony, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsElven, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsFalmer, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsGlass, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsIron, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsOrcish, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsSteel, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsWolf, DBM_SectionArmory_Displays_Merged)
+		_onConsolidateDisplays(DBM_SectionDaedricGalleryImmersiveWeapons, DBM_SectionDaedricGallery_Merged)
+		_onConsolidateDisplays(DBM_SectionHOHImmersiveWeapons, DBM_SectionHOH_Merged)
+
+
+		GV_DaedricGalleryImmersiveWeapons.SetValue(DBM_SectionDaedricGalleryImmersiveWeapons.GetSize())
+		GV_ImmersiveWeaponsAncientNordic.SetValue(DBM_SectionArmoryImmersiveWeaponsAncientNordic.GetSize())
+		GV_ImmersiveWeaponsBlades.SetValue(DBM_SectionArmoryImmersiveWeaponsBlades.GetSize())
+		GV_ImmersiveWeaponsDaedric.SetValue(DBM_SectionArmoryImmersiveWeaponsDaedric.GetSize())
+		GV_ImmersiveWeaponsDawnguard.SetValue(DBM_SectionArmoryImmersiveWeaponsDawnguard.GetSize())
+		GV_ImmersiveWeaponsDragon.SetValue(DBM_SectionArmoryImmersiveWeaponsDragon.GetSize())
+		GV_ImmersiveWeaponsDwarven.SetValue(DBM_SectionArmoryImmersiveWeaponsDwarven.GetSize())
+		GV_ImmersiveWeaponsEbony.SetValue(DBM_SectionArmoryImmersiveWeaponsEbony.GetSize())
+		GV_ImmersiveWeaponsElven.SetValue(DBM_SectionArmoryImmersiveWeaponsElven.GetSize())
+		GV_ImmersiveWeaponsFalmer.SetValue(DBM_SectionArmoryImmersiveWeaponsFalmer.GetSize())
+		GV_ImmersiveWeaponsGlass.SetValue(DBM_SectionArmoryImmersiveWeaponsGlass.GetSize())
+		GV_ImmersiveWeaponsIron.SetValue(DBM_SectionArmoryImmersiveWeaponsIron.GetSize())
+		GV_ImmersiveWeaponsOrcish.SetValue(DBM_SectionArmoryImmersiveWeaponsOrcish.GetSize())
+		GV_ImmersiveWeaponsSteel.SetValue(DBM_SectionArmoryImmersiveWeaponsSteel.GetSize())
+		GV_ImmersiveWeaponsWolf.SetValue(DBM_SectionArmoryImmersiveWeaponsWolf.GetSize())
+		GV_SectionHOHImmersiveWeapons.SetValue(DBM_SectionHOHImmersiveWeapons.GetSize())
+
+		GV_IW.SetValue(DBM_SectionArmory_IW_Displays_Merged.GetSize())
+
+		RN_Setup_Done.Mod(1)
+		RN_SupportedModCount.Mod(1)
+		_setupDone = True
+		
+		If MCM.DevDebugVal
+			Trace("_onModSetup() Event Completed for: Immersive Weapons")
+		endIf
+		
+	else
 	
-	;;Generates a total available display count (used for Section / Set Completion along with the original Display Formlists)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsAncientNordic, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsBlades, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDaedric, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDawnguard, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDragon, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsDwarven, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsEbony, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsElven, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsFalmer, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsGlass, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsIron, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsOrcish, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsSteel, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionArmoryImmersiveWeaponsWolf, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionDaedricGalleryImmersiveWeapons, DBM_SectionArmory_IW_Displays_Merged)
-	_onConsolidateDisplays(DBM_SectionHOHImmersiveWeapons, DBM_SectionArmory_IW_Displays_Merged)
-
-	GV_DaedricGalleryImmersiveWeapons.SetValue(DBM_SectionDaedricGalleryImmersiveWeapons.GetSize())
-	GV_ImmersiveWeaponsAncientNordic.SetValue(DBM_SectionArmoryImmersiveWeaponsAncientNordic.GetSize())
-	GV_ImmersiveWeaponsBlades.SetValue(DBM_SectionArmoryImmersiveWeaponsBlades.GetSize())
-	GV_ImmersiveWeaponsDaedric.SetValue(DBM_SectionArmoryImmersiveWeaponsDaedric.GetSize())
-	GV_ImmersiveWeaponsDawnguard.SetValue(DBM_SectionArmoryImmersiveWeaponsDawnguard.GetSize())
-	GV_ImmersiveWeaponsDragon.SetValue(DBM_SectionArmoryImmersiveWeaponsDragon.GetSize())
-	GV_ImmersiveWeaponsDwarven.SetValue(DBM_SectionArmoryImmersiveWeaponsDwarven.GetSize())
-	GV_ImmersiveWeaponsEbony.SetValue(DBM_SectionArmoryImmersiveWeaponsEbony.GetSize())
-	GV_ImmersiveWeaponsElven.SetValue(DBM_SectionArmoryImmersiveWeaponsElven.GetSize())
-	GV_ImmersiveWeaponsFalmer.SetValue(DBM_SectionArmoryImmersiveWeaponsFalmer.GetSize())
-	GV_ImmersiveWeaponsGlass.SetValue(DBM_SectionArmoryImmersiveWeaponsGlass.GetSize())
-	GV_ImmersiveWeaponsIron.SetValue(DBM_SectionArmoryImmersiveWeaponsIron.GetSize())
-	GV_ImmersiveWeaponsOrcish.SetValue(DBM_SectionArmoryImmersiveWeaponsOrcish.GetSize())
-	GV_ImmersiveWeaponsSteel.SetValue(DBM_SectionArmoryImmersiveWeaponsSteel.GetSize())
-	GV_ImmersiveWeaponsWolf.SetValue(DBM_SectionArmoryImmersiveWeaponsWolf.GetSize())
-	GV_SectionHOHImmersiveWeapons.SetValue(DBM_SectionHOHImmersiveWeapons.GetSize())
-
-	GV_IW.SetValue(DBM_SectionArmory_IW_Displays_Merged.GetSize())
-
-	RN_Setup_Done.Mod(1)
+		Trace("Setup already completed for: Immersive Weapons")	
+		RN_Setup_Done.Mod(1)
+	endIf
+	
 endEvent
 
 ;;-- Events ---------------------------------------	
@@ -284,7 +329,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsAncientNordic.GetValue()) == 0
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsAncientNordic, DBM_SectionArmoryImmersiveWeaponsAncientNordic_Enabled, GV_ImmersiveWeaponsAncientNordic_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsAncientNordic_Enabled, DBM_SectionArmoryImmersiveWeaponsAncientNordic, DBM_GV_ImmersiveWeaponsAncientNordic, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsAncientNordic_Count, GV_ImmersiveWeaponsAncientNordic, DBM_GV_ImmersiveWeaponsAncientNordic, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsAncientNordic_Notification.Show()
 				else
@@ -297,7 +342,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsBlades.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsBlades, DBM_SectionArmoryImmersiveWeaponsBlades_Enabled, GV_ImmersiveWeaponsBlades_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsBlades_Enabled, DBM_SectionArmoryImmersiveWeaponsBlades, DBM_GV_ImmersiveWeaponsBlades, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsBlades_Count, GV_ImmersiveWeaponsBlades, DBM_GV_ImmersiveWeaponsBlades, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsBlades_Notification.Show()
 				else
@@ -310,7 +355,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsDaedric.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsDaedric, DBM_SectionArmoryImmersiveWeaponsDaedric_Enabled, GV_ImmersiveWeaponsDaedric_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsDaedric_Enabled, DBM_SectionArmoryImmersiveWeaponsDaedric, DBM_GV_ImmersiveWeaponsDaedric, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsDaedric_Count, GV_ImmersiveWeaponsDaedric, DBM_GV_ImmersiveWeaponsDaedric, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsDaedric_Notification.Show()
 				else
@@ -323,7 +368,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsDawnguard.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsDawnguard, DBM_SectionArmoryImmersiveWeaponsDawnguard_Enabled, GV_ImmersiveWeaponsDawnguard_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsDawnguard_Enabled, DBM_SectionArmoryImmersiveWeaponsDawnguard, DBM_GV_ImmersiveWeaponsDawnguard, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsDawnguard_Count, GV_ImmersiveWeaponsDawnguard, DBM_GV_ImmersiveWeaponsDawnguard, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsDawnguard_Notification.Show()
 				else
@@ -336,7 +381,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsDragon.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsDragon, DBM_SectionArmoryImmersiveWeaponsDragon_Enabled, GV_ImmersiveWeaponsDragon_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsDragon_Enabled, DBM_SectionArmoryImmersiveWeaponsDragon, DBM_GV_ImmersiveWeaponsDragon, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsDragon_Count, GV_ImmersiveWeaponsDragon, DBM_GV_ImmersiveWeaponsDragon, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsDragon_Notification.Show()
 				else
@@ -349,7 +394,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsDwarven.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsDwarven, DBM_SectionArmoryImmersiveWeaponsDwarven_Enabled, GV_ImmersiveWeaponsDwarven_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsDwarven_Enabled, DBM_SectionArmoryImmersiveWeaponsDwarven, DBM_GV_ImmersiveWeaponsDwarven, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsDwarven_Count, GV_ImmersiveWeaponsDwarven, DBM_GV_ImmersiveWeaponsDwarven, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsDwarven_Notification.Show()
 				else
@@ -362,7 +407,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsEbony.GetValue()) == 0
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsEbony, DBM_SectionArmoryImmersiveWeaponsEbony_Enabled, GV_ImmersiveWeaponsEbony_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsEbony_Enabled, DBM_SectionArmoryImmersiveWeaponsEbony, DBM_GV_ImmersiveWeaponsEbony, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsEbony_Count, GV_ImmersiveWeaponsEbony, DBM_GV_ImmersiveWeaponsEbony, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsEbony_Notification.Show()
 				else
@@ -375,7 +420,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsElven.GetValue()) == 0
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsElven, DBM_SectionArmoryImmersiveWeaponsElven_Enabled, GV_ImmersiveWeaponsElven_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsElven_Enabled, DBM_SectionArmoryImmersiveWeaponsElven, DBM_GV_ImmersiveWeaponsElven, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsElven_Count, GV_ImmersiveWeaponsElven, DBM_GV_ImmersiveWeaponsElven, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsElven_Notification.Show()
 				else
@@ -388,7 +433,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsFalmer.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsFalmer, DBM_SectionArmoryImmersiveWeaponsFalmer_Enabled, GV_ImmersiveWeaponsFalmer_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsFalmer_Enabled, DBM_SectionArmoryImmersiveWeaponsFalmer, DBM_GV_ImmersiveWeaponsFalmer, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsFalmer_Count, GV_ImmersiveWeaponsFalmer, DBM_GV_ImmersiveWeaponsFalmer, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsFalmer_Notification.Show()
 				else
@@ -401,7 +446,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsGlass.GetValue()) == 0
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsGlass, DBM_SectionArmoryImmersiveWeaponsGlass_Enabled, GV_ImmersiveWeaponsGlass_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsGlass_Enabled, DBM_SectionArmoryImmersiveWeaponsGlass, DBM_GV_ImmersiveWeaponsGlass, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsGlass_Count, GV_ImmersiveWeaponsGlass, DBM_GV_ImmersiveWeaponsGlass, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsGlass_Notification.Show()
 				else
@@ -414,7 +459,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsIron.GetValue()) == 0
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsIron, DBM_SectionArmoryImmersiveWeaponsIron_Enabled, GV_ImmersiveWeaponsIron_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsIron_Enabled, DBM_SectionArmoryImmersiveWeaponsIron, DBM_GV_ImmersiveWeaponsIron, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsIron_Count, GV_ImmersiveWeaponsIron, DBM_GV_ImmersiveWeaponsIron, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsIron_Notification.Show()
 				else
@@ -427,7 +472,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsOrcish.GetValue()) == 0
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsOrcish, DBM_SectionArmoryImmersiveWeaponsOrcish_Enabled, GV_ImmersiveWeaponsOrcish_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsOrcish_Enabled, DBM_SectionArmoryImmersiveWeaponsOrcish, DBM_GV_ImmersiveWeaponsOrcish, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsOrcish_Count, GV_ImmersiveWeaponsOrcish, DBM_GV_ImmersiveWeaponsOrcish, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsOrcish_Notification.Show()
 				else
@@ -440,7 +485,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsSteel.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsSteel, DBM_SectionArmoryImmersiveWeaponsSteel_Enabled, GV_ImmersiveWeaponsSteel_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsSteel_Enabled, DBM_SectionArmoryImmersiveWeaponsSteel, DBM_GV_ImmersiveWeaponsSteel, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsSteel_Count, GV_ImmersiveWeaponsSteel, DBM_GV_ImmersiveWeaponsSteel, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsSteel_Notification.Show()
 				else
@@ -453,7 +498,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_ImmersiveWeaponsWolf.GetValue()) == 0
 		_onDisplayCheck(DBM_SectionArmoryImmersiveWeaponsWolf, DBM_SectionArmoryImmersiveWeaponsWolf_Enabled, GV_ImmersiveWeaponsWolf_Count)
-			if (CheckListSizes2(DBM_SectionArmoryImmersiveWeaponsWolf_Enabled, DBM_SectionArmoryImmersiveWeaponsWolf, DBM_GV_ImmersiveWeaponsWolf, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_ImmersiveWeaponsWolf_Count, GV_ImmersiveWeaponsWolf, DBM_GV_ImmersiveWeaponsWolf, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionArmoryImmersiveWeaponsWolf_Notification.Show()
 				else
@@ -466,7 +511,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_DaedricGalleryImmersiveWeapons.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionDaedricGalleryImmersiveWeapons, DBM_SectionDaedricGalleryImmersiveWeapons_Enabled, GV_DaedricGalleryImmersiveWeapons_Count)
-			if (CheckListSizes2(DBM_SectionDaedricGalleryImmersiveWeapons_Enabled, DBM_SectionDaedricGalleryImmersiveWeapons, DBM_GV_DaedricGalleryImmersiveWeapons, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_DaedricGalleryImmersiveWeapons_Count, GV_DaedricGalleryImmersiveWeapons, DBM_GV_DaedricGalleryImmersiveWeapons, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionDaedricGalleryImmersiveWeapons_Notification.Show()
 				else
@@ -479,7 +524,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 
 	if (DBM_GV_SectionHOHImmersiveWeapons.GetValue()) == 0	
 		_onDisplayCheck(DBM_SectionHOHImmersiveWeapons, DBM_SectionHOHImmersiveWeapons_Enabled, GV_SectionHOHImmersiveWeapons_Count)
-			if (CheckListSizes2(DBM_SectionHOHImmersiveWeapons_Enabled, DBM_SectionHOHImmersiveWeapons, DBM_GV_SectionHOHImmersiveWeapons, iImmWeapSets) && (MCM.ShowSetCompleteVal))
+			if (CheckSetCount1(GV_SectionHOHImmersiveWeapons_Count, GV_SectionHOHImmersiveWeapons, DBM_GV_SectionHOHImmersiveWeapons, iImmWeapSets) && (MCM.ShowSetCompleteVal))
 				if (MCM.ShowSimpleNotificationVal)
 					DBM_SectionHOHImmersiveWeapons_Notification.Show()
 				else
@@ -507,7 +552,7 @@ Event OnRunIWDisplayCheck(string eventName, string strArg, float numArg, Form se
 	_onDisplayCheck(DBM_SectionDaedricGalleryImmersiveWeapons, DBM_SectionArmory_IW_Displays_Enabled, GV_IW_Count)
 	_onDisplayCheck(DBM_SectionHOHImmersiveWeapons, DBM_SectionArmory_IW_Displays_Enabled, GV_IW_Count)
 	
-		if (CheckFormListSizes(DBM_SectionArmory_IW_Displays_Enabled, DBM_SectionArmory_IW_Displays_Merged, GetOwningQuest(), DBM_MC_GV_IW, iModComplete) && (MCM.ShowSetCompleteVal))
+		if (CheckValueCount1(GV_IW_Count, GV_IW, GetOwningQuest(), DBM_MC_GV_IW, iModComplete) && (MCM.ShowSetCompleteVal))
 			if (MCM.ShowSimpleNotificationVal)
 				DBM_IW_Complete_Notification.Show()
 			else

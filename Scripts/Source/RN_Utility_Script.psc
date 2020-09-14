@@ -1,5 +1,9 @@
 scriptname RN_Utility_Script extends quest
 
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------ Script Properties -------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 import AhzMoreHud
 import AhzMoreHudIE
 
@@ -38,6 +42,7 @@ message property ModConfigFinishedNoPatches auto
 message property SetupComplete auto
 message property ModStartup auto
 message property ModStartupDone auto
+message property ModStartup_UpdatingLists auto
 
 message property UserSettingsLoaded auto
 message property UserSettingsNone auto
@@ -47,10 +52,23 @@ bool bScanAll
 bool bUpdating
 bool bMoreHUDListsCreated
 bool bSetupStarted
+bool _OldShowStartup
 
+;;Treasury 
+miscobject property Gold001 auto
+
+;;Player Ref 
+objectreference property PlayerRef auto
+	
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;----------------------------------------------------------------------------- Formlist Properties ------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+;;Merged & Found Item list 1
 formlist property DBM_Section_DG_HOLE_HOO_NS_GH_HOS_Merged auto
 formlist property DBM_Section_DG_HOLE_HOO_NS_GH_HOS_Found auto
 
+;;Merged & Found Item list 2
 formlist property DBM_Section_HOH_LIB_Merged auto
 formlist property DBM_Section_HOH_LIB_Found auto
 
@@ -59,6 +77,7 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 
+;;Replica Formlists
 formlist property DBM_ReplicaBaseItems auto
 formlist property DBM_ReplicaItems auto
 
@@ -70,17 +89,12 @@ formlist property DBM_RN_ExplorationDisplays auto
 ;;Custom Storage
 formlist property RN_TokenFormlist auto
 
-;;Treasury 
-miscobject property Gold001 auto
-
-;;Player Ref 
-objectreference property PlayerRef auto
-
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;----------------------------------------------------------------------------- Global Variables ---------------------------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------ Global Variables --------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 globalvariable property RN_SupportedModCount auto
+globalvariable property RN_SupportedCreationCount auto
 
 globalvariable property RN_moreHUD_Option auto
 
@@ -102,6 +116,10 @@ globalvariable property RN_Debug_Randomiser auto
 
 globalvariable property RN_Quest_Listener_Total auto
 globalvariable property RN_Exploration_Listener_Total auto
+
+globalvariable property GV_SectionHallofHeroes auto
+globalvariable property GV_SectionDaedricGallery auto
+globalvariable property GV_SectionHOLE auto
 	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -111,8 +129,8 @@ globalvariable property RN_Exploration_Listener_Total auto
 		
 function OnInit()
 	
-	RN_Debug_Access.SetValue(RandomInt(0, 250))
-	RN_Debug_Randomiser.SetValue(RandomInt(251, 500))
+	RN_Debug_Access.setvalue(RandomInt(0, 250))
+	RN_Debug_Randomiser.setvalue(RandomInt(251, 500))
 	RN_TokenFormlist.AddForm(PlayerRef)
 	Wait(5.0)
 	RunSetup()
@@ -134,7 +152,7 @@ Event RunSetup()
 	else
 	
 		ModConfigStartup.Show() 
-		RN_Setup_Start.SetValue(1)	
+		RN_Setup_Start.setvalue(1)	
 	
 		bSetupStarted = True
 		DBM_SortWait.setvalue(1)
@@ -155,16 +173,25 @@ Event RunSetup()
 			if RN_Array._bPatches[_Index]
 				SendModEvent(RN_Array._Patches[_Index])
 				RN_Setup_Sent.Mod(1)
-				RN_SupportedModCount.Mod(1)
 			endIf
 			_Index +=1
 		endWhile
 
+		_Index = 0
+		_ArraySize = RN_Array._Creations.length
+		While _Index < _ArraySize	
+			if RN_Array._bCreations[_Index]
+				SendModEvent(RN_Array._Creations[_Index])
+				RN_Setup_Sent.Mod(1)
+			endIf
+			_Index +=1
+		endWhile
+		
 ;;------------------------------------	
 
 		while bSetupStarted		
 			if RN_Setup_Done.GetValue() == RN_Setup_Sent.GetValue() 
-			
+				
 				CreateMoreHudLists()	
 				InitGlobals()
 				FireScripts()
@@ -209,7 +236,7 @@ function CreateMoreHudLists()
 	endWhile
 				
 		
-	RN_MoreHud_Option.SetValue(1)	
+	RN_MoreHud_Option.setvalue(1)	
 	
 	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017	
 		AhzMoreHudIE.RegisterIconFormList("dbmNew", dbmNew)
@@ -264,7 +291,10 @@ endFunction
 ;;-- Events ---------------------------------------
 
 Event InitGlobals()
-
+	
+	RN_Quest_Listener_Total.setvalue(0)
+	RN_Exploration_Listener_Total.setvalue(0)
+	
 	RN_Quest_Listener_Total.Mod(DBM_RN_QuestDisplays.GetSize())
 	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
 	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
@@ -276,6 +306,7 @@ Event InitGlobals()
 	endIf
 	
 	UpdateCurrentInstanceGlobal(RN_SupportedModCount)
+	UpdateCurrentInstanceGlobal(RN_SupportedCreationCount)
 	
 	RN_Setup_Done.setvalue(0)
 	RN_Setup_Sent.setvalue(0)	
@@ -297,7 +328,9 @@ endEvent
 ;;-- Events ---------------------------------------
 
 Event FinishSetup()
-
+	
+	UpdateGlobalsforCC()
+	
 	Int _Menu = ModConfigProgress.Show() 
 	if _Menu == 0
 		UpdateAllFound()
@@ -316,7 +349,7 @@ Event FinishSetup()
 		UserSettingsNone.Show()
 	endIf
 	
-	if RN_SupportedModCount.GetValue() > 0 				
+	if RN_SupportedModCount.GetValue() > 0 || RN_SupportedCreationCount.GetValue() > 0 				
 		ModConfigFinished.Show()		;;Setup Finished - Ready to use.
 	else
 		ModConfigFinishedNoPatches.Show()
@@ -324,8 +357,80 @@ Event FinishSetup()
 	
 	RN_Setup_Start.setvalue(0)
 	RN_Setup_Finish.setvalue(1)
+	RegisterForSingleUpdate(30.0)
 endEvent
 
+;;-- Events ---------------------------------------
+
+Event UpdateGlobalsforCC()
+
+	Int _Index = 0
+	Int _Length = RN_Array._Armory_Global_Total.length
+	While _Index < _Length
+		if _Index == 11
+			RN_Array._Armory_Global_Total[_Index].SetValue(RN_Array._Armory_Formlist_Displays[_Index].GetSize() + 9)
+		else
+			RN_Array._Armory_Global_Total[_Index].SetValue(RN_Array._Armory_Formlist_Displays[_Index].GetSize())
+		endIf
+		_Index += 1
+	endWhile
+
+	 _Index = 0
+	 _Length = RN_Array._Museum_Global_Total.length
+	While _Index < _Length
+		if _Index == 0
+			RN_Array._Museum_Global_Total[_Index].SetValue(RN_Array._Museum_Formlist_Merged[_Index].GetSize() + 9)
+		else
+			RN_Array._Museum_Global_Total[_Index].SetValue(RN_Array._Museum_Formlist_Merged[_Index].GetSize())
+		endIf
+		_Index += 1
+	endWhile
+	
+	if RN_Mod.XX_Chrysamere ;;Chrysamere
+		GV_SectionHallofHeroes.Mod(-1)
+	endIf
+	
+	if RN_Mod.XX_DawnfangDuskfang ;;Dawnfang & Duskfang
+		GV_SectionHallofHeroes.Mod(-1)
+	endIf
+	
+	if RN_Mod.XX_DeadMansDread_Standalone ;;Dead Mans Dread
+		GV_SectionHallofHeroes.Mod(-1)
+	endIf
+
+	if RN_Mod.XX_DeadMansDread_Oblivion ;;Dead Mans Dread
+		GV_SectionHallofHeroes.Mod(-2)
+	endIf
+	
+	if RN_Mod.XX_DivineCrusader_Standalone || RN_Mod.XX_DivineCrusader_Individual ;;Divine Crusader
+		GV_SectionHallofHeroes.Mod(-7)
+	endif
+
+	if RN_Mod.XX_NetchLeatherArmor ;;Netch Leather Armor
+		GV_SectionHallofHeroes.Mod(-1)
+	endif
+
+	if RN_Mod.XX_SaintsL ;;Saints & Seducers
+		GV_SectionDaedricGallery.Mod(-1)
+	endif
+
+	if RN_Mod.XX_Shadowrend_Boethiah ;;Shadowrend
+		GV_SectionDaedricGallery.Mod(-1)
+	endif	
+	
+	if RN_Mod.XX_StaffofHasedoki ;;Staff of Hasedoki
+		GV_SectionHallofHeroes.Mod(-1)
+	endif	
+	
+	if RN_Mod.XX_StendarrsHammer ;;Stendarrs Hammer
+		GV_SectionHallofHeroes.Mod(-1)
+	endif
+	
+	if RN_Mod.XX_SunderWraithguard ;;Sunder & Wraithguard
+		GV_SectionHOLE.Mod(-2)
+	endif
+endEvent	
+	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Load Game Funcions ------------------------------------------------------------------------------------------------
@@ -338,11 +443,64 @@ Function Maintenance()
 		ModStartup.Show()
 	endIf
 	
-	RN_Debug_Access.SetValue(Utility.RandomInt(0, 250))
-	RN_Debug_Randomiser.SetValue(Utility.RandomInt(251, 500))
+	RN_Debug_Access.setvalue(Utility.RandomInt(0, 250))
+	RN_Debug_Randomiser.setvalue(Utility.RandomInt(251, 500))
 
-	RN_Quest_Listener_Total.SetValue(0)
-	RN_Exploration_Listener_Total.SetValue(0)
+;;--------------
+	RN_Setup_Finish.setvalue(0)
+	RN_Setup_Start.setvalue(1)	
+
+	bSetupStarted = True
+	DBM_SortWait.setvalue(1)
+	RN_Mod.CheckSupportedMods()
+	RN_Array.CreatePatchArray()
+	
+	Int _OldPatchCount = RN_SupportedModCount.GetValue() as Int
+	Int _OldCreationCount = RN_SupportedCreationCount.GetValue() as Int
+	
+	Int _Index = 0
+	Int _ArraySize = RN_Array._Patches.length
+	While _Index < _ArraySize	
+		if RN_Array._bPatches[_Index]
+			SendModEvent(RN_Array._Patches[_Index])
+			RN_Setup_Sent.Mod(1)
+		endIf
+		_Index +=1
+	endWhile
+
+	_Index = 0
+	_ArraySize = RN_Array._Creations.length
+	While _Index < _ArraySize	
+		if RN_Array._bCreations[_Index]
+			SendModEvent(RN_Array._Creations[_Index])
+			RN_Setup_Sent.Mod(1)
+		endIf
+		_Index +=1
+	endWhile
+
+	while bSetupStarted		
+		if RN_Setup_Done.GetValue() == RN_Setup_Sent.GetValue() 
+			
+			if RN_SupportedModCount.GetValue() > _OldCreationCount ||  RN_SupportedCreationCount.GetValue() > _OldCreationCount
+				
+				_OldShowStartup = RN_MCM.ShowStartup
+				
+				RN_MCM.ShowStartup = true
+				ModStartup_UpdatingLists.Show()
+				CreateMoreHudLists()
+				UpdateAllFound()
+			endIf
+	
+			InitGlobals()
+			bSetupStarted = False
+			RN_Setup_Start.setvalue(0)
+			RN_Setup_Finish.setvalue(1)
+			
+		endIf
+	endWhile	
+		
+	RN_Quest_Listener_Total.setvalue(0)
+	RN_Exploration_Listener_Total.setvalue(0)
 	
 	RN_Quest_Listener_Total.Mod(DBM_RN_QuestDisplays.GetSize())
 	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
@@ -354,6 +512,7 @@ Function Maintenance()
 		RN_Quest_Listener_Total.Mod(2) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood]
 	endIf
 	
+	UpdateGlobalsforCC()
 	
 	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
 		if !bMoreHUDListsCreated
@@ -387,8 +546,6 @@ Function Maintenance()
 				
 		endIf
 	endIf	
-
-
 
 	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
 		if !bMoreHUDListsCreated
@@ -425,6 +582,7 @@ Function Maintenance()
 	
 	if RN_MCM.ShowStartup
 		ModStartupDone.Show()
+		RN_MCM.ShowStartup = _OldShowStartup
 	endIf
 	
 endFunction
@@ -438,12 +596,14 @@ endFunction
 function ScanAll()
 	
 	bScanAll = True
-	DBM_SortWait.SetValue(1)
+	DBM_SortWait.setvalue(1)
 	DBM_ScanMuseum_Message.Show()
-	SendModEvent("RunMuseumCheck")
-	SendModEvent("RunArmoryCheck")
-	RN_Scan_Sent.Mod(2)
-	ScanMods()						
+	ScanMuseum()
+	ScanMods()
+	if RN_SupportedCreationCount.GetValue() > 0
+		ScanCreations()
+	endIf
+	FinishScan()
 endFunction
 
 ;;-- Functions ---------------------------------------
@@ -451,44 +611,27 @@ endFunction
 function ScanMuseum()
 			
 	bScanning = True	
-	DBM_SortWait.SetValue(1)
-	DBM_ScanMuseum_Message.Show()
-	SendModEvent("RunMuseumCheck")
-	RN_Scan_Sent.Mod(1)
-	
-	while bScanning	
-		if RN_Scan_Done.GetValue() == RN_Scan_Sent.GetValue()			
-			bScanning = False
-			
-			RN_Scan_Done.SetValue(0)
-			RN_Scan_Sent.SetValue(0)
-			DBM_SortWait.SetValue(0)
-			DBM_ScanMuseum_Finished_Message.Show()		
-		endIf		
-	endWhile	
-endFunction
+	DBM_SortWait.setvalue(1)
 
-;;-- Functions ---------------------------------------
+	if !bScanAll		
+		DBM_ScanMuseum_Message.Show()		
+	endIf
+	
+	Int _Index = 0
+	Int _Length = RN_Array._Museum_Scan_EventNames.length
+	While _Index < _Length
+		SendModEvent(RN_Array._Museum_Scan_EventNames[_Index])
+		RN_Scan_Sent.Mod(1)
+		_Index += 1
 		
-function ScanArmory()
+		if _Index == 9 && !RN_SupportedCreationCount.GetValue() || _Index == 12 && RN_Mod.XX_SafehouseL == false
+			_Index += 1
+		endIf	
+	endWhile
 	
-	bScanning = True
-	DBM_SortWait.SetValue(1)
-	DBM_ScanMuseum_Message.Show()
-	SendModEvent("RunArmoryCheck")
-	RN_Scan_Sent.Mod(1)
-
-
-	while bScanning	
-		if RN_Scan_Done.GetValue() == RN_Scan_Sent.GetValue()			
-			bScanning = False
-			
-			RN_Scan_Done.SetValue(0)
-			RN_Scan_Sent.SetValue(0)
-			DBM_SortWait.SetValue(0)
-			DBM_ScanMuseum_Finished_Message.Show()		
-		endIf		
-	endWhile		
+	if !bScanAll	
+		FinishScan()
+	endIf	
 endFunction
 
 ;;-- Functions ---------------------------------------
@@ -496,7 +639,7 @@ endFunction
 function ScanMods()
 	
 	bScanning = True
-	DBM_SortWait.SetValue(1)
+	DBM_SortWait.setvalue(1)
 	
 	if !bScanAll		
 		DBM_ScanMuseum_Message.Show()		
@@ -512,19 +655,52 @@ function ScanMods()
 			_Index +=1
 		endWhile
 		
-;;------------------------------------
+	if !bScanAll	
+		FinishScan()
+	endIf		
+endFunction
+
+;;-- Functions ---------------------------------------
+		
+function ScanCreations()
+	
+	bScanning = True
+	DBM_SortWait.setvalue(1)
+	
+	if !bScanAll		
+		DBM_ScanMuseum_Message.Show()		
+	endIf
+
+	Int _Index = 0
+	Int _ArraySize = RN_Array._CreationScan.length
+		While _Index < _ArraySize	
+			if RN_Array._bCreations[_Index] && RN_Array._GVCreationComplete[_Index].GetValue() == 0
+				SendModEvent(RN_Array._CreationScan[_Index])
+				RN_Scan_Sent.Mod(1)
+			endIf
+			_Index +=1
+		endWhile
+		
+	if !bScanAll	
+		FinishScan()
+	endIf
+endFunction
+
+;;-- Functions ---------------------------------------
+
+function FinishScan()
 
 	while bScanning	
 		if RN_Scan_Done.GetValue() == RN_Scan_Sent.GetValue()			
 			bScanning = False
 			bScanAll = False
 			
-			RN_Scan_Done.SetValue(0)
-			RN_Scan_Sent.SetValue(0)
-			DBM_SortWait.SetValue(0)
+			RN_Scan_Done.setvalue(0)
+			RN_Scan_Sent.setvalue(0)
+			DBM_SortWait.setvalue(0)
 			DBM_ScanMuseum_Finished_Message.Show()		
 		endIf		
-	endWhile		
+	endWhile
 endFunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -536,7 +712,7 @@ endFunction
 function UpdateAllFound()
 		
 	bUpdating = True
-	DBM_SortWait.SetValue(1)
+	DBM_SortWait.setvalue(1)
 	
 	Int _Index = 0
 	Int _ArraySize = RN_Array._ModUpdate.length
@@ -551,9 +727,9 @@ function UpdateAllFound()
 	while bUpdating	
 		if RN_Found_Done.GetValue() == RN_Found_Sent.GetValue()		
 			bUpdating = False
-			DBM_SortWait.SetValue(0)
-			RN_Found_Done.SetValue(0)
-			RN_Found_Sent.SetValue(0)
+			DBM_SortWait.setvalue(0)
+			RN_Found_Done.setvalue(0)
+			RN_Found_Sent.setvalue(0)
 		endIf		
 	endWhile
 endFunction		
@@ -562,7 +738,7 @@ endFunction
 
 Function UpdateTreasuryValue(ObjectReference _akContainer, GlobalVariable _akVariable)
 	
-	_akVariable.SetValue(0)
+	_akVariable.setvalue(0)
 	
 	Int _Index = _akContainer.GetNumItems()
 	
@@ -578,7 +754,7 @@ Function UpdateTreasuryValue(ObjectReference _akContainer, GlobalVariable _akVar
 	
 	_akVariable.Mod(_akContainer.GetItemCount(Gold001))	
 endFunction
-
+				
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ End of Script -----------------------------------------------------------------------------------------------------

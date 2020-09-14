@@ -61,6 +61,59 @@ Bool Property XX_LAL Auto
 Bool Property XX_RelicHunterL Auto
 Bool Property XX_SkyrimSewers Auto
 Bool Property XX_3DNPC Auto
+Bool Property XX_SaintsL Auto
+Bool Property XX_RareCuriosL Auto
+Bool Property XX_EliteCross Auto
+Bool Property XX_EliteCrossBolt Auto
+Bool Property XX_ExpandedCross Auto
+Bool Property XX_ExpandedCrossBolt Auto
+Bool Property XX_Camping Auto
+Bool Property XX_AADwarvenMail Auto
+Bool Property XX_AADaedricMail Auto
+Bool Property XX_AADragonscale Auto
+Bool Property XX_AAEbonyPlate Auto
+Bool Property XX_AAElvenHunter Auto
+Bool Property XX_AAStalhrimFur Auto
+Bool Property XX_AASteelSoldier Auto
+Bool Property XX_ArcaneAccessories Auto
+Bool Property XX_ArcaneArcher Auto
+Bool Property XX_BoneWolf Auto
+Bool Property XX_Plague Auto
+Bool Property XX_Seasons Auto
+Bool Property XX_Goblins Auto
+Bool Property XX_Backpack Auto
+Bool Property XX_Pets Auto
+Bool Property XX_Holiday Auto
+Bool Property XX_Horses Auto
+Bool Property XX_ArmsofChaos Auto
+Bool Property XX_Chrysamere Auto
+Bool Property XX_NetchLeatherArmor Auto
+Bool Property XX_NordicJewelry Auto
+Bool Property XX_SpellKnightArmor Auto
+Bool Property XX_StaffofHasedoki Auto
+Bool Property XX_StendarrsHammer Auto
+Bool Property XX_Umbra Auto
+Bool Property XX_VigilEnforcerArmorSet Auto
+Bool Property XX_DawnfangDuskfang Auto
+Bool Property XX_CivilWarChampions_Standalone Auto
+Bool Property XX_CivilWarChampions_Individual Auto
+Bool Property XX_DeadMansDread_Standalone Auto
+Bool Property XX_DeadMansDread_Oblivion Auto	
+Bool Property XX_DivineCrusader_Standalone Auto
+Bool Property XX_DivineCrusader_Individual Auto	
+Bool Property XX_Shadowrend_Standalone Auto
+Bool Property XX_Shadowrend_Boethiah Auto
+Bool Property XX_RuinsEdgeCC Auto
+Bool Property XX_StaffofSheoCC_Standalone Auto
+Bool Property XX_StaffofSheoCC_Cheese Auto
+Bool Property XX_StaffofSheoCC_UCCCP Auto
+Bool Property XX_TheGrayCowlReturns Auto
+Bool Property XX_SunderWraithguard Auto
+Bool Property XX_DwarvenMudcrab Auto
+Bool Property XX_NixHound Auto
+Bool Property XX_AnimArm Auto
+
+Bool Property XX_SafehouseL Auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -128,5 +181,59 @@ Event CheckSupportedMods()
 	XX_JaysusCraftL = Game.GetModByName("LOTD_TCC_JaysusCraft.esp") != 255				
 	XX_ZimThaneL = Game.GetModByName("LOTD_TCC_ZimThane.esp") != 255
 	XX_ZimThaneOnlyL = Game.GetModByName("LOTD_TCC_ZimThaneOnly.esp") != 255
+	
+	;Creations
+	XX_SaintsL = Game.GetModByName("LOTD_TCC_Saints.esp") != 255
+	XX_RareCuriosL = Game.GetModByName("LOTD_TCC_RareCurios.esp") != 255	
+	XX_EliteCross = Game.GetModByName("LOTD_TCC_EliteCross.esp") != 255
+	XX_EliteCrossBolt = Game.GetModByName("LOTD_TCC_EliteCrossBolt.esp") != 255	
+	XX_ExpandedCross = Game.GetModByName("LOTD_TCC_ExpandedCross.esp") != 255
+	XX_ExpandedCrossBolt = Game.GetModByName("LOTD_TCC_ExpandedCrossBolt.esp") != 255
+	XX_Camping = Game.GetModByName("LOTD_TCC_Camping.esp") != 255
+	XX_AADwarvenMail = Game.GetModByName("LOTD_TCC_AADwarvenMail.esp") != 255
+	XX_AADaedricMail = Game.GetModByName("LOTD_TCC_AADaedricMail.esp") != 255
+	XX_AADragonscale = Game.GetModByName("LOTD_TCC_AADragonscale.esp") != 255
+	XX_AAEbonyPlate = Game.GetModByName("LOTD_TCC_AAEbonyPlate.esp") != 255
+	XX_AAElvenHunter = Game.GetModByName("LOTD_TCC_AAElvenHunter.esp") != 255
+	XX_AAStalhrimFur = Game.GetModByName("LOTD_TCC_AAStalhrimFur.esp") != 255
+	XX_AASteelSoldier = Game.GetModByName("LOTD_TCC_AASteelSoldier.esp") != 255
+	XX_ArcaneAccessories = Game.GetModByName("LOTD_TCC_ArcaneAccessories.esp") != 255
+	XX_ArcaneArcher = Game.GetModByName("LOTD_TCC_ArcaneArcher.esp") != 255
+	XX_BoneWolf = Game.GetModByName("LOTD_TCC_BoneWolf.esp") != 255
+	XX_Plague = Game.GetModByName("LOTD_TCC_Plague.esp") != 255
+	XX_Seasons = Game.GetModByName("LOTD_TCC_Seasons.esp") != 255
+	XX_Goblins = Game.GetModByName("LOTD_TCC_Goblins.esp") != 255
+	XX_Backpack = Game.GetModByName("LOTD_TCC_Backpack.esp") != 255
+	XX_Pets = Game.GetModByName("LOTD_TCC_Pets.esp") != 255
+	XX_Holiday = Game.GetModByName("LOTD_TCC_Holiday.esp") != 255
+	XX_Horses = Game.GetModByName("LOTD_TCC_Horses.esp") != 255
+	XX_ArmsofChaos = Game.GetModByName("LOTD_TCC_ArmsofChaos.esp") != 255
+	XX_Chrysamere = Game.GetModByName("LOTD_TCC_Chrysamere.esp") != 255
+	XX_NetchLeatherArmor = Game.GetModByName("LOTD_TCC_NetchLeatherArmor.esp") != 255
+	XX_NordicJewelry = Game.GetModByName("LOTD_TCC_NordicJewelry.esp") != 255
+	XX_SpellKnightArmor = Game.GetModByName("LOTD_TCC_SpellKnightArmor.esp") != 255
+	XX_StaffofHasedoki = Game.GetModByName("LOTD_TCC_StaffofHasedoki.esp") != 255
+	XX_StendarrsHammer = Game.GetModByName("LOTD_TCC_StendarrsHammer.esp") != 255
+	XX_Umbra = Game.GetModByName("LOTD_TCC_Umbra.esp") != 255
+	XX_VigilEnforcerArmorSet = Game.GetModByName("LOTD_TCC_VigilEnforcerArmorSet.esp") != 255
+	XX_DawnfangDuskfang = Game.GetModByName("LOTD_TCC_DawnfangDuskfang.esp") != 255	
+	XX_CivilWarChampions_Standalone = Game.GetModByName("LOTD_TCC_CivilWarChampions_Standalone.esp") != 255
+	XX_CivilWarChampions_Individual = Game.GetModByName("LOTD_TCC_CivilWarChampions_Individual.esp") != 255
+	XX_DeadMansDread_Standalone = Game.GetModByName("LOTD_TCC_DeadMansDread_Standalone.esp") != 255
+	XX_DeadMansDread_Oblivion = Game.GetModByName("LOTD_TCC_DeadMansDread_Oblivion.esp") != 255
+	XX_DivineCrusader_Standalone = Game.GetModByName("LOTD_TCC_DivineCrusader_Standalone.esp") != 255
+	XX_DivineCrusader_Individual = Game.GetModByName("LOTD_TCC_DivineCrusader_Individual.esp") != 255
+	XX_Shadowrend_Standalone = Game.GetModByName("LOTD_TCC_Shadowrend_Standalone.esp") != 255
+	XX_Shadowrend_Boethiah = Game.GetModByName("LOTD_TCC_Shadowrend_Boethiah.esp") != 255
+	XX_RuinsEdgeCC = Game.GetModByName("LOTD_TCC_RuinsEdgeCC.esp") != 255
+	XX_StaffofSheoCC_Standalone = Game.GetModByName("LOTD_TCC_StaffofSheoCC_Standalone.esp") != 255
+	XX_StaffofSheoCC_Cheese = Game.GetModByName("LOTD_TCC_StaffofSheoCC_Cheese.esp") != 255
+	XX_StaffofSheoCC_UCCCP = Game.GetModByName("LOTD_TCC_StaffofSheoCC_UCCCP.esp") != 255
+	XX_TheGrayCowlReturns = Game.GetModByName("LOTD_TCC_TheGrayCowlReturns.esp") != 255
+	XX_SunderWraithguard = Game.GetModByName("LOTD_TCC_SunderWraithguard.esp") != 255
+	XX_DwarvenMudcrab = Game.GetModByName("LOTD_TCC_DwarvenMudcrab.esp") != 255
+	XX_NixHound = Game.GetModByName("LOTD_TCC_NixHound.esp") != 255
+	XX_AnimArm = Game.GetModByName("LOTD_TCC_AnimatedArmory.esp") != 255
+	XX_SafehouseL = XX_CloaksL || XX_SoapsL || XX_SoapsKICL
 	
 EndEvent

@@ -13,36 +13,34 @@ RN_Utility_Mods property RN_Mod auto
 
 RN_Storage_Transfer property RN_Transfer auto
 
-RN_Utility_QuestTracker property RN_Tracker auto
+RN_Utility_QuestTracker_MCM property RN_Tracker auto
 
 DBM_ReplicaHandler property ReplicaHandler auto
 
 RN_Utility_ArrayHolder property RN_Array auto
 
+RN_Utility_QuestTracker_Arrays property RN_Tracker_Array auto
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties -------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-;; string Returns
-
+;; String Returns
 string[] MCM_Strings
 string[] PagesList
 string InputBox = "Enter Password"
 string Status_Return
-
-Perk property DBM_ArcPerkRelicHunter auto
 
 ;; Scan Variables
 bool bScanning = false
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Sent auto
 
-message property DBM_ScanMuseum_Message auto
-message property DBM_ScanMuseum_Finished_Message auto
-
 ;; Debug Variables
 int inputOID_I
 message property moreHUDListRebuilt auto
+globalvariable property RN_Debug_Access auto
+globalvariable property RN_Debug_Randomiser auto
 
 ;; Player Ref for Game.GetPlayer()
 objectreference property PlayerRef auto
@@ -64,8 +62,8 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
-
 formlist property RN_TokenFormlist_NoShipment auto
+globalvariable property RN_moreHUD_Option auto
 
 ;; Formlists to control merged and found lists
 formlist property Supported_Items_Merged auto
@@ -146,34 +144,27 @@ bool PrepStationTransfer = false
 bool property ReplicaTag auto hidden
 bool ReplicaTagging = false
 
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;----------------------------------------------------------------------------- Global Variables ---------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 ;; Globals for Complete Set Listings.
 globalvariable property iMuseumSets auto
 globalvariable property iArmorySets auto
 globalvariable property iImmWeapSets auto
 globalvariable property iHeavyArmSets auto
 globalvariable property iModComplete auto
+globalvariable property iCreationComplete auto
 globalvariable property iDisplaySectionComplete auto
 globalvariable property RN_SupportedModCount auto
+globalvariable property RN_SupportedCreationCount auto
 
 ;; General Globals
+globalvariable property DBM_ArcSkill auto
+globalvariable property DBM_SortWait auto
+globalvariable property RN_Setup_Start auto
 
+;; Treasury Globals
 globalvariable property RN_Total_Value auto
 globalvariable property RN_Treasury_Count auto
 globalvariable property RN_Treasury_Count2 auto
 globalvariable property RN_Treasury_Count3 auto
-
-globalvariable property RN_moreHUD_Option auto
-
-globalvariable property DBM_SortWait auto
-
-globalvariable property RN_Setup_Start auto
-
-globalvariable property RN_Debug_Access auto
-globalvariable property RN_Debug_Randomiser auto
 
 ;;Globals for Display Listener
 globalvariable property RN_Quest_Listener_Total auto
@@ -192,450 +183,6 @@ globalvariable property RN_Skills_Listener_Total auto
 globalvariable property RN_Skills_Listener_Count auto
 globalvariable property RN_Skills_Listener_Complete auto
 
-;; Globals for set completion - Mods - (Aetherium)
-globalvariable property DBM_MC_GV_Aetherium auto
-globalvariable property GV_SectionHOLEAetherium_Count auto
-globalvariable property GV_SectionHOLEAetherium auto
-
-;; Globals for set completion - Mods - (Amulets)
-globalvariable property DBM_MC_GV_Amulets auto
-globalvariable property GV_AmuletsDisplay_Count auto
-globalvariable property GV_AmuletsDisplay auto
-
-;; Globals for set completion - Mods - (Artifacts)
-globalvariable property DBM_MC_GV_AOS auto
-globalvariable property GV_Artifacts_Skyrim_Count auto
-globalvariable property GV_Artifacts_Skyrim auto
-
-;; Globals for set completion - Mods - (Bad Gremlins)
-globalvariable property DBM_MC_GV_BG auto
-globalvariable property GV_BadGremlin_Count auto
-globalvariable property GV_BadGremlin auto
-
-;; Globals for set completion - Mods - (Boethiah)
-globalvariable property DBM_MC_GV_Boethiah auto
-globalvariable property GV_AOB_Count auto
-globalvariable property GV_AOB auto
-
-;; Globals for set completion - Mods - (Cloaks)
-globalvariable property DBM_MC_GV_Cloaks auto
-globalvariable property GV_Cloaks_Count auto
-globalvariable property GV_Cloaks auto
-
-;; Globals for set completion - Mods - (Clockwork)
-globalvariable property DBM_MC_GV_Clockwork auto
-globalvariable property GV_Clockwork_Count auto
-globalvariable property GV_Clockwork auto
-
-;; Globals for set completion - Mods - (Dawnguard Arsenal)
-globalvariable property DBM_MC_GV_DA auto
-globalvariable property GV_DGA_Count auto
-globalvariable property GV_DGA auto
-
-;; Globals for set completion - Mods - (Falskaar)
-globalvariable property DBM_MC_GV_Falskaar auto
-globalvariable property GV_Falskaar_Count auto
-globalvariable property GV_Falskaar auto
-
-;; Globals for set completion - Mods - (Fossils)
-globalvariable property DBM_MC_GV_Fossils auto
-globalvariable property GV_Fossils_Count auto
-globalvariable property GV_Fossils auto
-
-;; Globals for set completion - Mods - (Gray Cowl)
-globalvariable property DBM_MC_GV_GrayCowl auto
-globalvariable property GV_GCON_Count auto
-globalvariable property GV_GCON auto
-
-;; Globals for set completion - Mods - (Guard Armor Replacer)
-globalvariable property DBM_MC_GV_GAR auto
-globalvariable property GV_GAR_Count auto
-globalvariable property GV_GAR auto
-
-;; Globals for set completion - Mods - (Heavy Armory)
-globalvariable property DBM_MC_GV_HA auto
-globalvariable property GV_Heavy_Count auto
-globalvariable property GV_Heavy auto
-
-;; Globals for set completion - Mods - (Helgen Reborn)
-globalvariable property DBM_MC_GV_Helgen auto
-globalvariable property GV_Helgen_Count auto
-globalvariable property GV_Helgen auto
-
-;; Globals for set completion - Mods - (IceBlade)
-globalvariable property DBM_MC_GV_IceBlade auto
-globalvariable property GV_IBOM_Count auto
-globalvariable property GV_IBOM auto
-
-;; Globals for set completion - Mods - (ICOW)
-globalvariable property DBM_MC_GV_ICOW auto
-globalvariable property GV_ICOW_Count auto
-globalvariable property GV_ICOW auto
-
-;; Globals for set completion - Mods - (Immersive Armors)
-globalvariable property DBM_MC_GV_IA auto
-globalvariable property GV_IA_Count auto
-globalvariable property GV_IA auto
-
-;; Globals for set completion - Mods - (Immersive Weapons)
-globalvariable property DBM_MC_GV_IW auto
-globalvariable property GV_IW_Count auto
-globalvariable property GV_IW auto
-
-;; Globals for set completion - Mods - (jaysus)
-globalvariable property DBM_MC_GV_Jaysus auto
-globalvariable property GV_Jaysus_Count auto
-globalvariable property GV_Jaysus auto
-
-;; Globals for set completion - Mods - (KA)
-globalvariable property DBM_MC_GV_KA auto
-globalvariable property GV_KA_Count auto
-globalvariable property GV_KA auto
-
-;; Globals for set completion - Mods - (TOK)
-globalvariable property DBM_MC_GV_TOK auto
-globalvariable property GV_Kagrenac_Count auto
-globalvariable property GV_Kagrenac auto
-
-;; Globals for set completion - Mods - (Kthonia)
-globalvariable property DBM_MC_GV_KW auto
-globalvariable property GV_Kthonia_Count auto
-globalvariable property GV_Kthonia auto
-
-;; Globals for set completion - Mods - (Moonpath)
-globalvariable property DBM_MC_GV_Moonpath auto
-globalvariable property GV_MoonPath_Count auto
-globalvariable property GV_MoonPath auto
-
-;; Globals for set completion - Mods - (MoonStar)
-globalvariable property DBM_MC_GV_MoonStar auto
-globalvariable property GV_MoonStar_Count auto
-globalvariable property GV_MoonStar auto
-
-;; Globals for set completion - Mods - (NTHunter)
-globalvariable property DBM_MC_GV_NTH auto
-globalvariable property GV_NTHunter_Count auto
-globalvariable property GV_NTHunter auto
-
-;; Globals for set completion - Mods - (OAP)
-globalvariable property DBM_MC_GV_OA auto
-globalvariable property GV_OA_Count auto
-globalvariable property GV_OA auto
-
-;; Globals for set completion - Mods - (PathRev)
-globalvariable property DBM_MC_GV_PathRev auto
-globalvariable property GV_PathRev_Count auto
-globalvariable property GV_PathRev auto
-
-;; Globals for set completion - Mods - (P-AHO)
-globalvariable property DBM_MC_GV_PAHO auto
-globalvariable property GV_AHO_Count auto
-globalvariable property GV_AHO auto
-
-;; Globals for set completion - Mods - (Royal Armory)
-globalvariable property DBM_MC_GV_RA auto
-globalvariable property GV_Royal_Count auto
-globalvariable property GV_Royal auto
-
-;; Globals for set completion - Mods - (Ruins Edge)
-globalvariable property DBM_MC_GV_Ruins auto
-globalvariable property GV_Ruins_Count auto
-globalvariable property GV_Ruins auto
-
-;; Globals for set completion - Mods - (Sheo Staff)
-globalvariable property DBM_MC_GV_Sheo auto
-globalvariable property GV_Sheo_Count auto
-globalvariable property GV_Sheo auto
-
-;; Globals for set completion - Mods - (Inn Soaps)
-globalvariable property DBM_MC_GV_Soaps auto
-globalvariable property GV_Soaps_Count auto
-globalvariable property GV_Soaps auto
-
-;; Globals for set completion - Mods - (Skyrim Sewers)
-globalvariable property DBM_MC_GV_Sewers auto
-globalvariable property GV_Sewers_Count auto
-globalvariable property GV_Sewers auto
-
-;; Globals for set completion - Mods - (SUT)
-globalvariable property DBM_MC_GV_SUT auto
-globalvariable property GV_SUT_Count auto
-globalvariable property GV_SUT auto
-
-;; Globals for set completion - Mods - (TFC)
-globalvariable property DBM_MC_GV_TFC auto
-globalvariable property GV_TFC_Count auto
-globalvariable property GV_TFC auto
-
-;; Globals for set completion - Mods - (Treasure Hunter)
-globalvariable property DBM_MC_GV_TH auto
-globalvariable property GV_TH_Count auto
-globalvariable property GV_TH auto
-
-;; Globals for set completion - Mods - (Undeath)
-globalvariable property DBM_MC_GV_Undeath auto
-globalvariable property GV_Undeath_Count auto
-globalvariable property GV_Undeath auto
-
-;; Globals for set completion - Mods - (Skyrim Underground)
-globalvariable property DBM_MC_GV_SU auto
-globalvariable property GV_SU_Count auto
-globalvariable property GV_SU auto
-
-;; Globals for set completion - Mods - (Vigilant)
-globalvariable property DBM_MC_GV_Vig auto
-globalvariable property GV_Vig_Count auto
-globalvariable property GV_Vig auto
-
-;; Globals for set completion - Mods - (Volkihar Knight)
-globalvariable property DBM_MC_GV_Volk auto
-globalvariable property GV_Volk_Count auto
-globalvariable property GV_Volk auto
-
-;; Globals for set completion - Mods - (Wheels Of Lull)
-globalvariable property DBM_MC_GV_WOL auto
-globalvariable property GV_Wheels_Count auto
-globalvariable property GV_Wheels auto
-
-;; Globals for set completion - Mods - (Wintersun)
-globalvariable property DBM_MC_GV_Winter auto
-globalvariable property GV_Wintersun_Count auto
-globalvariable property GV_Wintersun auto
-
-;; Globals for set completion - Mods - (Wyrmstooth)
-globalvariable property DBM_MC_GV_Wyrms auto
-globalvariable property GV_Wyrmstooth_Count auto
-globalvariable property GV_Wyrmstooth auto
-
-;; Globals for set completion - Mods - (Zims Thane Weapons)
-globalvariable property DBM_MC_GV_ZTW auto
-globalvariable property GV_ZIA_Count auto
-globalvariable property GV_ZIA auto
-
-;; Globals for set completion - Mods - (3DNPC)
-globalvariable property DBM_MC_GV_3DNPC auto
-globalvariable property GV_3DNPC_Count auto
-globalvariable property GV_3DNPC auto
-
-;; Globals for set completion - Museum
-globalvariable property DBM_GV_SectionDragonbornHall auto
-globalvariable property DBM_GV_SectionHallOfHeroes auto
-globalvariable property DBM_GV_SectionLibrary auto
-globalvariable property DBM_GV_SectionDaedricGallery auto
-globalvariable property DBM_GV_SectionHOLE auto
-globalvariable property DBM_GV_SectionHallOfOddities auto
-globalvariable property DBM_GV_SectionNaturalScience auto
-globalvariable property DBM_GV_SectionHallOfSecrets auto
-globalvariable property DBM_GV_SectionGuildhouse auto
-globalvariable property DBM_GV_SectionStoreroom auto
-
-;; Globals For Total Count.
-globalvariable property GV_SectionDragonbornHall auto
-globalvariable property GV_SectionHallofHeroes auto
-globalvariable property GV_SectionLibrary auto
-globalvariable property GV_SectionDaedricGallery auto
-globalvariable property GV_SectionHOLE auto
-globalvariable property GV_SectionHallOfOddities auto
-globalvariable property GV_SectionNaturalScience auto
-globalvariable property GV_SectionHallOfSecrets auto
-globalvariable property GV_SectionGuildhouse auto
-globalvariable property GV_SectionStoreroom auto
-	
-;; Globals For Current Count.
-globalvariable property GV_SectionDragonbornHall_Count auto
-globalvariable property GV_SectionHallOfHeroes_Count auto
-globalvariable property GV_SectionLibrary_Count auto
-globalvariable property GV_SectionDaedricGallery_Count auto
-globalvariable property GV_SectionHOLE_Count auto
-globalvariable property GV_SectionHallOfOddities_Count auto
-globalvariable property GV_SectionNaturalScience_Count auto
-globalvariable property GV_SectionHallOfSecrets_Count auto
-globalvariable property GV_SectionGuildhouse_Count auto
-globalvariable property GV_SectionStoreroom_Count auto
-
-;; Globals for set completion - Armory
-globalvariable property DBM_GV_SectionArmoryAncientNord auto
-globalvariable property DBM_GV_SectionArmoryBlades auto
-globalvariable property DBM_GV_SectionArmoryDaedric auto
-globalvariable property DBM_GV_SectionArmoryDawnguard auto
-globalvariable property DBM_GV_SectionArmoryDragon auto
-globalvariable property DBM_GV_SectionArmoryDwarven auto
-globalvariable property DBM_GV_SectionArmoryEbony auto
-globalvariable property DBM_GV_SectionArmoryElven auto
-globalvariable property DBM_GV_SectionArmoryExtraDisplays auto
-globalvariable property DBM_GV_SectionArmoryFalmer auto
-globalvariable property DBM_GV_SectionArmoryForsworn auto
-globalvariable property DBM_GV_SectionArmoryGlass auto
-globalvariable property DBM_GV_SectionArmoryGuardArmorDisplay auto
-globalvariable property DBM_GV_SectionArmoryIron auto
-globalvariable property DBM_GV_SectionArmoryNordic auto
-globalvariable property DBM_GV_SectionArmoryOrcish auto
-globalvariable property DBM_GV_SectionArmorySnowElf auto
-globalvariable property DBM_GV_SectionArmoryStalhrim auto
-globalvariable property DBM_GV_SectionArmorySteel auto
-globalvariable property DBM_GV_SectionArmoryThaneWeapons auto
-
-;; Globals For Current Count.
-globalvariable property GV_ArmoryAncientNord_Count auto
-globalvariable property GV_ArmoryBlades_Count auto
-globalvariable property GV_ArmoryDaedric_Count auto
-globalvariable property GV_ArmoryDawnguard_Count auto
-globalvariable property GV_ArmoryDragon_Count auto
-globalvariable property GV_ArmoryDwarven_Count auto
-globalvariable property GV_ArmoryEbony_Count auto
-globalvariable property GV_ArmoryElven_Count auto
-globalvariable property GV_ArmoryExtraDisplays_Count auto
-globalvariable property GV_ArmoryFalmer_Count auto
-globalvariable property GV_ArmoryForsworn_Count auto
-globalvariable property GV_ArmoryGlass_Count auto
-globalvariable property GV_ArmoryGuardArmor_Count auto
-globalvariable property GV_ArmoryIron_Count auto
-globalvariable property GV_ArmoryNordic_Count auto
-globalvariable property GV_ArmoryOrcish_Count auto
-globalvariable property GV_ArmorySnowElf_Count auto
-globalvariable property GV_ArmoryStalhrim_Count auto
-globalvariable property GV_ArmorySteel_Count auto
-globalvariable property GV_ArmoryThane_Count auto
-
-;; Globals For Total Count.
-globalvariable property GV_ArmoryAncientNord auto
-globalvariable property GV_ArmoryBlades auto
-globalvariable property GV_ArmoryDaedric auto
-globalvariable property GV_ArmoryDawnguard auto
-globalvariable property GV_ArmoryDragon auto
-globalvariable property GV_ArmoryDwarven auto
-globalvariable property GV_ArmoryEbony auto
-globalvariable property GV_ArmoryElven auto
-globalvariable property GV_ArmoryExtraDisplays auto
-globalvariable property GV_ArmoryFalmer auto
-globalvariable property GV_ArmoryForsworn auto
-globalvariable property GV_ArmoryGlass auto
-globalvariable property GV_ArmoryGuardArmor auto
-globalvariable property GV_ArmoryIron auto
-globalvariable property GV_ArmoryNordic auto
-globalvariable property GV_ArmoryOrcish auto
-globalvariable property GV_ArmorySnowElf auto
-globalvariable property GV_ArmoryStalhrim auto
-globalvariable property GV_ArmorySteel auto
-globalvariable property GV_ArmoryThane auto
-
-;; Globals for set completion - Heavy Armory
-globalvariable property DBM_GV_SectionArmoryHAAncientNordic auto
-globalvariable property DBM_GV_SectionArmoryHABlades auto
-globalvariable property DBM_GV_SectionArmoryHADaedric auto
-globalvariable property DBM_GV_SectionArmoryHADawnguard auto
-globalvariable property DBM_GV_SectionArmoryHADragon auto
-globalvariable property DBM_GV_SectionArmoryHADwarven auto
-globalvariable property DBM_GV_SectionArmoryHAEbony auto
-globalvariable property DBM_GV_SectionArmoryHAElven auto
-globalvariable property DBM_GV_SectionArmoryHAFalmer auto
-globalvariable property DBM_GV_SectionArmoryHAForsworn auto
-globalvariable property DBM_GV_SectionArmoryHAGlass auto
-globalvariable property DBM_GV_SectionArmoryHAImperial auto
-globalvariable property DBM_GV_SectionArmoryHAIron auto
-globalvariable property DBM_GV_SectionArmoryHANordHero auto
-globalvariable property DBM_GV_SectionArmoryHANordic auto
-globalvariable property DBM_GV_SectionArmoryHAOrcish auto
-globalvariable property DBM_GV_SectionArmoryHASilver auto
-globalvariable property DBM_GV_SectionArmoryHAStalhrim auto
-globalvariable property DBM_GV_SectionArmoryHASteel auto
-
-;; Globals For Current Count.
-globalvariable property GV_SectionArmoryHAAncientNordic_Count auto
-globalvariable property GV_SectionArmoryHABlades_Count auto
-globalvariable property GV_SectionArmoryHADaedric_Count auto
-globalvariable property GV_SectionArmoryHADawnguard_Count auto
-globalvariable property GV_SectionArmoryHADragon_Count auto
-globalvariable property GV_SectionArmoryHADwarven_Count auto
-globalvariable property GV_SectionArmoryHAEbony_Count auto
-globalvariable property GV_SectionArmoryHAElven_Count auto
-globalvariable property GV_SectionArmoryHAFalmer_Count auto
-globalvariable property GV_SectionArmoryHAForsworn_Count auto
-globalvariable property GV_SectionArmoryHAGlass_Count auto
-globalvariable property GV_SectionArmoryHAImperial_Count auto
-globalvariable property GV_SectionArmoryHAIron_Count auto
-globalvariable property GV_SectionArmoryHANordHero_Count auto
-globalvariable property GV_SectionArmoryHANordic_Count auto
-globalvariable property GV_SectionArmoryHAOrcish_Count auto
-globalvariable property GV_SectionArmoryHASilver_Count auto
-globalvariable property GV_SectionArmoryHAStalhrim_Count auto
-globalvariable property GV_SectionArmoryHASteel_Count auto
-
-;; Globals For Total Count.
-globalvariable property GV_SectionArmoryHAAncientNordic auto
-globalvariable property GV_SectionArmoryHABlades auto
-globalvariable property GV_SectionArmoryHADaedric auto
-globalvariable property GV_SectionArmoryHADawnguard auto
-globalvariable property GV_SectionArmoryHADragon auto
-globalvariable property GV_SectionArmoryHADwarven auto
-globalvariable property GV_SectionArmoryHAEbony auto
-globalvariable property GV_SectionArmoryHAElven auto
-globalvariable property GV_SectionArmoryHAFalmer auto
-globalvariable property GV_SectionArmoryHAForsworn auto
-globalvariable property GV_SectionArmoryHAGlass auto
-globalvariable property GV_SectionArmoryHAImperial auto
-globalvariable property GV_SectionArmoryHAIron auto
-globalvariable property GV_SectionArmoryHANordHero auto
-globalvariable property GV_SectionArmoryHANordic auto
-globalvariable property GV_SectionArmoryHAOrcish auto
-globalvariable property GV_SectionArmoryHASilver auto
-globalvariable property GV_SectionArmoryHAStalhrim auto
-globalvariable property GV_SectionArmoryHASteel auto
-
-;; Globals for set completion - Immersive Weapons
-globalvariable property DBM_GV_DaedricGalleryImmersiveWeapons auto
-globalvariable property DBM_GV_ImmersiveWeaponsAncientNordic auto
-globalvariable property DBM_GV_ImmersiveWeaponsBlades auto
-globalvariable property DBM_GV_ImmersiveWeaponsDaedric auto
-globalvariable property DBM_GV_ImmersiveWeaponsDawnguard auto
-globalvariable property DBM_GV_ImmersiveWeaponsDragon auto
-globalvariable property DBM_GV_ImmersiveWeaponsDwarven auto
-globalvariable property DBM_GV_ImmersiveWeaponsEbony auto
-globalvariable property DBM_GV_ImmersiveWeaponsElven auto
-globalvariable property DBM_GV_ImmersiveWeaponsFalmer auto
-globalvariable property DBM_GV_ImmersiveWeaponsGlass auto
-globalvariable property DBM_GV_ImmersiveWeaponsIron auto
-globalvariable property DBM_GV_ImmersiveWeaponsOrcish auto
-globalvariable property DBM_GV_ImmersiveWeaponsSteel auto
-globalvariable property DBM_GV_ImmersiveWeaponsWolf auto
-globalvariable property DBM_GV_SectionHOHImmersiveWeapons auto
-
-;; Globals For Current Count.
-globalvariable property GV_DaedricGalleryImmersiveWeapons_Count auto
-globalvariable property GV_ImmersiveWeaponsAncientNordic_Count auto
-globalvariable property GV_ImmersiveWeaponsBlades_Count auto
-globalvariable property GV_ImmersiveWeaponsDaedric_Count auto
-globalvariable property GV_ImmersiveWeaponsDawnguard_Count auto
-globalvariable property GV_ImmersiveWeaponsDragon_Count auto
-globalvariable property GV_ImmersiveWeaponsDwarven_Count auto
-globalvariable property GV_ImmersiveWeaponsEbony_Count auto
-globalvariable property GV_ImmersiveWeaponsElven_Count auto
-globalvariable property GV_ImmersiveWeaponsFalmer_Count auto
-globalvariable property GV_ImmersiveWeaponsGlass_Count auto
-globalvariable property GV_ImmersiveWeaponsIron_Count auto
-globalvariable property GV_ImmersiveWeaponsOrcish_Count auto
-globalvariable property GV_ImmersiveWeaponsSteel_Count auto
-globalvariable property GV_ImmersiveWeaponsWolf_Count auto
-globalvariable property GV_SectionHOHImmersiveWeapons_Count auto
-
-;; Globals For Total Count.
-globalvariable property GV_DaedricGalleryImmersiveWeapons auto
-globalvariable property GV_ImmersiveWeaponsAncientNordic auto
-globalvariable property GV_ImmersiveWeaponsBlades auto
-globalvariable property GV_ImmersiveWeaponsDaedric auto
-globalvariable property GV_ImmersiveWeaponsDawnguard auto
-globalvariable property GV_ImmersiveWeaponsDragon auto
-globalvariable property GV_ImmersiveWeaponsDwarven auto
-globalvariable property GV_ImmersiveWeaponsEbony auto
-globalvariable property GV_ImmersiveWeaponsElven auto
-globalvariable property GV_ImmersiveWeaponsFalmer auto
-globalvariable property GV_ImmersiveWeaponsGlass auto
-globalvariable property GV_ImmersiveWeaponsIron auto
-globalvariable property GV_ImmersiveWeaponsOrcish auto
-globalvariable property GV_ImmersiveWeaponsSteel auto
-globalvariable property GV_ImmersiveWeaponsWolf auto
-globalvariable property GV_SectionHOHImmersiveWeapons auto
-
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -653,7 +200,7 @@ EndEvent
 Event AddDynamicPagesList()
 
 	ModName = "LOTD: The Curators Companion"
-	PagesList = new String[10]
+	PagesList = new String[11]
 	PagesList[0] = "General Settings"
 	PagesList[1] = "Scan & Advanced"
 	PagesList[2] = "Relic Storage"
@@ -662,11 +209,12 @@ Event AddDynamicPagesList()
 	PagesList[5] = "Museum Sections"
 	PagesList[6] = "Armory Sections"
 	PagesList[7] = "Supported Mods"
-	PagesList[8] = ""
-	PagesList[9] = "Debug Options"
+	PagesList[8] = "Supported Creations"
+	PagesList[9] = ""
+	PagesList[10] = "Debug Options"
 	
 	Int Q = 0
-	Int x = 10
+	Int x = 11
 		
   Pages = Utility.CreateStringArray(x)
   Int index = x
@@ -692,6 +240,7 @@ Event OnPageReset(string page)
 	AddMuseumSetsPage()
 	AddArmorySetsPage()
 	AddCompletedModsPage()
+	AddCompletedCreationsPage()
 	AddDebugPage()
 	InitmoreHUDChoiceList()
 	InitMCMStrings()
@@ -715,7 +264,7 @@ Event InitMCMStrings()
 
 	MCM_Strings = new string[28]
 	MCM_Strings[0] = "Developed By (Ic0n)Ic0de"
-	MCM_Strings[1] = "Version 1.1.3"
+	MCM_Strings[1] = "Version 2.1.0"
 	MCM_Strings[2] = "<font color='#750e0e'>Invalid Version</font>"
 	MCM_Strings[3] = "<font color='#750e0e'>Not Found</font>"
 	MCM_Strings[4] = "Complete"
@@ -743,12 +292,12 @@ Event InitMCMStrings()
 	MCM_Strings[26] = "Restore"
 EndEvent
 
-		;;<font color='COLORHERE'>
-		
-		;;</font>
-		
-		;;#2b6320 - Green
-		;;#750e0e - Red
+	;;<font color='COLORHERE'>
+
+	;;</font>
+
+	;;#2b6320 - Green
+	;;#750e0e - Red
 	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Settings Page ------------------------------------------------------------------------------------------------------
@@ -761,23 +310,20 @@ Event AddSettingsPage()
 		SetCursorPosition(0)
 		
 		AddHeaderOption("Notification Settings:")	
-		AddTextOptionST("iRelicMuseumNotifications", "Museum Notifications:", self.GetMuseumNotificationsString(), 0)
-		AddTextOptionST("iRelicArmoryNotifications", "Armory Notifications:", self.GetArmoryNotificationsString(), 0)	
+		AddTextOptionST("iRelicMuseumNotifications", "Museum Items:", self.GetMuseumNotificationsString(), 0)
+		AddTextOptionST("iRelicArmoryNotifications", "Armory Items:", self.GetArmoryNotificationsString(), 0)	
 		
-		if RN_SupportedModCount.GetValue() > 0
-			AddTextOptionST("iRelicModsNotifications", "Supported Mods Notifications:", self.GetModsNotificationsString(), 0)
+		if RN_SupportedModCount.GetValue() > 0 || RN_SupportedCreationCount.GetValue() > 0
+			AddTextOptionST("iRelicModsNotifications", "Creations & Mods Items:", self.GetModsNotificationsString(), 0)
 		else
-			AddTextOptionST("iRelicModsNotifications", "Supported Mods Notifications:", "No Patches Found", 1)
+			AddTextOptionST("iRelicModsNotifications", "Creations & Mods Items:", "No Patches Found", 1)
 		endIF
 		
-		AddTextOptionST("iRelicListenerNotifications", "Museum Display Notifications:", self.GetListenerString(), 0)
-		AddTextOptionST("iRelicSetCompleteNotifications", "Set Completion Notifications:", self.GetCompleteNotificationsString(), 0)
+		AddTextOptionST("iRelicListenerNotifications", "Exploration & Quest Displays:", self.GetListenerString(), 0)
+		AddTextOptionST("iRelicSetCompleteNotifications", "Collection / Set Completion:", self.GetCompleteNotificationsString(), 0)
 		AddEmptyOption()		
 		AddHeaderOption("General Settings:")
 		AddTextOptionST("iRelicSimpleNotifications", "Notification Style:", self.GetNotificationsString(), 0)
-			
-
-			
 		AddTextOptionST("RefreshMCM", "Something not working?", MCM_Strings[19], 0)
 		
 		SetCursorPosition(1)			
@@ -821,14 +367,19 @@ Event AddAdvancedPage()
 		AddHeaderOption("Museum Scan:")
 		AddTextOptionST("ScanAll", "Scan Displays (All Displays)", MCM_Strings[5], 0)
 		AddTextOptionST("ScanMuseum", "Scan Displays (Museum)", MCM_Strings[5], 0)
-		AddTextOptionST("ScanArmory", "Scan Displays (Armory)", MCM_Strings[5], 0)
 		
 		if RN_SupportedModCount.GetValue() > 0
 			AddTextOptionST("ScanMods", "Scan Displays (Mods)", MCM_Strings[5], 0)
 		else
 			AddTextOptionST("ScanMods", "Scan Displays (Mods)", "No Patches Found", 1)
 		endIf
-								
+
+		if RN_SupportedCreationCount.GetValue() > 0
+			AddTextOptionST("ScanCreations", "Scan Displays (Creations)", MCM_Strings[5], 0)
+		else
+			AddTextOptionST("ScanCreations", "Scan Displays (Creations)", "No Creations Found", 1)
+		endIf
+		
 		SetCursorPosition(1)
 		
 		AddHeaderOption("General Settings:")
@@ -858,13 +409,13 @@ Event AddRelicStoragePage()
 		
 		AddHeaderOption("Relic Storage Settings:")
 		
-			if Game.GetPlayer().HasPerk(DBM_ArcPerkRelicHunter) || ShowStorageSpellOverideVal
+			 if DBM_ArcSkill.GetValue() >= 5 || ShowStorageSpellOverideVal 
 				AddTextOptionST("iRelicStorageOptions", "Relic Storage Container:", self.GetStorageOptions(), 0)
 			else
 				AddTextOptionST("iRelicStorageOptions", "Relic Storage Container:", self.GetStorageOptions(), 1)
 			endIf
 			
-			if StorageSpellVal
+			if StorageSpellVal 
 				AddTextOptionST("iRelicStorageTransfer", "Auto Relic Storage:", self.GetTransferOptions(), 0)
 			else
 				AddTextOptionST("iRelicStorageTransfer", "Auto Relic Storage:", self.GetTransferOptions(), 1)
@@ -950,66 +501,25 @@ Event AddMuseumSetsPage()
 			AddTextOption("                                   -David G. Allen", "", 0)		
 		else		
 			AddHeaderOption("Museum Sections:")	
-
-			if (DBM_GV_SectionDragonbornHall.GetValue()) == 1
-				AddTextOption("Dragonborn Hall:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Dragonborn Hall:", self.GetCurrentCount(GV_SectionDragonbornHall_Count, GV_SectionDragonbornHall), 0)
-			endIf
-
-			if (DBM_GV_SectionHallOfHeroes.GetValue()) == 1
-				AddTextOption("Hall of Heroes:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Hall of Heroes:", self.GetCurrentCount(GV_SectionHallOfHeroes_Count, GV_SectionHallofHeroes), 0)
-			endIf
+			Int _Index = 0
+			Int _Length = RN_Array._Museum_Section_names.length
+			While _Index < _Length 
 			
-			if (DBM_GV_SectionLibrary.GetValue()) == 1
-				AddTextOption("Library:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Library:", self.GetCurrentCount(GV_SectionLibrary_Count, GV_SectionLibrary), 0)
-			endIf			
-			
-			if (DBM_GV_SectionDaedricGallery.GetValue()) == 1
-				AddTextOption("Daedric Gallery:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Daedric Gallery:", self.GetCurrentCount(GV_SectionDaedricGallery_Count, GV_SectionDaedricGallery), 0)
-			endIf			
-
-			if (DBM_GV_SectionNaturalScience.GetValue()) == 1
-				AddTextOption("Natural Science:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Natural Science:", self.GetCurrentCount(GV_SectionNaturalScience_Count, GV_SectionNaturalScience), 0)
-			endIf
-			
-			if (DBM_GV_SectionHOLE.GetValue()) == 1
-				AddTextOption("Hall of Lost Empires:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Hall of Lost Empires:", self.GetCurrentCount(GV_SectionHOLE_Count, GV_SectionHOLE), 0)
-			endIf
-
-			if (DBM_GV_SectionHallOfOddities.GetValue()) == 1
-				AddTextOption("Hall of Oddities:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Hall of Oddities:", self.GetCurrentCount(GV_SectionHallOfOddities_Count, GV_SectionHallOfOddities), 0)
-			endIf
-
-			if (DBM_GV_SectionHallOfSecrets.GetValue()) == 1
-				AddTextOption("Hall of Secrets:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Hall of Secrets:", self.GetCurrentCount(GV_SectionHallOfSecrets_Count, GV_SectionHallOfSecrets), 0)
-			endIf
-			
-			if (DBM_GV_SectionGuildhouse.GetValue()) == 1
-				AddTextOption("Guildhouse:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Guildhouse:", self.GetCurrentCount(GV_SectionGuildhouse_Count, GV_SectionGuildhouse), 0)
-			endIf			
-
-			if (DBM_GV_SectionStoreroom.GetValue()) == 1
-				AddTextOption("Storeroom:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Storeroom:", self.GetCurrentCount(GV_SectionStoreroom_Count, GV_SectionStoreroom), 0)
-			endIf
+				if RN_Array._Museum_Global_Complete[_Index].GetValue() == 1
+					AddTextOption(RN_Array._Museum_Section_names[_Index], MCM_Strings[4], 1)
+				else
+					AddTextOption(RN_Array._Museum_Section_names[_Index], self.GetCurrentCount(RN_Array._Museum_Global_Count[_Index], RN_Array._Museum_Global_Total[_Index]), 0)
+				endIf
+				_Index += 1
+				
+				if _Index == 8 && RN_SupportedCreationCount.GetValue() == 0
+					_Index += 1
+				endIf
+				
+				if _Index == 11 && RN_Mod.XX_SafehouseL == false
+					_Index += 1
+				endIf
+			endWhile
 			
 			AddEmptyOption()
 			AddHeaderOption("Museum Displays:")
@@ -1051,9 +561,16 @@ Event AddMuseumSetsPage()
 			AddTextOption("As you collect and display your items, the page will keep", "", 0)
 			AddTextOption("track of your progess.", "", 0)
 			AddEmptyOption()
-			AddTextOption("Run the Museum Scan from the MCM or Prep station to", "", 0)
-			AddTextOption("update the current figures.", "", 0)
-			AddEmptyOption()
+			AddTextOption("Running the Museum Scan from the MCM or Prep Station", "", 0)
+			AddTextOption("will scan the Museum and Armory for items on display", "", 0)
+			AddTextOption("then update the figures in the MCM, it is recommended", "", 0)
+			AddTextOption("to scan after using the Prep Station to display items", "", 0)
+			if RN_SupportedCreationCount.GetValue() > 0
+				AddEmptyOption()
+			endIf
+			if RN_Mod.XX_SafehouseL
+				AddEmptyOption()
+			endIf
 			AddEmptyOption()
 			AddTextOption("Completed:", self.GetCurrentMuseumCount(iMuseumSets), 0)
 			AddEmptyOption()
@@ -1102,378 +619,80 @@ Event AddArmorySetsPage()
 			AddTextOption("in a different order than the one you have in your mind'", "", 0)
 			AddTextOption("                                   -David G. Allen", "", 0)			
 		else
-			
+
 			AddHeaderOption("Armory Sets:")
-			if (DBM_GV_SectionArmoryAncientNord.GetValue()) == 1
-				AddTextOption("Ancient Nord Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Ancient Nord Set:", self.GetCurrentCount(GV_ArmoryAncientNord_Count, GV_ArmoryAncientNord), 0)
-			endIf	
-		
-			if (DBM_GV_SectionArmoryBlades.GetValue()) == 1
-				AddTextOption("Blades Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Blades Set:", self.GetCurrentCount(GV_ArmoryBlades_Count, GV_ArmoryBlades), 0)
-			endIf			
+			Int _Index = 0
+			Int _Length = RN_Array._Armory_Section_names.length
+			While _Index < _Length 
 			
-			if (DBM_GV_SectionArmoryDaedric.GetValue()) == 1
-				AddTextOption("Daedric Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Daedric Set:", self.GetCurrentCount(GV_ArmoryDaedric_Count, GV_ArmoryDaedric), 0)
-			endIf	
-		
-			if (DBM_GV_SectionArmoryDawnguard.GetValue()) == 1
-				AddTextOption("Dawnguard Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Dawnguard Set:", self.GetCurrentCount(GV_ArmoryDawnguard_Count, GV_ArmoryDawnguard), 0)
-			endIf				
-			
-			if (DBM_GV_SectionArmoryDragon.GetValue()) == 1
-				AddTextOption("Dragon Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Dragon Set:", self.GetCurrentCount(GV_ArmoryDragon_Count, GV_ArmoryDragon), 0)
-			endIf	
-		
-			if (DBM_GV_SectionArmoryDwarven.GetValue()) == 1
-				AddTextOption("Dwarven Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Dwarven Set:", self.GetCurrentCount(GV_ArmoryDwarven_Count, GV_ArmoryDwarven), 0)
-			endIf			
-			
-			if (DBM_GV_SectionArmoryEbony.GetValue()) == 1
-				AddTextOption("Ebony Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Ebony Set:", self.GetCurrentCount(GV_ArmoryEbony_Count, GV_ArmoryEbony), 0)
-			endIf	
-		
-			if (DBM_GV_SectionArmoryElven.GetValue()) == 1
-				AddTextOption("Elven Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Elven Set:", self.GetCurrentCount(GV_ArmoryElven_Count, GV_ArmoryElven), 0)
-			endIf				
-
-			if (DBM_GV_SectionArmoryFalmer.GetValue()) == 1
-				AddTextOption("Falmer Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Falmer Set:", self.GetCurrentCount(GV_ArmoryFalmer_Count, GV_ArmoryFalmer), 0)
-			endIf	
-		
-			if (DBM_GV_SectionArmoryForsworn.GetValue()) == 1
-				AddTextOption("Forsworn Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Forsworn Set:", self.GetCurrentCount(GV_ArmoryForsworn_Count, GV_ArmoryForsworn), 0)
-			endIf			
-			
-			AddTextOptionST("ScanArmory", "", MCM_Strings[24], 0)
-			AddEmptyOption()
-		
-			if (RN_Mod.XX_HeavyArmL)		
-				AddHeaderOption("Heavy Armory Sets:")
-
-				if (DBM_GV_SectionArmoryHAAncientNordic.GetValue()) == 1
-					AddTextOption("Ancient Nord Set:", MCM_Strings[4], 1)
+				if RN_Array._Armory_Global_Complete[_Index].GetValue() == 1
+					AddTextOption(RN_Array._Armory_Section_names[_Index], MCM_Strings[4], 1)
 				else
-					AddTextOption("Ancient Nord Set:", self.GetCurrentCount(GV_SectionArmoryHAAncientNordic_Count, GV_SectionArmoryHAAncientNordic), 0)
-				endIf	
-
-				if (DBM_GV_SectionArmoryHABlades.GetValue()) == 1
-					AddTextOption("Blades Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Blades Set:", self.GetCurrentCount(GV_SectionArmoryHABlades_Count, GV_SectionArmoryHABlades), 0)
-				endIf			
-				
-				if (DBM_GV_SectionArmoryHADaedric.GetValue()) == 1
-					AddTextOption("Daedric Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Daedric Set:", self.GetCurrentCount(GV_SectionArmoryHADaedric_Count, GV_SectionArmoryHADaedric), 0)
-				endIf	
-			
-				if (DBM_GV_SectionArmoryHADawnguard.GetValue()) == 1
-					AddTextOption("Dawnguard Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Dawnguard Set:", self.GetCurrentCount(GV_SectionArmoryHADawnguard_Count, GV_SectionArmoryHADaedric), 0)
-				endIf				
-				
-				if (DBM_GV_SectionArmoryHADragon.GetValue()) == 1
-					AddTextOption("Dragon Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Dragon Set:", self.GetCurrentCount(GV_SectionArmoryHADragon_Count, GV_SectionArmoryHADragon), 0)
-				endIf	
-			
-				if (DBM_GV_SectionArmoryHADwarven.GetValue()) == 1
-					AddTextOption("Dwarven Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Dwarven Set:", self.GetCurrentCount(GV_SectionArmoryHADwarven_Count, GV_SectionArmoryHADwarven), 0)
-				endIf			
-				
-				if (DBM_GV_SectionArmoryHAEbony.GetValue()) == 1
-					AddTextOption("Ebony Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Ebony Set:", self.GetCurrentCount(GV_SectionArmoryHAEbony_Count, GV_SectionArmoryHAEbony), 0)
-				endIf	
-			
-				if (DBM_GV_SectionArmoryHAElven.GetValue()) == 1
-					AddTextOption("Elven Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Elven Set:", self.GetCurrentCount(GV_SectionArmoryHAElven_Count, GV_SectionArmoryHAElven), 0)
-				endIf				
-
-				if (DBM_GV_SectionArmoryHAFalmer.GetValue()) == 1
-					AddTextOption("Falmer Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Falmer Set:", self.GetCurrentCount(GV_SectionArmoryHAFalmer_Count, GV_SectionArmoryHAFalmer), 0)
-				endIf	
-			
-				if (DBM_GV_SectionArmoryHAForsworn.GetValue()) == 1
-					AddTextOption("Forsworn Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Forsworn Set:", self.GetCurrentCount(GV_SectionArmoryHAForsworn_Count, GV_SectionArmoryHAForsworn), 0)
-				endIf	
-								
-				AddTextOptionST("ScanHeavyArm", "", MCM_Strings[24], 0)
-				AddEmptyOption()
-			endIf
-			
-			if (RN_Mod.XX_ImmWeapL)			
-				AddHeaderOption("Immersive Weapons Sets:")
-
-				if (DBM_GV_ImmersiveWeaponsAncientNordic.GetValue()) == 1
-					AddTextOption("Ancient Nord Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Ancient Nord Set:", self.GetCurrentCount(GV_ImmersiveWeaponsAncientNordic_Count, GV_ImmersiveWeaponsAncientNordic), 0)
-				endIf	
-			
-				if (DBM_GV_ImmersiveWeaponsBlades.GetValue()) == 1
-					AddTextOption("Blades Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Blades Set:", self.GetCurrentCount(GV_ImmersiveWeaponsBlades_Count, GV_ImmersiveWeaponsBlades), 0)
-				endIf			
-				
-				if (DBM_GV_ImmersiveWeaponsDaedric.GetValue()) == 1
-					AddTextOption("Daedric Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Daedric Set:", self.GetCurrentCount(GV_ImmersiveWeaponsDaedric_Count, GV_ImmersiveWeaponsDaedric), 0)
-				endIf	
-			
-				if (DBM_GV_ImmersiveWeaponsDawnguard.GetValue()) == 1
-					AddTextOption("Dawnguard Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Dawnguard Set:", self.GetCurrentCount(GV_ImmersiveWeaponsDawnguard_Count, GV_ImmersiveWeaponsDawnguard), 0)
-				endIf				
-				
-				if (DBM_GV_ImmersiveWeaponsDragon.GetValue()) == 1
-					AddTextOption("Dragon Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Dragon Set:", self.GetCurrentCount(GV_ImmersiveWeaponsDragon_Count, GV_ImmersiveWeaponsDragon), 0)
-				endIf	
-			
-				if (DBM_GV_ImmersiveWeaponsDwarven.GetValue()) == 1
-					AddTextOption("Dwarven Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Dwarven Set:", self.GetCurrentCount(GV_ImmersiveWeaponsDwarven_Count, GV_ImmersiveWeaponsDwarven), 0)
-				endIf			
-				
-				if (DBM_GV_ImmersiveWeaponsEbony.GetValue()) == 1
-					AddTextOption("Ebony Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Ebony Set:", self.GetCurrentCount(GV_ImmersiveWeaponsEbony_Count, GV_ImmersiveWeaponsEbony), 0)
-				endIf	
-			
-				if (DBM_GV_ImmersiveWeaponsElven.GetValue()) == 1
-					AddTextOption("Elven Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Elven Set:", self.GetCurrentCount(GV_ImmersiveWeaponsElven_Count, GV_ImmersiveWeaponsElven), 0)
+					AddTextOption(RN_Array._Armory_Section_names[_Index], self.GetCurrentCount(RN_Array._Armory_Global_Count[_Index], RN_Array._Armory_Global_Total[_Index]), 0)
 				endIf
+				_Index +=1
 				
-				
-				AddTextOptionST("ScanImmWeap", "", MCM_Strings[24], 0)
-				AddEmptyOption()
-			endIf
-		
-			SetCursorPosition(1)
+				if _Index == _Length / 2
+					AddEmptyOption()
+					SetCursorPosition(1)
+					AddHeaderOption("Completed: " + self.GetCurrentArmoryCount(iArmorySets) + " Sets")
+				endIf
+			endWhile
 			
-			AddHeaderOption("")
-			
-			if (DBM_GV_SectionArmoryGlass.GetValue()) == 1
-				AddTextOption("Glass Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Glass Set:", self.GetCurrentCount(GV_ArmoryGlass_Count, GV_ArmoryGlass), 0)
-			endIf	
-		
-			if (DBM_GV_SectionArmoryGuardArmorDisplay.GetValue()) == 1
-				AddTextOption("Guard Armor Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Guard Armor Set:", self.GetCurrentCount(GV_ArmoryGuardArmor_Count, GV_ArmoryGuardArmor), 0)
-			endIf				
-			
-			if (DBM_GV_SectionArmoryIron.GetValue()) == 1
-				AddTextOption("Iron Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Iron Set:", self.GetCurrentCount(GV_ArmoryIron_Count, GV_ArmoryIron), 0)
-			endIf	
-
-			if (DBM_GV_SectionArmoryExtraDisplays.GetValue()) == 1
-				AddTextOption("Misc Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Misc Set:", self.GetCurrentCount(GV_ArmoryExtraDisplays_Count, GV_ArmoryExtraDisplays), 0)
-			endIf	
-			
-			if (DBM_GV_SectionArmoryNordic.GetValue()) == 1
-				AddTextOption("Nordic Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Nordic Set:", self.GetCurrentCount(GV_ArmoryNordic_Count, GV_ArmoryNordic), 0)
-			endIf			
-			
-			if (DBM_GV_SectionArmoryOrcish.GetValue()) == 1
-				AddTextOption("Orcish Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Orcish Set:", self.GetCurrentCount(GV_ArmoryOrcish_Count, GV_ArmoryOrcish), 0)
-			endIf	
-		
-			if (DBM_GV_SectionArmorySnowElf.GetValue()) == 1
-				AddTextOption("Snow Elf Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Snow Elf Set:", self.GetCurrentCount(GV_ArmorySnowElf_Count, GV_ArmorySnowElf), 0)
-			endIf
-			
-			if (DBM_GV_SectionArmoryStalhrim.GetValue()) == 1
-				AddTextOption("Stalhrim Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Stalhrim Set:", self.GetCurrentCount(GV_ArmoryStalhrim_Count, GV_ArmoryStalhrim), 0)
-			endIf			
-			
-			if (DBM_GV_SectionArmorySteel.GetValue()) == 1
-				AddTextOption("Steel Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Steel Set:", self.GetCurrentCount(GV_ArmorySteel_Count, GV_ArmorySteel), 0)
-			endIf	
-		
-			if (DBM_GV_SectionArmoryThaneWeapons.GetValue()) == 1
-				AddTextOption("Thane Weapons Set:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Thane Weapons Set:", self.GetCurrentCount(GV_ArmoryThane_Count, GV_ArmoryThane), 0)
-			endIf
-						
-			AddTextOption("Completed:", self.GetCurrentArmoryCount(iArmorySets), 0)
-			AddEmptyOption()
+			SetCursorPosition(24)
 			
 			if (RN_Mod.XX_HeavyArmL)
-				AddHeaderOption("")
+				AddHeaderOption("Heavy Armory Sets:")
 				
-				if (DBM_GV_SectionArmoryHAGlass.GetValue()) == 1
-					AddTextOption("Glass Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Glass Set:", self.GetCurrentCount(GV_SectionArmoryHAGlass_Count, GV_SectionArmoryHAGlass), 0)
-				endIf	
-			
-				if (DBM_GV_SectionArmoryHAImperial.GetValue()) == 1
-					AddTextOption("Imperial Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Imperial Set:", self.GetCurrentCount(GV_SectionArmoryHAImperial_Count, GV_SectionArmoryHAImperial), 0)
-				endIf				
+				_Index = 0
+				_Length = RN_Array._HeavyArmory_Section_names.length
+				While _Index < _Length 
 				
-				if (DBM_GV_SectionArmoryHAIron.GetValue()) == 1
-					AddTextOption("Iron Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Iron Set:", self.GetCurrentCount(GV_SectionArmoryHAIron_Count, GV_SectionArmoryHAIron), 0)
-				endIf	
-
-				if (DBM_GV_SectionArmoryHANordHero.GetValue()) == 1
-					AddTextOption("Nord Hero Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Nord Hero Set:", self.GetCurrentCount(GV_SectionArmoryHANordHero_Count, GV_SectionArmoryHANordHero), 0)
-				endIf	
-				
-				if (DBM_GV_SectionArmoryHANordic.GetValue()) == 1
-					AddTextOption("Nordic Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Nordic Set:", self.GetCurrentCount(GV_SectionArmoryHANordic_Count, GV_SectionArmoryHANordic), 0)
-				endIf			
-				
-				if (DBM_GV_SectionArmoryHAOrcish.GetValue()) == 1
-					AddTextOption("Orcish Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Orcish Set:", self.GetCurrentCount(GV_SectionArmoryHAOrcish_Count, GV_SectionArmoryHAOrcish), 0)
-				endIf	
-			
-				if (DBM_GV_SectionArmoryHASilver.GetValue()) == 1
-					AddTextOption("Silver Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Silver Set:", self.GetCurrentCount(GV_SectionArmoryHASilver_Count, GV_SectionArmoryHASilver), 0)
-				endIf
-				
-				if (DBM_GV_SectionArmoryHAStalhrim.GetValue()) == 1
-					AddTextOption("Stalhrim Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Stalhrim Set:", self.GetCurrentCount(GV_SectionArmoryHAStalhrim_Count, GV_SectionArmoryHAStalhrim), 0)
-				endIf			
-				
-				if (DBM_GV_SectionArmoryHASteel.GetValue()) == 1
-					AddTextOption("Steel Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Steel Set:", self.GetCurrentCount(GV_SectionArmoryHASteel_Count, GV_SectionArmoryHASteel), 0)
-				endIf
-				
-				AddEmptyOption()
-				AddTextOption("Completed:", self.GetCurrentHACount(iHeavyArmSets) + " Sets", 0)
-				AddEmptyOption()
+					if RN_Array._HeavyArmory_Global_Complete[_Index].GetValue() == 1
+						AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], MCM_Strings[4], 1)
+					else
+						AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], self.GetCurrentCount(RN_Array._HeavyArmory_Global_Count[_Index], RN_Array._HeavyArmory_Global_Total[_Index]), 0)
+					endIf
+					_Index +=1
+					
+					if _Index == _Length / 2 + 1
+						SetCursorPosition(25)
+						AddHeaderOption("Completed: " + self.GetCurrentHACount(iHeavyArmSets) + " Sets")
+					endIf
+				endWhile
 			endIf
 			
-			if RN_Mod.XX_ImmWeapL
-				AddHeaderOption("")
+			if (RN_Mod.XX_HeavyArmL)
+				SetCursorPosition(48)
+			else
+				SetCursorPosition(24)
+			endIf
+			
+			if (RN_Mod.XX_ImmWeapL)
+				AddHeaderOption("Immersive Weapons Sets:")
 				
-				if (DBM_GV_ImmersiveWeaponsFalmer.GetValue()) == 1
-					AddTextOption("Falmer Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Falmer Set:", self.GetCurrentCount(GV_ImmersiveWeaponsFalmer_Count, GV_ImmersiveWeaponsFalmer), 0)
-				endIf				
+				_Index = 0
+				_Length = RN_Array._ImmersiveWeapons_Section_names.length
+				While _Index < _Length 
 				
-				if (DBM_GV_ImmersiveWeaponsGlass.GetValue()) == 1
-					AddTextOption("Glass Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Glass Set:", self.GetCurrentCount(GV_ImmersiveWeaponsGlass_Count, GV_ImmersiveWeaponsGlass), 0)
-				endIf				
-							
-				if (DBM_GV_ImmersiveWeaponsIron.GetValue()) == 1
-					AddTextOption("Iron Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Iron Set:", self.GetCurrentCount(GV_ImmersiveWeaponsIron_Count, GV_ImmersiveWeaponsIron), 0)
-				endIf	
-
-				if (DBM_GV_ImmersiveWeaponsOrcish.GetValue()) == 1
-					AddTextOption("Orcish Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Orcish Set:", self.GetCurrentCount(GV_ImmersiveWeaponsOrcish_Count, GV_ImmersiveWeaponsOrcish), 0)
-				endIf	
-
-				if (DBM_GV_ImmersiveWeaponsSteel.GetValue()) == 1
-					AddTextOption("Steel Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Steel Set:", self.GetCurrentCount(GV_ImmersiveWeaponsSteel_Count, GV_ImmersiveWeaponsSteel), 0)
-				endIf	
-
-				if (DBM_GV_ImmersiveWeaponsWolf.GetValue()) == 1
-					AddTextOption("Wolf Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Wolf Set:", self.GetCurrentCount(GV_ImmersiveWeaponsWolf_Count, GV_ImmersiveWeaponsWolf), 0)
-				endIf	
-				
-				if (DBM_GV_DaedricGalleryImmersiveWeapons.GetValue()) == 1
-					AddTextOption("Daedric Gallery Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Daedric Gallery Set:", self.GetCurrentCount(GV_DaedricGalleryImmersiveWeapons_Count, GV_DaedricGalleryImmersiveWeapons), 0)
-				endIf			
-				
-				if (DBM_GV_SectionHOHImmersiveWeapons.GetValue()) == 1
-					AddTextOption("Hall Of Heroes Set:", MCM_Strings[4], 1)
-				else
-					AddTextOption("Hall Of Heroes Set:", self.GetCurrentCount(GV_SectionHOHImmersiveWeapons_Count, GV_SectionHOHImmersiveWeapons), 0)
-				endIf
-											
-				AddTextOption("Completed:", self.GetCurrentIWCount(iImmWeapSets) + " Sets", 0)
-				AddEmptyOption()
-			endIf				
-		endif
+					if RN_Array._ImmersiveWeapons_Global_Complete[_Index].GetValue() == 1
+						AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], MCM_Strings[4], 1)
+					else
+						AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], self.GetCurrentCount(RN_Array._ImmersiveWeapons_Global_Count[_Index], RN_Array._ImmersiveWeapons_Global_Total[_Index]), 0)
+					endIf
+					_Index +=1
+					
+					if _Index == _Length / 2
+						if (RN_Mod.XX_HeavyArmL) 
+							SetCursorPosition(49)
+						else
+							SetCursorPosition(25)
+						endIf
+						AddHeaderOption("Completed: " + self.GetCurrentIWCount(iImmWeapSets) + " Sets")
+					endIf
+				endWhile
+			endIf
+		endIf
 	endIf
 endEvent		
 
@@ -1507,370 +726,22 @@ Event AddCompletedModsPage()
 			AddTextOption("in a different order than the one you have in your mind'", "", 0)
 			AddTextOption("                                   -David G. Allen", "", 0)			
 		else
-			AddHeaderOption("Installed Mods:")
-			
+			AddHeaderOption("Installed Patches:")
+
 			if RN_SupportedModCount.GetValue() > 0
-				if (RN_Mod.XX_AetheriumL)	
-					if (DBM_MC_GV_Aetherium.GetValue()) == 1
-						AddTextOption("Aetherium Armor and Weapons:", MCM_Strings[4], 1)
-					else
-						AddTextOption("Aetherium Armor and Weapons:", self.GetCurrentCount(GV_SectionHOLEAetherium_Count, GV_SectionHOLEAetherium), 0)
-					endIf
-				endIf
 
-				if (RN_Mod.XX_AmuletsSkyrimL)			
-					if (DBM_MC_GV_Amulets.GetValue()) == 1
-						AddTextOption("Amulets of Skyrim", MCM_Strings[4], 1)
-					else
-						AddTextOption("Amulets of Skyrim", self.GetCurrentCount(GV_AmuletsDisplay_Count, GV_AmuletsDisplay), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_BoethiahL)
-					if (DBM_MC_GV_Boethiah.GetValue()) == 1
-						AddTextOption("Artifacts of Boethiah", MCM_Strings[4], 1)
-					else
-						AddTextOption("Artifacts of Boethiah", self.GetCurrentCount(GV_AOB_Count, GV_AOB), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_ArtifactsSkyrimL)			
-					if (DBM_MC_GV_AOS.GetValue()) == 1
-						AddTextOption("Artifacts of Skyrim", MCM_Strings[4], 1)
-					else
-						AddTextOption("Artifacts of Skyrim", self.GetCurrentCount(GV_Artifacts_Skyrim_Count, GV_Artifacts_Skyrim), 0)
-					endIf
-				endIf
-					
-				if (RN_Mod.XX_BadGremlinL)
-					if (DBM_MC_GV_BG.GetValue()) == 1
-						AddTextOption("Bad Gremlins Collectables", MCM_Strings[4], 1)
-					else
-						AddTextOption("Bad Gremlins Collectables", self.GetCurrentCount(GV_BadGremlin_Count, GV_BadGremlin), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_CloaksL)			
-					if (DBM_MC_GV_Cloaks.GetValue()) == 1
-						AddTextOption("Cloaks of Skyrim", MCM_Strings[4], 1)
-					else
-						AddTextOption("Cloaks of Skyrim", self.GetCurrentCount(GV_Cloaks_Count, GV_Cloaks), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_ClockworkL)
-					if (DBM_MC_GV_Clockwork.GetValue()) == 1
-						AddTextOption("Clockwork", MCM_Strings[4], 1)
-					else
-						AddTextOption("Clockwork", self.GetCurrentCount(GV_Clockwork_Count, GV_Clockwork), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_DawnguardArsenalL)			
-					if (DBM_MC_GV_DA.GetValue()) == 1
-						AddTextOption("Dawnguard Arsenal", MCM_Strings[4], 1)
-					else
-						AddTextOption("Dawnguard Arsenal", self.GetCurrentCount(GV_DGA_Count, GV_DGA), 0)
-					endIf
-				endIf
-					
-				if (RN_Mod.XX_FalskaarL)	
-					if (DBM_MC_GV_Falskaar.GetValue()) == 1
-						AddTextOption("Falskaar", MCM_Strings[4], 1)
-					else
-						AddTextOption("Falskaar", self.GetCurrentCount(GV_Falskaar_Count, GV_Falskaar), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_FossilsL)			
-					if (DBM_MC_GV_Fossils.GetValue()) == 1
-						AddTextOption("Fossil Mining", MCM_Strings[4], 1)
-					else
-						AddTextOption("Fossil Mining", self.GetCurrentCount(GV_Fossils_Count, GV_Fossils), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_GrayCowlL)
-					if (DBM_MC_GV_GrayCowl.GetValue()) == 1
-						AddTextOption("The Gray Cowl Of Nocturnal", MCM_Strings[4], 1)
-					else
-						AddTextOption("The Gray Cowl Of Nocturnal", self.GetCurrentCount(GV_GCON_Count, GV_GCON), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_GuardArmL)			
-					if (DBM_MC_GV_GAR.GetValue()) == 1
-						AddTextOption("Guard Armor Replacer", MCM_Strings[4], 1)
-					else
-						AddTextOption("Guard Armor Replacer", self.GetCurrentCount(GV_GAR_Count, GV_GAR), 0)
-					endIf
-				endIf
-					
-				if (RN_Mod.XX_HeavyArmL)
-					if (DBM_MC_GV_HA.GetValue()) == 1
-						AddTextOption("Heavy Armory", MCM_Strings[4], 1)
-					else
-						AddTextOption("Heavy Armory", self.GetCurrentCount(GV_Heavy_Count, GV_Heavy), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_HelgenL)			
-					if (DBM_MC_GV_Helgen.GetValue()) == 1
-						AddTextOption("Helgen Reborn", MCM_Strings[4], 1)
-					else
-						AddTextOption("Helgen Reborn", self.GetCurrentCount(GV_Helgen_Count, GV_Helgen), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_IceBladeL)
-					if (DBM_MC_GV_IceBlade.GetValue()) == 1
-						AddTextOption("Ice Blade of the Monarch", MCM_Strings[4], 1)
-					else
-						AddTextOption("Ice Blade of the Monarch", self.GetCurrentCount(GV_IBOM_Count, GV_IBOM), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_ImmersiveL)			
-					if (DBM_MC_GV_ICOW.GetValue()) == 1
-						AddTextOption("Immersive College Of Winterhold", MCM_Strings[4], 1)
-					else
-						AddTextOption("Immersive College Of Winterhold", self.GetCurrentCount(GV_ICOW_Count, GV_ICOW), 0)
-					endIf
-				endIf
+				Int _Index = 0
+				While _Index < RN_Array._PatchName.length
 				
-				if (RN_Mod.XX_ImmArmL)	
-					if (DBM_MC_GV_IA.GetValue()) == 1
-						AddTextOption("Immersive Armors", MCM_Strings[4], 1)
-					else
-						AddTextOption("Immersive Armors", self.GetCurrentCount(GV_IA_Count, GV_IA), 0)
+					if RN_Array._bPatches[_Index]
+						if RN_Array._GVComplete[_Index].GetValue() == 1
+							AddTextOption(RN_Array._PatchName[_Index], MCM_Strings[4], 1)
+						else
+							AddTextOption(RN_Array._PatchName[_Index], self.GetCurrentCount(RN_Array._PatchCount[_Index], RN_Array._PatchTotal[_Index]), 0)
+						endIf
 					endIf
-				endIf
-
-				if (RN_Mod.XX_ImmWeapL)			
-					if (DBM_MC_GV_IW.GetValue()) == 1
-						AddTextOption("Immersive Weapons", MCM_Strings[4], 1)
-					else
-						AddTextOption("Immersive Weapons", self.GetCurrentCount(GV_IW_Count, GV_IW), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_3DNPC)			
-					if (DBM_MC_GV_3DNPC.GetValue()) == 1
-						AddTextOption("Interesting NPC's", MCM_Strings[4], 1)
-					else
-						AddTextOption("Interesting NPC's", self.GetCurrentCount(GV_3DNPC_Count, GV_3DNPC), 0)
-					endIf
-				endIf
-
-
-
-				if (RN_Mod.XX_JaysusL) || (RN_Mod.XX_JaysusCraftL)
-					if (DBM_MC_GV_Jaysus.GetValue()) == 1
-						AddTextOption("Jaysus Swords", MCM_Strings[4], 1)
-					else
-						AddTextOption("Jaysus Swords", self.GetCurrentCount(GV_Jaysus_Count, GV_Jaysus), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_KonahrikL)			
-					if (DBM_MC_GV_KA.GetValue()) == 1
-						AddTextOption("konahrik's accoutrements", MCM_Strings[4], 1)
-					else
-						AddTextOption("konahrik's accoutrements", self.GetCurrentCount(GV_KA_Count, GV_KA), 0)
-					endIf
-				endIf
-					
-				if (RN_Mod.XX_KagrenacL)
-					if (DBM_MC_GV_TOK.GetValue()) == 1
-						AddTextOption("Tools of Kagrenac", MCM_Strings[4], 1)
-					else
-						AddTextOption("Tools of Kagrenac", self.GetCurrentCount(GV_Kagrenac_Count, GV_Kagrenac), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_KthoniaL)			
-					if (DBM_MC_GV_KW.GetValue()) == 1
-						AddTextOption("Kthonia's Weapon Pack", MCM_Strings[4], 1)
-					else
-						AddTextOption("Kthonia's Weapon Pack", self.GetCurrentCount(GV_Kthonia_Count, GV_Kthonia), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_MoonpathL)
-					if (DBM_MC_GV_Moonpath.GetValue()) == 1
-						AddTextOption("Moonpath to Elsweyr", MCM_Strings[4], 1)
-					else
-						AddTextOption("Moonpath to Elsweyr", self.GetCurrentCount(GV_MoonPath_Count, GV_MoonPath), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_MoonStarL)			
-					if (DBM_MC_GV_MoonStar.GetValue()) == 1
-						AddTextOption("Moon and Star", MCM_Strings[4], 1)
-					else
-						AddTextOption("Moon and Star", self.GetCurrentCount(GV_MoonStar_Count, GV_MoonStar), 0)
-					endIf
-				endIf
-					
-				if (RN_Mod.XX_NTHunterL) || (RN_Mod.XX_NTHunterESLL)
-					if (DBM_MC_GV_NTH.GetValue()) == 1
-						AddTextOption("New Treasure Hunt", MCM_Strings[4], 1)
-					else
-						AddTextOption("New Treasure Hunt", self.GetCurrentCount(GV_NTHunter_Count, GV_NTHunter), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_OblivionArtL)			
-					if (DBM_MC_GV_OA.GetValue()) == 1
-						AddTextOption("Oblivion Artifacts", MCM_Strings[4], 1)
-					else
-						AddTextOption("Oblivion Artifacts", self.GetCurrentCount(GV_OA_Count, GV_OA), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_PathRevL)
-					if (DBM_MC_GV_PathRev.GetValue()) == 1
-						AddTextOption("Path of the Revanant", MCM_Strings[4], 1)
-					else
-						AddTextOption("Path of the Revanant", self.GetCurrentCount(GV_PathRev_Count, GV_PathRev), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_ProjectAHOL)			
-					if (DBM_MC_GV_PAHO.GetValue()) == 1
-						AddTextOption("Project AHO", MCM_Strings[4], 1)
-					else
-						AddTextOption("Project AHO", self.GetCurrentCount(GV_AHO_Count, GV_AHO), 0)
-					endIf
-				endIf
-					
-				if (RN_Mod.XX_RoyalL)
-					if (DBM_MC_GV_RA.GetValue()) == 1
-						AddTextOption("Royal Armory", MCM_Strings[4], 1)
-					else
-						AddTextOption("Royal Armory", self.GetCurrentCount(GV_Royal_Count, GV_Royal), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_RuinsEdgeL)			
-					if (DBM_MC_GV_Ruins.GetValue()) == 1
-						AddTextOption("Ruins Edge", MCM_Strings[4], 1)
-					else
-						AddTextOption("Ruins Edge", self.GetCurrentCount(GV_Ruins_Count, GV_Ruins), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_SheoStaffL)
-					if (DBM_MC_GV_Sheo.GetValue()) == 1
-						AddTextOption("Staff of Sheogorath", MCM_Strings[4], 1)
-					else
-						AddTextOption("Staff of Sheogorath", self.GetCurrentCount(GV_Sheo_Count, GV_Sheo), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_SoapsL) || (RN_Mod.XX_SoapsKICL)			
-					if (DBM_MC_GV_Soaps.GetValue()) == 1
-						AddTextOption("Inn Soaps", MCM_Strings[4], 1)
-					else
-						AddTextOption("Inn Soaps", self.GetCurrentCount(GV_Soaps_Count, GV_Soaps), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_SkyrimSewers)
-					if (DBM_MC_GV_Sewers.GetValue()) == 1
-						AddTextOption("Skyrim Sewers", MCM_Strings[4], 1)
-					else
-						AddTextOption("Skyrim Sewers", self.GetCurrentCount(GV_Sewers_Count, GV_Sewers), 0)
-					endIf
-				endIf	
-				
-				if (RN_Mod.XX_SUTL)
-					if (DBM_MC_GV_SUT.GetValue()) == 1
-						AddTextOption("Skyrim Unique Treasures", MCM_Strings[4], 1)
-					else
-						AddTextOption("Skyrim Unique Treasures", self.GetCurrentCount(GV_SUT_Count, GV_SUT), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_ForgottenL)			
-					if (DBM_MC_GV_TFC.GetValue()) == 1
-						AddTextOption("The Forgotten City", MCM_Strings[4], 1)
-					else
-						AddTextOption("The Forgotten City", self.GetCurrentCount(GV_TFC_Count, GV_TFC), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_TreasureHuntL)
-					if (DBM_MC_GV_TH.GetValue()) == 1
-						AddTextOption("Treasure Hunter", MCM_Strings[4], 1)
-					else
-						AddTextOption("Treasure Hunter", self.GetCurrentCount(GV_TH_Count, GV_TH), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_UndeathL)			
-					if (DBM_MC_GV_Undeath.GetValue()) == 1
-						AddTextOption("Undeath", MCM_Strings[4], 1)
-					else
-						AddTextOption("Undeath", self.GetCurrentCount(GV_Undeath_Count, GV_Undeath), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_UndergroundL) || (RN_Mod.XX_UndergroundESPL)
-					if (DBM_MC_GV_SU.GetValue()) == 1
-						AddTextOption("Skyrim Underground", MCM_Strings[4], 1)
-					else
-						AddTextOption("Skyrim Underground", self.GetCurrentCount(GV_SU_Count, GV_SU), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_VigilantL)		
-					if (DBM_MC_GV_Vig.GetValue()) == 1
-						AddTextOption("Vigilant.", MCM_Strings[4], 1)
-					else
-						AddTextOption("Vigilant.", self.GetCurrentCount(GV_Vig_Count, GV_Vig), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_VolkiharL)		
-					if (DBM_MC_GV_Volk.GetValue()) == 1
-						AddTextOption("Volkihar Knight", MCM_Strings[4], 1)
-					else
-						AddTextOption("Volkihar Knight", self.GetCurrentCount(GV_Volk_Count, GV_Volk), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_WheelsOfLullL)
-					if (DBM_MC_GV_WOL.GetValue()) == 1
-						AddTextOption("The Wheels of Lull", MCM_Strings[4], 1)
-					else
-						AddTextOption("The Wheels of Lull", self.GetCurrentCount(GV_Wheels_Count, GV_Wheels), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_WintersunL)			
-					if (DBM_MC_GV_Winter.GetValue()) == 1
-						AddTextOption("Wintersun", MCM_Strings[4], 1)
-					else
-						AddTextOption("Wintersun", self.GetCurrentCount(GV_Wintersun_Count, GV_Wintersun), 0)
-					endIf
-				endIf
-
-				if (RN_Mod.XX_WyrmstoothL)
-					if (DBM_MC_GV_Wyrms.GetValue()) == 1
-						AddTextOption("Wyrmstooth", MCM_Strings[4], 1)
-					else
-						AddTextOption("Wyrmstooth", self.GetCurrentCount(GV_Wyrmstooth_Count, GV_Wyrmstooth), 0)
-					endIf
-				endIf	
-
-				if (RN_Mod.XX_ZimThaneL) || (RN_Mod.XX_ZimThaneOnlyL)			
-					if (DBM_MC_GV_ZTW.GetValue()) == 1
-						AddTextOption("Zim's Thane Weapons", MCM_Strings[4], 1)
-					else
-						AddTextOption("Zim's Thane Weapons", self.GetCurrentCount(GV_ZIA_Count, GV_ZIA), 0)
-					endIf
-				endIf
+					_Index +=1
+				endWhile					
 			else
 				AddTextOption("No Patches Installed", "", 1)
 			endIf
@@ -1886,6 +757,71 @@ Event AddCompletedModsPage()
 			AddTextOption("update the current figures.", "", 0)
 			AddEmptyOption()
 			AddTextOption("Completed ", self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Supported Mods", 0)			
+		endIf
+	endIf
+endEvent
+
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------------------------------------Creations Page --------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Event AddCompletedCreationsPage()
+
+	if CurrentPage == "Supported Creations"
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		SetCursorPosition(0)		
+		if (DBM_SortWait.GetValue())
+			AddHeaderOption("Information:")
+			AddTextOption("This Page is currently unavailable due to an on-going", "", 0)
+			AddTextOption("process, this could include:", "", 0)
+			AddEmptyOption()
+			AddTextOption("-Mod Setup.", "", 0)
+			AddTextOption("-Display Scanning features.", "", 0)
+			AddTextOption("-Sorting via Prep Station.", "", 0)
+			AddTextOption("-Sorting via Display Drop-Off.", "", 0)
+			AddEmptyOption()
+			AddTextOption("Please exit the MCM and wait for the current operation", "", 0)
+			AddTextOption("to finish.", "", 0)			
+			SetCursorPosition(1)
+			AddEmptyOption()
+			AddEmptyOption()
+			AddEmptyOption()
+			AddEmptyOption()
+			AddTextOption("'Patience is the calm acceptance that things can happen", "", 0)
+			AddTextOption("in a different order than the one you have in your mind'", "", 0)
+			AddTextOption("                                   -David G. Allen", "", 0)			
+		else
+			AddHeaderOption("Installed Creations:")
+			
+			if RN_SupportedCreationCount.GetValue() > 0
+
+				Int _Index = 0
+				While _Index < RN_Array._CreationName.length
+				
+					if RN_Array._bCreations[_Index]
+						if RN_Array._GVCreationComplete[_Index].GetValue() == 1
+							AddTextOption(RN_Array._CreationName[_Index], MCM_Strings[4], 1)
+						else
+							AddTextOption(RN_Array._CreationName[_Index], self.GetCurrentCount(RN_Array._CreationCount[_Index], RN_Array._CreationTotal[_Index]), 0)
+						endIf
+					endIf
+					_Index +=1
+				endWhile					
+			else
+				AddTextOption("No Creations Installed", "", 1)
+			endIf
+
+			SetCursorPosition(1)
+			AddHeaderOption("Page Information:")
+			AddTextOption("This page lists all installed and supported Creations.", "", 0)
+			AddEmptyOption()
+			AddTextOption("As you collect and display your items, the page will", "", 0)
+			AddTextOption("keep track of your progess.", "", 0)
+			AddEmptyOption()			
+			AddTextOption("Run the Mods Scan from the MCM or Prep station to", "", 0)
+			AddTextOption("update the current figures.", "", 0)
+			AddEmptyOption()
+			AddTextOption("Completed ", self.GetCurrentCount(iCreationComplete, RN_SupportedCreationCount) + " Supported Creations", 0)			
 		endIf
 	endIf
 endEvent
@@ -2017,7 +953,9 @@ state RefreshMCM
 	
 			ShowMessage("Please exit MCM and re-enter again to see changes", false, "Ok")
 			SetTitleText("===PLEASE WAIT===")
-			AddDynamicPagesList()
+			AddDynamicPagesList()	
+			RN_Tracker_Array._Build_Quest_Toggles()
+			RN_Tracker_Array._Build_Quest_Arrays()
 			ForcePageReset()
 	endFunction
 
@@ -2410,7 +1348,7 @@ Function Begin_Config_Author()
 			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
 		endIf
 	
-	if Game.GetPlayer().HasPerk(DBM_ArcPerkRelicHunter)
+	if DBM_ArcSkill.GetValue() >= 5
 		AutoTransferRelics = True
 		RN_Transfer.GoToState("")
 		AllowWeapon = True
@@ -2420,10 +1358,12 @@ Function Begin_Config_Author()
 		AllowKey = True
 		AllowGems = True
 		AllowMisc = True
+		
 		StorageSpellVal = True
 		if !(Game.GetPlayer().HasSpell(RN_Storage_Spell))
 			(Game.GetPlayer().AddSpell(RN_Storage_Spell))
 		endIf
+		
 	else
 		AutoTransferRelics = False
 		RN_Transfer.GoToState("Disabled")
@@ -2495,32 +1435,7 @@ state ScanMuseum
 
 	function OnHighlightST()
 
-		SetInfoText("Selecting this option will scan the Museum for all displayed items and update the listings within this mod.")
-	endFunction
-endState
-
-;;------------------------------
-
-state ScanArmory
-
-	function OnSelectST()		
-	
-	PlayerRef.GetCurrentLocation()	
-		if (PlayerRef.IsInLocation(DBM_DragonbornGalleryLocation)) || (PlayerRef.IsInLocation(DBM_GuildHouseSolitudeLocation)) && (PlayerRef.IsInInterior()) || ShowLocationOverrideVal
-		
-			if ShowMessage("This will start the process of Scanning the Armory for completed sets... do you want to scan now?", true, "Scan", "Cancel")
-				ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
-				RN_Utility.ScanArmory()
-			endIf
-		else	
-			ShowMessage("You must be inside the Museum to carry out this operation.", false, "OK")
-				return
-		endIf
-	endFunction
-
-	function OnHighlightST()
-
-		SetInfoText("Selecting this option will scan the Armory for all displayed items and update the listings within this mod.")
+		SetInfoText("Selecting this option will scan the Museum & Armory for all displayed items and update the listings within this mod.")
 	endFunction
 endState
 
@@ -2552,33 +1467,17 @@ endState
 
 ;;-------------------------------
 
-state ScanHeavyArm
+state ScanCreations
 
 	function OnSelectST()	
 	
 	PlayerRef.GetCurrentLocation()	
 		if (PlayerRef.IsInLocation(DBM_DragonbornGalleryLocation)) || (PlayerRef.IsInLocation(DBM_GuildHouseSolitudeLocation)) && (PlayerRef.IsInInterior()) || ShowLocationOverrideVal
 		
-			if ShowMessage("This will scan and update the figures for Heavy Armory... do you want to scan now?", true, "Scan", "Cancel")
-							
-				bScanning = True
-				DBM_SortWait.SetValue(1)
-				SendModEvent("RunHADisplayCheck")
-				RN_Scan_Sent.Mod(1)
+			if ShowMessage("This will start the process of Scanning the Museum for completed sets from supported creations... do you want to scan now?", true, "Scan", "Cancel")
 				ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
-
-				while bScanning	
-					if RN_Scan_Done.GetValue() == RN_Scan_Sent.GetValue()			
-						bScanning = False
-						
-						RN_Scan_Done.SetValue(0)
-						RN_Scan_Sent.SetValue(0)
-						DBM_SortWait.SetValue(0)
-						DBM_ScanMuseum_Finished_Message.Show()		
-					endIf		
-				endWhile
+				RN_Utility.ScanCreations()
 			endIf
-			
 		else	
 			ShowMessage("You must be inside the Museum to carry out this operation.", false, "OK")
 				return
@@ -2588,49 +1487,7 @@ state ScanHeavyArm
 
 	function OnHighlightST()
 
-		SetInfoText("Selecting this option will scan the Museum for all displayed items from Heavy Armory and update the current figures.")
-	endFunction
-endState
-
-;;-------------------------------
-
-state ScanImmWeap
-
-	function OnSelectST()	
-	
-	PlayerRef.GetCurrentLocation()	
-		if (PlayerRef.IsInLocation(DBM_DragonbornGalleryLocation)) || (PlayerRef.IsInLocation(DBM_GuildHouseSolitudeLocation)) && (PlayerRef.IsInInterior()) || ShowLocationOverrideVal
-		
-			if ShowMessage("This will scan and update the figures for Immersive Weapons... do you want to scan now?", true, "Scan", "Cancel")
-			
-				bScanning = True
-				DBM_SortWait.SetValue(1)
-				SendModEvent("RunIWDisplayCheck")
-				RN_Scan_Sent.Mod(1)
-				ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
-
-				while bScanning	
-					if RN_Scan_Done.GetValue() == RN_Scan_Sent.GetValue()			
-						bScanning = False
-						
-						RN_Scan_Done.SetValue(0)
-						RN_Scan_Sent.SetValue(0)
-						DBM_SortWait.SetValue(0)
-						DBM_ScanMuseum_Finished_Message.Show()		
-					endIf		
-				endWhile
-			endIf
-			
-		else	
-			ShowMessage("You must be inside the Museum to carry out this operation.", false, "OK")
-				return
-		endIf
-	endFunction
-
-
-	function OnHighlightST()
-
-		SetInfoText("Selecting this option will scan the Museum for all displayed items from Immersive Weapons and update the current figures.")
+		SetInfoText("Selecting this option will scan the Museum for all displayed items from supported creations and update the listings within this mod.")
 	endFunction
 endState
 
@@ -2668,7 +1525,7 @@ state iRelicSpellDebug ;;Debug Options
 		ShowStorageSpellOverideVal = !ShowStorageSpellOverideVal
 		SetToggleOptionValueST(ShowStorageSpellOverideVal)
 			
-		if !ShowStorageSpellOverideVal && !Game.GetPlayer().HasPerk(DBM_ArcPerkRelicHunter)
+		if ShowStorageSpellOverideVal
 			if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
 				(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
 				if AutoTransferRelics
@@ -2838,7 +1695,7 @@ state iRelicSetCompleteNotifications
 
 	Event OnHighlightST()
 
-		self.SetInfoText("This option will display notifications when the player collects all displayable items from a given Set or Museum Section.\n Includes Armory Add-on if installed as well as any installed supported mods.\n Default: Enabled")
+		self.SetInfoText("This option will display notifications when the player collects all displayable items from a given Set, collection or Museum Section.\n Default: Enabled")
 	EndEvent
 endState
 
@@ -2965,7 +1822,7 @@ state iRelicStorageOptions ;;Storage Spell
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Adds the spell for the Relic Storage Container to the player.\n The container is inaccessible until the player has acquired the 'Relic Hunter' perk from the Excavation Perk Tree")
+		self.SetInfoText("Adds the spell for the Relic Storage Container to the player.\n The container is inaccessible until the player has reached an overall Archaeology level of 5")
 	EndEvent
 endState		
 
@@ -3002,7 +1859,8 @@ endFunction
 ;;-------------------------------
 	
 String function GetStorageOptions()
-	if !Game.GetPlayer().HasPerk(DBM_ArcPerkRelicHunter) && !ShowStorageSpellOverideVal
+	
+	if DBM_ArcSkill.GetValue() < 5 && !ShowStorageSpellOverideVal
 		Status_Return = MCM_Strings[21]
 		StorageSpellVal = FALSE
 	elseif !StorageSpellVal
@@ -3683,9 +2541,9 @@ String function GetReplicaTaggingOptions()
 	return Status_Return
 endFunction	
 
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Return Strings --------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------- Return Strings -------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------
 
 string function GetCurrentCount(GlobalVariable akVariable, GlobalVariable akVariableB)
 	
@@ -3701,8 +2559,17 @@ endFunction
 string function GetCurrentMuseumCount(GlobalVariable akVariable)
 	
 	Int Current_Count = (akVariable.GetValue()) as Int	
-	
-		Status_Return = (Current_Count + "/10 Sections")
+	Int Total_Room = 11
+		
+		if RN_SupportedCreationCount.GetValue() > 0
+			Total_Room += 1
+		endIf
+		
+		if RN_Mod.XX_SafehouseL
+			Total_Room += 1
+		endIf
+
+		Status_Return = (Current_Count + "/" + Total_Room + " Sections")
 	return Status_Return
 endFunction
 
@@ -3722,7 +2589,7 @@ string function GetCurrentArmoryCount(GlobalVariable akVariable)
 	
 	Int Current_Count = (akVariable.GetValue()) as Int	
 	
-		Status_Return = (Current_Count + "/20 Sets")
+		Status_Return = (Current_Count + "/20")
 	return Status_Return
 endFunction
 

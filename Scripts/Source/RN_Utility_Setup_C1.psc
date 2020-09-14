@@ -17,9 +17,28 @@ formlist property DBM_SectionHOLEMainFloor auto
 formlist property DBM_SectionHOLEUpperRing auto
 formlist property DBM_SectionHOLE_Merged auto
 
-;;Globals For List Sizes.
-GlobalVariable Property GV_SectionHallofHeroes Auto
-GlobalVariable Property GV_SectionHOLE Auto
+;Display Ref List - Hall Of Secrets
+formlist property DBM_SectionHOSDisplays auto
+formlist property DBM_SectionHallofSecrets_Merged auto
+
+;Display Ref List - Guildhouse
+formlist property DBM_SectionGuildhouse auto
+formlist property DBM_SectionGuildhouse_Merged auto
+;Display Ref List - Storeroom
+formlist property DBM_SectionStoreRoomReserveVintages auto
+formlist property DBM_SectionStoreRoom_Merged auto
+
+;Display Ref List - Daedric Gallery
+formlist property DBM_SectionDaedricGallery auto
+formlist property DBM_SectionDaedricGallery_Merged auto
+
+;Display Ref List - Hall Of Oddities
+formlist property DBM_SectionHOOMainFloor auto
+formlist property DBM_SectionHallofOddities_Merged auto
+
+;Display Ref List - Dragonborn Hall
+formlist property DBM_SectionDBHallAchievements auto
+formlist property DBM_SectionDragonbornHall_Merged auto
 
 ;; Global for ModEvent Return.
 GlobalVariable Property RN_Setup_Done Auto
@@ -57,11 +76,15 @@ function OnRunSetup_C1(string eventName, string strArg, float numArg, Form sende
 
 	;;Merge Hall Of Lost Empires Display Lists
 	_onConsolidateDisplays(DBM_SectionHOLEMainFloor, DBM_SectionHOLE_Merged)  
-	_onConsolidateDisplays(DBM_SectionHOLEUpperRing, DBM_SectionHOLE_Merged)
+	_onConsolidateDisplays(DBM_SectionHOLEUpperRing, DBM_SectionHOLE_Merged)	
 	
-	GV_SectionHallofHeroes.Mod(DBM_SectionHOH_Merged.GetSize())
-	GV_SectionHOLE.Mod(DBM_SectionHOLE_Merged.GetSize())
-	
+	;;Merge All Halls Display Lists
+	_onConsolidateDisplays(DBM_SectionDBHallAchievements, DBM_SectionDragonbornHall_Merged)
+	_onConsolidateDisplays(DBM_SectionDaedricGallery, DBM_SectionDaedricGallery_Merged)
+	_onConsolidateDisplays(DBM_SectionHOOMainFloor, DBM_SectionHallofOddities_Merged)
+	_onConsolidateDisplays(DBM_SectionHOSDisplays, DBM_SectionHallofSecrets_Merged)
+	_onConsolidateDisplays(DBM_SectionGuildhouse, DBM_SectionGuildhouse_Merged)
+	_onConsolidateDisplays(DBM_SectionStoreRoomReserveVintages, DBM_SectionStoreRoom_Merged)
 	
 	RN_Setup_Done.Mod(1)
 endFunction
