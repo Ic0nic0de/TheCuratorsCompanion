@@ -1,5 +1,5 @@
 ---
-name: Custom issue template
+name: Raise New Issue
 about: Bug Reporting
 title: ''
 labels: ''
