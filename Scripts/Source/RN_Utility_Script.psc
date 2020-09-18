@@ -481,7 +481,7 @@ Function Maintenance()
 	while bSetupStarted		
 		if RN_Setup_Done.GetValue() == RN_Setup_Sent.GetValue() 
 			
-			if RN_SupportedModCount.GetValue() > _OldCreationCount ||  RN_SupportedCreationCount.GetValue() > _OldCreationCount
+			if RN_SupportedModCount.GetValue() > _OldPatchCount ||  RN_SupportedCreationCount.GetValue() > _OldCreationCount
 				
 				_OldShowStartup = RN_MCM.ShowStartup
 				

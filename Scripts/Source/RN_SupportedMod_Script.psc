@@ -42,6 +42,8 @@ String property _ModScan  auto
 globalvariable property RN_SupportedModCount auto
 globalvariable property RN_SupportedCreationCount auto
 
+formlist property RN_TokenFormlistExcluded auto
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -82,6 +84,10 @@ ObjectReference[] property _questDisplays auto
 ;;Shrine Display Properties
 ObjectReference[] property _wintersunShrine auto
 
+;;Prisoner belongigns chest for mods that add one.
+ObjectReference[] property _PrisonerChest auto
+Bool _PrisonerChestAdded
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -108,6 +114,10 @@ Event onPlayerLoadGame()
 	endIf
 	
 	_Global_Display_Count.SetValue(_displayList_Enabled.GetSize())	
+	
+	if !_PrisonerChestAdded
+		AddPrisonerChest()
+	endIf
 endEvent
 	
 ;;-- Events ---------------------------------------		
@@ -172,6 +182,19 @@ Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;
 			EndWhile
 		endIf
 
+;;------------
+
+		if _PrisonerChest
+			Index = _PrisonerChest.length
+			while Index > 0
+				Index -= 1		
+				RN_TokenFormlistExcluded.AddForm(_PrisonerChest[Index])
+			EndWhile
+		endIf
+		
+		_PrisonerChestAdded = True
+		
+;;------------
 
 		if _bPatchType	
 			RN_SupportedModCount.Mod(1)
@@ -235,3 +258,18 @@ Event _onModScan(string eventName, string strArg, float numArg, Form sender) ;;A
 	endIf
 	
 EndEvent	
+
+;;-- Events ---------------------------------------	
+
+Event AddPrisonerChest()
+
+	if _PrisonerChest
+		Int Index = _PrisonerChest.length
+		while Index > 0
+			Index -= 1		
+			RN_TokenFormlistExcluded.AddForm(_PrisonerChest[Index])
+		EndWhile
+	endIf
+	
+	_PrisonerChestAdded = True
+endEvent
