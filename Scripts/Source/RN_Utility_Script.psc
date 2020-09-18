@@ -52,7 +52,6 @@ bool bScanAll
 bool bUpdating
 bool bMoreHUDListsCreated
 bool bSetupStarted
-bool _OldShowStartup
 
 ;;Treasury 
 miscobject property Gold001 auto
@@ -482,10 +481,6 @@ Function Maintenance()
 		if RN_Setup_Done.GetValue() == RN_Setup_Sent.GetValue() 
 			
 			if RN_SupportedModCount.GetValue() > _OldPatchCount ||  RN_SupportedCreationCount.GetValue() > _OldCreationCount
-				
-				_OldShowStartup = RN_MCM.ShowStartup
-				
-				RN_MCM.ShowStartup = true
 				ModStartup_UpdatingLists.Show()
 				CreateMoreHudLists()
 				UpdateAllFound()
@@ -582,7 +577,6 @@ Function Maintenance()
 	
 	if RN_MCM.ShowStartup
 		ModStartupDone.Show()
-		RN_MCM.ShowStartup = _OldShowStartup
 	endIf
 	
 endFunction

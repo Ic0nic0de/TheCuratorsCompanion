@@ -269,7 +269,7 @@ Event InitMCMStrings()
 	MCM_Strings[3] = "<font color='#750e0e'>Not Found</font>"
 	MCM_Strings[4] = "Complete"
 	MCM_Strings[5] = "Scan"
-	MCM_Strings[6] = "Hide"
+	MCM_Strings[6] = "Messages Hidden"
 	MCM_Strings[7] = "Disabled"
 	MCM_Strings[8] = "Enabled"
 	MCM_Strings[9] = "Add Spell"
@@ -283,7 +283,7 @@ Event InitMCMStrings()
 	MCM_Strings[17] = "FISS Not Found"
 	MCM_Strings[18] = "Save Preset"
 	MCM_Strings[19] = "Reload MCM"
-	MCM_Strings[20] = "Show"
+	MCM_Strings[20] = "Messages Shown"
 	MCM_Strings[21] = "Locked"
 	MCM_Strings[22] = "Requires Perk"
 	MCM_Strings[23] = "Setting Up"
@@ -1788,9 +1788,9 @@ endState
 String function SetShowStartup()
 
 		if !ShowStartup		
-			Status_Return = MCM_Strings[20]
-		elseif ShowStartup	
 			Status_Return = MCM_Strings[6]
+		elseif ShowStartup	
+			Status_Return = MCM_Strings[20]
 		endIf
 		return Status_Return
 endfunction
@@ -1800,9 +1800,9 @@ endfunction
 String function GetShowStartup()
 
 	if !ShowStartup
-		Status_Return = MCM_Strings[20]
-	elseif ShowStartup	
 		Status_Return = MCM_Strings[6]
+	elseif ShowStartup	
+		Status_Return = MCM_Strings[20]
 	endIf
 	return Status_Return
 endFunction	
