@@ -47,6 +47,8 @@ message property ModStartup_UpdatingLists auto
 message property UserSettingsLoaded auto
 message property UserSettingsNone auto
 
+message property moreHUDListRebuilt auto
+
 bool bScanning
 bool bScanAll
 bool bUpdating
@@ -75,6 +77,7 @@ formlist property DBM_Section_HOH_LIB_Found auto
 formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
+formlist property dbmMaster auto
 
 ;;Replica Formlists
 formlist property DBM_ReplicaBaseItems auto
@@ -169,7 +172,7 @@ Event RunSetup()
 		_Index = 0
 		_ArraySize = RN_Array._Patches.length
 		While _Index < _ArraySize	
-			if RN_Array._bPatches[_Index]
+			if RN_Array._bPatches[_Index] && RN_Array._GVComplete[_Index].GetValue() == 0
 				SendModEvent(RN_Array._Patches[_Index])
 				RN_Setup_Sent.Mod(1)
 			endIf
@@ -179,7 +182,7 @@ Event RunSetup()
 		_Index = 0
 		_ArraySize = RN_Array._Creations.length
 		While _Index < _ArraySize	
-			if RN_Array._bCreations[_Index]
+			if RN_Array._bCreations[_Index] && RN_Array._GVCreationComplete[_Index].GetValue() == 0
 				SendModEvent(RN_Array._Creations[_Index])
 				RN_Setup_Sent.Mod(1)
 			endIf
@@ -356,7 +359,6 @@ Event FinishSetup()
 	
 	RN_Setup_Start.setvalue(0)
 	RN_Setup_Finish.setvalue(1)
-	RegisterForSingleUpdate(30.0)
 endEvent
 
 ;;-- Events ---------------------------------------
@@ -460,7 +462,7 @@ Function Maintenance()
 	Int _Index = 0
 	Int _ArraySize = RN_Array._Patches.length
 	While _Index < _ArraySize	
-		if RN_Array._bPatches[_Index]
+		if RN_Array._bPatches[_Index] && RN_Array._GVComplete[_Index].GetValue() == 0
 			SendModEvent(RN_Array._Patches[_Index])
 			RN_Setup_Sent.Mod(1)
 		endIf
@@ -470,7 +472,7 @@ Function Maintenance()
 	_Index = 0
 	_ArraySize = RN_Array._Creations.length
 	While _Index < _ArraySize	
-		if RN_Array._bCreations[_Index]
+		if RN_Array._bCreations[_Index] && RN_Array._GVCreationComplete[_Index].GetValue() == 0
 			SendModEvent(RN_Array._Creations[_Index])
 			RN_Setup_Sent.Mod(1)
 		endIf
@@ -589,26 +591,37 @@ endFunction
 
 function ScanAll()
 	
-	bScanAll = True
-	DBM_SortWait.setvalue(1)
 	DBM_ScanMuseum_Message.Show()
+	
+	bScanAll = True
+	bScanning = True
+	RN_Mod.CheckSupportedMods()
+	RN_Array.CreatePatchArray()
+	DBM_SortWait.setvalue(1)
+	
 	ScanMuseum()
-	ScanMods()
+	if RN_SupportedModCount.GetValue() > 0
+		ScanMods()
+	endIf
+	
 	if RN_SupportedCreationCount.GetValue() > 0
 		ScanCreations()
 	endIf
+	
 	FinishScan()
+	
 endFunction
 
 ;;-- Functions ---------------------------------------
 		
 function ScanMuseum()
-			
-	bScanning = True	
-	DBM_SortWait.setvalue(1)
 
 	if !bScanAll		
-		DBM_ScanMuseum_Message.Show()		
+		DBM_ScanMuseum_Message.Show()
+		bScanning = True
+		RN_Mod.CheckSupportedMods()
+		RN_Array.CreatePatchArray()
+		DBM_SortWait.setvalue(1)		
 	endIf
 	
 	Int _Index = 0
@@ -632,13 +645,14 @@ endFunction
 		
 function ScanMods()
 	
-	bScanning = True
-	DBM_SortWait.setvalue(1)
-	
 	if !bScanAll		
-		DBM_ScanMuseum_Message.Show()		
+		DBM_ScanMuseum_Message.Show()
+		bScanning = True
+		RN_Mod.CheckSupportedMods()
+		RN_Array.CreatePatchArray()
+		DBM_SortWait.setvalue(1)		
 	endIf
-
+	
 	Int _Index = 0
 	Int _ArraySize = RN_Array._ModScan.length
 		While _Index < _ArraySize	
@@ -657,14 +671,16 @@ endFunction
 ;;-- Functions ---------------------------------------
 		
 function ScanCreations()
-	
-	bScanning = True
-	DBM_SortWait.setvalue(1)
+
 	
 	if !bScanAll		
-		DBM_ScanMuseum_Message.Show()		
+		DBM_ScanMuseum_Message.Show()
+		bScanning = True
+		RN_Mod.CheckSupportedMods()
+		RN_Array.CreatePatchArray()
+		DBM_SortWait.setvalue(1)		
 	endIf
-
+	
 	Int _Index = 0
 	Int _ArraySize = RN_Array._CreationScan.length
 		While _Index < _ArraySize	
@@ -708,6 +724,9 @@ function UpdateAllFound()
 	bUpdating = True
 	DBM_SortWait.setvalue(1)
 	
+	RN_Mod.CheckSupportedMods()
+	RN_Array.CreatePatchArray()
+	
 	Int _Index = 0
 	Int _ArraySize = RN_Array._ModUpdate.length
 	While _Index < _ArraySize
@@ -748,7 +767,64 @@ Function UpdateTreasuryValue(ObjectReference _akContainer, GlobalVariable _akVar
 	
 	_akVariable.Mod(_akContainer.GetItemCount(Gold001))	
 endFunction
-				
+
+;;-- Functions ---------------------------------------
+
+Function FullReset()
+	
+	if bSetupStarted
+		RN_Setup_Done.SetValue(RN_Setup_Sent.GetValue())
+	endIf
+	
+	RN_Setup_Start.setvalue(0)	
+	RN_Setup_Finish.setvalue(0)
+	RN_Setup_Sent.setvalue(0)
+	RN_Setup_Done.setvalue(0)
+	DBM_SortWait.setvalue(0)
+	bSetupStarted = false
+	bMoreHUDListsCreated = false
+	
+	Utility.Wait(5.0)
+	RunSetup()
+	
+	RevertLists()
+	RebuildLists()
+	
+	Debug.Notification("The Curators Companion: Mod Reset Complete")
+endFunction
+
+;;-- Functions ---------------------------------------
+
+Function RevertLists()
+
+	dbmNew.revert()
+	dbmFound.revert()
+	dbmDisp.revert()
+	Debug.Notification("The Curators Companion: moreHUD Lists Reset")
+endFunction
+
+;;-- Functions ---------------------------------------
+
+Function RebuildLists()
+	
+	Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists...")
+	
+	DBM_SortWait.SetValue(1)
+	
+	Int _Index = dbmMaster.GetSize()
+	While _Index > 0
+		_Index -= 1
+		form _item = dbmMaster.GetAt(_Index) as form
+		dbmNew.AddForm(_item)
+	endWhile
+		
+	CreateMoreHudLists()
+	
+	moreHUDListRebuilt.Show()
+	
+	DBM_SortWait.SetValue(0)
+endFunction
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ End of Script -----------------------------------------------------------------------------------------------------

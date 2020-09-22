@@ -38,7 +38,6 @@ globalvariable property RN_Scan_Sent auto
 
 ;; Debug Variables
 int inputOID_I
-message property moreHUDListRebuilt auto
 globalvariable property RN_Debug_Access auto
 globalvariable property RN_Debug_Randomiser auto
 
@@ -264,7 +263,7 @@ Event InitMCMStrings()
 
 	MCM_Strings = new string[28]
 	MCM_Strings[0] = "Developed By (Ic0n)Ic0de"
-	MCM_Strings[1] = "Version 2.1.1"
+	MCM_Strings[1] = "Version 2.1.2"
 	MCM_Strings[2] = "<font color='#750e0e'>Invalid Version</font>"
 	MCM_Strings[3] = "<font color='#750e0e'>Not Found</font>"
 	MCM_Strings[4] = "Complete"
@@ -845,7 +844,8 @@ Event AddDebugPage()
 			AddToggleOptionST("iRelicLocationDebug", "Disable Location Checks", ShowLocationOverrideVal)
 			AddToggleOptionST("iRelicSpellDebug", "Disable Spell Requirements", ShowStorageSpellOverideVal)
 			AddToggleOptionST("Dev_Alerts", "Developer Debugging", DevDebugVal)
-			
+			AddTextOptionST("Scan_Debug", "Reset Scanner", "", 0)
+			AddTextOptionST("Mod_Reset", "Reset Mod", "", 0)
 			AddEmptyOption()
 			AddHeaderOption("moreHUD Debug:")
 			AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 0)
@@ -1411,7 +1411,7 @@ state ScanAll
 
 	function OnHighlightST()
 
-		SetInfoText("Selecting this option will scan the Museum for all displayed items from the Museum, Armory add-on and any installed mods then update the listings within this mod.")
+		SetInfoText("Selecting this option will scan the Museum for all displayed items from the Museum, Armory, and any installed mods / creations then update the listings within this mod.")
 	endFunction
 endState
 
@@ -1557,6 +1557,8 @@ state iRelicSpellDebug ;;Debug Options
 	EndEvent
 endState
 
+;;-------------------------------
+
 state Dev_Alerts ;;Debug Options
 
 	Event OnSelectST()
@@ -1574,6 +1576,46 @@ state Dev_Alerts ;;Debug Options
 	Event OnHighlightST()
 
 		self.SetInfoText("Enables Developer Debugging Alerts -- NOT FOR PLAYER USE\n Default: OFF")
+	EndEvent
+endState
+
+;;-------------------------------
+
+state Scan_Debug
+
+	Event OnSelectST()
+	
+		if self.ShowMessage("This will reset the current Museum scan and reset the scanner, do you want to reset now?", true, "Reset", "Cancel")
+			RN_Scan_Done.SetValue(RN_Scan_Sent.GetValue())
+			DBM_SortWait.setvalue(0)
+			ForcePageReset()
+		endIf
+		
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Resets the Museum Scanner -- NOT FOR PLAYER USE")
+	EndEvent
+endState
+
+;;-------------------------------
+
+state Mod_Reset
+
+	Event OnSelectST()
+	
+		if self.ShowMessage("This will reset the mod and force start the inital setup, do you want to reset now?", true, "Reset", "Cancel")
+			ShowMessage("Please exit the MCM and follow the on screen instructions", false, "Ok")
+			RN_Utility.FullReset()
+			ForcePageReset()
+		endIf
+		
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Resets the Mod")
 	EndEvent
 endState
 
@@ -1631,13 +1673,12 @@ state RevertLists
 
 	Event OnSelectST()
 		
-		if self.ShowMessage("This will revert the moreHUD new / found / displayed formlists to 0, do you want to revert now?", true, "Revert", "Cancel")
 		
-			dbmNew.revert()
-			dbmFound.revert()
-			dbmDisp.revert()
-			forcepagereset()
-			
+		if IsInMenuMode()
+			if self.ShowMessage("This will revert the moreHUD new / found / displayed formlists to 0, do you want to revert now?", true, "Revert", "Cancel")
+				RN_Utility.RevertLists()
+				forcepagereset()
+			endIF				
 		endIf
 		
 	EndEvent
@@ -1653,26 +1694,14 @@ endState
 state RebuildLists
 
 	Event OnSelectST()
-		
-		if self.ShowMessage("This will rebuild and update the moreHUD lists for all new / found / displayed items, do you want to rebuild now?", true, "Rebuild", "Cancel")
-			ShowMessage("Please exit the MCM and wait for a completion message", false, "Ok")
-			
-			DBM_SortWait.SetValue(1)
-			
-			Int _Index = dbmMaster.GetSize()
-			While _Index > 0
-				_Index -= 1
-				form _item = dbmMaster.GetAt(_Index) as form
-				dbmNew.AddForm(_item)
-			endWhile
+	
+		if IsInMenuMode()
+			if self.ShowMessage("This will rebuild and update the moreHUD lists for all new / found / displayed items, do you want to rebuild now?", true, "Rebuild", "Cancel")
 				
-			RN_Utility.CreateMoreHudLists()
-			
-			moreHUDListRebuilt.Show()
-			
-			DBM_SortWait.SetValue(0)
+				ShowMessage("Please exit the MCM and wait for a completion message", false, "Ok")
+				RN_Utility.RebuildLists()
+			endIF
 		endIf
-		
 	EndEvent
 
 	Event OnHighlightST()
