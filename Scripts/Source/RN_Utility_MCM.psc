@@ -31,7 +31,9 @@ string[] PagesList
 string InputBox = "Enter Password"
 string Status_Return
 
-;; Scan Variables
+bool Safehouse_Enabled 
+bool property Safehouse_Configured auto
+
 bool bScanning = false
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Sent auto
@@ -61,6 +63,7 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
+formlist property RN_Safehouse_Items_Merged auto
 formlist property RN_TokenFormlist_NoShipment auto
 globalvariable property RN_moreHUD_Option auto
 
@@ -263,7 +266,7 @@ Event InitMCMStrings()
 
 	MCM_Strings = new string[28]
 	MCM_Strings[0] = "Developed By (Ic0n)Ic0de"
-	MCM_Strings[1] = "Version 2.1.2"
+	MCM_Strings[1] = "Version 2.1.3"
 	MCM_Strings[2] = "<font color='#750e0e'>Invalid Version</font>"
 	MCM_Strings[3] = "<font color='#750e0e'>Not Found</font>"
 	MCM_Strings[4] = "Complete"
@@ -359,6 +362,13 @@ Event AddAdvancedPage()
 		else
 			AddtextOption("moreHUD Icon Settings:", MCM_Strings[3])
 		endif
+		
+		if Safehouse_Enabled
+			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 1)
+		else
+			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 0)
+		endIf
+		
 		AddTextOptionST("ReplicaTagging", "moreHUD Advanced Tagging:", self.GetReplicaTaggingOptions(), 0)
 		
 		AddEmptyOption()
@@ -500,12 +510,17 @@ Event AddMuseumSetsPage()
 			AddTextOption("                                   -David G. Allen", "", 0)		
 		else		
 			AddHeaderOption("Museum Sections:")	
+				
 			Int _Index = 0
 			Int _Length = RN_Array._Museum_Section_names.length
 			While _Index < _Length 
-			
 				if RN_Array._Museum_Global_Complete[_Index].GetValue() == 1
-					AddTextOption(RN_Array._Museum_Section_names[_Index], MCM_Strings[4], 1)
+					if RN_Array._Museum_Global_Total[_Index].GetValue() > RN_Array._Museum_Global_Count[_Index].GetValue() 
+						RN_Array._Museum_Global_Complete[_Index].SetValue(0)
+						iMuseumSets.Mod(-1)
+					else
+						AddTextOption(RN_Array._Museum_Section_names[_Index], MCM_Strings[4], 1)
+					endIF
 				else
 					AddTextOption(RN_Array._Museum_Section_names[_Index], self.GetCurrentCount(RN_Array._Museum_Global_Count[_Index], RN_Array._Museum_Global_Total[_Index]), 0)
 				endIf
@@ -518,6 +533,7 @@ Event AddMuseumSetsPage()
 				if _Index == 11 && RN_Mod.XX_SafehouseL == false
 					_Index += 1
 				endIf
+				
 			endWhile
 			
 			AddEmptyOption()
@@ -2424,6 +2440,53 @@ state moreHUDOptions
 	endEvent
 endState
 
+;;-------------------------------
+
+state Safehouse_Disp
+	
+	function OnSelectST()
+	
+		Safehouse_Enabled = !Safehouse_Enabled 
+		
+		if Safehouse_Enabled
+			if self.ShowMessage("This will Enable moreHUD icons and functionality for all standard Safehouse displays, do you want to enable now?", true, "Enable", "Cancel")
+				self.SetTextOptionValueST(self.SetSafehouseOptions(), false, "")
+				RN_Utility.SetUpSafehouse()
+				Safehouse_Configured = True
+			endIf
+		endIF			
+	EndFunction
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Enable this to show moreHUD icons and add functionality to general Safehouse items.\n Default: Disabled \n (THIS FEATURE CAN NOT BE DISABLED ONCE TURNED ON)")
+	EndEvent
+endState
+
+;;-------------------------------
+
+String function SetSafehouseOptions()
+
+	if !Safehouse_Enabled		
+		Status_Return = MCM_Strings[7]
+	elseif Safehouse_Enabled	
+		Status_Return = MCM_Strings[8]
+	endIf
+		return Status_Return
+endfunction
+
+;;-------------------------------
+			
+String function GetSafehouseOptions()
+
+	if !Safehouse_Enabled
+		Status_Return = MCM_Strings[7]
+	elseif Safehouse_Enabled	
+		Status_Return = MCM_Strings[8]
+	endIf
+		return Status_Return
+endFunction	
+	
 ;;-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Advanced tagging ----------------------------------------------------------------------------------------------
 ;;-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2593,11 +2656,11 @@ string function GetCurrentMuseumCount(GlobalVariable akVariable)
 		if RN_SupportedCreationCount.GetValue() > 0
 			Total_Room += 1
 		endIf
-		
+
 		if RN_Mod.XX_SafehouseL
 			Total_Room += 1
 		endIf
-
+		
 		Status_Return = (Current_Count + "/" + Total_Room + " Sections")
 	return Status_Return
 endFunction

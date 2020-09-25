@@ -38,7 +38,7 @@ endEvent
 
 Event onItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 	
-	if RN_Array._MuseumContainerArray_WP.Find(akSourceContainer) == -1 && !dbmDisp.HasForm(akBaseItem) 	;; Ignore anything coming from the museum display containers, those are already handled in RN_Utility_MuseumContainerMonitor OnItemRemoved, and if dbmDisp.HasForm == true then this is a duplicate item so nothing to do here
+	if RN_Array._MuseumContainerArray_WP.Find(akSourceContainer) == -1 && !dbmDisp.HasForm(akBaseItem) || RN_Array._SafehouseContainerArray_WP.Find(akSourceContainer) == -1 && !dbmDisp.HasForm(akBaseItem) 	;; Ignore anything coming from the museum display containers, those are already handled in RN_Utility_MuseumContainerMonitor OnItemRemoved, and if dbmDisp.HasForm == true then this is a duplicate item so nothing to do here
 		processForm(akBaseItem, true)
 	endIf
 	
@@ -48,7 +48,7 @@ endEvent
 		
 Event onItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
 	
-	if dbmFound.HasForm(akBaseItem) && !akDestContainer || (RN_Array._MuseumContainerArray_WP.Find(akDestContainer) == -1 && !RN_TokenFormlist.HasForm(akDestContainer))
+	if dbmFound.HasForm(akBaseItem) && !akDestContainer || (RN_Array._MuseumContainerArray_WP.Find(akDestContainer) == -1 && !RN_TokenFormlist.HasForm(akDestContainer)) || (RN_Array._SafehouseContainerArray_WP.Find(akDestContainer) == -1 && !RN_TokenFormlist.HasForm(akDestContainer))
 	
         Bool bMoreThanOne
         Int Index = RN_TokenFormlist.GetSize()

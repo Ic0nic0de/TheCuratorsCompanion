@@ -49,17 +49,22 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	Int _Length = RN_Array._Armory_Section_names.length
 	While _Index < _Length 
 		if RN_Array._Armory_Global_Complete[_Index].GetValue() == 0
-			_onDisplayCheck(RN_Array._Armory_Formlist_Displays[_Index], RN_Array._Armory_Formlist_Enabled[_Index], RN_Array._Armory_Global_Count[_Index])		
+			_onDisplayCheck(RN_Array._Armory_Formlist_Displays[_Index], RN_Array._Armory_Formlist_Enabled[_Index], RN_Array._Armory_Global_Count[_Index])
 			if _Index == 11
 				Int _Index2 = 0
 				Int _Length2 = RN_Array._Armory_Helms_Displays.length
 				While _Index2 < _Length2
-					if RN_Array._Armory_Formlist_Enabled[_Index].HasForm(RN_Array._Armory_Helms_Displays[_Index2]) && !RN_Array._Armory_Helms_Displays[_Index2].IsDisabled()
-						RN_Array._Armory_Formlist_Enabled[_Index].AddForm(RN_Array._Armory_Helms_Displays[_Index2])
-						RN_Array._Armory_Global_Count[_Index].Mod(1)
+				ObjectReference formToProcess = RN_Array._Armory_Helms_Displays[_Index2] As ObjectReference
+					if !RN_Array._Armory_Formlist_Enabled[_Index].HasForm(formToProcess) && !formToProcess.IsDisabled()
+						RN_Array._Armory_Formlist_Enabled[_Index].AddForm(formToProcess)
+						
+					elseif RN_Array._Armory_Formlist_Enabled[_Index].HasForm(formToProcess) && formToProcess.IsDisabled()
+						RN_Array._Armory_Formlist_Enabled[_Index].RemoveAddedForm(formToProcess)	
 					endIf
 					_Index2 += 1
 				endWhile
+				
+				RN_Array._Armory_Global_Count[_Index].setvalue(RN_Array._Armory_Formlist_Enabled[_Index].GetSize()) 	
 			endIf
 			if (CheckSetCount1(RN_Array._Armory_Global_Count[_Index], RN_Array._Armory_Global_Total[_Index], RN_Array._Armory_Global_Complete[_Index], iArmorySets) && (MCM.ShowSetCompleteVal)) 
 				if (MCM.ShowSimpleNotificationVal)

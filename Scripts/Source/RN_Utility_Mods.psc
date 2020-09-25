@@ -4,6 +4,8 @@ Scriptname RN_Utility_Mods extends Quest
 ;;------------------------------------------------------------------------------Get Form From File --------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+RN_Utility_MCM Property RN_MCM Auto
+
 RN_Utility_Script Property RN_Utility Auto
 
 ;;(Is the Supported Mod Installed?)
@@ -114,6 +116,14 @@ Bool Property XX_NixHound Auto
 Bool Property XX_AnimArm Auto
 
 Bool Property XX_SafehouseL Auto
+
+Bool Property XX_Follower_Auri Auto
+Bool Property XX_Follower_Inigo Auto
+Bool Property XX_Follower_Kaidan Auto
+Bool Property XX_Follower_Lucien Auto
+Bool Property XX_Follower_Mrissi Auto
+
+Bool Property XX_SafehousePlus Auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -234,6 +244,11 @@ Event CheckSupportedMods()
 	XX_DwarvenMudcrab = Game.GetModByName("LOTD_TCC_DwarvenMudcrab.esp") != 255
 	XX_NixHound = Game.GetModByName("LOTD_TCC_NixHound.esp") != 255
 	XX_AnimArm = Game.GetModByName("LOTD_TCC_AnimatedArmory.esp") != 255
-	XX_SafehouseL = XX_CloaksL || XX_SoapsL || XX_SoapsKICL
-	
+	XX_Follower_Auri = Game.GetModByName("LOTD_TCC_Follower_Auri.esp") != 255
+	XX_Follower_Inigo = Game.GetModByName("LOTD_TCC_Follower_Inigo.esp") != 255
+	XX_Follower_Kaidan = Game.GetModByName("LOTD_TCC_Follower_Kaidan.esp") != 255
+	XX_Follower_Lucien = Game.GetModByName("LOTD_TCC_Follower_Lucien.esp") != 255
+	XX_Follower_Mrissi = Game.GetModByName("LOTD_TCC_Follower_Mrissi.esp") != 255	
+	XX_SafehousePlus = Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255
+	XX_SafehouseL = XX_CloaksL || XX_SoapsL || XX_SoapsKICL || RN_MCM.Safehouse_Configured || XX_Follower_Auri || XX_Follower_Inigo || XX_Follower_Kaidan || XX_Follower_Lucien || XX_Follower_Mrissi
 EndEvent

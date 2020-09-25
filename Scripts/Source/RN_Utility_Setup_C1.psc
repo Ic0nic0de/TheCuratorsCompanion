@@ -24,6 +24,7 @@ formlist property DBM_SectionHallofSecrets_Merged auto
 ;Display Ref List - Guildhouse
 formlist property DBM_SectionGuildhouse auto
 formlist property DBM_SectionGuildhouse_Merged auto
+
 ;Display Ref List - Storeroom
 formlist property DBM_SectionStoreRoomReserveVintages auto
 formlist property DBM_SectionStoreRoom_Merged auto
