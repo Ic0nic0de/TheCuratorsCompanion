@@ -64,17 +64,21 @@ Utility function _onDisplayCheck (Formlist afListA, Formlist afListB, GlobalVari
 				Index2 -= 1
 				ObjectReference DisplayRef = nestedList.GetAt(Index2) as ObjectReference	
 				if !afListB.HasForm(DisplayRef) && !DisplayRef.IsDisabled()
-					afListB.AddForm(DisplayRef)
-					akVariable.Mod(1)
+					afListB.AddForm(DisplayRef)				
+				elseif aflistB.HasForm(DisplayRef) && DisplayRef.IsDisabled()
+					afListB.RemoveAddedForm(DisplayRef)
 				endIf
 			EndWhile
 				
 		elseif (formToProcess As ObjectReference)
-		ObjectReference DisplayRef = formToProcess As ObjectReference
+			ObjectReference DisplayRef = formToProcess As ObjectReference
 			if !afListB.HasForm(DisplayRef) && !DisplayRef.IsDisabled()
-				afListB.AddForm(DisplayRef)
-				akVariable.Mod(1)
+				afListB.AddForm(DisplayRef)			
+			elseif aflistB.HasForm(DisplayRef) && DisplayRef.IsDisabled()
+				afListB.RemoveAddedForm(DisplayRef)
 			endIf
+
+			akVariable.Setvalue(afListB.GetSize())
 		endIf
 	endWhile
 endFunction

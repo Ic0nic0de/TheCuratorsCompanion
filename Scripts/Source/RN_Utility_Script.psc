@@ -9,6 +9,13 @@ import AhzMoreHudIE
 
 import utility
 
+RN_Utility_SafehouseContainerMonitor property SHContainerScript1 auto
+RN_Utility_SafehouseContainerMonitor property SHContainerScript2 auto
+RN_Utility_SafehouseContainerMonitor property SHContainerScript3 auto
+RN_Utility_SafehouseContainerMonitor property SHContainerScript4 auto
+RN_Utility_SafehouseContainerMonitor property SHContainerScript5 auto
+RN_Utility_SafehouseContainerMonitor property SHContainerScript6 auto
+
 RN_Utility_Mods property RN_Mod auto
 
 RN_Utility_ArrayHolder property RN_Array auto
@@ -49,6 +56,7 @@ message property UserSettingsNone auto
 
 message property moreHUDListRebuilt auto
 
+bool bSettingup
 bool bScanning
 bool bScanAll
 bool bUpdating
@@ -83,6 +91,10 @@ formlist property dbmMaster auto
 formlist property DBM_ReplicaBaseItems auto
 formlist property DBM_ReplicaItems auto
 
+;;Safehouse formlists
+formlist property RN_Safehouse_Items_Merged auto
+formlist property RN_Safehouse_Items_Found auto
+
 ;;Listeners
 formlist property DBM_RN_QuestDisplays auto
 formlist property DBM_RN_Quest_Stage_Displays auto
@@ -90,6 +102,7 @@ formlist property DBM_RN_ExplorationDisplays auto
 
 ;;Custom Storage
 formlist property RN_TokenFormlist auto
+formlist property _SafehouseContainerList_WP auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Global Variables --------------------------------------------------------------------------------------------------
@@ -101,6 +114,9 @@ globalvariable property RN_SupportedCreationCount auto
 globalvariable property RN_moreHUD_Option auto
 
 globalvariable property DBM_SortWait auto
+
+globalvariable property RN_Safehouse_Sent auto
+globalvariable property RN_Safehouse_Done auto
 
 globalvariable property RN_Setup_Start auto
 globalvariable property RN_Setup_Done auto
@@ -122,7 +138,7 @@ globalvariable property RN_Exploration_Listener_Total auto
 globalvariable property GV_SectionHallofHeroes auto
 globalvariable property GV_SectionDaedricGallery auto
 globalvariable property GV_SectionHOLE auto
-	
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------- Start of Script -----------------------------------------------------------------------------------------------------
@@ -134,6 +150,7 @@ function OnInit()
 	RN_Debug_Access.setvalue(RandomInt(0, 250))
 	RN_Debug_Randomiser.setvalue(RandomInt(251, 500))
 	RN_TokenFormlist.AddForm(PlayerRef)
+	_SafehouseContainerList_WP.AddForm(PlayerRef)
 	Wait(5.0)
 	RunSetup()
 	
@@ -222,6 +239,23 @@ function CreateMoreHudLists()
 		endWhile
 	endWhile
 	
+	if RN_MCM.Safehouse_Configured
+		Int Index = 0
+		Int ListSize = RN_Array._SafehouseContainerList.GetSize()
+		While Index < ListSize
+			ObjectReference _Container = RN_Array._SafehouseContainerList.GetAt(Index) as ObjectReference
+			Int Index2 = 0
+			Int ContainerList = _Container.GetNumItems()
+			while Index2 < ContainerList	
+				Form _ItemRelic = _Container.GetNthForm(Index2)			
+				if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) || dbmFound.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) 
+					processForm(_ItemRelic, true)
+				endIf
+				Index2 += 1
+			endWhile
+			Index += 1
+		endWhile
+	endIF
 	
 	_Index = RN_TokenFormlist.GetSize() ;; Check player and custom storage for found items.
 	While _Index
@@ -324,7 +358,7 @@ Event FireScripts()
 	RN_Thane.OnPlayerLoadGame()		;; Fire off Thane Listener.
 	RN_Skills.OnPlayerLoadGame()	;; Fire off Skills Listener.		
 	RN_Transfer.OnPlayerLoadGame()	;; Fire off Auto Transfer.
-	RN_Inventory.OnPlayerLoadGame()	;; Fire off Inventory Manager.	
+	RN_Inventory.OnPlayerLoadGame()	;; Fire off Inventory Manager.
 endEvent
 
 ;;-- Events ---------------------------------------
@@ -443,6 +477,9 @@ Function Maintenance()
 	if RN_MCM.ShowStartup
 		ModStartup.Show()
 	endIf
+
+	RN_TokenFormlist.AddForm(PlayerRef)
+	_SafehouseContainerList_WP.AddForm(PlayerRef)
 	
 	RN_Debug_Access.setvalue(Utility.RandomInt(0, 250))
 	RN_Debug_Randomiser.setvalue(Utility.RandomInt(251, 500))
@@ -478,7 +515,7 @@ Function Maintenance()
 		endIf
 		_Index +=1
 	endWhile
-
+	
 	while bSetupStarted		
 		if RN_Setup_Done.GetValue() == RN_Setup_Sent.GetValue() 
 			
@@ -495,7 +532,7 @@ Function Maintenance()
 			
 		endIf
 	endWhile	
-		
+	
 	RN_Quest_Listener_Total.setvalue(0)
 	RN_Exploration_Listener_Total.setvalue(0)
 	
@@ -576,7 +613,7 @@ Function Maintenance()
 				
 		endIf
 	endIf
-	
+
 	if RN_MCM.ShowStartup
 		ModStartupDone.Show()
 	endIf
@@ -824,6 +861,105 @@ Function RebuildLists()
 	
 	DBM_SortWait.SetValue(0)
 endFunction
+
+;;-- Functions ---------------------------------------
+
+Function SetUpSafehouse()
+
+	DBM_SortWait.setvalue(1)
+	bSettingup = true
+	
+	SendModEvent("RunSetup_D")
+	SendModEvent("RunSetup_D1")
+	RN_Safehouse_Sent.Mod(2)
+	
+	if RN_Mod.XX_SafehousePlus
+		SendModEvent("RunSafehousePlusSetup")
+		SendModEvent("RunSafehousePlusSetup_D")
+		RN_Safehouse_Sent.Mod(2)
+	endIf
+	
+	Debug.Notification("The Curators Companion: Adding Safehouse Integration...")
+	WaitForSafehouseSetup()
+endFunction
+
+;;-------------------------------
+
+Function WaitForSafehouseSetup()
+
+	while bSettingup	
+		if RN_Safehouse_Sent.GetValue() == RN_Safehouse_Done.GetValue()	
+
+			Int Index = 0
+			Int ListSize = RN_Array._SafehouseContainerList.GetSize()
+			While Index < ListSize
+				ObjectReference _Container = RN_Array._SafehouseContainerList.GetAt(Index) as ObjectReference
+				Int Index2 = 0
+				Int ContainerList = _Container.GetNumItems()
+				while Index2 < ContainerList	
+					Form _ItemRelic = _Container.GetNthForm(Index2)			
+					if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) || dbmFound.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) 
+						dbmNew.RemoveAddedForm(_ItemRelic)
+						dbmFound.RemoveAddedForm(_ItemRelic)
+						dbmDisp.AddForm(_ItemRelic)
+					endIf
+					Index2 += 1
+				endWhile
+				Index += 1
+			endWhile
+
+			Index = 0
+			ListSize = RN_Array._SafehouseContainerList_WP.GetSize()
+			While Index < ListSize
+				ObjectReference _Container = RN_Array._SafehouseContainerList_WP.GetAt(Index) as ObjectReference
+				Int Index2 = 0
+				Int ContainerList = _Container.GetNumItems()
+				while Index2 < ContainerList	
+					Form _ItemRelic = _Container.GetNthForm(Index2)			
+					if RN_Safehouse_Items_Merged.HasForm(_ItemRelic)
+						if !RN_Safehouse_Items_Found.HasForm(_ItemRelic)
+							RN_Safehouse_Items_Found.AddForm(_ItemRelic)
+						endIf
+					endIf
+					Index2 += 1
+				endWhile
+				Index += 1
+			endWhile
+
+			Index = RN_TokenFormlist.GetSize() ;; Check player and custom storage for found items.
+			While Index
+				Index -= 1
+				ObjectReference _Container = RN_TokenFormlist.GetAt(Index) as ObjectReference		
+				Int _Index2 = _Container.GetNumItems()
+				While _Index2
+					_Index2 -= 1
+					Form _ItemRelic = _Container.GetNthForm(_Index2)
+					if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
+						dbmNew.RemoveAddedForm(_ItemRelic)
+						dbmFound.AddForm(_ItemRelic)
+					endIf
+				endWhile
+			endWhile
+			
+			if RN_MCM.Safehouse_Configured
+				SHContainerScript1.GoToState("")
+				SHContainerScript2.GoToState("")
+				SHContainerScript3.GoToState("")
+				SHContainerScript4.GoToState("")
+				SHContainerScript5.GoToState("")
+				SHContainerScript6.GoToState("")
+			endIF
+			
+			UpdateGlobalsforCC()
+			bSettingup = False
+			DBM_SortWait.setvalue(0)
+			RN_Safehouse_Sent.setvalue(0)
+			RN_Safehouse_Done.setvalue(0)
+			RN_Mod.XX_SafehouseL = True
+			Debug.Notification("The Curators Companion: Safehouse Integration Done")
+		endIf		
+	endWhile
+endFunction	
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -6,6 +6,13 @@ RN_Utility_Mods Property RN_Mod Auto
 ObjectReference[] property _MuseumContainerArray auto 		;; Used to check Museum containers for displayed items (Creating moreHUD lists).
 ObjectReference[] property _MuseumContainerArray_WP auto	;; Used to check Museum containers & Player when updating found items lists by all patches.
 
+;;Safehouse storage containers to check within several events.
+ObjectReference[] property _SafehouseContainerArray auto 		;; Used to check Museum containers for displayed items (Creating moreHUD lists).
+ObjectReference[] property _SafehouseContainerArray_WP auto	;; Used to check Museum containers & Player when updating found items lists by all patches.
+
+Formlist property _SafehouseContainerList auto 		;; Used to check Museum containers for displayed items (Creating moreHUD lists).
+Formlist property _SafehouseContainerList_WP auto		;; Used to check Museum containers & Player when updating found items lists by all patches.
+
 ;;Setup Events
 String[] Property _ModSetup auto ;;Museum Setup
 String[] Property _ModUpdate auto ;;Update Found Items
@@ -66,7 +73,7 @@ String[] Property _Creations auto
 
 Event CreatePatchArray()
 
-	_bPatches = new bool[46]
+	_bPatches = new bool[52]
 	_bPatches[0] = RN_Mod.XX_AetheriumL
 	_bPatches[1] = RN_Mod.XX_AmuletsSkyrimL
 	_bPatches[2] = RN_Mod.XX_AnimArm
@@ -77,43 +84,47 @@ Event CreatePatchArray()
 	_bPatches[7] = RN_Mod.XX_ClockworkL
 	_bPatches[8] = RN_Mod.XX_DawnguardArsenalL
 	_bPatches[9] = RN_Mod.XX_FalskaarL
-	_bPatches[10] = RN_Mod.XX_FossilsL
-	_bPatches[11] = RN_Mod.XX_GrayCowlL
-	_bPatches[12] = RN_Mod.XX_GuardArmL
-	_bPatches[13] = RN_Mod.XX_HeavyArmL
-	_bPatches[14] = RN_Mod.XX_HelgenL
-	_bPatches[15] = RN_Mod.XX_IceBladeL	
-	_bPatches[16] = RN_Mod.XX_ImmersiveL
-	_bPatches[17] = RN_Mod.XX_ImmArmL
-	_bPatches[18] = RN_Mod.XX_ImmWeapL
-	_bPatches[19] = RN_Mod.XX_SoapsKICL || RN_Mod.XX_SoapsL
-	_bPatches[20] = RN_Mod.XX_3DNPC
-	_bPatches[21] = RN_Mod.XX_JaysusCraftL || RN_Mod.XX_JaysusL
-	_bPatches[22] = RN_Mod.XX_KonahrikL
-	_bPatches[23] = RN_Mod.XX_KthoniaL
-	_bPatches[24] = RN_Mod.XX_MoonpathL
-	_bPatches[25] = RN_Mod.XX_MoonStarL
-	_bPatches[26] = RN_Mod.XX_NTHunterESLL || RN_Mod.XX_NTHunterL
-	_bPatches[27] = RN_Mod.XX_OblivionArtL
-	_bPatches[28] = RN_Mod.XX_PathRevL
-	_bPatches[29] = RN_Mod.XX_ProjectAHOL
-	_bPatches[30] = RN_Mod.XX_RoyalL
-	_bPatches[31] = RN_Mod.XX_RuinsEdgeL
-	_bPatches[32] = RN_Mod.XX_SkyrimSewers
-	_bPatches[33] = RN_Mod.XX_UndergroundESPL || RN_Mod.XX_UndergroundL
-	_bPatches[34] = RN_Mod.XX_SUTL
-	_bPatches[35] = RN_Mod.XX_SheoStaffL
-	_bPatches[36] = RN_Mod.XX_ForgottenL
-	_bPatches[37] = RN_Mod.XX_WheelsOfLullL
-	_bPatches[38] = RN_Mod.XX_KagrenacL
-	_bPatches[39] = RN_Mod.XX_TreasureHuntL
-	_bPatches[40] = RN_Mod.XX_UndeathL
-	_bPatches[41] = RN_Mod.XX_VigilantL
-	_bPatches[42] = RN_Mod.XX_VolkiharL
-	_bPatches[43] = RN_Mod.XX_WintersunL
-	_bPatches[44] = RN_Mod.XX_WyrmstoothL
-	_bPatches[45] = RN_Mod.XX_ZimThaneL || RN_Mod.XX_ZimThaneOnlyL
-
+	_bPatches[10] = RN_Mod.XX_Follower_Auri
+	_bPatches[11] = RN_Mod.XX_Follower_Inigo
+	_bPatches[12] = RN_Mod.XX_Follower_Kaidan
+	_bPatches[13] = RN_Mod.XX_Follower_Lucien
+	_bPatches[14] = RN_Mod.XX_Follower_Mrissi
+	_bPatches[15] = RN_Mod.XX_FossilsL
+	_bPatches[16] = RN_Mod.XX_GrayCowlL
+	_bPatches[17] = RN_Mod.XX_GuardArmL
+	_bPatches[18] = RN_Mod.XX_HeavyArmL
+	_bPatches[19] = RN_Mod.XX_HelgenL
+	_bPatches[20] = RN_Mod.XX_IceBladeL	
+	_bPatches[21] = RN_Mod.XX_ImmersiveL
+	_bPatches[22] = RN_Mod.XX_ImmArmL
+	_bPatches[23] = RN_Mod.XX_ImmWeapL
+	_bPatches[24] = RN_Mod.XX_SoapsKICL || RN_Mod.XX_SoapsL
+	_bPatches[25] = RN_Mod.XX_3DNPC
+	_bPatches[26] = RN_Mod.XX_JaysusCraftL || RN_Mod.XX_JaysusL
+	_bPatches[27] = RN_Mod.XX_KonahrikL
+	_bPatches[28] = RN_Mod.XX_KthoniaL
+	_bPatches[39] = RN_Mod.XX_MoonpathL
+	_bPatches[30] = RN_Mod.XX_MoonStarL
+	_bPatches[31] = RN_Mod.XX_NTHunterESLL || RN_Mod.XX_NTHunterL
+	_bPatches[32] = RN_Mod.XX_OblivionArtL
+	_bPatches[33] = RN_Mod.XX_PathRevL
+	_bPatches[34] = RN_Mod.XX_ProjectAHOL
+	_bPatches[35] = RN_Mod.XX_RoyalL
+	_bPatches[36] = RN_Mod.XX_RuinsEdgeL
+	_bPatches[37] = RN_Mod.XX_SkyrimSewers
+	_bPatches[38] = RN_Mod.XX_UndergroundESPL || RN_Mod.XX_UndergroundL
+	_bPatches[39] = RN_Mod.XX_SUTL
+	_bPatches[40] = RN_Mod.XX_SheoStaffL
+	_bPatches[41] = RN_Mod.XX_ForgottenL
+	_bPatches[42] = RN_Mod.XX_WheelsOfLullL
+	_bPatches[43] = RN_Mod.XX_KagrenacL
+	_bPatches[44] = RN_Mod.XX_TreasureHuntL
+	_bPatches[45] = RN_Mod.XX_UndeathL
+	_bPatches[46] = RN_Mod.XX_VigilantL
+	_bPatches[47] = RN_Mod.XX_VolkiharL
+	_bPatches[48] = RN_Mod.XX_WintersunL
+	_bPatches[49] = RN_Mod.XX_WyrmstoothL
+	_bPatches[50] = RN_Mod.XX_ZimThaneL || RN_Mod.XX_ZimThaneOnlyL
 	
 	_bCreations = new bool[42]
 	_bCreations[0] = RN_Mod.XX_Backpack

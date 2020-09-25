@@ -13,6 +13,8 @@ formlist property dbmDisp auto 						;; Items that are on display
 formlist property DBM_ReplicaBaseItems auto 		;; holds the Replica Base Items.
 formlist property DBM_ReplicaItems auto 			;; Holds the Replicas.
 
+formlist property RN_Safehouse_Items_Merged auto
+
 formlist property RN_TokenFormlist auto
 
 objectreference property DBM_CloaksStorage auto
@@ -22,7 +24,7 @@ objectreference property DISPLAYCHEST auto
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 		
-	if dbmNew.HasForm(akBaseItem) || dbmFound.HasForm(akBaseItem)
+	if dbmNew.HasForm(akBaseItem) && !RN_Safehouse_Items_Merged.HasForm(akBaseItem) || dbmFound.HasForm(akBaseItem) && !RN_Safehouse_Items_Merged.HasForm(akBaseItem)
 		processForm(akBaseitem, true)
 	endIf
 	
@@ -39,7 +41,7 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
 				;; Do Nothing
 				
 			elseif self.GetItemCount(akBaseItem) == 0 && !((DBM_ReplicaBaseItems.HasForm(akBaseitem) && self.GetItemCount(ReplicaHandler.GetReplica(akBaseItem))) || (DBM_ReplicaItems.HasForm(akBaseitem) && self.GetItemCount(ReplicaHandler.GetOriginal(akBaseItem))))
-				if dbmDisp.HasForm(akBaseItem)
+				if dbmDisp.HasForm(akBaseItem) && !RN_Safehouse_Items_Merged.HasForm(akBaseItem)
 					processForm(akBaseitem, false, akDestContainer)
 				endIf
 			endIf
@@ -47,7 +49,7 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
 		else
 		
 			if self.GetItemCount(akBaseItem) == 0 && !((DBM_ReplicaBaseItems.HasForm(akBaseitem) && self.GetItemCount(ReplicaHandler.GetReplica(akBaseItem))) || (DBM_ReplicaItems.HasForm(akBaseitem) && self.GetItemCount(ReplicaHandler.GetOriginal(akBaseItem))))
-				if dbmDisp.HasForm(akBaseItem)
+				if dbmDisp.HasForm(akBaseItem) && !RN_Safehouse_Items_Merged.HasForm(akBaseItem)
 					processForm(akBaseitem, false, akDestContainer)
 				endIf
 			endIf
@@ -60,7 +62,7 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
 				;; Do Nothing
 				
 			elseif self.GetItemCount(akBaseItem) == 0 
-				if dbmDisp.HasForm(akBaseItem)
+				if dbmDisp.HasForm(akBaseItem) && !RN_Safehouse_Items_Merged.HasForm(akBaseItem)
 					processForm(akBaseitem, false, akDestContainer)
 				endIf
 			endIf
@@ -68,7 +70,7 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
 		else
 		
 			if self.GetItemCount(akBaseItem) == 0
-				if dbmDisp.HasForm(akBaseItem)
+				if dbmDisp.HasForm(akBaseItem) && !RN_Safehouse_Items_Merged.HasForm(akBaseItem)
 					processForm(akBaseitem, false, akDestContainer)
 				endIf
 			endIf
