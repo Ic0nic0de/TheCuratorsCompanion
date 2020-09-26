@@ -256,7 +256,7 @@ function CreateMoreHudLists()
 			Index += 1
 		endWhile
 	endIF
-	
+			
 	_Index = RN_TokenFormlist.GetSize() ;; Check player and custom storage for found items.
 	While _Index
 		_Index -= 1
@@ -848,11 +848,16 @@ Function RebuildLists()
 	
 	DBM_SortWait.SetValue(1)
 	
+	Int _Total = dbmMaster.GetSize()
 	Int _Index = dbmMaster.GetSize()
 	While _Index > 0
 		_Index -= 1
 		form _item = dbmMaster.GetAt(_Index) as form
 		dbmNew.AddForm(_item)
+		
+		if _Index == 500 || _Index == 1000 || _Index == 1500 || _Index == 2000 || _Index == 2500 || _Index == 3000 || _Index == 3500 || _Index == 4000
+			Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists... (" + _Index + " / " + _Total + ")")
+		endIf
 	endWhile
 		
 	CreateMoreHudLists()
@@ -891,7 +896,7 @@ Function WaitForSafehouseSetup()
 		if RN_Safehouse_Sent.GetValue() == RN_Safehouse_Done.GetValue()	
 
 			Int Index = 0
-			Int ListSize = RN_Array._SafehouseContainerList.GetSize()
+			Int ListSize = RN_Array._SafehouseContainerList.GetSize() ;;Update moreHUD icons on safehouse items
 			While Index < ListSize
 				ObjectReference _Container = RN_Array._SafehouseContainerList.GetAt(Index) as ObjectReference
 				Int Index2 = 0
@@ -899,17 +904,15 @@ Function WaitForSafehouseSetup()
 				while Index2 < ContainerList	
 					Form _ItemRelic = _Container.GetNthForm(Index2)			
 					if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) || dbmFound.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) 
-						dbmNew.RemoveAddedForm(_ItemRelic)
-						dbmFound.RemoveAddedForm(_ItemRelic)
-						dbmDisp.AddForm(_ItemRelic)
+						processForm(_ItemRelic, true)
 					endIf
 					Index2 += 1
 				endWhile
 				Index += 1
 			endWhile
-
+		
 			Index = 0
-			ListSize = RN_Array._SafehouseContainerList_WP.GetSize()
+			ListSize = RN_Array._SafehouseContainerList_WP.GetSize() ;;Check safehouse items found
 			While Index < ListSize
 				ObjectReference _Container = RN_Array._SafehouseContainerList_WP.GetAt(Index) as ObjectReference
 				Int Index2 = 0
@@ -935,8 +938,7 @@ Function WaitForSafehouseSetup()
 					_Index2 -= 1
 					Form _ItemRelic = _Container.GetNthForm(_Index2)
 					if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
-						dbmNew.RemoveAddedForm(_ItemRelic)
-						dbmFound.AddForm(_ItemRelic)
+						processForm(_ItemRelic, false)
 					endIf
 				endWhile
 			endWhile
