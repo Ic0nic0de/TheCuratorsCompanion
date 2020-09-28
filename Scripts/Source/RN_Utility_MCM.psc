@@ -31,12 +31,14 @@ string[] PagesList
 string InputBox = "Enter Password"
 string Status_Return
 
+bool Token_Vis
 bool Safehouse_Enabled 
-bool property Safehouse_Configured auto
 
 bool bScanning = false
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Sent auto
+
+String Property _ModVersion auto
 
 ;; Debug Variables
 int inputOID_I
@@ -52,6 +54,7 @@ location property DBM_GuildHouseSolitudeLocation auto
 
 ;; Storage Options
 spell property RN_Storage_Spell auto
+spell property RN_Storage_Summon_Spell auto
 globalvariable property CustomContainer auto
 
 ;; Treasury Value
@@ -110,6 +113,9 @@ bool iRelicSpellDebug = false
 bool property StorageSpellVal auto hidden ;;Storage spell Value
 bool iRelicStorageOptions = false
 
+bool property SummonSpellVal auto hidden ;;Summon Type Value
+bool iRelicStorageSummon = false
+
 bool property AutoTransferRelics auto hidden ;;auto Transfer To Storage Container
 bool iRelicStorageTransfer = false
 
@@ -122,9 +128,6 @@ bool Transfer_Armor = false
 bool property AllowBook auto hidden ;;auto Transfer To Storage Container
 bool Transfer_Book = false
 
-bool property AllowPotion auto hidden ;;auto Transfer To Storage Container
-bool Transfer_Potion = false
-
 bool property AllowKey auto hidden ;;auto Transfer To Storage Container
 bool Transfer_Key = false
 
@@ -133,6 +136,9 @@ bool Transfer_Gems = false
 
 bool property AllowMisc auto hidden ;;auto Transfer To Storage Container
 bool Transfer_Misc = false
+
+bool property AllowPotion auto hidden ;;auto Transfer To Storage Container
+bool Transfer_Potion = false
 
 bool property DevDebugVal auto hidden ;; Debug alerts for Dev usage.
 bool Dev_Alerts = false
@@ -161,6 +167,13 @@ globalvariable property RN_SupportedCreationCount auto
 globalvariable property DBM_ArcSkill auto
 globalvariable property DBM_SortWait auto
 globalvariable property RN_Setup_Start auto
+globalvariable property RN_Token_Visibility auto
+
+globalvariable property RN_Installed_SafehouseGeneral auto
+globalvariable property RN_Installed_SkyUI auto
+globalvariable property RN_Installed_Fiss auto
+globalvariable property RN_Installed_ImmWeap auto
+globalvariable property RN_Installed_HeavyArm auto
 
 ;; Treasury Globals
 globalvariable property RN_Total_Value auto
@@ -266,7 +279,7 @@ Event InitMCMStrings()
 
 	MCM_Strings = new string[28]
 	MCM_Strings[0] = "Developed By (Ic0n)Ic0de"
-	MCM_Strings[1] = "Version 2.2.0"
+	MCM_Strings[1] = ""
 	MCM_Strings[2] = "<font color='#750e0e'>Invalid Version</font>"
 	MCM_Strings[3] = "<font color='#750e0e'>Not Found</font>"
 	MCM_Strings[4] = "Complete"
@@ -278,7 +291,7 @@ Event InitMCMStrings()
 	MCM_Strings[10] = "Remove Spell"
 	MCM_Strings[11] = "Default Message"
 	MCM_Strings[12] = "Simple Notification"
-	MCM_Strings[13] = "Access"
+	MCM_Strings[13] = "Monkey Bum"
 	MCM_Strings[14] = "<font color='#2b6320'>Authorised</font>"
 	MCM_Strings[15] = "Enter Password"
 	MCM_Strings[16] = "Load Preset"
@@ -334,7 +347,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", MCM_Strings[0], 0)
-		AddTextOption("", MCM_Strings[1], 0)		
+		AddTextOption("", _ModVersion, 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -423,6 +436,12 @@ Event AddRelicStoragePage()
 			else
 				AddTextOptionST("iRelicStorageOptions", "Relic Storage Container:", self.GetStorageOptions(), 1)
 			endIf
+
+			 if DBM_ArcSkill.GetValue() >= 5 && StorageSpellVal || ShowStorageSpellOverideVal 
+				AddTextOptionST("iRelicStorageSummon", "Container Access Type:", self.GetSummonOptions(), 0)
+			else
+				AddTextOptionST("iRelicStorageSummon", "Container Access Type:", self.GetSummonOptions(), 1)
+			endIf
 			
 			if StorageSpellVal 
 				AddTextOptionST("iRelicStorageTransfer", "Auto Relic Storage:", self.GetTransferOptions(), 0)
@@ -430,25 +449,25 @@ Event AddRelicStoragePage()
 				AddTextOptionST("iRelicStorageTransfer", "Auto Relic Storage:", self.GetTransferOptions(), 1)
 			endIf
 		
-		
+		AddTextOptionST("Token_Visibility", "Storage Token Crafting:", self.GetTokenVisibility(), 0)
 		AddEmptyOption()
 		AddHeaderOption("Auto Storage Options:")
-			if !StorageSpellVal || !AutoTransferRelics
-				AddToggleOptionST("Transfer_Weapon", "Weapons", AllowWeapon, 1)
+			if !StorageSpellVal || !AutoTransferRelics	
 				AddToggleOptionST("Transfer_Armor", "Armor", AllowArmor, 1)
 				AddToggleOptionST("Transfer_Book", "Books", AllowBook, 1)
-				AddToggleOptionST("Transfer_Gems", "Gems & Soul Gems", AllowGems, 1)
-				AddToggleOptionST("Transfer_Potion", "Potions", AllowPotion, 1)
+				AddToggleOptionST("Transfer_Gems", "Gems", AllowGems, 1)
 				AddToggleOptionST("Transfer_Key", "Keys", AllowKey, 1)
 				AddToggleOptionST("Transfer_Misc", "Misc Items", AllowMisc, 1)
+				AddToggleOptionST("Transfer_Potion", "Potions", AllowPotion, 1)
+				AddToggleOptionST("Transfer_Weapon", "Weapons", AllowWeapon, 1)
 			else
-				AddToggleOptionST("Transfer_Weapon", "Weapons", AllowWeapon, 0)
 				AddToggleOptionST("Transfer_Armor", "Armor", AllowArmor, 0)
 				AddToggleOptionST("Transfer_Book", "Books", AllowBook, 0)
-				AddToggleOptionST("Transfer_Gems", "Gems & Soul Gems", AllowGems, 0)
-				AddToggleOptionST("Transfer_Potion", "Potions", AllowPotion, 0)
-				AddToggleOptionST("Transfer_Key", "Keys", AllowKey, 0)	
+				AddToggleOptionST("Transfer_Gems", "Gems", AllowGems, 0)
+				AddToggleOptionST("Transfer_Key", "Keys", AllowKey, 0)
 				AddToggleOptionST("Transfer_Misc", "Misc Items", AllowMisc, 0)
+				AddToggleOptionST("Transfer_Potion", "Potions", AllowPotion, 0)
+				AddToggleOptionST("Transfer_Weapon", "Weapons", AllowWeapon, 0)
 			endIf
 		
 		SetCursorPosition(1)
@@ -475,7 +494,6 @@ Event AddRelicStoragePage()
 		
 		AddEmptyOption()
 		AddTextOptionST("ShowCustomContainerInfo", "Custom Storage Info:", "Show Information", 0)
-		
 	endIf
 endEvent
 
@@ -526,11 +544,11 @@ Event AddMuseumSetsPage()
 				endIf
 				_Index += 1
 				
-				if _Index == 8 && RN_SupportedCreationCount.GetValue() == 0
+				if _Index == 8 && !RN_SupportedCreationCount.GetValue()
 					_Index += 1
 				endIf
 				
-				if _Index == 11 && RN_Mod.XX_SafehouseL == false
+				if _Index == 11 && !RN_Installed_SafehouseGeneral.GetValue()
 					_Index += 1
 				endIf
 				
@@ -583,7 +601,7 @@ Event AddMuseumSetsPage()
 			if RN_SupportedCreationCount.GetValue() > 0
 				AddEmptyOption()
 			endIf
-			if RN_Mod.XX_SafehouseL
+			if RN_Installed_SafehouseGeneral.GetValue()
 				AddEmptyOption()
 			endIf
 			AddEmptyOption()
@@ -656,7 +674,7 @@ Event AddArmorySetsPage()
 			
 			SetCursorPosition(24)
 			
-			if (RN_Mod.XX_HeavyArmL)
+			if (RN_Installed_HeavyArm.GetValue())
 				AddHeaderOption("Heavy Armory Sets:")
 				
 				_Index = 0
@@ -677,13 +695,13 @@ Event AddArmorySetsPage()
 				endWhile
 			endIf
 			
-			if (RN_Mod.XX_HeavyArmL)
+			if (RN_Installed_HeavyArm.GetValue())
 				SetCursorPosition(48)
 			else
 				SetCursorPosition(24)
 			endIf
 			
-			if (RN_Mod.XX_ImmWeapL)
+			if (RN_Installed_ImmWeap.GetValue())
 				AddHeaderOption("Immersive Weapons Sets:")
 				
 				_Index = 0
@@ -698,7 +716,7 @@ Event AddArmorySetsPage()
 					_Index +=1
 					
 					if _Index == _Length / 2
-						if (RN_Mod.XX_HeavyArmL) 
+						if (RN_Installed_HeavyArm.GetValue()) 
 							SetCursorPosition(49)
 						else
 							SetCursorPosition(25)
@@ -748,8 +766,8 @@ Event AddCompletedModsPage()
 				Int _Index = 0
 				While _Index < RN_Array._PatchName.length
 				
-					if RN_Array._bPatches[_Index]
-						if RN_Array._GVComplete[_Index].GetValue() == 1
+					if RN_Array._bPatches[_Index].GetValue()
+						if RN_Array._GVComplete[_Index].GetValue()
 							AddTextOption(RN_Array._PatchName[_Index], MCM_Strings[4], 1)
 						else
 							AddTextOption(RN_Array._PatchName[_Index], self.GetCurrentCount(RN_Array._PatchCount[_Index], RN_Array._PatchTotal[_Index]), 0)
@@ -813,7 +831,7 @@ Event AddCompletedCreationsPage()
 				Int _Index = 0
 				While _Index < RN_Array._CreationName.length
 				
-					if RN_Array._bCreations[_Index]
+					if RN_Array._bCreations[_Index].GetValue()
 						if RN_Array._GVCreationComplete[_Index].GetValue() == 1
 							AddTextOption(RN_Array._CreationName[_Index], MCM_Strings[4], 1)
 						else
@@ -869,7 +887,6 @@ Event AddDebugPage()
 			AddTextOption("moreHUD Displayed count:", dbmDisp.GetSize() As Int, 0)
 			AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 0)
 			AddEmptyOption()
-			AddTextOptionST("RevertLists", "Reset moreHUD Lists", "", 0)
 			AddTextOptionST("RebuildLists", "Rebuild moreHUD Items", "", 0)
 			AddEmptyOption()
 			AddHeaderOption("Items Debug:")
@@ -910,7 +927,7 @@ Event AddDebugPage()
 			
 		endIf
 
-		if (RN_Mod.XX_SkyUI)
+		if (RN_Installed_SkyUI.GetValue())
 		
 			AddTextOption("SkyUI:", MCM_Strings[25] + " [5.2SE]", 0)
 			
@@ -969,7 +986,8 @@ state RefreshMCM
 	
 			ShowMessage("Please exit MCM and re-enter again to see changes", false, "Ok")
 			SetTitleText("===PLEASE WAIT===")
-			AddDynamicPagesList()	
+			AddDynamicPagesList()
+			RN_Mod.CheckSupportedMods()		
 			RN_Tracker_Array._Build_Quest_Toggles()
 			RN_Tracker_Array._Build_Quest_Arrays()
 			ForcePageReset()
@@ -998,10 +1016,33 @@ state Config_Save
 	EndEvent
 endState
 
+state Config_Load
+
+	Event OnSelectST()
+		
+		Begin_Config_Load()
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Load user settings from Config File (Requires FISS)")
+	EndEvent
+endState
+
 String function GetConfigSaveString()
 	
-		if (RN_Mod.XX_FissL)
+		if (RN_Installed_Fiss.GetValue())
 			Status_Return = MCM_Strings[18]
+		else
+			Status_Return = MCM_Strings[17]
+		endIf
+	return Status_Return
+endFunction	
+
+String function GetConfigLoadString()
+
+		if (RN_Installed_Fiss.GetValue())
+			Status_Return = MCM_Strings[16]
 		else
 			Status_Return = MCM_Strings[17]
 		endIf
@@ -1019,7 +1060,8 @@ FISSInterface fiss = FISSFactory.getFISS()
 	endIf
 	
 	fiss.beginSave("TheCuratorsCompanion_Config.xml", "LOTD:The Curators Companion")
-		
+	
+	;;General Settings
 	fiss.saveBool("Museum Notifications", ShowMuseumVal)
 	fiss.saveBool("Armory Notifications", ShowArmoryVal)
 	fiss.saveBool("Supported Mods Notifications", ShowModsVal)
@@ -1027,27 +1069,29 @@ FISSInterface fiss = FISSFactory.getFISS()
 	fiss.saveBool("Show Basic Notifications", ShowSimpleNotificationVal)
 	fiss.saveBool("Museum Display Listener", ShowListenerVal)
 	
-	fiss.saveBool("Show startup notifications", ShowStartup)
-	
-	fiss.saveBool("Safe Storage Spell", StorageSpellVal)
-	fiss.saveBool("Relic Transfer", AutoTransferRelics)
-	fiss.saveInt("Prep Station Transfer", PrepTransfer) 
-	
-	fiss.saveBool("AllowWeapon", AllowWeapon)
-	fiss.saveBool("AllowArmor", AllowArmor)
-	fiss.saveBool("AllowBook", AllowBook)
-	fiss.saveBool("AllowPotion", AllowPotion)
-	fiss.saveBool("AllowKey", AllowKey)
-	fiss.saveBool("AllowGems", AllowGems)	
-	fiss.saveBool("AllowMisc", AllowMisc)	
-	
+	;;Scan & Advanced Page
 	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017 || SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800	
 		fiss.saveInt("moreHUDOption", IndexmoreHUD)		
 	endIf
-	
+	fiss.saveBool("Show startup notifications", ShowStartup)
+	fiss.saveInt("Prep Station Transfer", PrepTransfer)
+
+	;;Relic Storage Page
+	fiss.saveBool("Safe Storage Spell", StorageSpellVal)
+	fiss.saveBool("Summon Type", SummonSpellVal)
+	fiss.saveBool("Relic Transfer", AutoTransferRelics)
+	fiss.saveBool("TokenCrafting", Token_Vis)
+	fiss.saveBool("AllowWeapon", AllowWeapon)
+	fiss.saveBool("AllowArmor", AllowArmor)
+	fiss.saveBool("AllowBook", AllowBook)
+	fiss.saveBool("AllowKey", AllowKey)
+	fiss.saveBool("AllowGems", AllowGems)	
+	fiss.saveBool("AllowMisc", AllowMisc)	
+	fiss.saveBool("AllowPotion", AllowPotion)
+
+	;;Quest Tracker
 	fiss.saveBool("Show Spoilers", RN_Tracker._bSpoilers)
 	fiss.saveBool("Hide Incomplete", RN_Tracker._HideIncomplete)
-	
 	fiss.saveInt("Helgen Option", RN_Tracker._Helgen_Index)
 	fiss.saveInt("Legacy Option", RN_Tracker._Legacy_Index)
 	
@@ -1061,28 +1105,195 @@ EndFunction
 
 ;-- Load States / Function --------------------------------
 
-state Config_Load
+Function Begin_Config_Load()
+FISSInterface fiss = FISSFactory.getFISS()
+	
+	_UserSettings = false
+	
+	If !fiss && IsInMenuMode()
+		self.ShowMessage("FISS not installed, unable to load user settings from config file", false, "Ok")
+			return
+	endIf
+	
+	fiss.beginLoad("TheCuratorsCompanion_Config.xml")	
+	
+	;;General Settings
+	ShowMuseumVal = fiss.loadBool("Museum Notifications")
+	ShowArmoryVal = fiss.loadBool("Armory Notifications")
+	ShowModsVal = fiss.loadBool("Supported Mods Notifications")
+	ShowSetCompleteVal = fiss.loadBool("Show Section/Set Complete Notifications")
+	ShowSimpleNotificationVal = fiss.loadBool("Show Basic Notifications")
+	ShowListenerVal = fiss.loadBool("Museum Display Listener")
+	
+	;;Scan & Advanced Page
+	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
+	
+		IndexmoreHUD = fiss.loadInt("moreHUDOption")
 
-	Event OnSelectST()
+		if IndexmoreHUD == 0
+			RN_moreHUD_Option.SetValue(1)
+			AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
+			AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
+			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
+			
+		elseif IndexmoreHUD == 1
+			RN_moreHUD_Option.SetValue(2)
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
+			AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
+
+		elseif IndexmoreHUD == 2
+			RN_moreHUD_Option.SetValue(3)
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
+			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
+			
+		elseif IndexmoreHUD == 3
+			RN_moreHUD_Option.SetValue(4)
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
+			AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)	
+
+		elseif IndexmoreHUD == 4
+			RN_moreHUD_Option.SetValue(5)
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")
+			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
+			
+		endIf	
+			
+	endif
+
+	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
+	
+		IndexmoreHUD = fiss.loadInt("moreHUDOption")
+
+		if IndexmoreHUD == 0
+			RN_moreHUD_Option.SetValue(1)
+			AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
+			AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
+			AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
+			
+		elseif IndexmoreHUD == 1
+			RN_moreHUD_Option.SetValue(2)
+			AhzmoreHUD.UnRegisterIconFormList("dbmFound")
+			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
+			AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
+
+		elseif IndexmoreHUD == 2
+			RN_moreHUD_Option.SetValue(3)
+			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
+			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
+			AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
+			
+		elseif IndexmoreHUD == 3
+			RN_moreHUD_Option.SetValue(4)
+			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
+			AhzmoreHUD.UnRegisterIconFormList("dbmFound")
+			AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
+
+		elseif IndexmoreHUD == 4
+			RN_moreHUD_Option.SetValue(5)
+			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
+			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")
+			AhzmoreHUD.UnRegisterIconFormList("dbmFound")
+			
+		endIf	
+			
+	endif	
+	
+	ShowStartup = fiss.loadBool("Show startup notifications")	
+	PrepTransfer = fiss.loadInt("Prep Station Transfer")
+	
+	;;Relic Storage Page
+	
+	
+	if DBM_ArcSkill.GetValue() >= 5
+		StorageSpellVal = fiss.loadBool("Safe Storage Spell")	
+		if !StorageSpellVal
+			if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
+				(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
+			
+			elseif(Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
+				(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
+			endIf
 		
-		Begin_Config_Load()
-	EndEvent
+			AutoTransferRelics = False
+			RN_Transfer.GoToState("Disabled")
+			
+			AllowWeapon = False
+			AllowArmor = False
+			AllowBook = False
+			AllowKey = False
+			AllowGems = False
+			AllowMisc = False
+			AllowPotion = False		
 
-	Event OnHighlightST()
-
-		self.SetInfoText("Load user settings from Config File (Requires FISS)")
-	EndEvent
-endState
-
-String function GetConfigLoadString()
-
-		if (RN_Mod.XX_FissL)
-			Status_Return = MCM_Strings[16]
-		else
-			Status_Return = MCM_Strings[17]
+		elseif StorageSpellVal
+			if (!Game.GetPlayer().HasSpell(RN_Storage_Spell)) && SummonSpellVal
+				(Game.GetPlayer().AddSpell(RN_Storage_Spell))
+				
+			elseif (!Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)) && !SummonSpellVal
+				(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
+			endif
+		
+			AllowWeapon = fiss.loadBool("AllowWeapon")
+			AllowArmor = fiss.loadBool("AllowArmor")
+			AllowBook = fiss.loadBool("AllowBook")
+			AllowKey = fiss.loadBool("AllowKey")
+			AllowGems = fiss.loadBool("AllowGems")
+			AllowMisc = fiss.loadBool("AllowMisc")
+			AllowPotion = fiss.loadBool("AllowPotion")		
+			AutoTransferRelics = fiss.loadBool("Relic Transfer")
+			if AutoTransferRelics && DBM_ArcSkill.GetValue() >= 5
+				RN_Transfer.GoToState("")
+			else
+				RN_Transfer.GoToState("Disabled")
+			endIf
 		endIf
-	return Status_Return
-endFunction	
+	
+	else
+		StorageSpellVal = false
+		(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
+		(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
+		AutoTransferRelics = False
+		RN_Transfer.GoToState("Disabled")
+		AllowWeapon = False
+		AllowArmor = False
+		AllowBook = False
+		AllowKey = False
+		AllowGems = False
+		AllowMisc = False
+		AllowPotion = False			
+	endIf
+				
+	SummonSpellVal = fiss.loadBool("Summon Type")	
+	Token_Vis = fiss.loadBool("TokenCrafting")
+		
+
+	;;Quest Tracker
+	RN_Tracker._bSpoilers = fiss.loadBool("Show Spoilers")
+	RN_Tracker._HideIncomplete = fiss.loadBool("Hide Incomplete")
+	
+	RN_Tracker._Helgen_Index = fiss.loadInt("Helgen Option")
+	RN_Tracker._Legacy_Index = fiss.loadInt("Legacy Option")
+	
+	string loadResult = fiss.endLoad()
+		If (loadResult != "")
+			if IsInMenuMode()
+				self.ShowMessage("Fiss Load Error - No config file found", false, "Ok")
+			endIf
+			_UserSettings = false
+			Begin_Config_Default()
+		else
+			if IsInMenuMode()
+				self.ShowMessage("User settings loaded successfully from Config file", false, "Ok")
+				ForcePageReset()
+			endIF
+			_UserSettings = true
+		endIf
+EndFunction	
+
 
 ;-- Load States / Function --------------------------------
 
@@ -1130,155 +1341,6 @@ endFunction
 
 ;-- Load States / Function --------------------------------
 
-Function Begin_Config_Load()
-FISSInterface fiss = FISSFactory.getFISS()
-	
-	_UserSettings = false
-	
-	If !fiss && IsInMenuMode()
-		self.ShowMessage("FISS not installed, unable to load user settings from config file", false, "Ok")
-			return
-	endIf
-	
-	fiss.beginLoad("TheCuratorsCompanion_Config.xml")	
-	
-	ShowMuseumVal = fiss.loadBool("Museum Notifications")
-	ShowArmoryVal = fiss.loadBool("Armory Notifications")
-	ShowModsVal = fiss.loadBool("Supported Mods Notifications")
-	ShowSetCompleteVal = fiss.loadBool("Show Section/Set Complete Notifications")
-	ShowSimpleNotificationVal = fiss.loadBool("Show Basic Notifications")
-	ShowListenerVal = fiss.loadBool("Museum Display Listener")
-	ShowStartup = fiss.loadBool("Show startup notifications")	
-
-	StorageSpellVal= fiss.loadBool("Safe Storage Spell")
-		if !StorageSpellVal
-			if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
-				(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-			endIf
-			
-		elseif StorageSpellVal
-			if (!Game.GetPlayer().HasSpell(RN_Storage_Spell))
-				(Game.GetPlayer().AddSpell(RN_Storage_Spell))
-			endif	
-		endIf
-			
-	AutoTransferRelics = fiss.loadBool("Relic Transfer")
-		if AutoTransferRelics
-			RN_Transfer.GoToState("")
-			
-		else
-			RN_Transfer.GoToState("Disabled")
-		endIf
-	
-	PrepTransfer = fiss.loadInt("Prep Station Transfer") 	
-	AllowWeapon = fiss.loadBool("AllowWeapon")
-	AllowArmor = fiss.loadBool("AllowArmor")
-	AllowBook = fiss.loadBool("AllowBook")
-	AllowPotion = fiss.loadBool("AllowPotion")
-	AllowKey = fiss.loadBool("AllowKey")
-	AllowGems = fiss.loadBool("AllowGems")
-	AllowMisc = fiss.loadBool("AllowMisc")
-	
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
-		
-			IndexmoreHUD = fiss.loadInt("moreHUDOption")
-	
-			if IndexmoreHUD == 0
-				RN_moreHUD_Option.SetValue(1)
-				AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-				AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-				AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-				
-			elseif IndexmoreHUD == 1
-				RN_moreHUD_Option.SetValue(2)
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-				AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-
-			elseif IndexmoreHUD == 2
-				RN_moreHUD_Option.SetValue(3)
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-				
-			elseif IndexmoreHUD == 3
-				RN_moreHUD_Option.SetValue(4)
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-				AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)	
-
-			elseif IndexmoreHUD == 4
-				RN_moreHUD_Option.SetValue(5)
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-				
-			endIf	
-				
-		endif
-
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-		
-			IndexmoreHUD = fiss.loadInt("moreHUDOption")
-	
-			if IndexmoreHUD == 0
-				RN_moreHUD_Option.SetValue(1)
-				AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-				AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-				AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-				
-			elseif IndexmoreHUD == 1
-				RN_moreHUD_Option.SetValue(2)
-				AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-				AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-				AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-
-			elseif IndexmoreHUD == 2
-				RN_moreHUD_Option.SetValue(3)
-				AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-				AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-				
-			elseif IndexmoreHUD == 3
-				RN_moreHUD_Option.SetValue(4)
-				AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-				AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-
-			elseif IndexmoreHUD == 4
-				RN_moreHUD_Option.SetValue(5)
-				AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUD.UnRegisterIconFormList("dbmDisp")
-				AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-				
-			endIf	
-				
-		endif
-	
-	RN_Tracker._bSpoilers = fiss.loadBool("Show Spoilers")
-	RN_Tracker._HideIncomplete = fiss.loadBool("Hide Incomplete")
-	
-	RN_Tracker._Helgen_Index = fiss.loadInt("Helgen Option")
-	RN_Tracker._Legacy_Index = fiss.loadInt("Legacy Option")
-	
-	string loadResult = fiss.endLoad()
-		If (loadResult != "")
-			if IsInMenuMode()
-				self.ShowMessage("Fiss Load Error - No config file found", false, "Ok")
-			endIf
-			_UserSettings = false
-			Begin_Config_Default()
-		else
-			if IsInMenuMode()
-				self.ShowMessage("User settings loaded successfully from Config file", false, "Ok")
-				ForcePageReset()
-			endIF
-			_UserSettings = true
-		endIf
-EndFunction	
-
-;-- Load States / Function --------------------------------
-
 Function Begin_Config_Default()
 
 	ShowMuseumVal = True
@@ -1292,10 +1354,12 @@ Function Begin_Config_Default()
 	DevDebugVal = False
 	ShowStartup = True
 	PrepTransfer = 1
-	
-	StorageSpellVal = False
+	SummonSpellVal = False
+	StorageSpellVal = False	
 	if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
 		(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
+	elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
+		(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
 	endIf
 	
 	IndexmoreHUD = 0
@@ -1318,16 +1382,18 @@ Function Begin_Config_Default()
 	AllowWeapon = False
 	AllowArmor = False
 	AllowBook = False
-	AllowPotion = False
 	AllowKey = False
 	AllowGems = False
 	AllowMisc = False
+	AllowPotion = False
 	
 	RN_Tracker._bSpoilers = false
 	RN_Tracker._HideIncomplete = false
 	
 	RN_Tracker._Helgen_Index = 0
 	RN_Tracker._Legacy_Index = 0
+	
+	Token_Vis = True
 	
 	if IsInMenuMode()
 		ForcePageReset()
@@ -1347,22 +1413,24 @@ Function Begin_Config_Author()
 	ShowLocationOverrideVal = False
 	ShowStorageSpellOverideVal = False
 	DevDebugVal = False
-	ShowStartup = False
+	ShowStartup = True
 	PrepTransfer = 1
+	SummonSpellVal = False
+	Token_Vis = True
 	
 	IndexmoreHUD = 0
 	
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-			AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-			AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-			AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-		endIf
-		
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017	
-			AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-			AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-		endIf
+	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
+		AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
+		AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
+		AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
+	endIf
+	
+	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017	
+		AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
+		AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
+		AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
+	endIf
 	
 	if DBM_ArcSkill.GetValue() >= 5
 		AutoTransferRelics = True
@@ -1370,29 +1438,33 @@ Function Begin_Config_Author()
 		AllowWeapon = True
 		AllowArmor = True
 		AllowBook = True
-		AllowPotion = True
 		AllowKey = True
 		AllowGems = True
 		AllowMisc = True
+		AllowPotion = True
 		
 		StorageSpellVal = True
-		if !(Game.GetPlayer().HasSpell(RN_Storage_Spell))
+		if (!Game.GetPlayer().HasSpell(RN_Storage_Spell)) && SummonSpellVal
 			(Game.GetPlayer().AddSpell(RN_Storage_Spell))
+			
+		elseif (!Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)) && !SummonSpellVal
+			(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
 		endIf
-		
 	else
 		AutoTransferRelics = False
 		RN_Transfer.GoToState("Disabled")
 		AllowWeapon = False
 		AllowArmor = False
 		AllowBook = False
-		AllowPotion = False
 		AllowKey = False
 		AllowGems = False
 		AllowMisc = False
+		AllowPotion = FALSE
 		StorageSpellVal = False
 		if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
 			(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
+		elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
+			(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
 		endIf
 	endIf
 	
@@ -1544,17 +1616,20 @@ state iRelicSpellDebug ;;Debug Options
 		if ShowStorageSpellOverideVal
 			if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
 				(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-				if AutoTransferRelics
-					AutoTransferRelics = FALSE
-					RN_Transfer.GoToState("Disabled")	
-					AllowWeapon = FALSE
-					AllowArmor = FALSE
-					AllowBook = FALSE
-					AllowGems = FALSE
-					AllowKey = FALSE
-					AllowPotion = FALSE
-					AllowMisc= FALSE
-				endIf
+			elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
+				(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))	
+			endIf
+			
+			if AutoTransferRelics
+				AutoTransferRelics = FALSE
+				RN_Transfer.GoToState("Disabled")	
+				AllowWeapon = FALSE
+				AllowArmor = FALSE
+				AllowBook = FALSE
+				AllowGems = FALSE
+				AllowKey = FALSE
+				AllowMisc= FALSE
+				AllowPotion = FALSE
 			endIf
 		endIf	
 
@@ -1682,28 +1757,6 @@ function DisableDebugAccess()
 	RN_Debug_Access.SetValue(Utility.RandomInt(0, 250))
 	RN_Debug_Randomiser.SetValue(Utility.RandomInt(251, 500))
 endFunction
-
-;;-------------------------------
-
-state RevertLists
-
-	Event OnSelectST()
-		
-		
-		if IsInMenuMode()
-			if self.ShowMessage("This will revert the moreHUD new / found / displayed formlists to 0, do you want to revert now?", true, "Revert", "Cancel")
-				RN_Utility.RevertLists()
-				forcepagereset()
-			endIF				
-		endIf
-		
-	EndEvent
-
-	Event OnHighlightST()
-
-		SetInfoText("This option will revert the dbmNew / dbmFound / dbmDisp formlists -- NOT FOR PLAYER USE")
-	EndEvent
-endState
 
 ;;-------------------------------
 
@@ -1886,15 +1939,33 @@ String function SetStorageOptions()
 						AllowBook = FALSE
 						AllowGems = FALSE
 						AllowKey = FALSE
-						AllowPotion = FALSE
 						AllowMisc= FALSE
+						AllowPotion = FALSE
+					endIf
+				Status_Return = MCM_Strings[9]
+			
+			elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
+				(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
+					if AutoTransferRelics
+						AutoTransferRelics = FALSE
+						RN_Transfer.GoToState("Disabled")
+						AllowWeapon = FALSE
+						AllowArmor = FALSE
+						AllowBook = FALSE
+						AllowGems = FALSE
+						AllowKey = FALSE
+						AllowMisc= FALSE
+						AllowPotion = FALSE
 					endIf
 				Status_Return = MCM_Strings[9]
 			endIf
-			
+		
 		elseif StorageSpellVal
-			if (!Game.GetPlayer().HasSpell(RN_Storage_Spell))
+			if (!Game.GetPlayer().HasSpell(RN_Storage_Spell)) && SummonSpellVal
 				(Game.GetPlayer().AddSpell(RN_Storage_Spell))
+				
+			elseif (!Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)) && !SummonSpellVal
+				(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
 				Status_Return = MCM_Strings[10]
 			endif	
 		endIf	
@@ -1912,6 +1983,55 @@ String function GetStorageOptions()
 		Status_Return = MCM_Strings[9]		
 	elseif StorageSpellVal
 		Status_Return = MCM_Strings[10]
+	endIf
+		return Status_Return
+endFunction	
+
+;;-------------------------------
+
+state iRelicStorageSummon ;;Storage Spell
+	
+	Event OnSelectST()
+		SummonSpellVal = !SummonSpellVal 
+			
+		self.SetTextOptionValueST(Self.SetSummonOptions(), false, "")
+		ForcePagereset()
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Toggle to choose how you want to access the Relic Storage Container")
+	EndEvent
+endState
+
+;;-------------------------------
+	
+String function SetSummonOptions()	
+
+		if !SummonSpellVal
+			(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
+			(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
+			Status_Return = "Summon Chest"
+		
+		elseif SummonSpellVal
+			(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
+			(Game.GetPlayer().AddSpell(RN_Storage_Spell))
+			Status_Return = "Cloud Access"		
+		endIf
+
+	return Status_Return 
+endFunction
+
+;;-------------------------------
+	
+String function GetSummonOptions()
+	
+	if DBM_ArcSkill.GetValue() < 5 && !ShowStorageSpellOverideVal
+		Status_Return = MCM_Strings[21]
+	elseif !SummonSpellVal
+		Status_Return = "Summon Chest"
+	elseif SummonSpellVal
+		Status_Return = "Cloud Access"
 	endIf
 		return Status_Return
 endFunction	
@@ -2045,6 +2165,53 @@ endState
 
 ;;-------------------------------
 
+state Token_Visibility ;;Token Visibility
+
+	Event OnSelectST()
+		Token_Vis = !Token_Vis
+		SetToggleOptionValueST(Self.SetTokenVisibility(), false, "")
+		ForcePageReset()
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Toggle to show / hide the Curators Storage Token crafting recipe at the Forge / Smelter.")
+	EndEvent
+	
+endState
+
+;;-------------------------------
+	
+String function SetTokenVisibility()	
+
+	if !Token_Vis
+		RN_Token_Visibility.SetValue(0)
+		Status_Return = "Hidden"
+		
+	elseif Token_Vis
+		RN_Token_Visibility.SetValue(1)
+		Status_Return = "Visible"
+	endIf
+	
+	return Status_Return 
+endFunction
+	
+;;-------------------------------
+	
+String function GetTokenVisibility()
+	
+	if !Token_Vis
+		Status_Return = "Hidden"
+		
+	elseif Token_Vis
+		Status_Return = "Visible"
+	endIf
+	
+	return Status_Return 
+endFunction	
+
+;;-------------------------------
+
 state Transfer_Weapon
 
 	Event OnSelectST()
@@ -2125,26 +2292,6 @@ endState
 
 ;;-------------------------------
 
-state Transfer_Potion
-
-	Event OnSelectST()
-		AllowPotion = !AllowPotion
-			SetToggleOptionValueST(AllowPotion)
-	EndEvent
-	
-	Event OnDefaultST()
-		AllowPotion = false
-		SetToggleOptionValueST(AllowPotion)
-	EndEvent
-
-	Event OnHighlightST()
-
-		self.SetInfoText("Automatically transfer displayable potions to the Relic Storage Container when picked up.\n Default: Disabled")
-	EndEvent
-endState
-
-;;-------------------------------
-
 state Transfer_Gems
 
 	Event OnSelectST()
@@ -2180,6 +2327,26 @@ state Transfer_Misc
 	Event OnHighlightST()
 
 		self.SetInfoText("Automatically transfer displayable Misc Items to the Relic Storage Container when picked up.\n Default: Disabled")
+	EndEvent
+endState
+
+;;-------------------------------
+
+state Transfer_Potion
+
+	Event OnSelectST()
+		AllowPotion = !AllowPotion
+			SetToggleOptionValueST(AllowPotion)
+	EndEvent
+	
+	Event OnDefaultST()
+		AllowPotion = false
+		SetToggleOptionValueST(AllowPotion)
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Automatically transfer displayable Potions & Poisons to the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2452,7 +2619,7 @@ state Safehouse_Disp
 			if self.ShowMessage("This will Enable moreHUD icons and functionality for all standard Safehouse displays, do you want to enable now?", true, "Enable", "Cancel")
 				self.SetTextOptionValueST(self.SetSafehouseOptions(), false, "")
 				RN_Utility.SetUpSafehouse()
-				Safehouse_Configured = True
+				RN_Installed_SafehouseGeneral.SetValue(1)
 			endIf
 		endIF			
 	EndFunction
@@ -2657,7 +2824,7 @@ string function GetCurrentMuseumCount(GlobalVariable akVariable)
 			Total_Room += 1
 		endIf
 
-		if RN_Mod.XX_SafehouseL
+		if RN_Installed_SafehouseGeneral.GetValue()
 			Total_Room += 1
 		endIf
 		

@@ -68,6 +68,9 @@ miscobject property Gold001 auto
 
 ;;Player Ref 
 objectreference property PlayerRef auto
+
+int _OldPatchCount
+int _OldCreationCount
 	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Formlist Properties ------------------------------------------------------------------------------------------------
@@ -139,6 +142,21 @@ globalvariable property GV_SectionHallofHeroes auto
 globalvariable property GV_SectionDaedricGallery auto
 globalvariable property GV_SectionHOLE auto
 
+GlobalVariable Property RN_Installed_SafehouseGeneral Auto
+GlobalVariable Property RN_Installed_TFC Auto
+GlobalVariable Property RN_Installed_SafehousePlus Auto
+GlobalVariable Property RN_Installed_Chrysamere Auto
+GlobalVariable Property RN_Installed_DawnfangDuskfang Auto
+GlobalVariable Property RN_Installed_DivineCrusader Auto
+GlobalVariable Property RN_Installed_NetchLeatherArmor Auto
+GlobalVariable Property RN_Installed_SaintsL Auto
+GlobalVariable Property RN_Installed_SunderWraithguard Auto
+GlobalVariable Property RN_Installed_StaffofHasedoki Auto
+GlobalVariable Property RN_Installed_StendarrsHammer Auto
+GlobalVariable Property RN_Installed_Shadowrend_Boethiah Auto
+GlobalVariable Property RN_Installed_DeadMansDread_Standalone Auto
+GlobalVariable Property RN_Installed_DeadMansDread_Oblivion Auto	
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------- Start of Script -----------------------------------------------------------------------------------------------------
@@ -152,8 +170,7 @@ function OnInit()
 	RN_TokenFormlist.AddForm(PlayerRef)
 	_SafehouseContainerList_WP.AddForm(PlayerRef)
 	Wait(5.0)
-	RunSetup()
-	
+	RunSetup()	
 endFunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -176,7 +193,6 @@ Event RunSetup()
 		bSetupStarted = True
 		DBM_SortWait.setvalue(1)
 		RN_Mod.CheckSupportedMods()
-		RN_Array.CreatePatchArray()
 		
 		Int _Index = 0
 		Int _ArraySize = RN_Array._ModSetup.length
@@ -189,7 +205,7 @@ Event RunSetup()
 		_Index = 0
 		_ArraySize = RN_Array._Patches.length
 		While _Index < _ArraySize	
-			if RN_Array._bPatches[_Index] && RN_Array._GVComplete[_Index].GetValue() == 0
+			if RN_Array._bPatches[_Index].GetValue() && !RN_Array._GVComplete[_Index].GetValue()
 				SendModEvent(RN_Array._Patches[_Index])
 				RN_Setup_Sent.Mod(1)
 			endIf
@@ -199,7 +215,7 @@ Event RunSetup()
 		_Index = 0
 		_ArraySize = RN_Array._Creations.length
 		While _Index < _ArraySize	
-			if RN_Array._bCreations[_Index] && RN_Array._GVCreationComplete[_Index].GetValue() == 0
+			if RN_Array._bCreations[_Index].GetValue() && !RN_Array._GVCreationComplete[_Index].GetValue()
 				SendModEvent(RN_Array._Creations[_Index])
 				RN_Setup_Sent.Mod(1)
 			endIf
@@ -239,7 +255,7 @@ function CreateMoreHudLists()
 		endWhile
 	endWhile
 	
-	if RN_MCM.Safehouse_Configured
+	if RN_Installed_SafehouseGeneral.GetValue()
 		Int Index = 0
 		Int ListSize = RN_Array._SafehouseContainerList.GetSize()
 		While Index < ListSize
@@ -335,7 +351,7 @@ Event InitGlobals()
 	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
 	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
 	
-	if (RN_Mod.XX_ForgottenL)
+	if (RN_Installed_TFC.GetValue())
 		RN_Quest_Listener_Total.Mod(3) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood] [+1 The Forgotten City] 
 	else
 		RN_Quest_Listener_Total.Mod(2) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood]
@@ -421,47 +437,47 @@ Event UpdateGlobalsforCC()
 		_Index += 1
 	endWhile
 	
-	if RN_Mod.XX_Chrysamere ;;Chrysamere
+	if RN_Installed_Chrysamere.GetValue() ;;Chrysamere
 		GV_SectionHallofHeroes.Mod(-1)
 	endIf
 	
-	if RN_Mod.XX_DawnfangDuskfang ;;Dawnfang & Duskfang
+	if RN_Installed_DawnfangDuskfang.GetValue() ;;Dawnfang & Duskfang
 		GV_SectionHallofHeroes.Mod(-1)
 	endIf
 	
-	if RN_Mod.XX_DeadMansDread_Standalone ;;Dead Mans Dread
+	if RN_Installed_DeadMansDread_Standalone.GetValue() ;;Dead Mans Dread
 		GV_SectionHallofHeroes.Mod(-1)
 	endIf
 
-	if RN_Mod.XX_DeadMansDread_Oblivion ;;Dead Mans Dread
+	if RN_Installed_DeadMansDread_Oblivion.GetValue() ;;Dead Mans Dread
 		GV_SectionHallofHeroes.Mod(-2)
 	endIf
 	
-	if RN_Mod.XX_DivineCrusader_Standalone || RN_Mod.XX_DivineCrusader_Individual ;;Divine Crusader
+	if RN_Installed_DivineCrusader.GetValue() ;;Divine Crusader
 		GV_SectionHallofHeroes.Mod(-7)
 	endif
 
-	if RN_Mod.XX_NetchLeatherArmor ;;Netch Leather Armor
+	if RN_Installed_NetchLeatherArmor.GetValue() ;;Netch Leather Armor
 		GV_SectionHallofHeroes.Mod(-1)
 	endif
 
-	if RN_Mod.XX_SaintsL ;;Saints & Seducers
+	if RN_Installed_SaintsL.GetValue() ;;Saints & Seducers
 		GV_SectionDaedricGallery.Mod(-1)
 	endif
 
-	if RN_Mod.XX_Shadowrend_Boethiah ;;Shadowrend
+	if RN_Installed_Shadowrend_Boethiah.GetValue() ;;Shadowrend
 		GV_SectionDaedricGallery.Mod(-1)
 	endif	
 	
-	if RN_Mod.XX_StaffofHasedoki ;;Staff of Hasedoki
+	if RN_Installed_StaffofHasedoki.GetValue() ;;Staff of Hasedoki
 		GV_SectionHallofHeroes.Mod(-1)
 	endif	
 	
-	if RN_Mod.XX_StendarrsHammer ;;Stendarrs Hammer
+	if RN_Installed_StendarrsHammer.GetValue() ;;Stendarrs Hammer
 		GV_SectionHallofHeroes.Mod(-1)
 	endif
 	
-	if RN_Mod.XX_SunderWraithguard ;;Sunder & Wraithguard
+	if RN_Installed_SunderWraithguard.GetValue() ;;Sunder & Wraithguard
 		GV_SectionHOLE.Mod(-2)
 	endif
 endEvent	
@@ -477,7 +493,11 @@ Function Maintenance()
 	if RN_MCM.ShowStartup
 		ModStartup.Show()
 	endIf
-
+	
+	Utility.Wait(5)
+	
+	RN_Mod.CheckSupportedMods()
+	
 	RN_TokenFormlist.AddForm(PlayerRef)
 	_SafehouseContainerList_WP.AddForm(PlayerRef)
 	
@@ -490,16 +510,15 @@ Function Maintenance()
 
 	bSetupStarted = True
 	DBM_SortWait.setvalue(1)
-	RN_Mod.CheckSupportedMods()
-	RN_Array.CreatePatchArray()
+
 	
-	Int _OldPatchCount = RN_SupportedModCount.GetValue() as Int
-	Int _OldCreationCount = RN_SupportedCreationCount.GetValue() as Int
+	_OldPatchCount = RN_SupportedModCount.GetValue() as Int
+	_OldCreationCount = RN_SupportedCreationCount.GetValue() as Int
 	
 	Int _Index = 0
 	Int _ArraySize = RN_Array._Patches.length
 	While _Index < _ArraySize	
-		if RN_Array._bPatches[_Index] && RN_Array._GVComplete[_Index].GetValue() == 0
+		if (RN_Array._bPatches[_Index].GetValue()) && (RN_Array._GVComplete[_Index].GetValue() == 0)
 			SendModEvent(RN_Array._Patches[_Index])
 			RN_Setup_Sent.Mod(1)
 		endIf
@@ -509,29 +528,14 @@ Function Maintenance()
 	_Index = 0
 	_ArraySize = RN_Array._Creations.length
 	While _Index < _ArraySize	
-		if RN_Array._bCreations[_Index] && RN_Array._GVCreationComplete[_Index].GetValue() == 0
+		if RN_Array._bCreations[_Index].GetValue() && RN_Array._GVCreationComplete[_Index].GetValue() == 0
 			SendModEvent(RN_Array._Creations[_Index])
 			RN_Setup_Sent.Mod(1)
 		endIf
 		_Index +=1
 	endWhile
 	
-	while bSetupStarted		
-		if RN_Setup_Done.GetValue() == RN_Setup_Sent.GetValue() 
-			
-			if RN_SupportedModCount.GetValue() > _OldPatchCount ||  RN_SupportedCreationCount.GetValue() > _OldCreationCount
-				ModStartup_UpdatingLists.Show()
-				CreateMoreHudLists()
-				UpdateAllFound()
-			endIf
-	
-			InitGlobals()
-			bSetupStarted = False
-			RN_Setup_Start.setvalue(0)
-			RN_Setup_Finish.setvalue(1)
-			
-		endIf
-	endWhile	
+	WaitForMaintenance()	
 	
 	RN_Quest_Listener_Total.setvalue(0)
 	RN_Exploration_Listener_Total.setvalue(0)
@@ -540,7 +544,7 @@ Function Maintenance()
 	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
 	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
 	
-	if (RN_Mod.XX_ForgottenL)
+	if (RN_Installed_TFC.GetValue())
 		RN_Quest_Listener_Total.Mod(3) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood] [+1 The Forgotten City] 
 	else
 		RN_Quest_Listener_Total.Mod(2) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood]
@@ -620,6 +624,26 @@ Function Maintenance()
 	
 endFunction
 
+Event WaitForMaintenance()
+
+	while bSetupStarted		
+		if RN_Setup_Done.GetValue() == RN_Setup_Sent.GetValue() 
+	
+			if RN_SupportedModCount.GetValue() > _OldPatchCount ||  RN_SupportedCreationCount.GetValue() > _OldCreationCount
+				ModStartup_UpdatingLists.Show()
+				CreateMoreHudLists()
+				UpdateAllFound()
+			endIf
+	
+			InitGlobals()
+			bSetupStarted = False
+			RN_Setup_Start.setvalue(0)
+			RN_Setup_Finish.setvalue(1)
+			
+		endIf
+	endWhile
+endEvent
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Scan Functions ----------------------------------------------------------------------------------------------------
@@ -632,8 +656,6 @@ function ScanAll()
 	
 	bScanAll = True
 	bScanning = True
-	RN_Mod.CheckSupportedMods()
-	RN_Array.CreatePatchArray()
 	DBM_SortWait.setvalue(1)
 	
 	ScanMuseum()
@@ -656,8 +678,6 @@ function ScanMuseum()
 	if !bScanAll		
 		DBM_ScanMuseum_Message.Show()
 		bScanning = True
-		RN_Mod.CheckSupportedMods()
-		RN_Array.CreatePatchArray()
 		DBM_SortWait.setvalue(1)		
 	endIf
 	
@@ -668,7 +688,7 @@ function ScanMuseum()
 		RN_Scan_Sent.Mod(1)
 		_Index += 1
 		
-		if _Index == 9 && !RN_SupportedCreationCount.GetValue() || _Index == 12 && RN_Mod.XX_SafehouseL == false
+		if _Index == 9 && !RN_SupportedCreationCount.GetValue() || _Index == 12 && !RN_Installed_SafehouseGeneral.GetValue()
 			_Index += 1
 		endIf	
 	endWhile
@@ -685,15 +705,13 @@ function ScanMods()
 	if !bScanAll		
 		DBM_ScanMuseum_Message.Show()
 		bScanning = True
-		RN_Mod.CheckSupportedMods()
-		RN_Array.CreatePatchArray()
 		DBM_SortWait.setvalue(1)		
 	endIf
 	
 	Int _Index = 0
 	Int _ArraySize = RN_Array._ModScan.length
 		While _Index < _ArraySize	
-			if RN_Array._bPatches[_Index] && RN_Array._GVComplete[_Index].GetValue() == 0
+			if RN_Array._bPatches[_Index].GetValue() && RN_Array._GVComplete[_Index].GetValue() == 0
 				SendModEvent(RN_Array._ModScan[_Index])
 				RN_Scan_Sent.Mod(1)
 			endIf
@@ -713,15 +731,13 @@ function ScanCreations()
 	if !bScanAll		
 		DBM_ScanMuseum_Message.Show()
 		bScanning = True
-		RN_Mod.CheckSupportedMods()
-		RN_Array.CreatePatchArray()
 		DBM_SortWait.setvalue(1)		
 	endIf
 	
 	Int _Index = 0
 	Int _ArraySize = RN_Array._CreationScan.length
 		While _Index < _ArraySize	
-			if RN_Array._bCreations[_Index] && RN_Array._GVCreationComplete[_Index].GetValue() == 0
+			if RN_Array._bCreations[_Index].GetValue() && RN_Array._GVCreationComplete[_Index].GetValue() == 0
 				SendModEvent(RN_Array._CreationScan[_Index])
 				RN_Scan_Sent.Mod(1)
 			endIf
@@ -760,9 +776,6 @@ function UpdateAllFound()
 		
 	bUpdating = True
 	DBM_SortWait.setvalue(1)
-	
-	RN_Mod.CheckSupportedMods()
-	RN_Array.CreatePatchArray()
 	
 	Int _Index = 0
 	Int _ArraySize = RN_Array._ModUpdate.length
@@ -823,21 +836,8 @@ Function FullReset()
 	
 	Utility.Wait(5.0)
 	RunSetup()
-	
-	RevertLists()
 	RebuildLists()
-	
 	Debug.Notification("The Curators Companion: Mod Reset Complete")
-endFunction
-
-;;-- Functions ---------------------------------------
-
-Function RevertLists()
-
-	dbmNew.revert()
-	dbmFound.revert()
-	dbmDisp.revert()
-	Debug.Notification("The Curators Companion: moreHUD Lists Reset")
 endFunction
 
 ;;-- Functions ---------------------------------------
@@ -848,21 +848,24 @@ Function RebuildLists()
 	
 	DBM_SortWait.SetValue(1)
 	
+	dbmNew.revert()
+	dbmFound.revert()
+	dbmDisp.revert()	
+	
 	Int _Total = dbmMaster.GetSize()
-	Int _Index = dbmMaster.GetSize()
-	While _Index > 0
-		_Index -= 1
+	Int _Index = 0
+	While _Index < _Total
 		form _item = dbmMaster.GetAt(_Index) as form
-		dbmNew.AddForm(_item)
-		
+		dbmNew.AddForm(_item)	
 		if _Index == 500 || _Index == 1000 || _Index == 1500 || _Index == 2000 || _Index == 2500 || _Index == 3000 || _Index == 3500 || _Index == 4000
 			Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists... (" + _Index + " / " + _Total + ")")
 		endIf
+		_Index += 1
 	endWhile
 		
 	CreateMoreHudLists()
 	
-	moreHUDListRebuilt.Show()
+	Debug.Notification("The Curators Companion: moreHUD Lists Rebuilt & Ready")
 	
 	DBM_SortWait.SetValue(0)
 endFunction
@@ -878,7 +881,7 @@ Function SetUpSafehouse()
 	SendModEvent("RunSetup_D1")
 	RN_Safehouse_Sent.Mod(2)
 	
-	if RN_Mod.XX_SafehousePlus
+	if RN_Installed_SafehousePlus.GetValue()
 		SendModEvent("RunSafehousePlusSetup")
 		SendModEvent("RunSafehousePlusSetup_D")
 		RN_Safehouse_Sent.Mod(2)
@@ -943,7 +946,7 @@ Function WaitForSafehouseSetup()
 				endWhile
 			endWhile
 			
-			if RN_MCM.Safehouse_Configured
+			if RN_Installed_SafehousePlus.GetValue()
 				SHContainerScript1.GoToState("")
 				SHContainerScript2.GoToState("")
 				SHContainerScript3.GoToState("")
@@ -957,7 +960,6 @@ Function WaitForSafehouseSetup()
 			DBM_SortWait.setvalue(0)
 			RN_Safehouse_Sent.setvalue(0)
 			RN_Safehouse_Done.setvalue(0)
-			RN_Mod.XX_SafehouseL = True
 			Debug.Notification("The Curators Companion: Safehouse Integration Done")
 		endIf		
 	endWhile

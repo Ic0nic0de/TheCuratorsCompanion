@@ -15,6 +15,8 @@ Objectreference Property RN_Storage_Container auto
 
 Objectreference Property PlayerRef auto
 
+formlist property RN_Safehouse_Items_Merged auto
+
 Keyword Property VendorItemGem Auto
 
 ;-- Events --------------------------------
@@ -54,7 +56,7 @@ Function OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRef
 		elseif akBaseItem as Book && MCM.AllowBook 	
 			ProcessForm(akBaseItem)	
 		
-		elseif akBaseItem as Potion && MCM.AllowPotion	
+		elseif akBaseItem as Potion && !RN_Safehouse_Items_Merged.HasForm(akBaseItem) && MCM.AllowPotion
 			ProcessForm(akBaseItem)
 		
 		elseif akBaseItem as Key && MCM.AllowKey	
@@ -66,9 +68,8 @@ Function OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRef
 		elseif akBaseItem as SoulGem && MCM.AllowGems 
 			ProcessForm(akBaseItem)
 		
-		elseif akBaseItem as MiscObject && MCM.AllowMisc
+		elseif akBaseItem as MiscObject && !RN_Safehouse_Items_Merged.HasForm(akBaseItem) && MCM.AllowMisc
 			ProcessForm(akBaseItem)	
-				
 		endIf
 	endIf
 			

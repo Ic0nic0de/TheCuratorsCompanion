@@ -36,6 +36,8 @@ endFunction
 ;;-- Functions ---------------------------------------
 
 function OnRunSetup_D1(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)
+
+	Debug.Trace("The Curators Companion: Setup Event Received for RN_Utility_Setup_D1")
 	
 	;;Merge Safehouse Display Lists
 	_onConsolidateDisplays(DBM_FoodDisplayList, DBM_SectionSafehouse_Merged)
@@ -46,5 +48,6 @@ function OnRunSetup_D1(string eventName, string strArg, float numArg, Form sende
 	_onConsolidateDisplays(DBM_DisplayClosetList, DBM_SectionSafehouse_Merged)	
 	
 	RN_Safehouse_Done.Mod(1)
+	Debug.Trace("The Curators Companion: Setup Event Completed for RN_Utility_Setup_D1")
 endFunction
 

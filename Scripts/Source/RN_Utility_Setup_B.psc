@@ -35,6 +35,8 @@ endFunction
 ;;-- Functions ---------------------------------------
 
 function OnRunSetup_B(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)		
+
+	Debug.Trace("The Curators Companion: Setup Event Received for RN_Utility_Setup_B")
 	
 	Int _index = _itemsArray.length		
 	While _index
@@ -43,5 +45,6 @@ function OnRunSetup_B(string eventName, string strArg, float numArg, Form sender
 		_onConsolidateItems(_List, DBM_Section_DG_HOLE_HOO_NS_GH_HOS_Merged, dbmNew, dbmMaster)			
 	endWhile
 	
-	RN_Setup_Done.Mod(1)	
+	RN_Setup_Done.Mod(1)
+	Debug.Trace("The Curators Companion: Setup Event Completed for RN_Utility_Setup_B")	
 endFunction

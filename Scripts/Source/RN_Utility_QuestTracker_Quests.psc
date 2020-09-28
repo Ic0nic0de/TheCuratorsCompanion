@@ -4,7 +4,7 @@ RN_Utility_QuestTracker_MCM property MCM auto
 
 RN_Utility_QuestTracker_Arrays property Array auto
 
-RN_Utility_Mods Property RN_Mod Auto
+GlobalVariable Property RN_Installed_Moonpath Auto
 
 ;-- Events --------------------------------------
 
@@ -33,7 +33,7 @@ Event _Build_Quests()
 			MCM._Add_Quest_Data(Array.Museum_Radiant[7], 	Array.Museum_First[7], Array.Museum_Final[7], Array.Museum_ID[7], Array.Museum_Name[7], Array.page[0], Array.Museum_Giver[7], Array.Museum_Reqs[7], Array.Museum_Notes[7])		
 			MCM._Add_Quest_Data(Array.Museum_Radiant[8], 	Array.Museum_First[8], Array.Museum_Final[8], Array.Museum_ID[8], Array.Museum_Name[8], Array.page[0], Array.Museum_Giver[8], Array.Museum_Reqs[8], Array.Museum_Notes[8])		
 		
-		if RN_Mod.XX_MoonpathL	
+		if RN_Installed_Moonpath.GetValue()
 			MCM._Add_Quest_Data(Array.Museum_Radiant[9],	Array.Museum_First[9], Array.Museum_Final[9], Array.Museum_ID[9], Array.Museum_Name[9], Array.page[0], Array.Museum_Giver[9], Array.Museum_Reqs[9], Array.Museum_Notes[9])		
 		else
 			MCM._Add_Quest_Data(Array.Museum_Radiant[10], 	Array.Museum_First[10], Array.Museum_Final[10], Array.Museum_ID[10], Array.Museum_Name[10], Array.page[0], Array.Museum_Giver[10], Array.Museum_Reqs[10], Array.Museum_Notes[10])		

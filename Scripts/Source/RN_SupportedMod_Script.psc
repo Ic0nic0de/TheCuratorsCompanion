@@ -94,6 +94,10 @@ Bool _PrisonerChestAdded
 	
 Event onInit()
 
+	if _bPatchType && RN_Array._GVComplete.Find(_Global_Mod_Complete) < 0 || !_bPatchType && RN_Array._GVCreationComplete.Find(_Global_Mod_Complete) < 0
+		Debug.MessageBox("=== The Curators Companion === \n \n Invalid Patch Detected \n (" + _modName + ") can not be added to an existing save or game in progress. \n \n If you would like to use (" + _modName + ") please start a new game on  " + MCM._ModVersion + " or uninstall this patch to continue.")
+	endIf
+	
 	RegisterForModEvent(_ModSetup, "_onModSetup")	
 	RegisterForModEvent(_ModScan, "_onModScan")
 endEvent
@@ -102,6 +106,10 @@ endEvent
 
 Event onPlayerLoadGame()
 
+	if _bPatchType && RN_Array._GVComplete.Find(_Global_Mod_Complete) < 0 || !_bPatchType && RN_Array._GVCreationComplete.Find(_Global_Mod_Complete) < 0
+		Debug.MessageBox("=== The Curators Companion === \n \n Invalid Patch Detected \n (" + _modName + ") can not be added to an existing save or game in progress. \n \n If you would like to use (" + _modName + ") please start a new game on  " + MCM._ModVersion + " or uninstall this patch to continue.")
+	endIf
+	
 	RegisterForModEvent(_ModSetup, "_onModSetup")	
 	RegisterForModEvent(_ModScan, "_onModScan")
 	
@@ -124,9 +132,7 @@ Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;
 	
 	if !_setupDone
 
-		If MCM.DevDebugVal
-			Trace("_onModSetup() Event Received for: " + _modName)
-		endIf
+		Trace("The Curators Companion: Setup Event Received for " +_modName)	
 	
 		Int Index = _itemsArray.length		
 		While Index
@@ -204,14 +210,12 @@ Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;
 		
 		_setupDone = True
 		
-		If MCM.DevDebugVal
-			Trace("_onModSetup() Event Completed for: " + _modName)
-		endIf
+		Trace("The Curators Companion: Setup Event Completed for " +_modName)	
 		
 	else
-	
-		Trace("Setup already completed for " +_modName)	
+		
 		RN_Setup_Done.Mod(1)
+		Trace("The Curators Companion: Setup Event Already Completed for " +_modName)
 	endIf
 	
 endEvent	

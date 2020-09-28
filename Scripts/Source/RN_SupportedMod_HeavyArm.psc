@@ -242,9 +242,7 @@ Event OnRunHASetup(string eventName, string strArg, float numArg, Form sender) ;
 	
 	if !_setupDone
 	
-		If MCM.DevDebugVal
-			Trace("_onModSetup() Event Received for: Heavy Armory")
-		endIf
+		Trace("The Curators Companion: Setup Event Received for Heavy Armory")	
 	
 		;;Merge Formlist.
 		_onConsolidateItems(DBM_SectionArmoryHAAncientNordicItems, Supported_Items_Merged, dbmNew, dbmMaster)
@@ -316,16 +314,13 @@ Event OnRunHASetup(string eventName, string strArg, float numArg, Form sender) ;
 		RN_SupportedModCount.Mod(1)
 		_setupDone = True
 		
-		If MCM.DevDebugVal
-			Trace("_onModSetup() Event Completed for: Heavy Armory")
-		endIf
+		Trace("The Curators Companion: Setup Event Completed for Heavy Armory")
 		
 	else
-	
-		Trace("Setup already completed for: Heavy Armory")	
+		
 		RN_Setup_Done.Mod(1)
+		Trace("The Curators Companion: Setup Event Already Completed for Heavy Armory")
 	endIf
-	
 endEvent	
 
 ;;-- Events ---------------------------------------		
