@@ -112,44 +112,6 @@ EndFunction
 
 ;;-- Functions ---------------------------------------
 
-Bool Function CheckFormListSizes(Formlist afListA, Formlist afListB, Quest akQuest, GlobalVariable akVariable, GlobalVariable akComplete) global
-	if (afListA.GetSize() >= afListB.GetSize())
-		if (akQuest.IsRunning())
-			akQuest.Stop()
-		endif
-		akVariable.SetValue(1)
-		akComplete.Mod(1)
-	return true
-  endif
-  
-  return false
-EndFunction
-
-;;-- Functions ---------------------------------------
-
-Bool Function CheckListSizes (Formlist afListA, Formlist afListB, GlobalVariable akVariable) global
-	if (afListA.GetSize() >= afListB.GetSize())
-		akVariable.SetValue(1)
-			return true
-	endif
-  
-  return false
-EndFunction 
-
-;;-- Functions ---------------------------------------
-
-Bool Function CheckListSizes2 (Formlist afListA, Formlist afListB, GlobalVariable akVariable, GlobalVariable aKSets) global
-	if (afListA.GetSize() >= afListB.GetSize())
-		akVariable.SetValue(1)
-		aKSets.Mod(1)
-		return true
-	endif
-  
-  return false
-EndFunction 
-
-;;-- Functions ---------------------------------------
-
 Bool Function CheckQuestComplete (Quest akQuest) global
 	if (akQuest.IsCompleted())
 		return true

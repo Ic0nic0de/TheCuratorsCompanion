@@ -35,7 +35,9 @@ endFunction
 ;;-- Functions ---------------------------------------
 
 function OnRunSetup_B1(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)		
-		
+
+	Debug.Trace("The Curators Companion: Setup Event Received for RN_Utility_Setup_B1")
+	
 	Int _index = _itemsArray.length		
 	While _index
 		_index -= 1
@@ -44,4 +46,5 @@ function OnRunSetup_B1(string eventName, string strArg, float numArg, Form sende
 	endWhile
 	
 	RN_Setup_Done.Mod(1)
+	Debug.Trace("The Curators Companion: Setup Event Completed for RN_Utility_Setup_B1")
 endFunction

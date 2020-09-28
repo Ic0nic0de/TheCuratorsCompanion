@@ -32,6 +32,21 @@ Int Property _Legacy_Index = 0 Auto Hidden
 Bool Property _bSpoilers Auto Hidden
 Bool Property _HideIncomplete Auto Hidden
 
+GlobalVariable Property RN_Installed_Clockwork Auto
+GlobalVariable Property RN_Installed_Falskaar Auto
+GlobalVariable Property RN_Installed_Helgen Auto
+GlobalVariable Property RN_Installed_MAS Auto
+GlobalVariable Property RN_Installed_Moonpath Auto
+GlobalVariable Property RN_Installed_3DNPC Auto
+GlobalVariable Property RN_Installed_GrayCowl Auto
+GlobalVariable Property RN_Installed_ProjectAHO Auto
+GlobalVariable Property RN_Installed_Undeath Auto
+GlobalVariable Property RN_Installed_Underground Auto
+GlobalVariable Property RN_Installed_Vigilant Auto
+GlobalVariable Property RN_Installed_WheelsOfLull Auto
+GlobalVariable Property RN_Installed_Wyrmstooth Auto
+GlobalVariable Property RN_Installed_ASLAL Auto
+
 ;-- Events --------------------------------------
 
 Event OnConfigInit()
@@ -91,73 +106,73 @@ Event _Build_Pages_Dynamic()
 	Int _Index = 0
 	Int _Page = 10
 
-	if RN_Mod.XX_ClockworkL
+	if RN_Installed_Clockwork.GetValue()
 		_Index = _Array_Page_Static.Find("")	
 			_Array_Page_Static[_Index] = "Clockwork"
 		_Page += 1
 	endif
 
-	if RN_Mod.XX_FalskaarL
+	if RN_Installed_Falskaar.GetValue()
 		_Index = _Array_Page_Static.Find("") 	
 			_Array_Page_Static[_Index] = "Falskaar"
 		_Page += 1
 	endif
 
-	if RN_Mod.XX_HelgenL
+	if RN_Installed_Helgen.GetValue()
 		_Index = _Array_Page_Static.Find("")  
 			_Array_Page_Static[_Index] = "Helgen Reborn"
 		_Page += 1
 	endif
 
-	if RN_Mod.XX_MoonStarL  
+	if RN_Installed_MAS.GetValue()
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Moon And Star"
 		_Page += 1
 	endif
 	
-	if RN_Mod.XX_MoonpathL
+	if RN_Installed_Moonpath.GetValue()
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Moonpath To Elsweyr"
 		_Page += 1
 	endIf
  
- 	if RN_Mod.XX_ProjectAHOL  
+ 	if RN_Installed_ProjectAHO.GetValue()  
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Project AHO"
 		_Page += 1
 	endif
 
-	if RN_Mod.XX_UndergroundL || RN_Mod.XX_UndergroundESPL
+	if RN_Installed_Underground.GetValue()
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Skyrim Underground"
 		_Page += 1
 	endif
 
-	if RN_Mod.XX_GrayCowlL
+	if RN_Installed_GrayCowl.GetValue()
 		_Index = _Array_Page_Static.Find("")	
 			_Array_Page_Static[_Index] = "The Gray Cowl Of Nocturnal"
 		_Page += 1
 	endif 
 
-	if RN_Mod.XX_WheelsOfLullL
+	if RN_Installed_WheelsOfLull.GetValue()
 		_Index = _Array_Page_Static.Find("")  
 			_Array_Page_Static[_Index] = "The Wheels Of Lull"
 		_Page += 1
 	endif
 
-	if RN_Mod.XX_UndeathL
+	if RN_Installed_Undeath.GetValue()
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Undeath"
 		_Page += 1
 	endif
 	
-	if RN_Mod.XX_WyrmstoothL
+	if RN_Installed_Wyrmstooth.GetValue()
 		_Index = _Array_Page_Static.Find("")	
 			_Array_Page_Static[_Index] = "Wyrmstooth"
 		_Page += 1
 	endif
 	
-	if RN_Mod.XX_3DNPC
+	if RN_Installed_3DNPC.GetValue()
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = " "
 		_Page += 1
@@ -183,7 +198,7 @@ Event _Build_Pages_Dynamic()
 		_Page += 1	
 	endIf
 	
-	if RN_Mod.XX_VigilantL
+	if RN_Installed_Vigilant.GetValue()
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = " "
 		_Page += 1
@@ -284,7 +299,7 @@ Event _Build_Page_Settings()
 		SetCursorPosition(0)
 		AddHeaderOption("Mod Settings:")
 		
-		if RN_Mod.XX_LAL
+		if RN_Installed_ASLAL.GetValue()
 			AddMenuOptionST("_State_Menu_Legacy", "Live Another Life Config:", _Legacy_Menu_Option[_Legacy_Index])
 			
 		else
@@ -305,7 +320,7 @@ Event _Build_Page_Settings()
 		SetCursorPosition(1)
 		AddHeaderOption("")	
 	
-		if RN_Mod.XX_HelgenL
+		if RN_Installed_Helgen.GetValue()
 			AddMenuOptionST("_State_Menu_Helgen", "Helgen Reborn Config:", _Helgen_Menu_Option[_Helgen_Index])			
 			
 		else

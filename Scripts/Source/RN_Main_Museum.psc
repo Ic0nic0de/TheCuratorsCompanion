@@ -8,8 +8,6 @@ RN_Utility_MCM Property MCM Auto
 
 RN_Utility_ArrayHolder property RN_Array auto
 
-RN_Utility_Mods property RN_Mod auto
-
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Item Lists ----------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,6 +51,8 @@ Objectreference Property PlayerRef Auto
 GlobalVariable Property RN_Found_Done Auto
 GlobalVariable property RN_SupportedCreationCount auto
 GlobalVariable Property iMuseumSets Auto
+
+GlobalVariable Property RN_Installed_SafehouseGeneral Auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemRefer
 			FoundRelic.Delete()
 		endIf
 		
-	elseif RN_Safehouse_Items_Merged.HasForm(akBaseItem) && !RN_Safehouse_Items_Found.HasForm(akBaseItem) && MCM.Safehouse_Configured	
+	elseif RN_Safehouse_Items_Merged.HasForm(akBaseItem) && !RN_Safehouse_Items_Found.HasForm(akBaseItem) && RN_Installed_SafehouseGeneral.GetValue()
 		RN_Safehouse_Items_Found.AddForm(akBaseItem)
 							
 		if (MCM.ShowMuseumVal)

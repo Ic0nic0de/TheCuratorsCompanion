@@ -223,9 +223,7 @@ Event OnRunIWSetup(string eventName, string strArg, float numArg, Form sender) ;
 
 	if !_setupDone
 	
-		If MCM.DevDebugVal
-			Trace("_onModSetup() Event Received for: Immersive Weapons")
-		endIf
+		Trace("The Curators Companion: Setup Event Received for Immersive Weapons")	
 		
 		;;Merge Formlist.	
 		_onConsolidateItems(DBM_SectionArmoryImmersiveWeaponsAncientNordicItems, Supported_Items_Merged, dbmNew, dbmMaster)
@@ -305,14 +303,12 @@ Event OnRunIWSetup(string eventName, string strArg, float numArg, Form sender) ;
 		RN_SupportedModCount.Mod(1)
 		_setupDone = True
 		
-		If MCM.DevDebugVal
-			Trace("_onModSetup() Event Completed for: Immersive Weapons")
-		endIf
+		Trace("The Curators Companion: Setup Event Completed for Immersive Weapons")
 		
 	else
 	
-		Trace("Setup already completed for: Immersive Weapons")	
 		RN_Setup_Done.Mod(1)
+		Trace("The Curators Companion: Setup Event Already Completed for Immersive Weapons")
 	endIf
 	
 endEvent

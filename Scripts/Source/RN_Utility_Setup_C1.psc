@@ -65,6 +65,8 @@ endFunction
 ;;-- Functions ---------------------------------------
 
 function OnRunSetup_C1(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)
+
+	Debug.Trace("The Curators Companion: Setup Event Received for RN_Utility_Setup_C1")
 	
 	;;Merge Hall Of Heroes Display Lists
 	_onConsolidateDisplays(DBM_SectionHOHGroundFloorLeft, DBM_SectionHOH_Merged)
@@ -88,4 +90,5 @@ function OnRunSetup_C1(string eventName, string strArg, float numArg, Form sende
 	_onConsolidateDisplays(DBM_SectionStoreRoomReserveVintages, DBM_SectionStoreRoom_Merged)
 	
 	RN_Setup_Done.Mod(1)
+	Debug.Trace("The Curators Companion: Setup Event Completed for RN_Utility_Setup_C1")
 endFunction
