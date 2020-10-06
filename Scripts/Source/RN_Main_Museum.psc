@@ -6,8 +6,6 @@ Import RN_Utility_Global
 
 RN_Utility_MCM Property MCM Auto
 
-RN_Utility_ArrayHolder property RN_Array auto
-
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Item Lists ----------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,10 +47,15 @@ Objectreference Property PlayerRef Auto
 
 ;; Global for ModEvent Return.
 GlobalVariable Property RN_Found_Done Auto
+GlobalVariable Property RN_found_Registered Auto
 GlobalVariable property RN_SupportedCreationCount auto
 GlobalVariable Property iMuseumSets Auto
 
 GlobalVariable Property RN_Installed_SafehouseGeneral Auto
+
+;;Museum / Safehouse storage containers to check within several events.
+Formlist property _SafehouseContainerList_WP auto
+formlist property _MuseumContainerList_WP auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -61,8 +64,7 @@ GlobalVariable Property RN_Installed_SafehouseGeneral Auto
 ;;-- Events ---------------------------------------
 
 Event OnInit()
-	RegisterForModEvent("RunMuseumUpdate", "_onRunMuseumUpdate")
-	RegisterForModEvent("RunSafehouseUpdate", "_onRunSafehouseUpdate")
+	RegisterForModEvent("TCCUpdate", "_onUpdate")
 	AddInventoryEventFilters()
 endEvent
 
@@ -70,8 +72,7 @@ endEvent
 
 Event OnPlayerLoadGame()
 	
-	RegisterForModEvent("RunMuseumUpdate", "_onRunMuseumUpdate")
-	RegisterForModEvent("RunSafehouseUpdate", "_onRunSafehouseUpdate")
+	RegisterForModEvent("TCCUpdate", "_onUpdate")
 	AddInventoryEventFilters()
 endEvent
 	
@@ -146,19 +147,22 @@ EndEvent
 	
 ;;-- Events ---------------------------------------	
 
-Event _onRunMuseumUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 
+	RN_found_Registered.Mod(1)
+	
 	If MCM.DevDebugVal
-		Trace("_onModUpdate() Event Received for: Museum")
+		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Received for: Museum & Safehouse")
 	endIf
 	
-	Int Index = RN_Array._MuseumContainerArray_WP.length
-	While Index 
-		Index -= 1		
-		Int Index2 = RN_Array._MuseumContainerArray_WP[Index].GetNumItems()
+	Int _Index = _MuseumContainerList_WP.GetSize()
+	While _Index 
+		_Index -= 1
+		ObjectReference _Container = _MuseumContainerList_WP.GetAt(_Index) as ObjectReference
+		Int Index2 = _Container.GetNumItems()
 		while Index2
 			Index2 -=1		
-			Form ItemRelic = RN_Array._MuseumContainerArray_WP[Index].GetNthForm(index2)			
+			Form ItemRelic = _Container.GetNthForm(Index2)			
 			if DBM_Section_HOH_LIB_Merged.HasForm(ItemRelic)
 				if !DBM_Section_HOH_LIB_Found.HasForm(ItemRelic)
 					DBM_Section_HOH_LIB_Found.AddForm(ItemRelic)
@@ -172,26 +176,10 @@ Event _onRunMuseumUpdate(string eventName, string strArg, float numArg, Form sen
 		endWhile
 	endWhile
 	
-	RN_Found_Done.Mod(1)
-	
-	If MCM.DevDebugVal
-		Trace("_onModUpdate() Event Completed for: Museum")
-	endIf
-	
-endEvent	
-
-;;-- Events ---------------------------------------	
-
-Event _onRunSafehouseUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
-
-	If MCM.DevDebugVal
-		Trace("_onModUpdate() Event Received for: Safehouse")
-	endIf
-	
-	Int Index = 0
-	Int ListSize = RN_Array._SafehouseContainerList_WP.GetSize()
-	While Index < ListSize
-		ObjectReference _Container = RN_Array._SafehouseContainerList_WP.GetAt(Index) as ObjectReference
+	_Index = 0
+	Int ListSize = _SafehouseContainerList_WP.GetSize()
+	While _Index < ListSize
+		ObjectReference _Container = _SafehouseContainerList_WP.GetAt(_Index) as ObjectReference
 		Int Index2 = 0
 		Int ContainerList = _Container.GetNumItems()
 		while Index2 < ContainerList	
@@ -203,13 +191,12 @@ Event _onRunSafehouseUpdate(string eventName, string strArg, float numArg, Form 
 			endIf
 			Index2 += 1
 		endWhile
-		Index += 1
+		_Index += 1
 	endWhile
 	
 	RN_Found_Done.Mod(1)
 	
 	If MCM.DevDebugVal
-		Trace("_onModUpdate() Event Completed for: Safehouse")
+		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Completed for: Museum & Safehouse")
 	endIf
-	
-endEvent
+endEvent	

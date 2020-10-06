@@ -1,5 +1,7 @@
 ScriptName RN_Utility_Setup_SHP extends Quest
 
+RN_Utility_MCM property MCM auto
+
 Import RN_Utility_Global
 
 ;;Formlists to control item lists.
@@ -12,12 +14,20 @@ formlist property RN_Safehouse_Items_Merged auto ;;Merged Item List.
 Formlist property dbmNew auto
 formlist property dbmMaster auto
 
-globalvariable property RN_Safehouse_Done auto
-
 Objectreference[] property _Containers auto
 
 formlist property _SafehouseContainerList auto
 formlist property _SafehouseContainerList_WP auto
+
+formlist property RN_TokenFormlist auto
+formlist property RN_TokenFormlistExcluded auto
+
+formlist property DBM_DwemerDishDisplay auto
+formlist property DBM_SectionSafehouse_Merged auto
+
+;; Global for ModEvent Return.
+globalvariable property RN_Safehouse_Done auto
+globalvariable property RN_Safehouse_Registered auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -27,21 +37,25 @@ formlist property _SafehouseContainerList_WP auto
 
 function OnInit()
 
-	RegisterForModEvent("RunSafehousePlusSetup", "OnRunSafehousePlusSetup")
+	RegisterForModEvent("TCCSetup_SH", "OnSetup")
 endFunction
 
 ;;-- Functions ---------------------------------------
 
 Function OnPlayerLoadGame()
 
-	RegisterForModEvent("RunSafehousePlusSetup", "OnRunSafehousePlusSetup")
+	RegisterForModEvent("TCCSetup_SH", "OnSetup")
 endFunction
 
 ;;-- Functions ---------------------------------------
 
-function OnRunSafehousePlusSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)		
-
-	Debug.Trace("The Curators Companion: Setup Event Received for RN_Utility_Setup_SHP")
+function OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)		
+	
+	RN_Safehouse_Registered.Mod(1)
+	
+	If MCM.DevDebugVal
+		DBMDebug.Log(Self, "TCC: Setup Event Received for: Safehouse Plus")
+	endIf
 	
 	Int _index = _itemsArray.length		
 	While _index
@@ -53,10 +67,17 @@ function OnRunSafehousePlusSetup(string eventName, string strArg, float numArg, 
 	_index = _Containers.length
 	While _index
 		_index -= 1
+		RN_TokenFormlist.AddForm(_Containers[_index])
+		RN_TokenFormlistExcluded.AddForm(_Containers[_index])
 		_SafehouseContainerList.AddForm(_Containers[_index])
 		_SafehouseContainerList_WP.AddForm(_Containers[_index])
 	endWhile
 	
+	_onConsolidateDisplays(DBM_DwemerDishDisplay, DBM_SectionSafehouse_Merged)
+	
 	RN_Safehouse_Done.Mod(1)
-	Debug.Trace("The Curators Companion: Setup Event Completed for RN_Utility_Setup_SHP")
+	
+	If MCM.DevDebugVal
+		DBMDebug.Log(Self, "TCC: Setup Event Completed for: Safehouse Plus")
+	endIf
 endFunction

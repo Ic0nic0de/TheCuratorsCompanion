@@ -7,6 +7,8 @@ import AhzmoreHUDIE
 
 import utility
 
+RN_Utility_autoScan property RN_AutoScan auto
+
 RN_Utility_Script property RN_Utility auto
 
 RN_Utility_Mods property RN_Mod auto
@@ -14,8 +16,6 @@ RN_Utility_Mods property RN_Mod auto
 RN_Storage_Transfer property RN_Transfer auto
 
 RN_Utility_QuestTracker_MCM property RN_Tracker auto
-
-DBM_ReplicaHandler property ReplicaHandler auto
 
 RN_Utility_ArrayHolder property RN_Array auto
 
@@ -26,31 +26,19 @@ RN_Utility_QuestTracker_Arrays property RN_Tracker_Array auto
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;; String Returns
-string[] MCM_Strings
 string[] PagesList
-string InputBox = "Enter Password"
 string Status_Return
 
 bool Token_Vis
 bool Safehouse_Enabled 
 
-bool bScanning = false
 globalvariable property RN_Scan_Done auto
-globalvariable property RN_Scan_Sent auto
+globalvariable property RN_Scan_Registered auto
 
 String Property _ModVersion auto
 
-;; Debug Variables
-int inputOID_I
-globalvariable property RN_Debug_Access auto
-globalvariable property RN_Debug_Randomiser auto
-
 ;; Player Ref for Game.GetPlayer()
 objectreference property PlayerRef auto
-
-;; location Properties
-location property DBM_DragonbornGalleryLocation auto
-location property DBM_GuildHouseSolitudeLocation auto
 
 ;; Storage Options
 spell property RN_Storage_Spell auto
@@ -70,18 +58,16 @@ formlist property RN_Safehouse_Items_Merged auto
 formlist property RN_TokenFormlist_NoShipment auto
 globalvariable property RN_moreHUD_Option auto
 
-;; Formlists to control merged and found lists
-formlist property Supported_Items_Merged auto
-formlist property Supported_Items_Found auto
-
 string[] moreHUDChoiceList 
 int IndexmoreHUD = 0
 int moreHUDOptions
 
+;; DBM Debug
+globalvariable property DBM_DebuggingON auto
+quest property DBM_Debugging auto
+
 ;; Custom Storage
 formlist property RN_TokenFormlist auto
-formlist property DBM_ReplicaBaseItems auto
-formlist property DBM_ReplicaItems auto
 
 bool property _UserSettings auto hidden
 
@@ -103,12 +89,6 @@ bool iRelicSimpleNotifications = false
 
 bool property ShowListenerVal = true auto hidden ;;Notifications for Display Listeners
 bool iRelicListenerNotifications = false
-
-bool property ShowLocationOverrideVal auto hidden ;;Debug Disable location Checks
-bool iRelicLocationDebug = false
-
-bool property ShowStorageSpellOverideVal auto hidden ;;Debug Disable spell Checks
-bool iRelicSpellDebug = false
 
 bool property StorageSpellVal auto hidden ;;Storage spell Value
 bool iRelicStorageOptions = false
@@ -149,8 +129,9 @@ bool iRelicShowStartup = false
 Int property PrepTransfer auto hidden ;; Prep Station transfer settings.
 bool PrepStationTransfer = false
 
-bool property ReplicaTag auto hidden
-bool ReplicaTagging = false
+bool property ScanNotificationsval auto hidden ;; Museum Scan Notifications
+bool property autoScanVal auto hidden ;; Auto Museum Scan
+int property _ScanInterval auto ;; museum scan interval
 
 ;; Globals for Complete Set Listings.
 globalvariable property iMuseumSets auto
@@ -199,6 +180,32 @@ globalvariable property RN_Skills_Listener_Count auto
 globalvariable property RN_Skills_Listener_Complete auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------ Patches -----------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Formlist Property RN_Patches_Installed auto
+Formlist Property RN_Patches_Complete auto
+Formlist Property RN_Patches_Count auto
+Formlist Property RN_Patches_Total auto
+
+GlobalVariable[] RN_Patches_Installed_Array
+GlobalVariable[] RN_Patches_Complete_Array
+GlobalVariable[] RN_Patches_Count_Array
+GlobalVariable[] RN_Patches_Total_Array
+String[]  RN_Patches_Name
+
+Formlist Property RN_Creations_Installed auto
+Formlist Property RN_Creations_Complete auto
+Formlist Property RN_Creations_Count auto
+Formlist Property RN_Creations_Total auto
+
+GlobalVariable[] RN_Creations_Installed_Array
+GlobalVariable[] RN_Creations_Complete_Array
+GlobalVariable[] RN_Creations_Count_Array
+GlobalVariable[] RN_Creations_Total_Array
+String[]  RN_Creations_Name
+
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -208,6 +215,7 @@ Event OnConfigInit()
 	RN_Skills_Listener_Total.SetValue(6)
 	CustomContainer.SetValue(1)
 	AddDynamicPagesList()
+	Build_Arrays()
 EndEvent
 
 ;-- Events --------------------------------
@@ -217,7 +225,7 @@ Event AddDynamicPagesList()
 	ModName = "LOTD: The Curators Companion"
 	PagesList = new String[11]
 	PagesList[0] = "General Settings"
-	PagesList[1] = "Scan & Advanced"
+	PagesList[1] = "moreHUD & Scan"
 	PagesList[2] = "Relic Storage"
 	PagesList[3] = ""
 	PagesList[4] = "~~Completion~~"
@@ -230,7 +238,7 @@ Event AddDynamicPagesList()
 	
 	Int Q = 0
 	Int x = 11
-		
+	
   Pages = Utility.CreateStringArray(x)
   Int index = x
   While index >= 1
@@ -258,7 +266,6 @@ Event OnPageReset(string page)
 	AddCompletedCreationsPage()
 	AddDebugPage()
 	InitmoreHUDChoiceList()
-	InitMCMStrings()
 EndEvent
 
 ;-- Events --------------------------------
@@ -271,40 +278,6 @@ Event InitmoreHUDChoiceList()
 	moreHUDChoiceList[2] = "Show Found Icons"
 	moreHUDChoiceList[3] = "Show Displayed Icons"
 	moreHUDChoiceList[4] = "Hide All Icons"
-EndEvent
-
-;-- Events --------------------------------
-
-Event InitMCMStrings()
-
-	MCM_Strings = new string[28]
-	MCM_Strings[0] = "Developed By (Ic0n)Ic0de"
-	MCM_Strings[1] = ""
-	MCM_Strings[2] = "<font color='#750e0e'>Invalid Version</font>"
-	MCM_Strings[3] = "<font color='#750e0e'>Not Found</font>"
-	MCM_Strings[4] = "Complete"
-	MCM_Strings[5] = "Scan"
-	MCM_Strings[6] = "Messages Hidden"
-	MCM_Strings[7] = "Disabled"
-	MCM_Strings[8] = "Enabled"
-	MCM_Strings[9] = "Add Spell"
-	MCM_Strings[10] = "Remove Spell"
-	MCM_Strings[11] = "Default Message"
-	MCM_Strings[12] = "Simple Notification"
-	MCM_Strings[13] = "Monkey Bum"
-	MCM_Strings[14] = "<font color='#2b6320'>Authorised</font>"
-	MCM_Strings[15] = "Enter Password"
-	MCM_Strings[16] = "Load Preset"
-	MCM_Strings[17] = "FISS Not Found"
-	MCM_Strings[18] = "Save Preset"
-	MCM_Strings[19] = "Reload MCM"
-	MCM_Strings[20] = "Messages Shown"
-	MCM_Strings[21] = "Locked"
-	MCM_Strings[22] = "Requires Perk"
-	MCM_Strings[23] = "Setting Up"
-	MCM_Strings[24] = "Update Figures Now"
-	MCM_Strings[25] = "<font color='#2b6320'>Installed</font>"
-	MCM_Strings[26] = "Restore"
 EndEvent
 
 	;;<font color='COLORHERE'>
@@ -339,14 +312,17 @@ Event AddSettingsPage()
 		AddEmptyOption()		
 		AddHeaderOption("General Settings:")
 		AddTextOptionST("iRelicSimpleNotifications", "Notification Style:", self.GetNotificationsString(), 0)
-		AddTextOptionST("RefreshMCM", "Something not working?", MCM_Strings[19], 0)
+		AddTextOptionST("iRelicShowStartup", "Startup Notifications:", self.GetShowStartup(), 0)	
+		AddTextOptionST("PrepStationTransfer", "Prep Station Settings:", self.GetPrepStationOptions(), 0)
+
+		AddTextOptionST("RefreshMCM", "Something not working?", "Reload MCM", 0)
 		
 		SetCursorPosition(1)			
 		AddHeaderOption("Mod Info:")
 		AddTextOption("Thanks for using The Curators Companion, a full", "", 0)
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
-		AddTextOption("", MCM_Strings[0], 0)
+		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
 		AddTextOption("", _ModVersion, 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
@@ -364,7 +340,7 @@ endEvent
 	
 Event AddAdvancedPage()
 
-	if CurrentPage == "Scan & Advanced"
+	if CurrentPage == "moreHUD & Scan"
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
 		
@@ -373,49 +349,27 @@ Event AddAdvancedPage()
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017 || SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
 			AddMenuOptionST("moreHUDOptions", "moreHUD Icon Settings:", moreHUDChoiceList[IndexmoreHUD])	
 		else
-			AddtextOption("moreHUD Icon Settings:", MCM_Strings[3])
+			AddtextOption("moreHUD Icon Settings:", "<font color='#750e0e'>Not Found</font>")
 		endif
 		
 		if Safehouse_Enabled
 			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 1)
+		elseif RN_Setup_Start.GetValue()
+			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", "Wait For Setup...", 1)
 		else
 			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 0)
 		endIf
-		
-		AddTextOptionST("ReplicaTagging", "moreHUD Advanced Tagging:", self.GetReplicaTaggingOptions(), 0)
-		
-		AddEmptyOption()
-		
-		AddHeaderOption("Museum Scan:")
-		AddTextOptionST("ScanAll", "Scan Displays (All Displays)", MCM_Strings[5], 0)
-		AddTextOptionST("ScanMuseum", "Scan Displays (Museum)", MCM_Strings[5], 0)
-		
-		if RN_SupportedModCount.GetValue() > 0
-			AddTextOptionST("ScanMods", "Scan Displays (Mods)", MCM_Strings[5], 0)
-		else
-			AddTextOptionST("ScanMods", "Scan Displays (Mods)", "No Patches Found", 1)
-		endIf
 
-		if RN_SupportedCreationCount.GetValue() > 0
-			AddTextOptionST("ScanCreations", "Scan Displays (Creations)", MCM_Strings[5], 0)
-		else
-			AddTextOptionST("ScanCreations", "Scan Displays (Creations)", "No Creations Found", 1)
-		endIf
-		
 		SetCursorPosition(1)
-		
-		AddHeaderOption("General Settings:")
-		AddTextOptionST("PrepStationTransfer", "Prep Station Settings:", self.GetPrepStationOptions(), 0)
-		AddTextOptionST("iRelicShowStartup", "Startup Notifications:", self.GetShowStartup(), 0)		
-		
-		AddEmptyOption()
-		
-		AddHeaderOption("Scan Info:")
-		AddTextOption("You can run these scans to update the info and figures", "", 0)
-		AddTextOption("within the MCM, the mod will automatically update all", "", 0)
-		AddTextOption("the required information during the scan and check for", "", 0)
-		AddTextOption("any completed sets or Museum sections.", "", 0)	
-			
+
+		AddHeaderOption("Museum Scan:")
+		AddTextOptionST("ScanType", "Museum Scan Type", self.GetScanType(), 0)
+		AddTextOptionST("ScanNotifications", "Museum Scan Notifications", self.GetScanNotification(), 0)
+		if autoScanVal
+			AddSliderOptionST("autoScanInterval", "Museum Scan Interval (Minutes)", _ScanInterval)	
+		elseif !autoScanVal
+			AddTextOptionST("ScanMuseum", "Museum Scan (Manual)", "Scan Now", 0)
+		endIf	
 	endif
 endEvent
 
@@ -431,13 +385,13 @@ Event AddRelicStoragePage()
 		
 		AddHeaderOption("Relic Storage Settings:")
 		
-			 if DBM_ArcSkill.GetValue() >= 5 || ShowStorageSpellOverideVal 
+			 if DBM_ArcSkill.GetValue() >= 5 
 				AddTextOptionST("iRelicStorageOptions", "Relic Storage Container:", self.GetStorageOptions(), 0)
 			else
 				AddTextOptionST("iRelicStorageOptions", "Relic Storage Container:", self.GetStorageOptions(), 1)
 			endIf
 
-			 if DBM_ArcSkill.GetValue() >= 5 && StorageSpellVal || ShowStorageSpellOverideVal 
+			 if DBM_ArcSkill.GetValue() >= 5 && StorageSpellVal 
 				AddTextOptionST("iRelicStorageSummon", "Container Access Type:", self.GetSummonOptions(), 0)
 			else
 				AddTextOptionST("iRelicStorageSummon", "Container Access Type:", self.GetSummonOptions(), 1)
@@ -504,120 +458,100 @@ endEvent
 Event AddMuseumSetsPage()
 
 	if CurrentPage == "Museum Sections"
+		BuildTotals(iMuseumSets, RN_Array._Museum_Global_Complete)
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetCursorPosition(0)
-		if (DBM_SortWait.GetValue())
-			AddHeaderOption("Information:")
-			AddTextOption("This Page is currently unavailable due to an on-going", "", 0)
-			AddTextOption("process, this could include:", "", 0)
-			AddEmptyOption()
-			AddTextOption("-Mod Setup.", "", 0)
-			AddTextOption("-Display Scanning features.", "", 0)
-			AddTextOption("-Sorting via Prep Station.", "", 0)
-			AddTextOption("-Sorting via Display Drop-Off.", "", 0)
-			AddEmptyOption()
-			AddTextOption("Please exit the MCM and wait for the current operation", "", 0)
-			AddTextOption("to finish.", "", 0)			
-			SetCursorPosition(1)
-			AddEmptyOption()
-			AddEmptyOption()
-			AddEmptyOption()
-			AddEmptyOption()
-			AddTextOption("'Patience is the calm acceptance that things can happen", "", 0)
-			AddTextOption("in a different order than the one you have in your mind'", "", 0)
-			AddTextOption("                                   -David G. Allen", "", 0)		
-		else		
-			AddHeaderOption("Museum Sections:")	
+		SetCursorPosition(0)	
+		AddHeaderOption("Museum Sections:")	
 				
-			Int _Index = 0
-			Int _Length = RN_Array._Museum_Section_names.length
-			While _Index < _Length 
-				if RN_Array._Museum_Global_Complete[_Index].GetValue() == 1
-					if RN_Array._Museum_Global_Total[_Index].GetValue() > RN_Array._Museum_Global_Count[_Index].GetValue() 
-						RN_Array._Museum_Global_Complete[_Index].SetValue(0)
-						iMuseumSets.Mod(-1)
-					else
-						AddTextOption(RN_Array._Museum_Section_names[_Index], MCM_Strings[4], 1)
-					endIF
+		Int _Index = 0
+		Int _Length = RN_Array._Museum_Section_names.length
+		While _Index < _Length 
+			if RN_Array._Museum_Global_Complete[_Index].GetValue() == 1
+				if RN_Array._Museum_Global_Total[_Index].GetValue() > RN_Array._Museum_Global_Count[_Index].GetValue() 
+					RN_Array._Museum_Global_Complete[_Index].SetValue(0)
 				else
-					AddTextOption(RN_Array._Museum_Section_names[_Index], self.GetCurrentCount(RN_Array._Museum_Global_Count[_Index], RN_Array._Museum_Global_Total[_Index]), 0)
-				endIf
+					AddTextOption(RN_Array._Museum_Section_names[_Index], "Complete", 1)
+				endIF
+			elseif RN_Scan_Registered.GetValue()
+				AddTextOption(RN_Array._Museum_Section_names[_Index], "Updating...", 1)
+			else
+				AddTextOption(RN_Array._Museum_Section_names[_Index], self.GetCurrentCount(RN_Array._Museum_Global_Count[_Index], RN_Array._Museum_Global_Total[_Index]), 0)
+			endIf
+			_Index += 1
+			
+			if _Index == 8 && !RN_SupportedCreationCount.GetValue()
 				_Index += 1
-				
-				if _Index == 8 && !RN_SupportedCreationCount.GetValue()
-					_Index += 1
-				endIf
-				
-				if _Index == 11 && !RN_Installed_SafehouseGeneral.GetValue()
-					_Index += 1
-				endIf
-				
-			endWhile
+			endIf
 			
-			AddEmptyOption()
-			AddHeaderOption("Museum Displays:")
+			if _Index == 11 && !RN_Installed_SafehouseGeneral.GetValue()
+				_Index += 1
+			endIf
 			
-			if (RN_Quest_Listener_Complete.GetValue()) == 1
-				AddTextOption("Quest Displays:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Quest Displays:", self.GetCurrentCount(RN_Quest_Listener_Count, RN_Quest_Listener_Total), 0)
-			endIf			
+		endWhile
+			
+		AddEmptyOption()
+		AddHeaderOption("Museum Displays:")
+		
+		if (RN_Quest_Listener_Complete.GetValue()) == 1
+			AddTextOption("Quest Displays:", "Complete", 1)
+		else
+			AddTextOption("Quest Displays:", self.GetCurrentCount(RN_Quest_Listener_Count, RN_Quest_Listener_Total), 0)
+		endIf			
 
-			if (RN_Exploration_Listener_Complete.GetValue()) == 1
-				AddTextOption("Exploration Displays:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Exploration Displays:", self.GetCurrentCount(RN_Exploration_Listener_Count, RN_Exploration_Listener_Total), 0)
-			endIf
-
-			if (RN_Skills_Listener_Complete.GetValue()) == 1
-				AddTextOption("Skills Displays:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Skills Displays:", self.GetCurrentCount(RN_Skills_Listener_Count, RN_Skills_Listener_Total), 0)
-			endIf
-
-			if (RN_Thane_Listener_Complete.GetValue()) == 1
-				AddTextOption("Thane of the Holds:", MCM_Strings[4], 1)
-			else
-				AddTextOption("Thane of the Holds:", self.GetCurrentCount(RN_Thane_Listener_Count, RN_Thane_Listener_Total), 0)
-			endIf
-			
-			AddEmptyOption()
-			AddHeaderOption("Player Wealth:")
-			AddTextOption("Safehouse Treasury Value:", RN_Treasury_Count.GetValue() as Int, 0)
-			AddTextOption("Deepholme Treasury Value:", Self.GetTreasuryCountString2(), 0)
-			AddTextOption("Karagas' Tower Treasury Value:", Self.GetTreasuryCountString3(), 0)
-			
-			SetCursorPosition(1)
-			AddHeaderOption("Page Information:")
-			AddTextOption("This page lists all Museum sections that can be completed.", "", 0)
-			AddEmptyOption()
-			AddTextOption("As you collect and display your items, the page will keep", "", 0)
-			AddTextOption("track of your progess.", "", 0)
-			AddEmptyOption()
-			AddTextOption("Running the Museum Scan from the MCM or Prep Station", "", 0)
-			AddTextOption("will scan the Museum and Armory for items on display", "", 0)
-			AddTextOption("then update the figures in the MCM, it is recommended", "", 0)
-			AddTextOption("to scan after using the Prep Station to display items", "", 0)
-			if RN_SupportedCreationCount.GetValue() > 0
-				AddEmptyOption()
-			endIf
-			if RN_Installed_SafehouseGeneral.GetValue()
-				AddEmptyOption()
-			endIf
-			AddEmptyOption()
-			AddTextOption("Completed:", self.GetCurrentMuseumCount(iMuseumSets), 0)
-			AddEmptyOption()
-			AddHeaderOption("Display Information:")
-			AddTextOption("This section automatically updates and tracks the", "", 0)
-			AddTextOption("displays being added to the Museum as a result of", "", 0)
-			AddTextOption("quest completion, Exploration and skill levelling.", "", 0)
-			AddTextOption("Completed:", self.GetDisplaySectionCount(iDisplaySectionComplete), 0)
-			AddEmptyOption()
-			AddHeaderOption("Wealth Information:")
-			AddTextOption("This section tracks the amount of Gold within the treasury", "", 0)
-			AddTextOption("rooms, the figures update after adding / removing Gold.", "", 0)
-			AddTextOption("Total value:", self.GetTotalTreasuryValue(RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3), 0)
+		if (RN_Exploration_Listener_Complete.GetValue()) == 1
+			AddTextOption("Exploration Displays:", "Complete", 1)
+		else
+			AddTextOption("Exploration Displays:", self.GetCurrentCount(RN_Exploration_Listener_Count, RN_Exploration_Listener_Total), 0)
 		endIf
+
+		if (RN_Skills_Listener_Complete.GetValue()) == 1
+			AddTextOption("Skills Displays:", "Complete", 1)
+		else
+			AddTextOption("Skills Displays:", self.GetCurrentCount(RN_Skills_Listener_Count, RN_Skills_Listener_Total), 0)
+		endIf
+
+		if (RN_Thane_Listener_Complete.GetValue()) == 1
+			AddTextOption("Thane of the Holds:", "Complete", 1)
+		else
+			AddTextOption("Thane of the Holds:", self.GetCurrentCount(RN_Thane_Listener_Count, RN_Thane_Listener_Total), 0)
+		endIf
+		
+		AddEmptyOption()
+		AddHeaderOption("Player Wealth:")
+		AddTextOption("Safehouse Treasury Value:", RN_Treasury_Count.GetValue() as Int, 0)
+		AddTextOption("Deepholme Treasury Value:", Self.GetTreasuryCountString2(), 0)
+		AddTextOption("Karagas' Tower Treasury Value:", Self.GetTreasuryCountString3(), 0)
+		
+		SetCursorPosition(1)
+		AddHeaderOption("Page Information:")
+		AddTextOption("This page lists all Museum sections that can be completed.", "", 0)
+		AddEmptyOption()
+		AddTextOption("As you collect and display your items, the page will keep", "", 0)
+		AddTextOption("track of your progess.", "", 0)
+		AddEmptyOption()
+		AddTextOption("Running the Museum Scan from the MCM or Prep Station", "", 0)
+		AddTextOption("will scan the Museum and Armory for items on display", "", 0)
+		AddTextOption("then update the figures in the MCM, it is recommended", "", 0)
+		AddTextOption("to scan after using the Prep Station to display items", "", 0)
+		if RN_SupportedCreationCount.GetValue() > 0
+			AddEmptyOption()
+		endIf
+		if RN_Installed_SafehouseGeneral.GetValue()
+			AddEmptyOption()
+		endIf
+		AddEmptyOption()			
+		AddTextOption("Completed:", self.GetCurrentMuseumCount(iMuseumSets), 0)
+		AddEmptyOption()
+		AddHeaderOption("Display Information:")
+		AddTextOption("This section automatically updates and tracks the", "", 0)
+		AddTextOption("displays being added to the Museum as a result of", "", 0)
+		AddTextOption("quest completion, Exploration and skill levelling.", "", 0)
+		AddTextOption("Completed:", self.GetDisplaySectionCount(iDisplaySectionComplete), 0)
+		AddEmptyOption()
+		AddHeaderOption("Wealth Information:")
+		AddTextOption("This section tracks the amount of Gold within the treasury", "", 0)
+		AddTextOption("rooms, the figures update after adding / removing Gold.", "", 0)
+		AddTextOption("Total value:", self.GetTotalTreasuryValue(RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3), 0)
 	endIf
 endEvent
 
@@ -629,102 +563,88 @@ endEvent
 Event AddArmorySetsPage()
 
 	if CurrentPage == "Armory Sections"
+		BuildTotals(iArmorySets, RN_Array._Armory_Global_Complete)
+		BuildTotals(iHeavyArmSets, RN_Array._HeavyArmory_Global_Complete)
+		BuildTotals(iImmWeapSets, RN_Array._ImmersiveWeapons_Global_Complete)
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetCursorPosition(0)				
-		if (DBM_SortWait.GetValue())
-			AddHeaderOption("Information:")
-			AddTextOption("This Page is currently unavailable due to an on-going", "", 0)
-			AddTextOption("process, this could include:", "", 0)
-			AddEmptyOption()
-			AddTextOption("-Mod Setup.", "", 0)
-			AddTextOption("-Display Scanning features.", "", 0)
-			AddTextOption("-Sorting via Prep Station.", "", 0)
-			AddTextOption("-Sorting via Display Drop-Off.", "", 0)
-			AddEmptyOption()
-			AddTextOption("Please exit the MCM and wait for the current operation", "", 0)
-			AddTextOption("to finish.", "", 0)			
-			SetCursorPosition(1)
-			AddEmptyOption()
-			AddEmptyOption()
-			AddEmptyOption()
-			AddEmptyOption()
-			AddTextOption("'Patience is the calm acceptance that things can happen", "", 0)
-			AddTextOption("in a different order than the one you have in your mind'", "", 0)
-			AddTextOption("                                   -David G. Allen", "", 0)			
-		else
-
-			AddHeaderOption("Armory Sets:")
-			Int _Index = 0
-			Int _Length = RN_Array._Armory_Section_names.length
+		SetCursorPosition(0)						
+		AddHeaderOption("Armory Sets:")
+		Int _Index = 0
+		Int _Length = RN_Array._Armory_Section_names.length
+		While _Index < _Length 
+		
+			if RN_Array._Armory_Global_Complete[_Index].GetValue() == 1
+				AddTextOption(RN_Array._Armory_Section_names[_Index], "Complete", 1)
+			elseif RN_Scan_Registered.GetValue()
+				AddTextOption(RN_Array._Armory_Section_names[_Index], "Updating...", 1)
+			else
+				AddTextOption(RN_Array._Armory_Section_names[_Index], self.GetCurrentCount(RN_Array._Armory_Global_Count[_Index], RN_Array._Armory_Global_Total[_Index]), 0)
+			endIf
+			_Index +=1
+			
+			if _Index == _Length / 2
+				AddEmptyOption()
+				SetCursorPosition(1)
+				AddHeaderOption("Completed: " + self.GetCurrentArmoryCount(iArmorySets) + " Sets")
+			endIf
+		endWhile
+		
+		SetCursorPosition(24)
+		
+		if (RN_Installed_HeavyArm.GetValue())
+			AddHeaderOption("Heavy Armory Sets:")
+			
+			_Index = 0
+			_Length = RN_Array._HeavyArmory_Section_names.length
 			While _Index < _Length 
 			
-				if RN_Array._Armory_Global_Complete[_Index].GetValue() == 1
-					AddTextOption(RN_Array._Armory_Section_names[_Index], MCM_Strings[4], 1)
+				if RN_Array._HeavyArmory_Global_Complete[_Index].GetValue() == 1
+					AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], "Complete", 1)
+				elseif RN_Scan_Registered.GetValue()
+					AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], "Updating...", 1)
 				else
-					AddTextOption(RN_Array._Armory_Section_names[_Index], self.GetCurrentCount(RN_Array._Armory_Global_Count[_Index], RN_Array._Armory_Global_Total[_Index]), 0)
+					AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], self.GetCurrentCount(RN_Array._HeavyArmory_Global_Count[_Index], RN_Array._HeavyArmory_Global_Total[_Index]), 0)
+				endIf
+				_Index +=1
+				
+				if _Index == _Length / 2 + 1
+					SetCursorPosition(25)
+					AddHeaderOption("Completed: " + self.GetCurrentHACount(iHeavyArmSets) + " Sets")
+				endIf
+			endWhile
+		endIf
+		
+		if (RN_Installed_HeavyArm.GetValue())
+			SetCursorPosition(48)
+		else
+			SetCursorPosition(24)
+		endIf
+		
+		if (RN_Installed_ImmWeap.GetValue())
+			AddHeaderOption("Immersive Weapons Sets:")
+			
+			_Index = 0
+			_Length = RN_Array._ImmersiveWeapons_Section_names.length
+			While _Index < _Length 
+			
+				if RN_Array._ImmersiveWeapons_Global_Complete[_Index].GetValue() == 1
+					AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], "Complete", 1)
+				elseif RN_Scan_Registered.GetValue()
+					AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], "Updating...", 1)
+				else
+					AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], self.GetCurrentCount(RN_Array._ImmersiveWeapons_Global_Count[_Index], RN_Array._ImmersiveWeapons_Global_Total[_Index]), 0)
 				endIf
 				_Index +=1
 				
 				if _Index == _Length / 2
-					AddEmptyOption()
-					SetCursorPosition(1)
-					AddHeaderOption("Completed: " + self.GetCurrentArmoryCount(iArmorySets) + " Sets")
+					if (RN_Installed_HeavyArm.GetValue()) 
+						SetCursorPosition(49)
+					else
+						SetCursorPosition(25)
+					endIf
+					AddHeaderOption("Completed: " + self.GetCurrentIWCount(iImmWeapSets) + " Sets")
 				endIf
 			endWhile
-			
-			SetCursorPosition(24)
-			
-			if (RN_Installed_HeavyArm.GetValue())
-				AddHeaderOption("Heavy Armory Sets:")
-				
-				_Index = 0
-				_Length = RN_Array._HeavyArmory_Section_names.length
-				While _Index < _Length 
-				
-					if RN_Array._HeavyArmory_Global_Complete[_Index].GetValue() == 1
-						AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], MCM_Strings[4], 1)
-					else
-						AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], self.GetCurrentCount(RN_Array._HeavyArmory_Global_Count[_Index], RN_Array._HeavyArmory_Global_Total[_Index]), 0)
-					endIf
-					_Index +=1
-					
-					if _Index == _Length / 2 + 1
-						SetCursorPosition(25)
-						AddHeaderOption("Completed: " + self.GetCurrentHACount(iHeavyArmSets) + " Sets")
-					endIf
-				endWhile
-			endIf
-			
-			if (RN_Installed_HeavyArm.GetValue())
-				SetCursorPosition(48)
-			else
-				SetCursorPosition(24)
-			endIf
-			
-			if (RN_Installed_ImmWeap.GetValue())
-				AddHeaderOption("Immersive Weapons Sets:")
-				
-				_Index = 0
-				_Length = RN_Array._ImmersiveWeapons_Section_names.length
-				While _Index < _Length 
-				
-					if RN_Array._ImmersiveWeapons_Global_Complete[_Index].GetValue() == 1
-						AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], MCM_Strings[4], 1)
-					else
-						AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], self.GetCurrentCount(RN_Array._ImmersiveWeapons_Global_Count[_Index], RN_Array._ImmersiveWeapons_Global_Total[_Index]), 0)
-					endIf
-					_Index +=1
-					
-					if _Index == _Length / 2
-						if (RN_Installed_HeavyArm.GetValue()) 
-							SetCursorPosition(49)
-						else
-							SetCursorPosition(25)
-						endIf
-						AddHeaderOption("Completed: " + self.GetCurrentIWCount(iImmWeapSets) + " Sets")
-					endIf
-				endWhile
-			endIf
 		endIf
 	endIf
 endEvent		
@@ -736,61 +656,39 @@ endEvent
 Event AddCompletedModsPage()
 
 	if CurrentPage == "Supported Mods"
+		BuildTotals(iModComplete, RN_Patches_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetCursorPosition(0)		
-		if (DBM_SortWait.GetValue())
-			AddHeaderOption("Information:")
-			AddTextOption("This Page is currently unavailable due to an on-going", "", 0)
-			AddTextOption("process, this could include:", "", 0)
-			AddEmptyOption()
-			AddTextOption("-Mod Setup.", "", 0)
-			AddTextOption("-Display Scanning features.", "", 0)
-			AddTextOption("-Sorting via Prep Station.", "", 0)
-			AddTextOption("-Sorting via Display Drop-Off.", "", 0)
-			AddEmptyOption()
-			AddTextOption("Please exit the MCM and wait for the current operation", "", 0)
-			AddTextOption("to finish.", "", 0)			
-			SetCursorPosition(1)
-			AddEmptyOption()
-			AddEmptyOption()
-			AddEmptyOption()
-			AddEmptyOption()
-			AddTextOption("'Patience is the calm acceptance that things can happen", "", 0)
-			AddTextOption("in a different order than the one you have in your mind'", "", 0)
-			AddTextOption("                                   -David G. Allen", "", 0)			
-		else
-			AddHeaderOption("Installed Patches:")
-
-			if RN_SupportedModCount.GetValue() > 0
-
-				Int _Index = 0
-				While _Index < RN_Array._PatchName.length
+		SetCursorPosition(0)				
+		AddHeaderOption("Supported Mods:")		
+		if RN_SupportedModCount.GetValue() > 0	
+			Int _IndexOpt = 0
+			Int _Index = 0
+			While _Index < RN_Patches_Name.length
+			
+				if RN_Patches_Installed_Array[_Index].GetValue()
+					if RN_Patches_Complete_Array[_Index].GetValue()
+						AddTextOption(RN_Patches_Name[_Index], "Complete", 1)
+						_IndexOpt += 1
 				
-					if RN_Array._bPatches[_Index].GetValue()
-						if RN_Array._GVComplete[_Index].GetValue()
-							AddTextOption(RN_Array._PatchName[_Index], MCM_Strings[4], 1)
-						else
-							AddTextOption(RN_Array._PatchName[_Index], self.GetCurrentCount(RN_Array._PatchCount[_Index], RN_Array._PatchTotal[_Index]), 0)
-						endIf
+					elseif RN_Scan_Registered.GetValue()
+						AddTextOption(RN_Patches_Name[_Index], "Updating...", 1)
+						_IndexOpt += 1
+						
+					else
+						AddTextOption(RN_Patches_Name[_Index], self.GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]), 0)
+						_IndexOpt += 1
 					endIf
-					_Index +=1
-				endWhile					
-			else
-				AddTextOption("No Patches Installed", "", 1)
-			endIf
-
-			SetCursorPosition(1)
-			AddHeaderOption("Page Information:")
-			AddTextOption("This page lists all the installed and supported mods.", "", 0)
-			AddEmptyOption()
-			AddTextOption("As you collect and display your items, the page will", "", 0)
-			AddTextOption("keep track of your progess.", "", 0)
-			AddEmptyOption()			
-			AddTextOption("Run the Mods Scan from the MCM or Prep station to", "", 0)
-			AddTextOption("update the current figures.", "", 0)
-			AddEmptyOption()
-			AddTextOption("Completed ", self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Supported Mods", 0)			
-		endIf
+				endIf
+				_Index +=1
+					
+				if _IndexOpt == (RN_SupportedModCount.GetValue() as Int / 2)
+					SetCursorPosition(1)
+					AddHeaderOption("Completed: " + self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Supported Mods", 0)
+				endIf
+			endWhile					
+		else
+			AddTextOption("No Patches Installed", "", 1)
+		endIf		
 	endIf
 endEvent
 
@@ -801,61 +699,39 @@ endEvent
 Event AddCompletedCreationsPage()
 
 	if CurrentPage == "Supported Creations"
+		BuildTotals(iCreationComplete, RN_Creations_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)		
-		if (DBM_SortWait.GetValue())
-			AddHeaderOption("Information:")
-			AddTextOption("This Page is currently unavailable due to an on-going", "", 0)
-			AddTextOption("process, this could include:", "", 0)
-			AddEmptyOption()
-			AddTextOption("-Mod Setup.", "", 0)
-			AddTextOption("-Display Scanning features.", "", 0)
-			AddTextOption("-Sorting via Prep Station.", "", 0)
-			AddTextOption("-Sorting via Display Drop-Off.", "", 0)
-			AddEmptyOption()
-			AddTextOption("Please exit the MCM and wait for the current operation", "", 0)
-			AddTextOption("to finish.", "", 0)			
-			SetCursorPosition(1)
-			AddEmptyOption()
-			AddEmptyOption()
-			AddEmptyOption()
-			AddEmptyOption()
-			AddTextOption("'Patience is the calm acceptance that things can happen", "", 0)
-			AddTextOption("in a different order than the one you have in your mind'", "", 0)
-			AddTextOption("                                   -David G. Allen", "", 0)			
-		else
-			AddHeaderOption("Installed Creations:")
+		AddHeaderOption("Supported Creations:")
+		if RN_SupportedCreationCount.GetValue() > 0
+			Int _IndexOpt = 0
+			Int _Index = 0
+			While _Index < RN_Creations_Name.length
 			
-			if RN_SupportedCreationCount.GetValue() > 0
-
-				Int _Index = 0
-				While _Index < RN_Array._CreationName.length
-				
-					if RN_Array._bCreations[_Index].GetValue()
-						if RN_Array._GVCreationComplete[_Index].GetValue() == 1
-							AddTextOption(RN_Array._CreationName[_Index], MCM_Strings[4], 1)
-						else
-							AddTextOption(RN_Array._CreationName[_Index], self.GetCurrentCount(RN_Array._CreationCount[_Index], RN_Array._CreationTotal[_Index]), 0)
-						endIf
+				if RN_Creations_Installed_Array[_Index].GetValue()
+					if RN_Creations_Complete_Array[_Index].GetValue()
+						AddTextOption(RN_Creations_Name[_Index], "Complete", 1)
+						_IndexOpt += 1
+					
+					elseif RN_Scan_Registered.GetValue()
+						AddTextOption(RN_Creations_Name[_Index], "Updating...", 1)
+						_IndexOpt += 1
+						
+					else
+						AddTextOption(RN_Creations_Name[_Index], self.GetCurrentCount(RN_Creations_Count_Array[_Index], RN_Creations_Total_Array[_Index]), 0)
+						_IndexOpt += 1
 					endIf
-					_Index +=1
-				endWhile					
-			else
-				AddTextOption("No Creations Installed", "", 1)
-			endIf
-
-			SetCursorPosition(1)
-			AddHeaderOption("Page Information:")
-			AddTextOption("This page lists all installed and supported Creations.", "", 0)
-			AddEmptyOption()
-			AddTextOption("As you collect and display your items, the page will", "", 0)
-			AddTextOption("keep track of your progess.", "", 0)
-			AddEmptyOption()			
-			AddTextOption("Run the Mods Scan from the MCM or Prep station to", "", 0)
-			AddTextOption("update the current figures.", "", 0)
-			AddEmptyOption()
-			AddTextOption("Completed ", self.GetCurrentCount(iCreationComplete, RN_SupportedCreationCount) + " Supported Creations", 0)			
-		endIf
+				endIf
+				_Index +=1
+				
+				if _IndexOpt == (RN_SupportedCreationCount.GetValue() as Int / 2)
+					SetCursorPosition(1)
+					AddHeaderOption("Completed: " + self.GetCurrentCount(iCreationComplete, RN_SupportedCreationCount) + " Supported Creations", 0)
+				endIf
+			endWhile						
+		else
+			AddTextOption("No Creations Installed", "", 1)
+		endIf		
 	endIf
 endEvent
 
@@ -870,70 +746,49 @@ Event AddDebugPage()
 		SetCursorPosition(0)
 		AddHeaderOption("Debug Options:")
 		
-		inputOID_I = AddInputOption("Debug Options:", InputBox)
+		AddToggleOptionST("Dev_Alerts", "Developer Debugging", DevDebugVal)
+		AddTextOptionST("Scan_Debug", "Reset Museum Scanner", "", 0)
 		AddEmptyOption()
-		
-		if (RN_Debug_Access.GetValue()) == (RN_Debug_Randomiser.GetValue())
+		AddEmptyOption()
+		AddHeaderOption("moreHUD Debug:")
+		AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 0)
+		AddTextOption("moreHUD found count:", dbmFound.GetSize() As Int, 0)
+		AddTextOption("moreHUD Displayed count:", dbmDisp.GetSize() As Int, 0)
+		AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 0)
+		AddEmptyOption()
+		AddTextOptionST("RebuildLists", "Rebuild moreHUD Items Lists", "Rebuild", 0)
 			
-			AddToggleOptionST("iRelicLocationDebug", "Disable Location Checks", ShowLocationOverrideVal)
-			AddToggleOptionST("iRelicSpellDebug", "Disable Spell Requirements", ShowStorageSpellOverideVal)
-			AddToggleOptionST("Dev_Alerts", "Developer Debugging", DevDebugVal)
-			AddTextOptionST("Scan_Debug", "Reset Scanner", "", 0)
-			AddTextOptionST("Mod_Reset", "Reset Mod", "", 0)
-			AddEmptyOption()
-			AddHeaderOption("moreHUD Debug:")
-			AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 0)
-			AddTextOption("moreHUD found count:", dbmFound.GetSize() As Int, 0)
-			AddTextOption("moreHUD Displayed count:", dbmDisp.GetSize() As Int, 0)
-			AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 0)
-			AddEmptyOption()
-			AddTextOptionST("RebuildLists", "Rebuild moreHUD Items", "", 0)
-			AddEmptyOption()
-			AddHeaderOption("Items Debug:")
-			AddTextOption("Supported Mods Merged count:", Supported_Items_Merged.GetSize() As Int, 0)
-			AddTextOption("Supported Mods Found count:", Supported_Items_Found.GetSize() As Int, 0)			
-			
-		else
-		
-			AddTextOption("This mods debug options have been password protected", "", 0)
-			AddTextOption("due to the nature of the tasks they perform.", "", 0)
-			AddEmptyOption()
-			AddTextOption("Users should have absolutely no reason to use them", "", 0)
-			AddTextOption("so they have been locked, if you require support or", "", 0)
-			AddTextOption("help with an issue please reach out to me on Nexus.", "", 0)	
-		endIf
-		
 		SetCursorPosition(1)
 		
 		AddHeaderOption("Mod Requirements:")
 
 		if SKSE.GetPluginVersion("fisses") > 0
 		
-			AddTextOption("FISSES:", MCM_Strings[25] + " [" + SKSE.GetPluginVersion("fisses") + "]", 0)
+			AddTextOption("FISSES:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("fisses") + "]", 0)
 			
 		else
 		
-			AddTextOption("FISSES:", MCM_Strings[3], 0)
+			AddTextOption("FISSES:", "<font color='#750e0e'>Not Found</font>", 0)
 			
 		endIf
 
 		if SKSE.GetVersion() > 0
 			Int fSKSE = SKSE.GetVersion() * 10000 + SKSE.GetVersionMinor() * 100 + SKSE.GetVersionBeta()
-			AddTextOption("SKSE:", MCM_Strings[25] + " [" + fSKSE + "]", 0)
+			AddTextOption("SKSE:", "<font color='#2b6320'>Installed</font>" + " [" + fSKSE + "]", 0)
 			
 		else
 		
-			AddTextOption("SKSE:", MCM_Strings[3], 0)
+			AddTextOption("SKSE:", "<font color='#750e0e'>Not Found</font>", 0)
 			
 		endIf
 
 		if (RN_Installed_SkyUI.GetValue())
 		
-			AddTextOption("SkyUI:", MCM_Strings[25] + " [5.2SE]", 0)
+			AddTextOption("SkyUI:", "<font color='#2b6320'>Installed</font>" + " [5.2SE]", 0)
 			
 		else
 		
-			AddTextOption("SkyUI:", MCM_Strings[3], 0)
+			AddTextOption("SkyUI:", "<font color='#750e0e'>Not Found</font>", 0)
 			
 		endIf	
 		
@@ -947,29 +802,29 @@ Event AddDebugPage()
 		
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
 		
-			AddTextOption("moreHUD:", MCM_Strings[25] + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") + "]", 0)
+			AddTextOption("moreHUD:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") + "]", 0)
 			
 		elseif SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") < 30800
 		
-			AddTextOption("moreHUD:", MCM_Strings[2], 0)
+			AddTextOption("moreHUD:", "<font color='#750e0e'>Invalid Version</font>", 0)
 		
 		else
 			
-			AddTextOption("moreHUD:", MCM_Strings[3], 0)
+			AddTextOption("moreHUD:", "<font color='#750e0e'>Not Found</font>", 0)
 			
 		endIf
 		
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
 		
-			AddTextOption("moreHUD Inventory Edition:", MCM_Strings[25] + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") + "]", 0)
+			AddTextOption("moreHUD Inventory Edition:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") + "]", 0)
 			
 		elseif SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") < 10017
 		
-			AddTextOption("moreHUD Inventory Edition:", MCM_Strings[2], 0)
+			AddTextOption("moreHUD Inventory Edition:", "<font color='#750e0e'>Invalid Version</font>", 0)
 		
 		else
 		
-			AddTextOption("moreHUD Inventory Edition:", MCM_Strings[3], 0)
+			AddTextOption("moreHUD Inventory Edition:", "<font color='#750e0e'>Not Found</font>", 0)
 			
 		endIf
 
@@ -985,12 +840,19 @@ state RefreshMCM
 	function OnSelectST()
 	
 			ShowMessage("Please exit MCM and re-enter again to see changes", false, "Ok")
+			bool bRefresh = True
 			SetTitleText("===PLEASE WAIT===")
-			AddDynamicPagesList()
-			RN_Mod.CheckSupportedMods()		
-			RN_Tracker_Array._Build_Quest_Toggles()
-			RN_Tracker_Array._Build_Quest_Arrays()
-			ForcePageReset()
+			While bRefresh
+				If !IsInMenuMode()
+					RN_Mod.CheckSupportedMods()
+					Build_Arrays()
+					AddDynamicPagesList()		
+					RN_Tracker_Array._Build_Quest_Toggles()
+					RN_Tracker_Array._Build_Quest_Arrays()
+					Debug.Notification("The Curators Companion: MCM Rebuilt")
+					bRefresh = false
+				endIf
+			endWhile
 	endFunction
 
 	function OnHighlightST()
@@ -1032,9 +894,9 @@ endState
 String function GetConfigSaveString()
 	
 		if (RN_Installed_Fiss.GetValue())
-			Status_Return = MCM_Strings[18]
+			Status_Return = "Save Preset"
 		else
-			Status_Return = MCM_Strings[17]
+			Status_Return = "FISS Not Found"
 		endIf
 	return Status_Return
 endFunction	
@@ -1042,9 +904,9 @@ endFunction
 String function GetConfigLoadString()
 
 		if (RN_Installed_Fiss.GetValue())
-			Status_Return = MCM_Strings[16]
+			Status_Return = "Load Preset"
 		else
-			Status_Return = MCM_Strings[17]
+			Status_Return = "FISS Not Found"
 		endIf
 	return Status_Return
 endFunction	
@@ -1075,7 +937,10 @@ FISSInterface fiss = FISSFactory.getFISS()
 	endIf
 	fiss.saveBool("Show startup notifications", ShowStartup)
 	fiss.saveInt("Prep Station Transfer", PrepTransfer)
-
+	fiss.saveBool("ScanNotificationsval", ScanNotificationsval)
+	fiss.saveBool("AutoScanVal", AutoScanVal)
+	fiss.saveInt("_ScanInterval", _ScanInterval)
+	
 	;;Relic Storage Page
 	fiss.saveBool("Safe Storage Spell", StorageSpellVal)
 	fiss.saveBool("Summon Type", SummonSpellVal)
@@ -1088,7 +953,7 @@ FISSInterface fiss = FISSFactory.getFISS()
 	fiss.saveBool("AllowGems", AllowGems)	
 	fiss.saveBool("AllowMisc", AllowMisc)	
 	fiss.saveBool("AllowPotion", AllowPotion)
-
+	
 	;;Quest Tracker
 	fiss.saveBool("Show Spoilers", RN_Tracker._bSpoilers)
 	fiss.saveBool("Hide Incomplete", RN_Tracker._HideIncomplete)
@@ -1204,6 +1069,15 @@ FISSInterface fiss = FISSFactory.getFISS()
 	
 	ShowStartup = fiss.loadBool("Show startup notifications")	
 	PrepTransfer = fiss.loadInt("Prep Station Transfer")
+
+	ScanNotificationsval = fiss.loadBool("ScanNotificationsval")
+	_ScanInterval = fiss.loadInt("_ScanInterval")
+	AutoScanVal = fiss.loadBool("AutoScanVal")
+	If AutoScanVal
+		RN_AutoScan.UpdateInt(_ScanInterval)
+	else
+		RN_AutoScan.UpdateInt(0)
+	endIf
 	
 	;;Relic Storage Page
 	
@@ -1269,8 +1143,12 @@ FISSInterface fiss = FISSFactory.getFISS()
 				
 	SummonSpellVal = fiss.loadBool("Summon Type")	
 	Token_Vis = fiss.loadBool("TokenCrafting")
-		
-
+	if 	Token_Vis
+		RN_Token_Visibility.SetValue(1)
+	else
+		RN_Token_Visibility.SetValue(0)
+	endIf
+			
 	;;Quest Tracker
 	RN_Tracker._bSpoilers = fiss.loadBool("Show Spoilers")
 	RN_Tracker._HideIncomplete = fiss.loadBool("Hide Incomplete")
@@ -1314,7 +1192,7 @@ endState
 
 String function GetConfigDefaultString()
 
-	return MCM_Strings[26]
+	return "Restore"
 endFunction	
 
 ;-- Load States / Function --------------------------------
@@ -1336,7 +1214,7 @@ endState
 
 String function GetConfigAuthorString()
 
-	return MCM_Strings[16]
+	return "Load Preset"
 endFunction	
 
 ;-- Load States / Function --------------------------------
@@ -1349,9 +1227,6 @@ Function Begin_Config_Default()
 	ShowSetCompleteVal = True
 	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
-	ShowLocationOverrideVal = False
-	ShowStorageSpellOverideVal = False
-	DevDebugVal = False
 	ShowStartup = True
 	PrepTransfer = 1
 	SummonSpellVal = False
@@ -1387,6 +1262,11 @@ Function Begin_Config_Default()
 	AllowMisc = False
 	AllowPotion = False
 	
+	ScanNotificationsval = True
+	_ScanInterval = 10
+	AutoScanVal = True
+	RN_AutoScan.UpdateInt(_ScanInterval)
+	
 	RN_Tracker._bSpoilers = false
 	RN_Tracker._HideIncomplete = false
 	
@@ -1394,7 +1274,8 @@ Function Begin_Config_Default()
 	RN_Tracker._Legacy_Index = 0
 	
 	Token_Vis = True
-	
+	RN_Token_Visibility.SetValue(1)
+
 	if IsInMenuMode()
 		ForcePageReset()
 	endIf
@@ -1410,13 +1291,12 @@ Function Begin_Config_Author()
 	ShowSetCompleteVal = True
 	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
-	ShowLocationOverrideVal = False
-	ShowStorageSpellOverideVal = False
-	DevDebugVal = False
 	ShowStartup = True
 	PrepTransfer = 1
 	SummonSpellVal = False
 	Token_Vis = True
+	RN_Token_Visibility.SetValue(1)
+
 	
 	IndexmoreHUD = 0
 	
@@ -1467,6 +1347,11 @@ Function Begin_Config_Author()
 			(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
 		endIf
 	endIf
+
+	ScanNotificationsval = True
+	_ScanInterval = 5
+	AutoScanVal = True
+	RN_AutoScan.UpdateInt(_ScanInterval)
 	
 	RN_Tracker._bSpoilers = True
 	RN_Tracker._HideIncomplete = false
@@ -1480,44 +1365,56 @@ endFunction
 ;;----------------------------------------------------------------------------- Museum Scan Options--------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-state ScanAll
+state ScanType
 
-	function OnSelectST()	
+	Event OnSelectST()
 	
-	PlayerRef.GetCurrentLocation()	
-		if (PlayerRef.IsInLocation(DBM_DragonbornGalleryLocation)) || (PlayerRef.IsInLocation(DBM_GuildHouseSolitudeLocation)) && (PlayerRef.IsInInterior()) || ShowLocationOverrideVal	
-		
-			if ShowMessage("This will start the process of Scanning all available sections for completed sets... do you want to scan now?", true, "Scan", "Cancel")
-				ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
-				RN_Utility.ScanAll()
-			endIf
-		else	
-			ShowMessage("You must be inside the Museum to carry out this operation.", false, "OK")
-				return
-		endIf
-	endFunction
+		autoScanVal = !autoScanVal
+		SetTextOptionValueST(SetScanType(), false, "")
+		ForcePageReset()		
+	EndEvent
 
 	function OnHighlightST()
 
-		SetInfoText("Selecting this option will scan the Museum for all displayed items from the Museum, Armory, and any installed mods / creations then update the listings within this mod.")
+		SetInfoText("Toggle to select between Manual / Automatic Scanning")
 	endFunction
 endState
 
+;;-------------------------------
+
+String function SetScanType()
+
+		if !autoScanVal	
+			RN_AutoScan.UpdateInt(0)
+			Status_Return = "Manual"
+		elseif autoScanVal
+			RN_AutoScan.UpdateInt(_ScanInterval)
+			Status_Return = "Automatic"
+		endIf
+		return Status_Return
+endfunction
+
+;;-------------------------------
+			
+String function GetScanType()
+
+	if !autoScanVal
+		Status_Return = "Manual"
+	elseif autoScanVal	
+		Status_Return = "Automatic"
+	endIf
+	return Status_Return
+endFunction	
+	
 ;;------------------------------
 
 state ScanMuseum
 
 	function OnSelectST()
-	
-	PlayerRef.GetCurrentLocation()	
-		if (PlayerRef.IsInLocation(DBM_DragonbornGalleryLocation)) || (PlayerRef.IsInLocation(DBM_GuildHouseSolitudeLocation)) && (PlayerRef.IsInInterior()) || ShowLocationOverrideVal		
-			if ShowMessage("This will start the process of Scanning the Museum for completed sets... do you want to scan now?", true, "Scan", "Cancel")
-				ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
-				RN_Utility.ScanMuseum()
-			endIf
-		else	
-			ShowMessage("You must be inside the Museum to carry out this operation.", false, "OK")
-				return
+		
+		if ShowMessage("This will start the process of Scanning the Museum for completed sets... do you want to scan now?", true, "Scan", "Cancel")
+			ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
+			RN_Utility.ScanMuseum()
 		endIf
 	endFunction
 
@@ -1527,126 +1424,78 @@ state ScanMuseum
 	endFunction
 endState
 
-;;-------------------------------
+;;------------------------------
 
-state ScanMods
+state autoScanInterval ; Museum scan slider.
 
-	function OnSelectST()	
+	event OnSliderOpenST()
+		SetSliderDialogStartValue(_ScanInterval)
+		SetSliderDialogRange(0, 60)
+		SetSliderDialogInterval(1)
+	endEvent
+
+	event OnSliderAcceptST(float a_value)
+		_ScanInterval = a_value as int
+		SetSliderOptionValueST(_ScanInterval)
+		RN_AutoScan.UpdateInt(_ScanInterval)
+	endEvent
+
+	event OnDefaultST()
+		_ScanInterval = 10
+		SetSliderOptionValueST(_ScanInterval)
+		RN_AutoScan.UpdateInt(_ScanInterval)
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("Use this slider to set the interval between automatic museum scans - Set to 0 to turn off.\n Default: 10 Minutes")
+	endEvent
 	
-	PlayerRef.GetCurrentLocation()	
-		if (PlayerRef.IsInLocation(DBM_DragonbornGalleryLocation)) || (PlayerRef.IsInLocation(DBM_GuildHouseSolitudeLocation)) && (PlayerRef.IsInInterior()) || ShowLocationOverrideVal
-		
-			if ShowMessage("This will start the process of Scanning the Museum for completed sets from supported mods... do you want to scan now?", true, "Scan", "Cancel")
-				ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
-				RN_Utility.ScanMods()
-			endIf
-		else	
-			ShowMessage("You must be inside the Museum to carry out this operation.", false, "OK")
-				return
-		endIf
-	endFunction
+endState
 
+;;------------------------------
 
-	function OnHighlightST()
+state ScanNotifications
 
-		SetInfoText("Selecting this option will scan the Museum for all displayed items from supported mods and update the listings within this mod.")
-	endFunction
+	Event OnSelectST()
+	
+		ScanNotificationsval = !ScanNotificationsval
+		SetTextOptionValueST(SetScanNotification(), false, "")
+		forcepagereset()
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Enables / Disables Museum Scanner Notifications\n Default: Enabled")
+	EndEvent
 endState
 
 ;;-------------------------------
 
-state ScanCreations
+String function SetScanNotification()
 
-	function OnSelectST()	
-	
-	PlayerRef.GetCurrentLocation()	
-		if (PlayerRef.IsInLocation(DBM_DragonbornGalleryLocation)) || (PlayerRef.IsInLocation(DBM_GuildHouseSolitudeLocation)) && (PlayerRef.IsInInterior()) || ShowLocationOverrideVal
-		
-			if ShowMessage("This will start the process of Scanning the Museum for completed sets from supported creations... do you want to scan now?", true, "Scan", "Cancel")
-				ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
-				RN_Utility.ScanCreations()
-			endIf
-		else	
-			ShowMessage("You must be inside the Museum to carry out this operation.", false, "OK")
-				return
+		if !ScanNotificationsval		
+			Status_Return = "Disabled"
+		elseif ScanNotificationsval	
+			Status_Return = "Enabled"
 		endIf
-	endFunction
+		return Status_Return
+endfunction
 
+;;-------------------------------
+			
+String function GetScanNotification()
 
-	function OnHighlightST()
-
-		SetInfoText("Selecting this option will scan the Museum for all displayed items from supported creations and update the listings within this mod.")
-	endFunction
-endState
+	if !ScanNotificationsval
+		Status_Return = "Disabled"
+	elseif ScanNotificationsval	
+		Status_Return = "Enabled"
+	endIf
+	return Status_Return
+endFunction	
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Debug Options -------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-state iRelicLocationDebug ;;Debug Options
-
-	Event OnSelectST()
-	
-		ShowLocationOverrideVal = !ShowLocationOverrideVal
-		SetToggleOptionValueST(ShowLocationOverrideVal)
-		ForcePageReset()		
-	EndEvent
-	
-	Event OnDefaultST()
-	
-		ShowLocationOverrideVal = false
-		SetToggleOptionValueST(ShowLocationOverrideVal)
-	EndEvent
-
-	Event OnHighlightST()
-
-		self.SetInfoText("Disables Museum Scanner Location / Cell restrictions -- NOT FOR PLAYER USE\n Default: OFF")
-	EndEvent
-endState
-
-;;-------------------------------
-
-state iRelicSpellDebug ;;Debug Options
-
-	Event OnSelectST()
-	
-		ShowStorageSpellOverideVal = !ShowStorageSpellOverideVal
-		SetToggleOptionValueST(ShowStorageSpellOverideVal)
-			
-		if ShowStorageSpellOverideVal
-			if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
-				(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-			elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
-				(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))	
-			endIf
-			
-			if AutoTransferRelics
-				AutoTransferRelics = FALSE
-				RN_Transfer.GoToState("Disabled")	
-				AllowWeapon = FALSE
-				AllowArmor = FALSE
-				AllowBook = FALSE
-				AllowGems = FALSE
-				AllowKey = FALSE
-				AllowMisc= FALSE
-				AllowPotion = FALSE
-			endIf
-		endIf	
-
-		ForcePageReset()
-	EndEvent
-	
-	Event OnDefaultST()
-	
-		ShowStorageSpellOverideVal = false
-		SetToggleOptionValueST(ShowStorageSpellOverideVal)
-	EndEvent
-
-	Event OnHighlightST()
-
-		self.SetInfoText("Disables storage spell restrictions -- NOT FOR PLAYER USE\n Default: OFF")
-	EndEvent
-endState
 
 ;;-------------------------------
 
@@ -1655,6 +1504,8 @@ state Dev_Alerts ;;Debug Options
 	Event OnSelectST()
 	
 		DevDebugVal = !DevDebugVal
+		DBM_DebuggingON.setvalue(1)
+		DBM_Debugging.Start()
 		SetToggleOptionValueST(DevDebugVal)	
 	EndEvent
 	
@@ -1666,7 +1517,7 @@ state Dev_Alerts ;;Debug Options
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Enables Developer Debugging Alerts -- NOT FOR PLAYER USE\n Default: OFF")
+		self.SetInfoText("Enables Developer Debugging Messages to the LegacyoftheDragonborn.log file\n Default: OFF")
 	EndEvent
 endState
 
@@ -1677,7 +1528,12 @@ state Scan_Debug
 	Event OnSelectST()
 	
 		if self.ShowMessage("This will reset the current Museum scan and reset the scanner, do you want to reset now?", true, "Reset", "Cancel")
-			RN_Scan_Done.SetValue(RN_Scan_Sent.GetValue())
+			RN_Scan_Done.SetValue(RN_Scan_Registered.GetValue())
+			
+			autoScanVal = True
+			_ScanInterval = 10
+			RN_AutoScan.UpdateInt(_ScanInterval)
+			
 			DBM_SortWait.setvalue(0)
 			ForcePageReset()
 		endIf
@@ -1686,77 +1542,9 @@ state Scan_Debug
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Resets the Museum Scanner -- NOT FOR PLAYER USE")
+		self.SetInfoText("Resets the Museum Scanner")
 	EndEvent
 endState
-
-;;-------------------------------
-
-state Mod_Reset
-
-	Event OnSelectST()
-	
-		if self.ShowMessage("This will reset the mod and force start the inital setup, do you want to reset now?", true, "Reset", "Cancel")
-			ShowMessage("Please exit the MCM and follow the on screen instructions", false, "Ok")
-			RN_Utility.FullReset()
-			ForcePageReset()
-		endIf
-		
-	EndEvent
-
-	Event OnHighlightST()
-
-		self.SetInfoText("Resets the Mod")
-	EndEvent
-endState
-
-;;-------------------------------
-
-event OnOptionInputOpen(int option)
-	if (option == inputOID_I)
-		;SetInputDialogStartText(InputBox)
-	endIf
-endEvent
-
-;;-------------------------------
-
-event OnOptionInputAccept(int option, string value)
-	if (option == inputOID_I)
-		InputBox = value
-		SetInputOptionValue(inputOID_I, value)
-		self.CheckPassword()
-	endIf
-endEvent
-
-;;-------------------------------
-
-event CheckPassword()
-	if InputBox == MCM_Strings[13] as string
-		InputBox = MCM_Strings[14]
-		EnableDebugAccess()
-		ForcePageReset()
-	else
-		self.ShowMessage("Incorrect Password, Please try again.", false, "Ok")
-		InputBox = MCM_Strings[15]
-		DisableDebugAccess()
-		ForcePageReset()
-	endIf
-endEvent
-
-;;-------------------------------
-
-function EnableDebugAccess()
-	
-	RN_Debug_Access.SetValue(RN_Debug_Randomiser.GetValue())
-endFunction
-
-;;-------------------------------
-		
-function DisableDebugAccess()
-
-	RN_Debug_Access.SetValue(Utility.RandomInt(0, 250))
-	RN_Debug_Randomiser.SetValue(Utility.RandomInt(251, 500))
-endFunction
 
 ;;-------------------------------
 
@@ -1802,9 +1590,9 @@ endState
 String function SetCompleteNotificationsString()
 
 		if !ShowSetCompleteVal		
-			Status_Return = MCM_Strings[7]
+			Status_Return = "Disabled"
 		elseif ShowSetCompleteVal	
-			Status_Return = MCM_Strings[8]
+			Status_Return = "Enabled"
 		endIf
 		return Status_Return
 endfunction
@@ -1814,9 +1602,9 @@ endfunction
 String function GetCompleteNotificationsString()
 
 	if !ShowSetCompleteVal
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowSetCompleteVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 	return Status_Return
 endFunction	
@@ -1845,9 +1633,9 @@ endState
 String function SetNotificationsString()
 
 		if !ShowSimpleNotificationVal		
-			Status_Return = MCM_Strings[11]
+			Status_Return = "Default Message"
 		elseif ShowSimpleNotificationVal	
-			Status_Return = MCM_Strings[12]
+			Status_Return = "Simple Notification"
 		endIf
 		return Status_Return
 endfunction
@@ -1857,9 +1645,9 @@ endfunction
 String function GetNotificationsString()
 
 	if !ShowSimpleNotificationVal
-		Status_Return = MCM_Strings[11]
+		Status_Return = "Default Message"
 	elseif ShowSimpleNotificationVal	
-		Status_Return = MCM_Strings[12]
+		Status_Return = "Simple Notification"
 	endIf
 	return Status_Return
 endFunction	
@@ -1886,9 +1674,9 @@ endState
 String function SetShowStartup()
 
 		if !ShowStartup		
-			Status_Return = MCM_Strings[6]
+			Status_Return = "Messages Hidden"
 		elseif ShowStartup	
-			Status_Return = MCM_Strings[20]
+			Status_Return = "Messages Shown"
 		endIf
 		return Status_Return
 endfunction
@@ -1898,9 +1686,9 @@ endfunction
 String function GetShowStartup()
 
 	if !ShowStartup
-		Status_Return = MCM_Strings[6]
+		Status_Return = "Messages Hidden"
 	elseif ShowStartup	
-		Status_Return = MCM_Strings[20]
+		Status_Return = "Messages Shown"
 	endIf
 	return Status_Return
 endFunction	
@@ -1942,7 +1730,7 @@ String function SetStorageOptions()
 						AllowMisc= FALSE
 						AllowPotion = FALSE
 					endIf
-				Status_Return = MCM_Strings[9]
+				Status_Return = "Add Spell"
 			
 			elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
 				(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
@@ -1957,7 +1745,7 @@ String function SetStorageOptions()
 						AllowMisc= FALSE
 						AllowPotion = FALSE
 					endIf
-				Status_Return = MCM_Strings[9]
+				Status_Return = "Add Spell"
 			endIf
 		
 		elseif StorageSpellVal
@@ -1966,7 +1754,7 @@ String function SetStorageOptions()
 				
 			elseif (!Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)) && !SummonSpellVal
 				(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
-				Status_Return = MCM_Strings[10]
+				Status_Return = "Remove Spell"
 			endif	
 		endIf	
 	return Status_Return 
@@ -1976,13 +1764,13 @@ endFunction
 	
 String function GetStorageOptions()
 	
-	if DBM_ArcSkill.GetValue() < 5 && !ShowStorageSpellOverideVal
-		Status_Return = MCM_Strings[21]
+	if DBM_ArcSkill.GetValue() < 5
+		Status_Return = "Locked"
 		StorageSpellVal = FALSE
 	elseif !StorageSpellVal
-		Status_Return = MCM_Strings[9]		
+		Status_Return = "Add Spell"		
 	elseif StorageSpellVal
-		Status_Return = MCM_Strings[10]
+		Status_Return = "Remove Spell"
 	endIf
 		return Status_Return
 endFunction	
@@ -2026,8 +1814,8 @@ endFunction
 	
 String function GetSummonOptions()
 	
-	if DBM_ArcSkill.GetValue() < 5 && !ShowStorageSpellOverideVal
-		Status_Return = MCM_Strings[21]
+	if DBM_ArcSkill.GetValue() < 5
+		Status_Return = "Locked"
 	elseif !SummonSpellVal
 		Status_Return = "Summon Chest"
 	elseif SummonSpellVal
@@ -2086,7 +1874,7 @@ state PrepStationTransfer ;;Prep Station Storage Transfer
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Choose which container(s) to check for displayable items when using the 'Transfer Relics' option at the Prep station.\n Default: All Custom Storage")
+		self.SetInfoText("Choose which container(s) to check for displayable items when using the 'Transfer Relics' option at the Prep station.\n Default: All Storage")
 	EndEvent
 endState
 
@@ -2098,10 +1886,10 @@ String function SetPrepStationOptions()
 		Status_Return = "Custom Storage"
 		
 	elseif PrepTransfer == 1
-		Status_Return = "Custom Storage & Player"
+		Status_Return = "All Storage"
 
 	elseif PrepTransfer == 2
-		Status_Return = "Relic Storage Container"
+		Status_Return = "Relic Storage"
 		
 	endIf	
 	
@@ -2116,10 +1904,10 @@ String function GetPrepStationOptions()
 		Status_Return = "Custom Storage"
 		
 	elseif PrepTransfer == 1
-		Status_Return = "Custom Storage & Player"
+		Status_Return = "All Storage"
 
 	elseif PrepTransfer == 2
-		Status_Return = "Relic Storage Container"
+		Status_Return = "Relic Storage"
 		
 	endIf	
 	
@@ -2131,9 +1919,9 @@ endFunction
 String function SetTransferOptions()	
 
 	if !AutoTransferRelics
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif AutoTransferRelics
-		Status_Return = MCM_Strings[8]				
+		Status_Return = "Enabled"				
 	endIf	
 return Status_Return 
 endFunction
@@ -2143,12 +1931,12 @@ endFunction
 String function GetTransferOptions()
 	
 	if !StorageSpellVal
-		Status_Return = MCM_Strings[21]
+		Status_Return = "Locked"
 		AutoTransferRelics = FALSE
 	elseif !AutoTransferRelics
-		Status_Return = MCM_Strings[7]			
+		Status_Return = "Disabled"			
 	elseif AutoTransferRelics
-		Status_Return = MCM_Strings[8]				
+		Status_Return = "Enabled"				
 	endIf	
 return Status_Return 
 endFunction	
@@ -2373,9 +2161,9 @@ endState
 String function SetMuseumNotificationsString()
 
 	if !ShowMuseumVal		
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowMuseumVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 	return Status_Return
 endfunction
@@ -2385,9 +2173,9 @@ endfunction
 String function GetMuseumNotificationsString()
 
 	if !ShowMuseumVal
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowMuseumVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 	return Status_Return
 endFunction	
@@ -2413,9 +2201,9 @@ endState
 String function SetArmoryNotificationsString()
 
 	if !ShowArmoryVal		
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowArmoryVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 		return Status_Return
 endfunction
@@ -2425,9 +2213,9 @@ endfunction
 String function GetArmoryNotificationsString()
 
 	if !ShowArmoryVal		
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowArmoryVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 		return Status_Return
 endFunction	
@@ -2453,9 +2241,9 @@ endState
 String function SetModsNotificationsString()
 
 	if !ShowModsVal		
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowModsVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 		return Status_Return
 endfunction
@@ -2465,9 +2253,9 @@ endfunction
 String function GetModsNotificationsString()
 
 	if !ShowModsVal
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowModsVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 		return Status_Return
 endFunction	
@@ -2493,9 +2281,9 @@ endState
 String function SetListenerString()
 
 	if !ShowListenerVal		
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowListenerVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 		return Status_Return
 endfunction
@@ -2505,9 +2293,9 @@ endfunction
 String function GetListenerString()
 
 	if !ShowListenerVal
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif ShowListenerVal	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 		return Status_Return
 endFunction	
@@ -2635,9 +2423,9 @@ endState
 String function SetSafehouseOptions()
 
 	if !Safehouse_Enabled		
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif Safehouse_Enabled	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 		return Status_Return
 endfunction
@@ -2647,157 +2435,11 @@ endfunction
 String function GetSafehouseOptions()
 
 	if !Safehouse_Enabled
-		Status_Return = MCM_Strings[7]
+		Status_Return = "Disabled"
 	elseif Safehouse_Enabled	
-		Status_Return = MCM_Strings[8]
+		Status_Return = "Enabled"
 	endIf
 		return Status_Return
-endFunction	
-	
-;;-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Advanced tagging ----------------------------------------------------------------------------------------------
-;;-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-state ReplicaTagging ;;Replica Tagging
-
-	Event OnSelectST()
-		ReplicaTag = !ReplicaTag
-		
-		
-		if self.ShowMessage("=== The Curators Companion ===" + "\n" + "\nEnabling Advanced Tagging will cause a noticeable increase in the amount of time it takes for icons to update, it is also not recommended to use 'Take All' on a large number of items" + "\n" + "\nEnabling / Disabling this feature may take a while, you will receive a message when the process has completed", true, "Ok", "Cancel")
-			self.SetTextOptionValueST(Self.SetReplicaTaggingOptions(), false, "")
-			ShowMessage("Please exit the MCM and wait for the process to complete", false, "Ok")
-			
-			if ReplicaTag
-				
-				dbmDisp.Revert()
-				
-				Int _Index = RN_Array._MuseumContainerArray.length	;;Check museum containers for displayed items.	
-				While _Index 
-					_Index -= 1
-					Int _Index2 = RN_Array._MuseumContainerArray[_Index].GetNumItems()
-					while _Index2
-						_Index2 -= 1		
-						Form _ItemRelic = RN_Array._MuseumContainerArray[_Index].GetNthForm(_Index2)
-						if dbmMaster.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
-							dbmDisp.AddForm(_ItemRelic)
-							processForm(_ItemRelic, true)
-						endIf
-					endWhile
-				endWhile
-				
-				dbmFound.Revert()
-
-				_Index = RN_TokenFormlist.GetSize() ;; Check player and custom storage for found items.
-				While _Index
-					_Index -= 1
-					ObjectReference _Container = RN_TokenFormlist.GetAt(_Index) as ObjectReference		
-					Int _Index2 = _Container.GetNumItems()
-					While _Index2
-						_Index2 -= 1
-						Form _ItemRelic = _Container.GetNthForm(_Index2)
-						if !dbmNew.HasForm(_ItemRelic) && dbmMaster.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
-							dbmFound.AddForm(_ItemRelic)
-							processForm(_ItemRelic, false)
-						endIf
-					endWhile
-				endWhile	
-				
-			elseif !ReplicaTag
-				
-				dbmDisp.Revert()
-				
-				Int _Index = RN_Array._MuseumContainerArray.length	;;Check museum containers for displayed items.	
-				While _Index 
-					_Index -= 1
-					Int _Index2 = RN_Array._MuseumContainerArray[_Index].GetNumItems()
-					while _Index2
-						_Index2 -= 1		
-						Form _ItemRelic = RN_Array._MuseumContainerArray[_Index].GetNthForm(_Index2)
-						if dbmMaster.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
-							dbmDisp.AddForm(_ItemRelic)
-						endIf
-					endWhile
-				endWhile			
-
-				dbmFound.Revert()
-				
-				_Index = RN_TokenFormlist.GetSize() ;; Check player and custom storage for found items.
-				While _Index
-					_Index -= 1
-					ObjectReference _Container = RN_TokenFormlist.GetAt(_Index) as ObjectReference		
-					Int _Index2 = _Container.GetNumItems()
-					While _Index2
-						_Index2 -= 1
-						Form _ItemRelic = _Container.GetNthForm(_Index2)
-						if !dbmNew.HasForm(_ItemRelic) && dbmMaster.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
-							dbmFound.AddForm(_ItemRelic)
-						endIf
-					endWhile
-				endWhile	
-				
-			endIf
-			
-			if ReplicaTag
-				Debug.MessageBox("=== The Curators Companion ===" + "\n" + "\nAdvanced Tagging Enabled")
-			else
-				Debug.MessageBox("=== The Curators Companion ===" + "\n" + "\nAdvanced Tagging Disabled")
-			endIf
-		endIf	
-	EndEvent
-
-	Event OnHighlightST()
-
-		self.SetInfoText("EXPERIMENTAL FEATURE\nWhen an item is found or displayed with Advanced Tagging Enabled, the scripts will attempt to update the Icons for both the Base Item and the Replica\n Default: Disabled")
-	EndEvent
-endState
-
-
-;;-- Functions ---------------------------------------
-
-function processForm(form _ItemRelic, bool _Displayed)
-	
-	if _Displayed
-	
-		if DBM_ReplicaBaseItems.HasForm(_ItemRelic)
-			dbmDisp.AddForm(ReplicaHandler.GetReplica(_ItemRelic))
-		elseif DBM_ReplicaItems.HasForm(_ItemRelic)
-			dbmDisp.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))
-		endIf
-		
-	else
-	
-		if DBM_ReplicaBaseItems.HasForm(_ItemRelic)
-			dbmFound.AddForm(ReplicaHandler.GetReplica(_ItemRelic))
-		elseif DBM_ReplicaItems.HasForm(_ItemRelic)
-			dbmFound.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))
-		endIf
-		
-	endIf
-endFunction
-
-;;-------------------------------
-
-String function SetReplicaTaggingOptions()
-
-		if !ReplicaTag		
-			Status_Return = MCM_Strings[7]	
-		elseif ReplicaTag	
-			Status_Return = MCM_Strings[8]
-		endIf
-		return Status_Return
-endfunction
-
-;;-------------------------------
-			
-String function GetReplicaTaggingOptions()
-
-	if !ReplicaTag
-		Status_Return = MCM_Strings[7]
-	elseif ReplicaTag	
-		Status_Return = MCM_Strings[8]
-	endIf
-	return Status_Return
 endFunction	
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------
@@ -2812,6 +2454,20 @@ string function GetCurrentCount(GlobalVariable akVariable, GlobalVariable akVari
 		Status_Return = (Current_Count + "/" + Total_Count)
 	return Status_Return
 endFunction
+
+;;-------------------------------
+
+Event BuildTotals(globalvariable akvariable, globalvariable[] array)
+
+	akvariable.setvalue(0)
+	Int _Index = array.length
+	while _Index
+		_Index -= 1
+		If array[_Index].GetValue()
+			akvariable.Mod(1)
+		endIF
+	endWhile
+endEvent
 
 ;;-------------------------------
 
@@ -2880,7 +2536,7 @@ String function GetTreasuryCountString2()
 		Status_Return = RN_Treasury_Count2.GetValue() As Int
 		return Status_Return
 	else
-		Status_Return = MCM_Strings[21]
+		Status_Return = "Locked"
 		return Status_Return 
 	endIf
 endFunction
@@ -2893,7 +2549,7 @@ String function GetTreasuryCountString3()
 		Status_Return = RN_Treasury_Count3.GetValue() As Int
 		return Status_Return
 	else
-		Status_Return = MCM_Strings[21]
+		Status_Return = "Locked"
 		return Status_Return 
 	endIf
 endFunction
@@ -2914,6 +2570,176 @@ String function GetTotalTreasuryValue(GlobalVariable akvariable1, GlobalVariable
 			Status_Return = RN_Total_Value.GetValue() As Int
 		return Status_Return
 endFunction
+
+;;-------------------------------
+
+Event Build_Arrays()	
+	
+	Int _Index
+	
+	RN_Patches_Count_Array = new globalvariable[53]
+	_Index = 0
+	While _Index < RN_Patches_Count.GetSize()
+		globalvariable akvariable = RN_Patches_Count.GetAt(_Index) as globalvariable
+		RN_Patches_Count_Array[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+	RN_Patches_Total_Array = new globalvariable[53]
+	_Index = 0
+	While _Index < RN_Patches_Total.GetSize()
+		globalvariable akvariable = RN_Patches_Total.GetAt(_Index) as globalvariable
+		RN_Patches_Total_Array[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+	RN_Patches_Complete_Array = new globalvariable[53]
+	_Index = 0
+	While _Index < RN_Patches_Complete.GetSize()
+		globalvariable akvariable = RN_Patches_Complete.GetAt(_Index) as globalvariable
+		RN_Patches_Complete_Array[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+	RN_Patches_Installed_Array = new globalvariable[53]
+	_Index = 0
+	While _Index < RN_Patches_Installed.GetSize()
+		globalvariable akvariable = RN_Patches_Installed.GetAt(_Index) as globalvariable
+		RN_Patches_Installed_Array[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+;;-------------------------------
+
+	RN_Creations_Count_Array = new globalvariable[40]
+	_Index = 0
+	While _Index < RN_Creations_Count.GetSize()
+		globalvariable akvariable = RN_Creations_Count.GetAt(_Index) as globalvariable
+		RN_Creations_Count_Array[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+	RN_Creations_Total_Array = new globalvariable[40]
+	_Index = 0
+	While _Index < RN_Creations_Total.GetSize()
+		globalvariable akvariable = RN_Creations_Total.GetAt(_Index) as globalvariable
+		RN_Creations_Total_Array[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+	RN_Creations_Complete_Array = new globalvariable[40]
+	_Index = 0
+	While _Index < RN_Creations_Complete.GetSize()
+		globalvariable akvariable = RN_Creations_Complete.GetAt(_Index) as globalvariable
+		RN_Creations_Complete_Array[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+	RN_Creations_Installed_Array = new globalvariable[40]
+	_Index = 0
+	While _Index < RN_Creations_Installed.GetSize()
+		globalvariable akvariable = RN_Creations_Installed.GetAt(_Index) as globalvariable
+		RN_Creations_Installed_Array[_Index] = akvariable
+		_Index += 1
+	endWhile
+	
+	RN_Patches_Name = new string[53]
+	RN_Patches_Name[0] = "Aetherium Armor and Weapons"
+	RN_Patches_Name[1] = "Amulets of Skyrim"
+	RN_Patches_Name[2] = "Animated Armory"
+	RN_Patches_Name[3] = "Artifacts of Boethiah"
+	RN_Patches_Name[4] = "Artifacts of Skyrim"
+	RN_Patches_Name[5] = "Bad Gremlins Collectables"
+	RN_Patches_Name[6] = "Cloaks of Skyrim"
+	RN_Patches_Name[7] = "Clockwork"
+	RN_Patches_Name[8] = "Dawnguard Arsenal"
+	RN_Patches_Name[9] = "Dwemer Spectres"
+	RN_Patches_Name[10] = "Falskaar"
+	RN_Patches_Name[11] = "Follower: Auri"
+	RN_Patches_Name[12] = "Follower: Inigo"
+	RN_Patches_Name[13] = "Follower: Kaidan"
+	RN_Patches_Name[14] = "Follower: M'rissi"
+	RN_Patches_Name[15] = "Fossil Mining"
+	RN_Patches_Name[16] = "The Gray Cowl Of Nocturnal"
+	RN_Patches_Name[17] = "Guard Armor Replacer"
+	RN_Patches_Name[18] = "Heavy Armory"
+	RN_Patches_Name[19] = "Helgen Reborn"
+	RN_Patches_Name[20] = "Ice Blade of the Monarch"
+	RN_Patches_Name[21] = "Immersive College Of Winterhold"
+	RN_Patches_Name[22] = "Immersive Armors"
+	RN_Patches_Name[23] = "Immersive Weapons"
+	RN_Patches_Name[24] = "Inn Soaps"
+	RN_Patches_Name[25] = "Interesting NPC's"
+	RN_Patches_Name[26] = "Jaysus Swords"
+	RN_Patches_Name[27] = "konahrik's accoutrements"
+	RN_Patches_Name[28] = "Kthonia's Weapon Pack"
+	RN_Patches_Name[29] = "Moonpath To Elsweyr"
+	RN_Patches_Name[30] = "Moon And Star"
+	RN_Patches_Name[31] = "New Treasure Hunt"
+	RN_Patches_Name[32] = "Oblivion Artifacts"
+	RN_Patches_Name[33] = "Path of the Revanant"
+	RN_Patches_Name[34] = "Project AHO"
+	RN_Patches_Name[35] = "Royal Armory"
+	RN_Patches_Name[36] = "Ruins Edge"
+	RN_Patches_Name[37] = "Skyrim Sewers"
+	RN_Patches_Name[38] = "Skyrim Underground"
+	RN_Patches_Name[39] = "Skyrim Unique Treasures"
+	RN_Patches_Name[40] = "Staff of Sheogorath"
+	RN_Patches_Name[41] = "Teldryn Serious"
+	RN_Patches_Name[42] = "The Brotherhood of Old"
+	RN_Patches_Name[43] = "The Forgotten City"
+	RN_Patches_Name[44] = "The Wheels Of Lull"
+	RN_Patches_Name[45] = "Tools of Kagrenac"
+	RN_Patches_Name[46] = "Treasure Hunter"
+	RN_Patches_Name[47] = "Undeath"
+	RN_Patches_Name[48] = "Vigilant."
+	RN_Patches_Name[49] = "Volkihar Knight"
+	RN_Patches_Name[50] = "Wintersun"
+	RN_Patches_Name[51] = "Wyrmstooth"
+	RN_Patches_Name[52] = "Zim's Thane Weapons"	
+
+	RN_Creations_Name = new string[40]
+	RN_Creations_Name[0] = "Adventurer's Backpack"
+	RN_Creations_Name[1] = "Alternate Armors - Daedric Mail"
+	RN_Creations_Name[2] = "Alternate Armors - Dragonscale"
+	RN_Creations_Name[3] = "Alternate Armors - Dwarven Mail"
+	RN_Creations_Name[4] = "Alternate Armors - Ebony Plate"
+	RN_Creations_Name[5] = "Alternate Armors - Elven Hunter"
+	RN_Creations_Name[6] = "Alternate Armors - Stalhrim Fur"
+	RN_Creations_Name[7] = "Alternate Armors - Steel Soldier"
+	RN_Creations_Name[8] = "Arcane Accessories"
+	RN_Creations_Name[9] = "Arcane Archer Pack"
+	RN_Creations_Name[10] = "Arms of Chaos"
+	RN_Creations_Name[11] = "Bone Wolf"
+	RN_Creations_Name[12] = "Camping"
+	RN_Creations_Name[13] = "Civil War Champions"
+	RN_Creations_Name[14] = "Dawnfang & Duskfang"
+	RN_Creations_Name[15] = "Dead Man's Dread"
+	RN_Creations_Name[16] = "Divine Crusader"
+	RN_Creations_Name[17] = "Dwarven Armored Mudcrab"
+	RN_Creations_Name[18] = "Elite Crossbows"
+	RN_Creations_Name[19] = "Expanded Crossbow Pack"
+	RN_Creations_Name[20] = "Forgotten Seasons"
+	RN_Creations_Name[21] = "Goblins"
+	RN_Creations_Name[22] = "Netch Leather Armor"
+	RN_Creations_Name[23] = "Nix-Hound"
+	RN_Creations_Name[24] = "Nordic Jewelry"
+	RN_Creations_Name[25] = "Pets of Skyrim"
+	RN_Creations_Name[26] = "Plague of the Dead"
+	RN_Creations_Name[27] = "Rare Curios"
+	RN_Creations_Name[28] = "Ruin's Edge"
+	RN_Creations_Name[29] = "Saints & Seducers"
+	RN_Creations_Name[30] = "Saturalia Holiday Pack"
+	RN_Creations_Name[31] = "Shadowrend"
+	RN_Creations_Name[32] = "Spell Knight Armor"
+	RN_Creations_Name[33] = "Staff of Hasedoki"
+	RN_Creations_Name[34] = "Staff of Sheogorath"
+	RN_Creations_Name[35] = "Stendarr's Hammer"
+	RN_Creations_Name[36] = "The Gray Cowl Returns!"
+	RN_Creations_Name[37] = "Umbra"
+	RN_Creations_Name[38] = "Vigil Enforcer Armor Set"
+	RN_Creations_Name[39] = "Wild Horses"
+endEvent
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script End ------------------------------------------------------------------------------------------------------------

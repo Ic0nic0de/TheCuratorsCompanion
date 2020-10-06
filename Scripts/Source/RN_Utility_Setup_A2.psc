@@ -2,6 +2,10 @@ ScriptName RN_Utility_Setup_A2 extends Quest
 
 Import RN_Utility_Global
 
+RN_Utility_MCM property MCM auto
+
+Import Debug
+
 ;;Formlists to control item lists.
 formlist[] property _itemsArray auto
 
@@ -13,6 +17,9 @@ Formlist Property dbmNew auto
 formlist property dbmMaster auto
 
 Globalvariable Property RN_Setup_Done auto
+globalvariable property RN_Setup_Registered auto
+
+bool _setupDone
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -21,30 +28,44 @@ Globalvariable Property RN_Setup_Done auto
 ;;-- Functions ---------------------------------------
 
 function OnInit()
-
-	RegisterForModEvent("RunSetup_A2", "OnRunSetup_A2")
+	
+	_RunSetup(false)
 endFunction
-
+	
 ;;-- Functions ---------------------------------------
 
-Function OnPlayerLoadGame()
-
-	RegisterForModEvent("RunSetup_A2", "OnRunSetup_A2")
-endFunction
-
-;;-- Functions ---------------------------------------
-
-function OnRunSetup_A2(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)		
+function _RunSetup(bool forced)	
 	
-	Debug.Trace("The Curators Companion: Setup Event Received for RN_Utility_Setup_A2")
+	RN_Setup_Registered.Mod(1)
 	
-	Int _index = _itemsArray.length		
-	While _index
-		_index -= 1
-		Formlist _List = _itemsArray[_index]
-		_onConsolidateItems(_List, DBM_SectionArmory_Merged, dbmNew, dbmMaster)			
-	endWhile
+	if forced
+		_setupDone = false
+	endIf
 	
-	RN_Setup_Done.Mod(1)
-	Debug.Trace("The Curators Companion: Setup Event Completed for RN_Utility_Setup_A2")
+	if !_setupDone
+
+		If MCM.DevDebugVal
+			DBMDebug.Log(Self, "TCC: Setup Event Received for: Setup A2")
+		endIf
+	
+		Int _index = _itemsArray.length		
+		While _index
+			_index -= 1
+			Formlist _List = _itemsArray[_index]
+			_onConsolidateItems(_List, DBM_SectionArmory_Merged, dbmNew, dbmMaster)			
+		endWhile
+		
+		RN_Setup_Done.Mod(1)
+		_setupDone = true
+		If MCM.DevDebugVal
+			DBMDebug.Log(Self, "TCC: Setup Event Completed for: Setup A2")
+		endIf
+	
+	else
+		
+		RN_Setup_Done.Mod(1)
+		If MCM.DevDebugVal
+			DBMDebug.Log(Self, "TCC: Setup Event Already Completed for: Setup A2")
+		endIf
+	endIf
 endFunction

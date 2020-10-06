@@ -1,5 +1,7 @@
 scriptName RN_Utility_Setup_D1 extends Quest
 
+RN_Utility_MCM property MCM auto
+
 Import RN_Utility_Global
 
 ;Display Ref List - Safehouse
@@ -14,6 +16,7 @@ formlist property DBM_SectionSafehouse_Merged auto
 
 ;; Global for ModEvent Return.
 globalvariable property RN_Safehouse_Done auto
+globalvariable property RN_Safehouse_Registered auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -23,21 +26,25 @@ globalvariable property RN_Safehouse_Done auto
 
 function OnInit()
 
-	RegisterForModEvent("RunSetup_D1", "OnRunSetup_D1")
+	RegisterForModEvent("TCCSetup_SH", "OnSetup")
 endFunction
 
 ;;-- Functions ---------------------------------------
 
 Function OnPlayerLoadGame()
 
-	RegisterForModEvent("RunSetup_D1", "OnRunSetup_D1")
+	RegisterForModEvent("TCCSetup_SH", "OnSetup")
 endFunction
 
 ;;-- Functions ---------------------------------------
 
-function OnRunSetup_D1(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)
-
-	Debug.Trace("The Curators Companion: Setup Event Received for RN_Utility_Setup_D1")
+function OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)
+	
+	RN_Safehouse_Registered.Mod(1)
+	
+	If MCM.DevDebugVal
+		DBMDebug.Log(Self, "TCC: Setup Event Received for: Setup D1")
+	endIf
 	
 	;;Merge Safehouse Display Lists
 	_onConsolidateDisplays(DBM_FoodDisplayList, DBM_SectionSafehouse_Merged)
@@ -48,6 +55,9 @@ function OnRunSetup_D1(string eventName, string strArg, float numArg, Form sende
 	_onConsolidateDisplays(DBM_DisplayClosetList, DBM_SectionSafehouse_Merged)	
 	
 	RN_Safehouse_Done.Mod(1)
-	Debug.Trace("The Curators Companion: Setup Event Completed for RN_Utility_Setup_D1")
+	
+	If MCM.DevDebugVal
+		DBMDebug.Log(Self, "TCC: Setup Event Completed for: Setup D1")
+	endIf
 endFunction
 

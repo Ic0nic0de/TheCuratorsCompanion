@@ -85,30 +85,15 @@ endFunction
 
 ;;-- Functions ---------------------------------------
 
-Bool Function CheckValueCount1(GlobalVariable aKVariable_Count, GlobalVariable aKVariable_Total, Quest akQuest, GlobalVariable akVariable, GlobalVariable akComplete) global
+Bool Function CheckValueCount1(GlobalVariable aKVariable_Count, GlobalVariable aKVariable_Total, GlobalVariable akVariable) global
 	if aKVariable_Count.GetValue() >= aKVariable_Total.GetValue()
-		if (akQuest.IsRunning())
-			akQuest.Stop()
-		endif
-		akVariable.SetValue(1)
-		akComplete.Mod(1)
+		akVariable.SetValue(1)	
 		return true
 	endIf
   
+  akVariable.SetValue(0)
   return false
 EndFunction
-
-;;-- Functions ---------------------------------------
-
-Bool Function CheckSetCount1(GlobalVariable aKVariable_Count, GlobalVariable aKVariable_Total, GlobalVariable akVariable, GlobalVariable aKSets) global
-	if (aKVariable_Count.GetValue() >= aKVariable_Total.GetValue())
-		akVariable.SetValue(1)
-		aKSets.Mod(1)
-		return true
-	endif
-  
-  return false
-EndFunction 
 
 ;;-- Functions ---------------------------------------
 

@@ -6,8 +6,6 @@ Import RN_Utility_Global
 
 RN_Utility_MCM property MCM auto
 
-RN_Utility_ArrayHolder property RN_Array auto
-
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -27,16 +25,15 @@ formlist property DBM_RN_QuestDisplays auto
 Formlist property DBM_RN_ExplorationDisplays auto
 
 ;; Global for ModEvent Return.
-GlobalVariable property RN_Setup_Done auto
-GlobalVariable property RN_Scan_Done auto
+globalvariable property RN_Setup_Done auto
+globalvariable property RN_Setup_Registered auto
+
+globalvariable property RN_Scan_Done auto
+globalvariable property RN_Scan_Registered auto
 
 ;;Global for mod completion.
-GlobalVariable property iModComplete auto
+globalvariable property iModComplete auto
 globalvariable property iCreationComplete auto
-
-;;Strings for ModEvent text replacement.
-String property _ModSetup  auto
-String property _ModScan  auto
 
 globalvariable property RN_SupportedModCount auto
 globalvariable property RN_SupportedCreationCount auto
@@ -49,9 +46,6 @@ formlist property RN_TokenFormlistExcluded auto
 
 ;;Patch Type - false - Creaton / true - Patch
 bool property _bPatchType auto 
-
-;;Name of the mod to pass through Events.
-String property _modName auto
 
 ;;Formlists to control item lists.
 formlist[] property _itemsArray auto
@@ -68,23 +62,22 @@ Message property _modCompleteMessage auto
 Message property _modCompleteNotification auto
 
 ;;Globals for set completion
-GlobalVariable property _Global_Mod_Complete auto
+globalvariable property _Global_Mod_Complete auto
 
 ;;Globals for current Count
-GlobalVariable property _Global_Display_Count auto
+globalvariable property _Global_Display_Count auto
 
 ;;Globals for Total Count
-GlobalVariable property _Global_Display_Total auto
+globalvariable property _Global_Display_Total auto
 
 ;;AddForm to quest display listener. 
 ObjectReference[] property _questDisplays auto
 
 ;;Shrine Display Properties
-ObjectReference[] property _wintersunShrine auto
+Formlist property _wintersunShrine auto
 
 ;;Prisoner belongigns chest for mods that add one.
 ObjectReference[] property _PrisonerChest auto
-Bool _PrisonerChestAdded
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,26 +86,18 @@ Bool _PrisonerChestAdded
 ;;-- Events ---------------------------------------			
 	
 Event onInit()
-
-	if _bPatchType && RN_Array._GVComplete.Find(_Global_Mod_Complete) < 0 || !_bPatchType && RN_Array._GVCreationComplete.Find(_Global_Mod_Complete) < 0
-		Debug.MessageBox("=== The Curators Companion === \n \n Invalid Patch Detected \n (" + _modName + ") can not be added to an existing save or game in progress. \n \n If you would like to use (" + _modName + ") please start a new game on  " + MCM._ModVersion + " or uninstall this patch to continue.")
-	endIf
-	
-	RegisterForModEvent(_ModSetup, "_onModSetup")	
-	RegisterForModEvent(_ModScan, "_onModScan")
+		
+	RegisterForModEvent("TCCScan", "_onScan")
+	_RunSetup()
 endEvent
 
 ;;-- Events ---------------------------------------		
 
 Event onPlayerLoadGame()
-
-	if _bPatchType && RN_Array._GVComplete.Find(_Global_Mod_Complete) < 0 || !_bPatchType && RN_Array._GVCreationComplete.Find(_Global_Mod_Complete) < 0
-		Debug.MessageBox("=== The Curators Companion === \n \n Invalid Patch Detected \n (" + _modName + ") can not be added to an existing save or game in progress. \n \n If you would like to use (" + _modName + ") please start a new game on  " + MCM._ModVersion + " or uninstall this patch to continue.")
-	endIf
 	
-	RegisterForModEvent(_ModSetup, "_onModSetup")	
-	RegisterForModEvent(_ModScan, "_onModScan")
-	
+	RegisterForModEvent("TCCScan", "_onScan")
+	_RunSetup()
+		
 	if _displayList_Merged
 		_Global_Display_Total.SetValue(_displayList_Merged.GetSize())
 	else
@@ -120,20 +105,20 @@ Event onPlayerLoadGame()
 	endIf
 	
 	_Global_Display_Count.SetValue(_displayList_Enabled.GetSize())	
-	
-	if !_PrisonerChestAdded
-		AddPrisonerChest()
-	endIf
 endEvent
 	
 ;;-- Events ---------------------------------------		
 
-Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)		
+Event _RunSetup()
+	
+	RN_Setup_Registered.Mod(1)
 	
 	if !_setupDone
 
-		Trace("The Curators Companion: Setup Event Received for " +_modName)	
-	
+		If MCM.DevDebugVal
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Received for: " +_Global_Mod_Complete)
+		endIf
+
 		Int Index = _itemsArray.length		
 		While Index
 			Index -= 1
@@ -169,10 +154,11 @@ Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;
 ;;------------
 		
 		if _wintersunShrine
-			Index = _wintersunShrine.Length
-			while Index > 0
-				Index -= 1		
-				DBM_RN_ExplorationDisplays.AddForm(_wintersunShrine[Index])
+			Index = 0
+			while Index < _wintersunShrine.GetSize()
+				ObjectReference _Shrine = _wintersunShrine.GetAt(Index) as ObjectReference		
+				DBM_RN_ExplorationDisplays.AddForm(_Shrine)
+				Index += 1
 			EndWhile
 		endIf
 	
@@ -196,82 +182,60 @@ Event _onModSetup(string eventName, string strArg, float numArg, Form sender) ;;
 			EndWhile
 		endIf
 		
-		_PrisonerChestAdded = True
-		
 ;;------------
 
 		if _bPatchType	
 			RN_SupportedModCount.Mod(1)
 		else
-			RN_SupportedCreationCount.Mod(1)
-			
+			RN_SupportedCreationCount.Mod(1)	
 		endIf
-			RN_Setup_Done.Mod(1)
 		
+		RN_Setup_Done.Mod(1)
 		_setupDone = True
 		
-		Trace("The Curators Companion: Setup Event Completed for " +_modName)	
-		
+		If MCM.DevDebugVal
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Completed for: " +_Global_Mod_Complete)
+		endIf
 	else
 		
 		RN_Setup_Done.Mod(1)
-		Trace("The Curators Companion: Setup Event Already Completed for " +_modName)
+		
+		If MCM.DevDebugVal
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Already Completed for: " +_Global_Mod_Complete)
+		endIf
 	endIf
-	
 endEvent	
 
 ;;-- Events ---------------------------------------		
 
-Event _onModScan(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+	
+	RN_Scan_Registered.Mod(1)
 	
 	If MCM.DevDebugVal
-		Trace("_onModScan() Event Received for: " + _modName)
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " +_Global_Mod_Complete)
 	endIf
 	
-	Int Index = _displaysArray.length
-	While Index
-		Index -= 1
-		_onDisplayCheck(_displaysArray[Index], _displayList_Enabled, _Global_Display_Count)
-	endWhile
-	
-	if _bPatchType
-		if (CheckValueCount1(_Global_Display_Count, _Global_Display_Total, GetOwningQuest(), _Global_Mod_Complete, iModComplete) && (MCM.ShowSetCompleteVal))
-			if (MCM.ShowSimpleNotificationVal)
-				_modCompleteNotification.Show()
-			else
-				_modCompleteMessage.Show()
-			endIf
-		endIf
+	if !_Global_Mod_Complete.GetValue()
+		Int Index = _displaysArray.length
+		While Index
+			Index -= 1
+			_onDisplayCheck(_displaysArray[Index], _displayList_Enabled, _Global_Display_Count)
+		endWhile
 		
-	else
-		if (CheckValueCount1(_Global_Display_Count, _Global_Display_Total, GetOwningQuest(), _Global_Mod_Complete, iCreationComplete) && (MCM.ShowSetCompleteVal))
+		if (CheckValueCount1(_Global_Display_Count, _Global_Display_Total, _Global_Mod_Complete) && (MCM.ShowSetCompleteVal))
 			if (MCM.ShowSimpleNotificationVal)
 				_modCompleteNotification.Show()
 			else
 				_modCompleteMessage.Show()
 			endIf
-		endIf
-	endIf				
+		endIf	
+	endIf
 	
 	RN_Scan_Done.Mod(1)
 	
 	If MCM.DevDebugVal
-		Trace("_onModScan() Event Completed for: " + _modName)
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " +_Global_Mod_Complete)
 	endIf
 	
 EndEvent	
-
-;;-- Events ---------------------------------------	
-
-Event AddPrisonerChest()
-
-	if _PrisonerChest
-		Int Index = _PrisonerChest.length
-		while Index > 0
-			Index -= 1		
-			RN_TokenFormlistExcluded.AddForm(_PrisonerChest[Index])
-		EndWhile
-	endIf
-	
-	_PrisonerChestAdded = True
-endEvent

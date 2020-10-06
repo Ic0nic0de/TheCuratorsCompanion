@@ -1,7 +1,5 @@
 ScriptName RN_Utility_Token extends ObjectReference
 
-DBM_ReplicaHandler Property ReplicaHandler Auto
-
 RN_Utility_MCM property RN_MCM auto
 
 message property TCC_TokenRemoval auto
@@ -23,9 +21,6 @@ formlist property dbmNew auto 						;; Items available to be displayed
 formlist property dbmFound auto 					;; Items that are in inventory or storage
 formlist property dbmDisp auto 						;; Items that are on display
 formlist property dbmMaster auto					;; Total items list
-
-Formlist property DBM_ReplicaBaseItems auto 		;; holds the Replica Base Items.
-formlist property DBM_ReplicaItems auto 			;; Holds the Replicas.
 
 MiscObject property TCCToken auto
 
@@ -61,7 +56,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 					Index -= 1
 					Form akBaseItem = akNewContainer.GetNthForm(Index)
 					If dbmNew.HasForm(akBaseItem) && !dbmDisp.HasForm(akBaseItem)
-						processForm(akBaseItem)
+						updateFormlists(akBaseItem)
 					endIf
 				endWhile
 			
@@ -125,23 +120,6 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 			akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
 		endIf
 	endIf		
-endEvent
-
-;-- Events --------------------------------
-
-Event processForm(form akBaseItem)
-
-	updateFormlists(akBaseitem)
-	
-	if RN_MCM.ReplicaTag		
-		if DBM_ReplicaBaseItems.HasForm(akBaseitem)						;; If the item being processed is a "Base Item" ...				
-			updateFormlists(ReplicaHandler.GetReplica(akBaseItem))		;; ... we also need to process the replica
-				
-		elseif DBM_ReplicaItems.HasForm(akBaseitem)						;; If the item being processed is a "Replica" ...
-			updateFormlists(ReplicaHandler.GetOriginal(akBaseItem))		;; ... we also need to process the original
-
-		endIf
-	endIf
 endEvent
 
 ;-- Events --------------------------------

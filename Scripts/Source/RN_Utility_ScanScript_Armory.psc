@@ -8,39 +8,35 @@ RN_Utility_MCM property MCM auto
 
 RN_Utility_ArrayHolder property RN_Array auto
 
-;;----------
+string property _RoomName Auto
 
-GlobalVariable Property iArmorySets Auto
-GlobalVariable Property RN_Scan_Done Auto
-
-String Property _ModEventName Auto
-
-String Property _RoomName Auto
+globalvariable property RN_Scan_Done auto
+globalvariable property RN_Scan_Registered auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-																			;; Script Start
-;;-- Events ---------------------------------------			
-	
+
 Event onInit()
 	
-	RegisterForModEvent(_ModEventName, "_onScan")
+	RegisterForModEvent("TCCScan", "_onScan")
 endEvent
 
 ;;-- Events ---------------------------------------		
 
 Event onPlayerLoadGame()
 	
-	RegisterForModEvent(_ModEventName, "_onScan")
+	RegisterForModEvent("TCCScan", "_onScan")
 endEvent
-
+	
 ;;-- Events ---------------------------------------	
 
-Event _onScan(string eventName, string strArg, float numArg, Form sender)	
-
+Event _onScan(string eventName, string strArg, float numArg, Form sender)
+	
+	RN_Scan_Registered.Mod(1)
+	
 	If MCM.DevDebugVal
-		Trace("_onModScan() Event Received for: " + _RoomName)
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " + _RoomName)
 	endIf
 	
 ;;----------
@@ -66,7 +62,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 				
 				RN_Array._Armory_Global_Count[_Index].setvalue(RN_Array._Armory_Formlist_Enabled[_Index].GetSize()) 	
 			endIf
-			if (CheckSetCount1(RN_Array._Armory_Global_Count[_Index], RN_Array._Armory_Global_Total[_Index], RN_Array._Armory_Global_Complete[_Index], iArmorySets) && (MCM.ShowSetCompleteVal)) 
+			if (CheckValueCount1(RN_Array._Armory_Global_Count[_Index], RN_Array._Armory_Global_Total[_Index], RN_Array._Armory_Global_Complete[_Index]) && (MCM.ShowSetCompleteVal)) 
 				if (MCM.ShowSimpleNotificationVal)
 					RN_Array._Armory_Message_Notification[_Index].Show()
 				else
@@ -82,8 +78,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	RN_Scan_Done.Mod(1)
 	
 	If MCM.DevDebugVal
-		Trace("_onModScan() Event Completed for: " + _RoomName)
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " + _RoomName)
 	endIf
-	
 endEvent
 

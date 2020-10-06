@@ -1,5 +1,7 @@
 ScriptName RN_Utility_Setup_D extends Quest
 
+RN_Utility_MCM property MCM auto
+
 Import RN_Utility_Global
 
 ;;Formlists to control item lists.
@@ -12,7 +14,10 @@ formlist property RN_Safehouse_Items_Merged auto ;;Merged Item List.
 Formlist Property dbmNew auto
 formlist property dbmMaster auto
 
+;; Global for ModEvent Return.
 globalvariable property RN_Safehouse_Done auto
+globalvariable property RN_Safehouse_Registered auto
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,21 +26,25 @@ globalvariable property RN_Safehouse_Done auto
 
 function OnInit()
 
-	RegisterForModEvent("RunSetup_D", "OnRunSetup_D")
+	RegisterForModEvent("TCCSetup_SH", "OnSetup")
 endFunction
 
 ;;-- Functions ---------------------------------------
 
 Function OnPlayerLoadGame()
 
-	RegisterForModEvent("RunSetup_D", "OnRunSetup_D")
+	RegisterForModEvent("TCCSetup_SH", "OnSetup")
 endFunction
 
 ;;-- Functions ---------------------------------------
 
-function OnRunSetup_D(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)		
-
-	Debug.Trace("The Curators Companion: Setup Event Received for RN_Utility_Setup_D")
+function OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (RN_Utility_Script)		
+	
+	RN_Safehouse_Registered.Mod(1)
+	
+	If MCM.DevDebugVal
+		DBMDebug.Log(Self, "TCC: Setup Event Received for: Setup D")
+	endIf
 	
 	Int _index = _itemsArray.length		
 	While _index
@@ -45,6 +54,9 @@ function OnRunSetup_D(string eventName, string strArg, float numArg, Form sender
 	endWhile
 	
 	RN_Safehouse_Done.Mod(1)
-	Debug.Trace("The Curators Companion: Setup Event Completed for RN_Utility_Setup_D")
+	
+	If MCM.DevDebugVal
+		DBMDebug.Log(Self, "TCC: Setup Event Completed for: Setup D")
+	endIf
 endFunction
 

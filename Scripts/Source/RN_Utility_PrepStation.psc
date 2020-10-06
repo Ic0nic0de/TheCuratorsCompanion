@@ -4,7 +4,6 @@ RN_Utility_MCM property RN_MCM auto
 RN_Utility_Script Property RN_Utility Auto
 
 Message Property DBM_SortError Auto
-Message Property DBM_RN_Scan_Message Auto
 Message Property DBM_RN_SetCheck_Message Auto
 Message Property DBM_RN_TransferRelics_Message Auto
 
@@ -29,7 +28,6 @@ formlist property RN_ExcludedItems_Generic auto
 formlist property RN_Safehouse_Items_Merged auto
 
 Int OPButton
-Int SCButton
 Int TRButton
 
 ;;------------------------------------------------------------------------------------------
@@ -48,33 +46,15 @@ endFunction
 function OptionsMenu()
 	OPButton = DBM_RN_SetCheck_Message.show()
 	if OPButton == 0
-		Scan()
+		if RN_MCM.autoScanVal
+			Debug.MessageBox("Please disable automatic scanning in the MCM")
+		else
+			RN_Utility.ScanMuseum()
+		endIf	
 	elseif OPButton == 1
 		Transfer()
 	elseif OPButton == 2
 		return
-	endIf
-endFunction
-
-;;------------------------------------------------------------------------------------------
-
-function Scan()
-
-	SCButton = DBM_RN_Scan_Message.Show()
-	if SCButton == 0
-		RN_Utility.ScanAll()
-	
-	elseif SCButton == 1
-		RN_Utility.ScanMuseum()
-		
-	elseif SCButton == 2
-		RN_Utility.ScanMods()
-
-	elseif SCButton == 3
-		RN_Utility.ScanCreations()
-		
-	elseif SCButton == 4
-		OptionsMenu()
 	endIf
 endFunction
 

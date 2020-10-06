@@ -4,8 +4,6 @@ Import Debug
 
 RN_Utility_MCM property MCM auto
 
-RN_Utility_ArrayHolder property RN_Array auto
-
 ;;Alias to force the base item into.
 ReferenceAlias property RN_Alias_Found auto
 
@@ -28,6 +26,10 @@ Message property DBM_FoundRelicNotification auto
 
 ;; Global for ModEvent Return.
 GlobalVariable property RN_Found_Done auto
+GlobalVariable Property RN_found_Registered Auto
+
+;;Museum storage containers to check within several events.
+formlist property _MuseumContainerList_WP auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,14 +39,14 @@ GlobalVariable property RN_Found_Done auto
 
 Event onInit()
 
-	RegisterForModEvent("RunModsUpdate", "_onModUpdate")	
+	RegisterForModEvent("TCCUpdate", "_onUpdate")	
 endEvent
 
 ;;-- Events ---------------------------------------		
 
 Event onPlayerLoadGame()
 
-	RegisterForModEvent("RunModsUpdate", "_onModUpdate")	
+	RegisterForModEvent("TCCUpdate", "_onUpdate")	
 endEvent
 
 ;;-- Events ---------------------------------------	
@@ -82,20 +84,22 @@ endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event _onModUpdate(string eventName, string strArg, float numArg, Form sender) ;; automatic Call from (RN_Utility_Script)
+Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;; automatic Call from (RN_Utility_Script)
+
+	RN_found_Registered.Mod(1)
 	
 	If MCM.DevDebugVal
-		Trace("_onModUpdate() Event Received for: Supported Mods")
+		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Received for: Supported Mods")
 	endIf
-	
-	Int Index = RN_Array._MuseumContainerArray_WP.length
-	
-	While Index 
-		Index -= 1		
-		Int Index2 = RN_Array._MuseumContainerArray_WP[Index].GetNumItems()
+
+	Int _Index = _MuseumContainerList_WP.GetSize()
+	While _Index 
+		_Index -= 1
+		ObjectReference _Container = _MuseumContainerList_WP.GetAt(_Index) as ObjectReference
+		Int Index2 = _Container.GetNumItems()
 		while Index2
 			Index2 -=1		
-			Form ItemRelic = RN_Array._MuseumContainerArray_WP[Index].GetNthForm(index2)
+			Form ItemRelic = _Container.GetNthForm(Index2)			
 			if Supported_Items_Merged.HasForm(ItemRelic) && !Supported_Items_Found.HasForm(ItemRelic)
 				Supported_Items_Found.AddForm(ItemRelic)
 			endIf	
@@ -105,7 +109,7 @@ Event _onModUpdate(string eventName, string strArg, float numArg, Form sender) ;
 	RN_Found_Done.Mod(1)
 	
 	If MCM.DevDebugVal
-		Trace("_onModUpdate() Event Completed for: Supported Mods")
+		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Completed for: Supported Mods")
 	endIf
 	
 endEvent

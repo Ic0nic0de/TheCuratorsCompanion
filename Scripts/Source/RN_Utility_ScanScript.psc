@@ -8,48 +8,55 @@ RN_Utility_MCM property MCM auto
 
 RN_Utility_ArrayHolder property RN_Array auto
 
-;;----------
+int property _SectionToScan auto
 
-GlobalVariable Property iMuseumSets Auto
-GlobalVariable Property RN_Scan_Done Auto
+string property _RoomName auto
 
-Int Property _SectionToScan Auto
-
-String Property _ModEventName Auto
-
-String Property _RoomName Auto
+globalvariable property RN_Scan_Done auto
+globalvariable property RN_Scan_Registered auto
+globalvariable property RN_SupportedCreationCount auto
+globalvariable property RN_Installed_SafehouseGeneral auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-																			;; Script Start
-;;-- Events ---------------------------------------			
-	
+
 Event onInit()
 	
-	RegisterForModEvent(_ModEventName, "_onScan")
+	RegisterForModEvent("TCCScan", "_onScan")
 endEvent
 
 ;;-- Events ---------------------------------------		
 
 Event onPlayerLoadGame()
 	
-	RegisterForModEvent(_ModEventName, "_onScan")
+	RegisterForModEvent("TCCScan", "_onScan")
 endEvent
-
+	
 ;;-- Events ---------------------------------------	
 
-Event _onScan(string eventName, string strArg, float numArg, Form sender)	
-
+Event _onScan(string eventName, string strArg, float numArg, Form sender)
+	
+	RN_Scan_Registered.Mod(1)
+	
 	If MCM.DevDebugVal
-		Trace("_onModScan() Event Received for: " + _RoomName)
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " + _RoomName)
 	endIf
-	
-;;----------
-	
-	if RN_Array._Museum_Global_Complete[_SectionToScan].GetValue() == 0
-		_onDisplayCheck(RN_Array._Museum_Formlist_Merged[_SectionToScan], RN_Array._Museum_Formlist_Enabled[_SectionToScan], RN_Array._Museum_Global_Count[_SectionToScan])
+
+;;----------	
+	If _SectionToScan == 8 && !RN_SupportedCreationCount.Getvalue() || _SectionToScan == 11 && !RN_Installed_SafehouseGeneral.GetValue()
+
+		RN_Scan_Done.Mod(1)
+		If MCM.DevDebugVal
+			DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Not Run for: " + _RoomName)
+		endIf
 		
+	else
+
+		if RN_Array._Museum_Global_Complete[_SectionToScan].GetValue() == 0
+		
+			_onDisplayCheck(RN_Array._Museum_Formlist_Merged[_SectionToScan], RN_Array._Museum_Formlist_Enabled[_SectionToScan], RN_Array._Museum_Global_Count[_SectionToScan])
+			
 			if _SectionToScan == 0
 				Int _Index2 = 0
 				Int _Length2 = RN_Array._Armory_Helms_Displays.length
@@ -67,22 +74,19 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 				RN_Array._Museum_Global_Count[_SectionToScan].setvalue(RN_Array._Museum_Formlist_Enabled[_SectionToScan].GetSize())
 			endIf
 			
-			if (CheckSetCount1(RN_Array._Museum_Global_Count[_SectionToScan], RN_Array._Museum_Global_Total[_SectionToScan], RN_Array._Museum_Global_Complete[_SectionToScan], iMuseumSets) && (MCM.ShowSetCompleteVal)) 
+			if (CheckValueCount1(RN_Array._Museum_Global_Count[_SectionToScan], RN_Array._Museum_Global_Total[_SectionToScan], RN_Array._Museum_Global_Complete[_SectionToScan]) && (MCM.ShowSetCompleteVal)) 
 				if (MCM.ShowSimpleNotificationVal)
 					RN_Array._Museum_Message_Notification[_SectionToScan].Show()
 				else
 					RN_Array._Museum_Message_Default[_SectionToScan].Show()
 				endif
 			endif
+		endIf
+		
+		RN_Scan_Done.Mod(1)
+		If MCM.DevDebugVal
+			DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " + _RoomName)
+		endIf	
 	endIf
-
-;;----------
-	
-	RN_Scan_Done.Mod(1)
-	
-	If MCM.DevDebugVal
-		Trace("_onModScan() Event Completed for: " + _RoomName)
-	endIf
-	
 endEvent
 

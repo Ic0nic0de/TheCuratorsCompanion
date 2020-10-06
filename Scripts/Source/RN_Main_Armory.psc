@@ -6,8 +6,6 @@ Import RN_Utility_Global
 
 RN_Utility_MCM Property MCM auto
 
-RN_Utility_ArrayHolder property RN_Array auto
-
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Item Lists ----------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -41,8 +39,11 @@ Quest Property DBM_MuseumIntro Auto
 Objectreference Property PlayerRef Auto
 
 ;; Global for ModEvent Return.
-GlobalVariable Property RN_Setup_Done Auto
+GlobalVariable Property RN_found_Registered Auto
 GlobalVariable Property RN_Found_Done Auto
+
+;;Museum storage containers to check within several events.
+formlist property _MuseumContainerList_WP auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
@@ -52,7 +53,7 @@ GlobalVariable Property RN_Found_Done Auto
 
 Event OnInit()
 
-	RegisterForModEvent("RunArmoryUpdate", "_onRunArmoryUpdate")	
+	RegisterForModEvent("TCCUpdate", "_onUpdate")	
 	AddInventoryEventFilters()
 endEvent
 
@@ -60,7 +61,7 @@ endEvent
 
 Event OnPlayerLoadGame()
 
-	RegisterForModEvent("RunArmoryUpdate", "_onRunArmoryUpdate")
+	RegisterForModEvent("TCCUpdate", "_onUpdate")
 	AddInventoryEventFilters()
 endEvent
 
@@ -99,29 +100,32 @@ EndEvent
 
 ;;-- Events ---------------------------------------
 
-Event _onRunArmoryUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
-
-	If MCM.DevDebugVal
-		Trace("_onModUpdate() Event Received for: Armory")
-	endIf
+Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 	
-	Int Index = RN_Array._MuseumContainerArray_WP.length	
-	While Index 
-		Index -= 1		
-		Int Index2 = RN_Array._MuseumContainerArray_WP[Index].GetNumItems()		
+	RN_found_Registered.Mod(1)
+	
+	If MCM.DevDebugVal
+		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Received for: Armory")
+	endIf
+
+	Int _Index = _MuseumContainerList_WP.GetSize()
+	While _Index 
+		_Index -= 1
+		ObjectReference _Container = _MuseumContainerList_WP.GetAt(_Index) as ObjectReference
+		Int Index2 = _Container.GetNumItems()
 		while Index2
-			Index2 -=1	
-			Form ItemRelic = RN_Array._MuseumContainerArray_WP[Index].GetNthForm(index2)
+			Index2 -=1		
+			Form ItemRelic = _Container.GetNthForm(Index2)			
 			if DBM_SectionArmory_Merged.HasForm(ItemRelic) && !DBM_SectionArmory_Found.HasForm(ItemRelic)
 				DBM_SectionArmory_Found.AddForm(ItemRelic)
-			endIf	
+			endIf		
 		endWhile
 	endWhile
 	
 	RN_Found_Done.Mod(1)
 
 	If MCM.DevDebugVal
-		Trace("_onModUpdate() Event Completed for: Armory")
+		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Completed for: Armory")
 	endIf
 	
 endEvent			

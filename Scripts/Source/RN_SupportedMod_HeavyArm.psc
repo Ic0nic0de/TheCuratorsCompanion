@@ -203,15 +203,16 @@ GlobalVariable Property GV_SectionArmoryHAStalhrim Auto
 GlobalVariable Property GV_SectionArmoryHASteel Auto
 
 ;; Globals for set completion.
-GlobalVariable Property iHeavyArmSets Auto
 GlobalVariable Property DBM_MC_GV_HA Auto
 GlobalVariable Property GV_Heavy_Count Auto
 GlobalVariable Property GV_Heavy Auto
-GlobalVariable Property iModComplete Auto
 
 ;; Global for ModEvent Return.
 GlobalVariable Property RN_Setup_Done Auto
+globalvariable property RN_Setup_Registered auto
+
 GlobalVariable Property RN_Scan_Done Auto
+globalvariable property RN_Scan_Registered auto
 
 globalvariable property RN_SupportedModCount auto
 Bool _setupDone
@@ -222,27 +223,32 @@ Bool _setupDone
 
 ;;-- Events ---------------------------------------		
 
-Event OnInit()
-
-	RegisterForModEvent("RunHASetup", "OnRunHASetup")
-	RegisterForModEvent("RunHADisplayCheck", "OnRunHADisplayCheck")
+Event onInit()
+		
+	RegisterForModEvent("TCCScan", "_onScan")
+	_RunSetup()
 endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event OnPlayerLoadGame()
-
-	RegisterForModEvent("RunHASetup", "OnRunHASetup")
-	RegisterForModEvent("RunHADisplayCheck", "OnRunHADisplayCheck")
+Event onPlayerLoadGame()
+	
+	RegisterForModEvent("TCCScan", "_onScan")
+	_RunSetup()
+	
 endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event OnRunHASetup(string eventName, string strArg, float numArg, Form sender) ;;Runs Once, Automatic Call from (DBM_RN_SetupScript)
+Event _RunSetup()
+	
+	RN_Setup_Registered.Mod(1)
 	
 	if !_setupDone
 	
-		Trace("The Curators Companion: Setup Event Received for Heavy Armory")	
+		If MCM.DevDebugVal
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Received for: Heavy Armory")
+		endIf
 	
 		;;Merge Formlist.
 		_onConsolidateItems(DBM_SectionArmoryHAAncientNordicItems, Supported_Items_Merged, dbmNew, dbmMaster)
@@ -314,306 +320,315 @@ Event OnRunHASetup(string eventName, string strArg, float numArg, Form sender) ;
 		RN_SupportedModCount.Mod(1)
 		_setupDone = True
 		
-		Trace("The Curators Companion: Setup Event Completed for Heavy Armory")
+		If MCM.DevDebugVal
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Completed for: Heavy Armory")
+		endIf
 		
 	else
 		
 		RN_Setup_Done.Mod(1)
-		Trace("The Curators Companion: Setup Event Already Completed for Heavy Armory")
+		If MCM.DevDebugVal
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Already Completed for: Heavy Armory")
+		endIf
 	endIf
 endEvent	
 
 ;;-- Events ---------------------------------------		
 
 Event OnRunHADisplayCheck(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (DBM_RN_ScanHandler)
-
+	
+	RN_Scan_Registered.Mod(1)
+	
 	If MCM.DevDebugVal
-		Trace("_onModScan() Event Received for: Heavy Armory")
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: Heavy Armory")
 	endIf
+	
+	if !DBM_MC_GV_HA.GetValue()
 	
 ;;-----------
 
-	if (DBM_GV_SectionArmoryHAAncientNordic.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHAAncientNordic, DBM_SectionArmoryHAAncientNordic_Enabled, GV_SectionArmoryHAAncientNordic_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAAncientNordic_Count, GV_SectionArmoryHAAncientNordic, DBM_GV_SectionArmoryHAAncientNordic, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAAncientNordic_Notification.Show()
-				else
-					DBM_SectionArmoryHAAncientNordic_Message.Show()
+		if (DBM_GV_SectionArmoryHAAncientNordic.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHAAncientNordic, DBM_SectionArmoryHAAncientNordic_Enabled, GV_SectionArmoryHAAncientNordic_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAAncientNordic_Count, GV_SectionArmoryHAAncientNordic, DBM_GV_SectionArmoryHAAncientNordic) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAAncientNordic_Notification.Show()
+					else
+						DBM_SectionArmoryHAAncientNordic_Message.Show()
+					endif
 				endif
-			endif
-	endIf
-		
+		endIf
+			
 ;;-----------
 
-	if (DBM_GV_SectionArmoryHABlades.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHABlades, DBM_SectionArmoryHABlades_Enabled, GV_SectionArmoryHABlades_Count)	
-			if (CheckSetCount1(GV_SectionArmoryHABlades_Count, GV_SectionArmoryHABlades, DBM_GV_SectionArmoryHABlades, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHABlades_Notification.Show()
-				else
-					DBM_SectionArmoryHABlades_Message.Show()
-				endif		
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHADaedric.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHADaedric, DBM_SectionArmoryHADaedric_Enabled, GV_SectionArmoryHADaedric_Count)
-			if (CheckSetCount1(GV_SectionArmoryHADaedric_Count, GV_SectionArmoryHADaedric, DBM_GV_SectionArmoryHADaedric, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHADaedric_Notification.Show()
-				else
-					DBM_SectionArmoryHADaedric_Message.Show()
-				endif	
-			endif
-	endIf
+		if (DBM_GV_SectionArmoryHABlades.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHABlades, DBM_SectionArmoryHABlades_Enabled, GV_SectionArmoryHABlades_Count)	
+				if (CheckValueCount1(GV_SectionArmoryHABlades_Count, GV_SectionArmoryHABlades, DBM_GV_SectionArmoryHABlades) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHABlades_Notification.Show()
+					else
+						DBM_SectionArmoryHABlades_Message.Show()
+					endif		
+				endif
+		endIf
 
 ;;-----------
 
-	if (DBM_GV_SectionArmoryHADawnguard.GetValue()) == 0	
-		_onDisplayCheck(DBM_SectionArmoryHADawnguard, DBM_SectionArmoryHADawnguard_Enabled, GV_SectionArmoryHADawnguard_Count)
-			if (CheckSetCount1(GV_SectionArmoryHADawnguard_Count, GV_SectionArmoryHADawnguard, DBM_GV_SectionArmoryHADawnguard, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHADawnguard_Notification.Show()
-				else
-					DBM_SectionArmoryHADawnguard_Message.Show()
-				endif			
-			endif
-	endIf
+		if (DBM_GV_SectionArmoryHADaedric.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHADaedric, DBM_SectionArmoryHADaedric_Enabled, GV_SectionArmoryHADaedric_Count)
+				if (CheckValueCount1(GV_SectionArmoryHADaedric_Count, GV_SectionArmoryHADaedric, DBM_GV_SectionArmoryHADaedric) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHADaedric_Notification.Show()
+					else
+						DBM_SectionArmoryHADaedric_Message.Show()
+					endif	
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHADawnguard.GetValue()) == 0	
+			_onDisplayCheck(DBM_SectionArmoryHADawnguard, DBM_SectionArmoryHADawnguard_Enabled, GV_SectionArmoryHADawnguard_Count)
+				if (CheckValueCount1(GV_SectionArmoryHADawnguard_Count, GV_SectionArmoryHADawnguard, DBM_GV_SectionArmoryHADawnguard) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHADawnguard_Notification.Show()
+					else
+						DBM_SectionArmoryHADawnguard_Message.Show()
+					endif			
+				endif
+		endIf
 
 ;;-----------	
 
-	if (DBM_GV_SectionArmoryHADragon.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHADragon, DBM_SectionArmoryHADragon_Enabled, GV_SectionArmoryHADragon_Count)
-			if (CheckSetCount1(GV_SectionArmoryHADragon_Count, GV_SectionArmoryHADragon, DBM_GV_SectionArmoryHADragon, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHADragon_Notification.Show()
-				else
-					DBM_SectionArmoryHADragon_Message.Show()
-				endif		
-			endif
-	endIf
+		if (DBM_GV_SectionArmoryHADragon.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHADragon, DBM_SectionArmoryHADragon_Enabled, GV_SectionArmoryHADragon_Count)
+				if (CheckValueCount1(GV_SectionArmoryHADragon_Count, GV_SectionArmoryHADragon, DBM_GV_SectionArmoryHADragon) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHADragon_Notification.Show()
+					else
+						DBM_SectionArmoryHADragon_Message.Show()
+					endif		
+				endif
+		endIf
 
 ;;-----------
 
-	if (DBM_GV_SectionArmoryHADwarven.GetValue()) == 0	
-		_onDisplayCheck(DBM_SectionArmoryHADwarven, DBM_SectionArmoryHADwarven_Enabled, GV_SectionArmoryHADwarven_Count)
-			if (CheckSetCount1(GV_SectionArmoryHADwarven_Count, GV_SectionArmoryHADwarven, DBM_GV_SectionArmoryHADwarven, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHADwarven_Notification.Show()
-				else
-					DBM_SectionArmoryHADwarven_Message.Show()
-				endif			
-			endif
-	endIf
+		if (DBM_GV_SectionArmoryHADwarven.GetValue()) == 0	
+			_onDisplayCheck(DBM_SectionArmoryHADwarven, DBM_SectionArmoryHADwarven_Enabled, GV_SectionArmoryHADwarven_Count)
+				if (CheckValueCount1(GV_SectionArmoryHADwarven_Count, GV_SectionArmoryHADwarven, DBM_GV_SectionArmoryHADwarven) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHADwarven_Notification.Show()
+					else
+						DBM_SectionArmoryHADwarven_Message.Show()
+					endif			
+				endif
+		endIf
 
 ;;-----------
 
-	
-
-	if (DBM_GV_SectionArmoryHAEbony.GetValue()) == 0	
-		_onDisplayCheck(DBM_SectionArmoryHAEbony, DBM_SectionArmoryHAEbony_Enabled, GV_SectionArmoryHAEbony_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAEbony_Count, GV_SectionArmoryHAEbony, DBM_GV_SectionArmoryHAEbony, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAEbony_Notification.Show()
-				else
-					DBM_SectionArmoryHAEbony_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHAElven.GetValue()) == 0	
-		_onDisplayCheck(DBM_SectionArmoryHAElven, DBM_SectionArmoryHAElven_Enabled, GV_SectionArmoryHAElven_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAElven_Count, GV_SectionArmoryHAElven, DBM_GV_SectionArmoryHAElven, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAElven_Notification.Show()
-				else
-					DBM_SectionArmoryHAElven_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHAFalmer.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHAFalmer, DBM_SectionArmoryHAFalmer_Enabled, GV_SectionArmoryHAFalmer_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAFalmer_Count, GV_SectionArmoryHAFalmer, DBM_GV_SectionArmoryHAFalmer, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAFalmer_Notification.Show()
-				else
-					DBM_SectionArmoryHAFalmer_Message.Show()
-				endif				
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHAForsworn.GetValue()) == 0	
-		_onDisplayCheck(DBM_SectionArmoryHAForsworn, DBM_SectionArmoryHAForsworn_Enabled, GV_SectionArmoryHAForsworn_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAForsworn_Count, GV_SectionArmoryHAForsworn, DBM_GV_SectionArmoryHAForsworn, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAForsworn_Notification.Show()
-				else
-					DBM_SectionArmoryHAForsworn_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHAGlass.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHAGlass, DBM_SectionArmoryHAGlass_Enabled, GV_SectionArmoryHAGlass_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAGlass_Count, GV_SectionArmoryHAGlass, DBM_GV_SectionArmoryHAGlass, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAGlass_Notification.Show()
-				else
-					DBM_SectionArmoryHAGlass_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHAImperial.GetValue()) == 0	
-		_onDisplayCheck(DBM_SectionArmoryHAImperial, DBM_SectionArmoryHAImperial_Enabled, GV_SectionArmoryHAImperial_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAImperial_Count, GV_SectionArmoryHAImperial, DBM_GV_SectionArmoryHAImperial, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAImperial_Notification.Show()
-				else
-					DBM_SectionArmoryHAImperial_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHAIron.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHAIron, DBM_SectionArmoryHAIron_Enabled, GV_SectionArmoryHAIron_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAIron_Count, GV_SectionArmoryHAIron, DBM_GV_SectionArmoryHAIron, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAIron_Notification.Show()
-				else
-					DBM_SectionArmoryHAIron_Message.Show()
-				endif				
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHANordHero.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHANordHero, DBM_SectionArmoryHANordHero_Enabled, GV_SectionArmoryHANordHero_Count)
-			if (CheckSetCount1(GV_SectionArmoryHANordHero_Count, GV_SectionArmoryHANordHero, DBM_GV_SectionArmoryHANordHero, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHANordHero_Notification.Show()
-				else
-					DBM_SectionArmoryHANordHero_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHANordic.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHANordic, DBM_SectionArmoryHANordic_Enabled, GV_SectionArmoryHANordic_Count)
-			if (CheckSetCount1(GV_SectionArmoryHANordic_Count, GV_SectionArmoryHANordic, DBM_GV_SectionArmoryHANordic, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHANordic_Notification.Show()
-				else
-					DBM_SectionArmoryHANordic_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHAOrcish.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHAOrcish, DBM_SectionArmoryHAOrcish_Enabled, GV_SectionArmoryHAOrcish_Count)
-			if (CheckSetCount1(GV_SectionArmoryHAOrcish_Count, GV_SectionArmoryHAOrcish, DBM_GV_SectionArmoryHAOrcish, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAOrcish_Notification.Show()
-				else
-					DBM_SectionArmoryHAOrcish_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHASilver.GetValue()) == 0	
-		_onDisplayCheck(DBM_SectionArmoryHASilver, DBM_SectionArmoryHASilver_Enabled, GV_SectionArmoryHASilver_Count)
-			if (CheckSetCount1(GV_SectionArmoryHASilver_Count, GV_SectionArmoryHASilver, DBM_GV_SectionArmoryHASilver, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHASilver_Notification.Show()
-				else
-					DBM_SectionArmoryHASilver_Message.Show()
-				endif			
-			endif
-	endIf
-
-;;-----------
-
-	if (DBM_GV_SectionArmoryHAStalhrim.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHAStalhrim, DBM_SectionArmoryHAStalhrim_Enabled, GV_SectionArmoryHAStalhrim_Count)	
-			if (CheckSetCount1(GV_SectionArmoryHAStalhrim_Count, GV_SectionArmoryHAStalhrim, DBM_GV_SectionArmoryHAStalhrim, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHAStalhrim_Notification.Show()
-				else
-					DBM_SectionArmoryHAStalhrim_Message.Show()
-				endif			
-			endif
-	endIf
 		
+
+		if (DBM_GV_SectionArmoryHAEbony.GetValue()) == 0	
+			_onDisplayCheck(DBM_SectionArmoryHAEbony, DBM_SectionArmoryHAEbony_Enabled, GV_SectionArmoryHAEbony_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAEbony_Count, GV_SectionArmoryHAEbony, DBM_GV_SectionArmoryHAEbony) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAEbony_Notification.Show()
+					else
+						DBM_SectionArmoryHAEbony_Message.Show()
+					endif			
+				endif
+		endIf
+
 ;;-----------
 
-	if (DBM_GV_SectionArmoryHASteel.GetValue()) == 0
-		_onDisplayCheck(DBM_SectionArmoryHASteel, DBM_SectionArmoryHASteel_Enabled, GV_SectionArmoryHASteel_Count)
-			if (CheckSetCount1(GV_SectionArmoryHASteel_Count, GV_SectionArmoryHASteel, DBM_GV_SectionArmoryHASteel, iHeavyArmSets) && (MCM.ShowSetCompleteVal))
-				if (MCM.ShowSimpleNotificationVal)
-					DBM_SectionArmoryHASteel_Notification.Show()
-				else
-					DBM_SectionArmoryHASteel_Message.Show()
-				endif			
-			endif
-	endIf	
+		if (DBM_GV_SectionArmoryHAElven.GetValue()) == 0	
+			_onDisplayCheck(DBM_SectionArmoryHAElven, DBM_SectionArmoryHAElven_Enabled, GV_SectionArmoryHAElven_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAElven_Count, GV_SectionArmoryHAElven, DBM_GV_SectionArmoryHAElven) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAElven_Notification.Show()
+					else
+						DBM_SectionArmoryHAElven_Message.Show()
+					endif			
+				endif
+		endIf
 
 ;;-----------
-	
-	_onDisplayCheck(DBM_SectionArmoryHAAncientNordic, DBM_SectionArmory_HA_Displays_Enabled , GV_Heavy_Count) ;;Check all formlists for Enabled displays, compare to merged formlist with total display count.
-	_onDisplayCheck(DBM_SectionArmoryHABlades, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHADaedric, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHADawnguard, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHADragon, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHADwarven, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAEbony, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAElven, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAFalmer, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAForsworn, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAGlass, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAImperial, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAIron, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHANordHero, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHANordic, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAOrcish, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHASilver, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHAStalhrim, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	_onDisplayCheck(DBM_SectionArmoryHASteel, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
-	
-		if (CheckValueCount1(GV_Heavy_Count, GV_Heavy, GetOwningQuest(), DBM_MC_GV_HA, iModComplete) && (MCM.ShowSetCompleteVal))
+
+		if (DBM_GV_SectionArmoryHAFalmer.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHAFalmer, DBM_SectionArmoryHAFalmer_Enabled, GV_SectionArmoryHAFalmer_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAFalmer_Count, GV_SectionArmoryHAFalmer, DBM_GV_SectionArmoryHAFalmer) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAFalmer_Notification.Show()
+					else
+						DBM_SectionArmoryHAFalmer_Message.Show()
+					endif				
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHAForsworn.GetValue()) == 0	
+			_onDisplayCheck(DBM_SectionArmoryHAForsworn, DBM_SectionArmoryHAForsworn_Enabled, GV_SectionArmoryHAForsworn_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAForsworn_Count, GV_SectionArmoryHAForsworn, DBM_GV_SectionArmoryHAForsworn) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAForsworn_Notification.Show()
+					else
+						DBM_SectionArmoryHAForsworn_Message.Show()
+					endif			
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHAGlass.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHAGlass, DBM_SectionArmoryHAGlass_Enabled, GV_SectionArmoryHAGlass_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAGlass_Count, GV_SectionArmoryHAGlass, DBM_GV_SectionArmoryHAGlass) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAGlass_Notification.Show()
+					else
+						DBM_SectionArmoryHAGlass_Message.Show()
+					endif			
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHAImperial.GetValue()) == 0	
+			_onDisplayCheck(DBM_SectionArmoryHAImperial, DBM_SectionArmoryHAImperial_Enabled, GV_SectionArmoryHAImperial_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAImperial_Count, GV_SectionArmoryHAImperial, DBM_GV_SectionArmoryHAImperial) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAImperial_Notification.Show()
+					else
+						DBM_SectionArmoryHAImperial_Message.Show()
+					endif			
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHAIron.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHAIron, DBM_SectionArmoryHAIron_Enabled, GV_SectionArmoryHAIron_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAIron_Count, GV_SectionArmoryHAIron, DBM_GV_SectionArmoryHAIron) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAIron_Notification.Show()
+					else
+						DBM_SectionArmoryHAIron_Message.Show()
+					endif				
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHANordHero.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHANordHero, DBM_SectionArmoryHANordHero_Enabled, GV_SectionArmoryHANordHero_Count)
+				if (CheckValueCount1(GV_SectionArmoryHANordHero_Count, GV_SectionArmoryHANordHero, DBM_GV_SectionArmoryHANordHero) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHANordHero_Notification.Show()
+					else
+						DBM_SectionArmoryHANordHero_Message.Show()
+					endif			
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHANordic.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHANordic, DBM_SectionArmoryHANordic_Enabled, GV_SectionArmoryHANordic_Count)
+				if (CheckValueCount1(GV_SectionArmoryHANordic_Count, GV_SectionArmoryHANordic, DBM_GV_SectionArmoryHANordic) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHANordic_Notification.Show()
+					else
+						DBM_SectionArmoryHANordic_Message.Show()
+					endif			
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHAOrcish.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHAOrcish, DBM_SectionArmoryHAOrcish_Enabled, GV_SectionArmoryHAOrcish_Count)
+				if (CheckValueCount1(GV_SectionArmoryHAOrcish_Count, GV_SectionArmoryHAOrcish, DBM_GV_SectionArmoryHAOrcish) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAOrcish_Notification.Show()
+					else
+						DBM_SectionArmoryHAOrcish_Message.Show()
+					endif			
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHASilver.GetValue()) == 0	
+			_onDisplayCheck(DBM_SectionArmoryHASilver, DBM_SectionArmoryHASilver_Enabled, GV_SectionArmoryHASilver_Count)
+				if (CheckValueCount1(GV_SectionArmoryHASilver_Count, GV_SectionArmoryHASilver, DBM_GV_SectionArmoryHASilver) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHASilver_Notification.Show()
+					else
+						DBM_SectionArmoryHASilver_Message.Show()
+					endif			
+				endif
+		endIf
+
+;;-----------
+
+		if (DBM_GV_SectionArmoryHAStalhrim.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHAStalhrim, DBM_SectionArmoryHAStalhrim_Enabled, GV_SectionArmoryHAStalhrim_Count)	
+				if (CheckValueCount1(GV_SectionArmoryHAStalhrim_Count, GV_SectionArmoryHAStalhrim, DBM_GV_SectionArmoryHAStalhrim) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHAStalhrim_Notification.Show()
+					else
+						DBM_SectionArmoryHAStalhrim_Message.Show()
+					endif			
+				endif
+		endIf
+			
+;;-----------
+
+		if (DBM_GV_SectionArmoryHASteel.GetValue()) == 0
+			_onDisplayCheck(DBM_SectionArmoryHASteel, DBM_SectionArmoryHASteel_Enabled, GV_SectionArmoryHASteel_Count)
+				if (CheckValueCount1(GV_SectionArmoryHASteel_Count, GV_SectionArmoryHASteel, DBM_GV_SectionArmoryHASteel) && (MCM.ShowSetCompleteVal))
+					if (MCM.ShowSimpleNotificationVal)
+						DBM_SectionArmoryHASteel_Notification.Show()
+					else
+						DBM_SectionArmoryHASteel_Message.Show()
+					endif			
+				endif
+		endIf	
+
+;;-----------
+		
+		_onDisplayCheck(DBM_SectionArmoryHAAncientNordic, DBM_SectionArmory_HA_Displays_Enabled , GV_Heavy_Count) ;;Check all formlists for Enabled displays, compare to merged formlist with total display count.
+		_onDisplayCheck(DBM_SectionArmoryHABlades, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHADaedric, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHADawnguard, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHADragon, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHADwarven, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAEbony, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAElven, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAFalmer, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAForsworn, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAGlass, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAImperial, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAIron, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHANordHero, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHANordic, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAOrcish, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHASilver, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHAStalhrim, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		_onDisplayCheck(DBM_SectionArmoryHASteel, DBM_SectionArmory_HA_Displays_Enabled, GV_Heavy_Count)
+		
+		if (CheckValueCount1(GV_Heavy_Count, GV_Heavy, DBM_MC_GV_HA) && (MCM.ShowSetCompleteVal))
 			if (MCM.ShowSimpleNotificationVal)
 				DBM_SectionArmoryHA_Total_Notification.Show()
 			else
 				DBM_SectionArmoryHA_Total_Message.Show()
 			endif
 		endif
+	endIf
 		
 	RN_Scan_Done.Mod(1)	
 
 	If MCM.DevDebugVal
-		Trace("_onModScan() Event Completed for: Heavy Armory")
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: Heavy Armory")
 	endIf
 	
 EndEvent
