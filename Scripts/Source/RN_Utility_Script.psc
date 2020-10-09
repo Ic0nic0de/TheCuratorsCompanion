@@ -181,6 +181,9 @@ Event RunSetup()
 		DBM_SortWait.setvalue(1)
 		RN_Mod.CheckSupportedMods()
 		
+		SendModEvent("TCCSetup_Patches")
+		Wait(5)
+		
 ;;------------------------------------	
 
 		while bSetupStarted	
@@ -360,10 +363,6 @@ Function Maintenance()
 	
 	RN_Mod.CheckSupportedMods()
 	
-	if RN_Setup_Registered.GetValue()
-		Wait(10)
-	endIf
-	
 	RN_TokenFormlist.AddForm(PlayerRef)
 	_SafehouseContainerList_WP.AddForm(PlayerRef)
 
@@ -374,7 +373,10 @@ Function Maintenance()
 
 	bSetupStarted = True
 	DBM_SortWait.setvalue(1)
-
+	
+	SendModEvent("TCCSetup_Patches")
+	Wait(5)
+	
 	while bSetupStarted		
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
 		

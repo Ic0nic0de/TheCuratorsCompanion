@@ -88,6 +88,7 @@ globalvariable property RN_Installed_NTHunter auto
 globalvariable property RN_Installed_OblivionArt auto
 globalvariable property RN_Installed_PathRev auto
 globalvariable property RN_Installed_ProjectAHO auto
+globalvariable property RN_Installed_RoM auto
 globalvariable property RN_Installed_Royal auto
 globalvariable property RN_Installed_RuinsEdge auto
 globalvariable property RN_Installed_SUT auto
@@ -477,6 +478,19 @@ Event CheckSupportedMods()
 		RN_Installed_Royal.SetValue(0)
 	endIf
 
+;--------------------------
+
+	if Game.GetModByName("LOTD_TCC_RoM.esp") != 255
+		RN_Installed_RoM.SetValue(1)
+		
+	elseif Game.GetModByName("LOTD_TCC_RoM.esp") == 255 && RN_Installed_RoM.GetValue()
+		SendError(RN_Installed_RoM)
+		_PatchError.Show()
+		
+	else
+		RN_Installed_RoM.SetValue(0)
+	endIf
+	
 ;--------------------------
 	
 	if Game.GetModByName("LOTD_TCC_RuinsEdge.esp") != 255

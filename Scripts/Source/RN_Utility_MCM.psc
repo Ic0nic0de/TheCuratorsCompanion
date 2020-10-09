@@ -120,6 +120,9 @@ bool Transfer_Misc = false
 bool property AllowPotion auto hidden ;;auto Transfer To Storage Container
 bool Transfer_Potion = false
 
+bool property AllowProtectedItems auto hidden ;; Allow Protected Items.
+bool Transfer_Protected = false
+
 bool property DevDebugVal auto hidden ;; Debug alerts for Dev usage.
 bool Dev_Alerts = false
 
@@ -323,7 +326,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", _ModVersion, 0)		
+		AddTextOption("", "Version 3.0.1", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -406,7 +409,8 @@ Event AddRelicStoragePage()
 		AddTextOptionST("Token_Visibility", "Storage Token Crafting:", self.GetTokenVisibility(), 0)
 		AddEmptyOption()
 		AddHeaderOption("Auto Storage Options:")
-			if !StorageSpellVal || !AutoTransferRelics	
+			if !StorageSpellVal || !AutoTransferRelics
+				AddToggleOptionST("Transfer_Protected", "Quest / Protected Items", AllowProtectedItems, 1)
 				AddToggleOptionST("Transfer_Armor", "Armor", AllowArmor, 1)
 				AddToggleOptionST("Transfer_Book", "Books", AllowBook, 1)
 				AddToggleOptionST("Transfer_Gems", "Gems", AllowGems, 1)
@@ -415,6 +419,7 @@ Event AddRelicStoragePage()
 				AddToggleOptionST("Transfer_Potion", "Potions", AllowPotion, 1)
 				AddToggleOptionST("Transfer_Weapon", "Weapons", AllowWeapon, 1)
 			else
+				AddToggleOptionST("Transfer_Protected", "Quest / Protected Items", AllowProtectedItems, 0)
 				AddToggleOptionST("Transfer_Armor", "Armor", AllowArmor, 0)
 				AddToggleOptionST("Transfer_Book", "Books", AllowBook, 0)
 				AddToggleOptionST("Transfer_Gems", "Gems", AllowGems, 0)
@@ -953,6 +958,7 @@ FISSInterface fiss = FISSFactory.getFISS()
 	fiss.saveBool("AllowGems", AllowGems)	
 	fiss.saveBool("AllowMisc", AllowMisc)	
 	fiss.saveBool("AllowPotion", AllowPotion)
+	fiss.saveBool("AllowProtectedItems", AllowProtectedItems)
 	
 	;;Quest Tracker
 	fiss.saveBool("Show Spoilers", RN_Tracker._bSpoilers)
@@ -1101,7 +1107,8 @@ FISSInterface fiss = FISSFactory.getFISS()
 			AllowKey = False
 			AllowGems = False
 			AllowMisc = False
-			AllowPotion = False		
+			AllowPotion = False
+			AllowProtectedItems = False
 
 		elseif StorageSpellVal
 			if (!Game.GetPlayer().HasSpell(RN_Storage_Spell)) && SummonSpellVal
@@ -1117,7 +1124,9 @@ FISSInterface fiss = FISSFactory.getFISS()
 			AllowKey = fiss.loadBool("AllowKey")
 			AllowGems = fiss.loadBool("AllowGems")
 			AllowMisc = fiss.loadBool("AllowMisc")
-			AllowPotion = fiss.loadBool("AllowPotion")		
+			AllowPotion = fiss.loadBool("AllowPotion")	
+			AllowProtectedItems= fiss.loadBool("AllowProtectedItems")
+			
 			AutoTransferRelics = fiss.loadBool("Relic Transfer")
 			if AutoTransferRelics && DBM_ArcSkill.GetValue() >= 5
 				RN_Transfer.GoToState("")
@@ -1138,7 +1147,8 @@ FISSInterface fiss = FISSFactory.getFISS()
 		AllowKey = False
 		AllowGems = False
 		AllowMisc = False
-		AllowPotion = False			
+		AllowPotion = False	
+		AllowProtectedItems = False
 	endIf
 				
 	SummonSpellVal = fiss.loadBool("Summon Type")	
@@ -1261,6 +1271,7 @@ Function Begin_Config_Default()
 	AllowGems = False
 	AllowMisc = False
 	AllowPotion = False
+	AllowProtectedItems = False
 	
 	ScanNotificationsval = True
 	_ScanInterval = 10
@@ -1322,6 +1333,7 @@ Function Begin_Config_Author()
 		AllowGems = True
 		AllowMisc = True
 		AllowPotion = True
+		AllowProtectedItems = False
 		
 		StorageSpellVal = True
 		if (!Game.GetPlayer().HasSpell(RN_Storage_Spell)) && SummonSpellVal
@@ -1339,7 +1351,8 @@ Function Begin_Config_Author()
 		AllowKey = False
 		AllowGems = False
 		AllowMisc = False
-		AllowPotion = FALSE
+		AllowPotion = False
+		AllowProtectedItems = False
 		StorageSpellVal = False
 		if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
 			(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
@@ -1729,6 +1742,7 @@ String function SetStorageOptions()
 						AllowKey = FALSE
 						AllowMisc= FALSE
 						AllowPotion = FALSE
+						AllowProtectedItems = False
 					endIf
 				Status_Return = "Add Spell"
 			
@@ -1744,6 +1758,7 @@ String function SetStorageOptions()
 						AllowKey = FALSE
 						AllowMisc= FALSE
 						AllowPotion = FALSE
+						AllowProtectedItems = False
 					endIf
 				Status_Return = "Add Spell"
 			endIf
@@ -2135,6 +2150,26 @@ state Transfer_Potion
 	Event OnHighlightST()
 
 		self.SetInfoText("Automatically transfer displayable Potions & Poisons to the Relic Storage Container when picked up.\n Default: Disabled")
+	EndEvent
+endState
+
+;;-------------------------------
+
+state Transfer_Protected
+
+	Event OnSelectST()
+		AllowProtectedItems = !AllowProtectedItems
+			SetToggleOptionValueST(AllowProtectedItems)
+	EndEvent
+	
+	Event OnDefaultST()
+		AllowProtectedItems = false
+		SetToggleOptionValueST(AllowProtectedItems)
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Enabling this option will allow displayable Quest / Protected items to be Automatically transfered to the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2577,7 +2612,7 @@ Event Build_Arrays()
 	
 	Int _Index
 	
-	RN_Patches_Count_Array = new globalvariable[53]
+	RN_Patches_Count_Array = new globalvariable[54]
 	_Index = 0
 	While _Index < RN_Patches_Count.GetSize()
 		globalvariable akvariable = RN_Patches_Count.GetAt(_Index) as globalvariable
@@ -2585,7 +2620,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Total_Array = new globalvariable[53]
+	RN_Patches_Total_Array = new globalvariable[54]
 	_Index = 0
 	While _Index < RN_Patches_Total.GetSize()
 		globalvariable akvariable = RN_Patches_Total.GetAt(_Index) as globalvariable
@@ -2593,7 +2628,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Complete_Array = new globalvariable[53]
+	RN_Patches_Complete_Array = new globalvariable[54]
 	_Index = 0
 	While _Index < RN_Patches_Complete.GetSize()
 		globalvariable akvariable = RN_Patches_Complete.GetAt(_Index) as globalvariable
@@ -2601,7 +2636,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Installed_Array = new globalvariable[53]
+	RN_Patches_Installed_Array = new globalvariable[54]
 	_Index = 0
 	While _Index < RN_Patches_Installed.GetSize()
 		globalvariable akvariable = RN_Patches_Installed.GetAt(_Index) as globalvariable
@@ -2643,7 +2678,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 	
-	RN_Patches_Name = new string[53]
+	RN_Patches_Name = new string[54]
 	RN_Patches_Name[0] = "Aetherium Armor and Weapons"
 	RN_Patches_Name[1] = "Amulets of Skyrim"
 	RN_Patches_Name[2] = "Animated Armory"
@@ -2679,24 +2714,25 @@ Event Build_Arrays()
 	RN_Patches_Name[32] = "Oblivion Artifacts"
 	RN_Patches_Name[33] = "Path of the Revanant"
 	RN_Patches_Name[34] = "Project AHO"
-	RN_Patches_Name[35] = "Royal Armory"
-	RN_Patches_Name[36] = "Ruins Edge"
-	RN_Patches_Name[37] = "Skyrim Sewers"
-	RN_Patches_Name[38] = "Skyrim Underground"
-	RN_Patches_Name[39] = "Skyrim Unique Treasures"
-	RN_Patches_Name[40] = "Staff of Sheogorath"
-	RN_Patches_Name[41] = "Teldryn Serious"
-	RN_Patches_Name[42] = "The Brotherhood of Old"
-	RN_Patches_Name[43] = "The Forgotten City"
-	RN_Patches_Name[44] = "The Wheels Of Lull"
-	RN_Patches_Name[45] = "Tools of Kagrenac"
-	RN_Patches_Name[46] = "Treasure Hunter"
-	RN_Patches_Name[47] = "Undeath"
-	RN_Patches_Name[48] = "Vigilant."
-	RN_Patches_Name[49] = "Volkihar Knight"
-	RN_Patches_Name[50] = "Wintersun"
-	RN_Patches_Name[51] = "Wyrmstooth"
-	RN_Patches_Name[52] = "Zim's Thane Weapons"	
+	RN_Patches_Name[35] = "Reliquary of Myth"
+	RN_Patches_Name[36] = "Royal Armory"
+	RN_Patches_Name[37] = "Ruins Edge"
+	RN_Patches_Name[38] = "Skyrim Sewers"
+	RN_Patches_Name[39] = "Skyrim Underground"
+	RN_Patches_Name[40] = "Skyrim Unique Treasures"
+	RN_Patches_Name[41] = "Staff of Sheogorath"
+	RN_Patches_Name[42] = "Teldryn Serious"
+	RN_Patches_Name[43] = "The Brotherhood of Old"
+	RN_Patches_Name[44] = "The Forgotten City"
+	RN_Patches_Name[45] = "The Wheels Of Lull"
+	RN_Patches_Name[46] = "Tools of Kagrenac"
+	RN_Patches_Name[47] = "Treasure Hunter"
+	RN_Patches_Name[48] = "Undeath"
+	RN_Patches_Name[49] = "Vigilant."
+	RN_Patches_Name[50] = "Volkihar Knight"
+	RN_Patches_Name[51] = "Wintersun"
+	RN_Patches_Name[52] = "Wyrmstooth"
+	RN_Patches_Name[53] = "Zim's Thane Weapons"	
 
 	RN_Creations_Name = new string[40]
 	RN_Creations_Name[0] = "Adventurer's Backpack"

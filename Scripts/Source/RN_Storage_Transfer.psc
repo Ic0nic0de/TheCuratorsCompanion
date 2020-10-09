@@ -17,6 +17,8 @@ Objectreference Property PlayerRef auto
 
 formlist property RN_Safehouse_Items_Merged auto
 
+formlist property DBM_ProtectedItems auto
+
 Keyword Property VendorItemGem Auto
 
 ;-- Events --------------------------------
@@ -46,30 +48,31 @@ endEvent
 Function OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 	
 	if !RN_Setup_Start.GetValue() && akSourceContainer != RN_Storage_Container && (dbmNew.HasForm(akBaseItem) || dbmFound.HasForm(akBaseItem))
+		if !DBM_ProtectedItems.HasForm(akBaseItem) || DBM_ProtectedItems.HasForm(akBaseItem) && MCM.AllowProtectedItems
+			if akBaseItem as Weapon && MCM.AllowWeapon
+				ProcessForm(akBaseItem)
+			
+			elseif akBaseItem as Armor && MCM.AllowArmor
+				ProcessForm(akBaseItem)	
 
-		if akBaseItem as Weapon && MCM.AllowWeapon
-			ProcessForm(akBaseItem)
-		
-		elseif akBaseItem as Armor && MCM.AllowArmor
-			ProcessForm(akBaseItem)	
-
-		elseif akBaseItem as Book && MCM.AllowBook 	
-			ProcessForm(akBaseItem)	
-		
-		elseif akBaseItem as Potion && !RN_Safehouse_Items_Merged.HasForm(akBaseItem) && MCM.AllowPotion
-			ProcessForm(akBaseItem)
-		
-		elseif akBaseItem as Key && MCM.AllowKey	
-			ProcessForm(akBaseItem)
-		
-		elseif akBaseItem.HasKeyword(VendorItemGem) && MCM.AllowGems
-			ProcessForm(akBaseItem)	
-		
-		elseif akBaseItem as SoulGem && MCM.AllowGems 
-			ProcessForm(akBaseItem)
-		
-		elseif akBaseItem as MiscObject && !RN_Safehouse_Items_Merged.HasForm(akBaseItem) && MCM.AllowMisc
-			ProcessForm(akBaseItem)	
+			elseif akBaseItem as Book && MCM.AllowBook 	
+				ProcessForm(akBaseItem)	
+			
+			elseif akBaseItem as Potion && !RN_Safehouse_Items_Merged.HasForm(akBaseItem) && MCM.AllowPotion
+				ProcessForm(akBaseItem)
+			
+			elseif akBaseItem as Key && MCM.AllowKey	
+				ProcessForm(akBaseItem)
+			
+			elseif akBaseItem.HasKeyword(VendorItemGem) && MCM.AllowGems
+				ProcessForm(akBaseItem)	
+			
+			elseif akBaseItem as SoulGem && MCM.AllowGems 
+				ProcessForm(akBaseItem)
+			
+			elseif akBaseItem as MiscObject && !RN_Safehouse_Items_Merged.HasForm(akBaseItem) && MCM.AllowMisc
+				ProcessForm(akBaseItem)	
+			endIf
 		endIf
 	endIf
 			

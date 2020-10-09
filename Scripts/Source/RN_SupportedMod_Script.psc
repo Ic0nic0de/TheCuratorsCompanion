@@ -88,7 +88,7 @@ ObjectReference[] property _PrisonerChest auto
 Event onInit()
 		
 	RegisterForModEvent("TCCScan", "_onScan")
-	_RunSetup()
+	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
 endEvent
 
 ;;-- Events ---------------------------------------		
@@ -96,7 +96,7 @@ endEvent
 Event onPlayerLoadGame()
 	
 	RegisterForModEvent("TCCScan", "_onScan")
-	_RunSetup()
+	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
 		
 	if _displayList_Merged
 		_Global_Display_Total.SetValue(_displayList_Merged.GetSize())
@@ -106,7 +106,15 @@ Event onPlayerLoadGame()
 	
 	_Global_Display_Count.SetValue(_displayList_Enabled.GetSize())	
 endEvent
-	
+
+;;-- Events ---------------------------------------	
+
+Event _onSetup(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+
+	Debug.Notification("Received")
+	_RunSetup()
+endEvent
+
 ;;-- Events ---------------------------------------		
 
 Event _RunSetup()
