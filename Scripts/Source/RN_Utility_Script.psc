@@ -174,14 +174,15 @@ Event RunSetup()
 	if RN_Setup_Finish.GetValue()		
 		SetupComplete.Show()		
 	else
-	
-		ModConfigStartup.Show() 
-		RN_Setup_Start.setvalue(1)		
-		bSetupStarted = True
-		DBM_SortWait.setvalue(1)
-		RN_Mod.CheckSupportedMods()
 		
+		RN_Mod.CheckSupportedMods()
+		DBM_SortWait.setvalue(1)
+		RN_Setup_Start.setvalue(1)
+		bSetupStarted = True
 		SendModEvent("TCCSetup_Patches")
+		
+		ModConfigStartup.Show() 
+		
 		Wait(5)
 		
 ;;------------------------------------	
