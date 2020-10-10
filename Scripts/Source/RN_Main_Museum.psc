@@ -64,6 +64,7 @@ formlist property _MuseumContainerList_WP auto
 ;;-- Events ---------------------------------------
 
 Event OnInit()
+
 	RegisterForModEvent("TCCUpdate", "_onUpdate")
 	AddInventoryEventFilters()
 endEvent
@@ -93,7 +94,7 @@ Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemRefer
 	if DBM_Section_HOH_LIB_Merged.HasForm(akBaseItem) && !DBM_Section_HOH_LIB_Found.HasForm(akBaseItem) 
 		DBM_Section_HOH_LIB_Found.AddForm(akBaseItem)
 						
-		if (MCM.ShowMuseumVal)
+		if (MCM.ShowMuseumVal)		
 			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
 			RN_Alias_Found.ForceRefTo(FoundRelic)
 			if (!MCM.ShowSimpleNotificationVal)

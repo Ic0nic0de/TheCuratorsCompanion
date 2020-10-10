@@ -637,10 +637,10 @@ Event CheckSupportedMods()
 
 ;--------------------------
 
-	if Game.GetModByName("LOTD_TCC_Underground.esp") != 255 || Game.GetModByName("LOTD_TCC_UndergroundESP.esp") != 255
+	if Game.GetModByName("LOTD_TCC_Underground.esp") != 255
 		RN_Installed_Underground.SetValue(1)
 		
-	elseif Game.GetModByName("LOTD_TCC_RuinsEdge.esp") == 255 && RN_Installed_Underground.GetValue() || !Game.GetModByName("LOTD_TCC_UndergroundESP.esp") == 255 && RN_Installed_Underground.GetValue()
+	elseif Game.GetModByName("LOTD_TCC_RuinsEdge.esp") == 255 && RN_Installed_Underground.GetValue()
 		SendError(RN_Installed_Underground)
 		_PatchError.Show()
 		
