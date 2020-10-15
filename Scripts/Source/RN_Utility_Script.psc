@@ -9,13 +9,6 @@ import AhzMoreHudIE
 
 import utility
 
-RN_Utility_SafehouseContainerMonitor property SHContainerScript1 auto
-RN_Utility_SafehouseContainerMonitor property SHContainerScript2 auto
-RN_Utility_SafehouseContainerMonitor property SHContainerScript3 auto
-RN_Utility_SafehouseContainerMonitor property SHContainerScript4 auto
-RN_Utility_SafehouseContainerMonitor property SHContainerScript5 auto
-RN_Utility_SafehouseContainerMonitor property SHContainerScript6 auto
-
 RN_Utility_MCM property RN_MCM auto
 RN_Utility_Mods property RN_Mod auto
 RN_Utility_ArrayHolder property RN_Array auto
@@ -65,6 +58,7 @@ objectreference property PlayerRef auto
 
 int _OldPatchCount
 int _OldCreationCount
+int _OldSafehouseCount
 	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Formlist Properties ------------------------------------------------------------------------------------------------
@@ -108,6 +102,7 @@ formlist property _SafehouseContainerList_WP auto
 
 globalvariable property RN_SupportedModCount auto
 globalvariable property RN_SupportedCreationCount auto
+globalvariable property RN_SupportedSafehouseCount auto
 
 globalvariable property RN_moreHUD_Option auto
 
@@ -202,6 +197,7 @@ Event RunSetup()
 				
 				UpdateCurrentInstanceGlobal(RN_SupportedModCount)
 				UpdateCurrentInstanceGlobal(RN_SupportedCreationCount)
+				UpdateCurrentInstanceGlobal(RN_SupportedSafehouseCount)
 	
 				Int _Menu = ModConfigProgress.Show() 
 				if _Menu == 0
@@ -219,7 +215,7 @@ Event RunSetup()
 					UserSettingsNone.Show()
 				endIf
 				
-				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedCreationCount.GetValue() > 0 				
+				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedCreationCount.GetValue() > 0 || RN_SupportedSafehouseCount.GetValue() > 0				
 					ModConfigFinished.Show()
 				else
 					ModConfigFinishedNoPatches.Show()
@@ -272,21 +268,8 @@ function CreateMoreHudLists()
 		endWhile
 	endWhile
 
-	if RN_Installed_SafehouseGeneral.GetValue() ; Check safehouse storage for displayed items.		
-		
-		SHContainerScript1.UpdateDisplays()
-		SHContainerScript2.UpdateDisplays()
-		SHContainerScript3.UpdateDisplays()
-		SHContainerScript4.UpdateDisplays()
-		SHContainerScript5.UpdateDisplays()
-		SHContainerScript6.UpdateDisplays()
-		
-		if RN_Installed_SafehousePlus.GetValue()
-			ObjectReference _DwemerDisplay = Game.GetFormFromFile(0x00A44, "DBM_SafehousePlus_Addon.esp") as ObjectReference
-			if _DwemerDisplay
-				(_DwemerDisplay as RN_Utility_SafehouseContainerMonitor).UpdateDisplays()
-			endIf
-		endIf	
+	if (RN_MCM.GetSafehouseOptions() == "Enabled") ; Check safehouse storage for displayed items.		
+		sendmodevent("SH_Update")
 	endIf				
 		
 	RN_MoreHud_Option.setvalue(1)	
@@ -334,7 +317,7 @@ Event InitGlobals()
 		endIf
 		_Index += 1
 	endWhile
-
+	
 	 _Index = 0
 	 _Length = RN_Array._Museum_Global_Total.length
 	While _Index < _Length
@@ -357,7 +340,8 @@ Function Maintenance()
 
 	_OldPatchCount = RN_SupportedModCount.GetValue() as Int
 	_OldCreationCount = RN_SupportedCreationCount.GetValue() as Int
-		
+	_OldSafehouseCount = RN_SupportedSafehouseCount.GetValue() as Int
+	
 	if RN_MCM.ShowStartup
 		ModStartup.Show()
 	endIf
@@ -376,15 +360,21 @@ Function Maintenance()
 	DBM_SortWait.setvalue(1)
 	
 	SendModEvent("TCCSetup_Patches")
+
+	if (RN_MCM.GetSafehouseOptions() == "Enabled") ; Check safehouse storage for displayed items.		
+		sendmodevent("TCCSetup_SH")
+	endIf	
+	
 	Wait(5)
 	
 	while bSetupStarted		
-		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
+		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() &&  RN_Safehouse_Done.GetValue() == RN_Safehouse_Registered.GetValue()
 		
 			UpdateCurrentInstanceGlobal(RN_SupportedModCount)
-			UpdateCurrentInstanceGlobal(RN_SupportedCreationCount)	
+			UpdateCurrentInstanceGlobal(RN_SupportedCreationCount)
+			UpdateCurrentInstanceGlobal(RN_SupportedSafehouseCount)			
 			
-			if RN_SupportedModCount.GetValue() > _OldPatchCount ||  RN_SupportedCreationCount.GetValue() > _OldCreationCount
+			if RN_SupportedModCount.GetValue() > _OldPatchCount || RN_SupportedCreationCount.GetValue() > _OldCreationCount || RN_SupportedSafehouseCount.GetValue() > _OldSafehouseCount
 				ModStartup_UpdatingLists.Show()
 				CreateMoreHudLists()
 				UpdateAllFound()
@@ -652,19 +642,9 @@ Function SetUpSafehouse()
 				endWhile
 			endWhile
 			
-			SHContainerScript1.UpdateDisplays()
-			SHContainerScript2.UpdateDisplays()
-			SHContainerScript3.UpdateDisplays()
-			SHContainerScript4.UpdateDisplays()
-			SHContainerScript5.UpdateDisplays()
-			SHContainerScript6.UpdateDisplays()	
+			sendmodevent("SH_Update")	
 			
-			if RN_Installed_SafehousePlus.GetValue()
-				ObjectReference _DwemerDisplay = Game.GetFormFromFile(0x00A44, "DBM_SafehousePlus_Addon.esp") as ObjectReference
-				if _DwemerDisplay
-					(_DwemerDisplay as RN_Utility_SafehouseContainerMonitor).UpdateDisplays()
-				endIf
-			endIf		
+			Wait(5)
 			
 			InitGlobals()
 			bSettingup = False

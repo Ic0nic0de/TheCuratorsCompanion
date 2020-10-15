@@ -19,11 +19,24 @@ globalvariable property RN_Installed_SafehouseGeneral auto
 
 Event onInit()
 	
+	Registerformodevent("SH_Update", "onSH_Update")
 	RemoveAllInventoryEventFilters()
 	AddInventoryEventFilter(dbmNew)
 	AddInventoryEventFilter(dbmFound)
 	AddInventoryEventFilter(dbmDisp)
 	AddInventoryEventFilter(_ChestSpecificItems)	
+endEvent
+
+;-- Events --------------------------------
+
+Event onPlayerLoadGame()
+	
+	Registerformodevent("SH_Update", "onSH_Update")
+	RemoveAllInventoryEventFilters()
+	AddInventoryEventFilter(dbmNew)
+	AddInventoryEventFilter(dbmFound)
+	AddInventoryEventFilter(dbmDisp)
+	AddInventoryEventFilter(_ChestSpecificItems)
 endEvent
 
 ;-- Events --------------------------------
@@ -72,7 +85,7 @@ endEvent
 
 ;-- Events --------------------------------
 
-Event UpdateDisplays()
+Event onSH_Update(string eventName, string strArg, float numArg, Form sender)
 	
 	Int _Index = self.GetNumItems()
 	While _Index 

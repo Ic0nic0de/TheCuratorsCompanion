@@ -664,7 +664,7 @@ Event AddCompletedModsPage()
 		BuildTotals(iModComplete, RN_Patches_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)				
-		AddHeaderOption("Supported Mods:")		
+		AddHeaderOption(self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Supported Mods Completed", 0)
 		if RN_SupportedModCount.GetValue() > 0	
 			Int _IndexOpt = 0
 			Int _Index = 0
@@ -685,15 +685,15 @@ Event AddCompletedModsPage()
 					endIf
 				endIf
 				_Index +=1
-					
-				if _IndexOpt == (RN_SupportedModCount.GetValue() as Int / 2)
+				
+				if _IndexOpt > (RN_SupportedModCount.GetValue() as Int / 2)
 					SetCursorPosition(1)
-					AddHeaderOption("Completed: " + self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Supported Mods", 0)
+					AddHeaderOption("", 0)
 				endIf
 			endWhile					
 		else
 			AddTextOption("No Patches Installed", "", 1)
-		endIf		
+		endIf
 	endIf
 endEvent
 
@@ -707,7 +707,7 @@ Event AddCompletedCreationsPage()
 		BuildTotals(iCreationComplete, RN_Creations_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)		
-		AddHeaderOption("Supported Creations:")
+		AddHeaderOption(self.GetCurrentCount(iCreationComplete, RN_SupportedCreationCount) + " Supported Creations Completed")
 		if RN_SupportedCreationCount.GetValue() > 0
 			Int _IndexOpt = 0
 			Int _Index = 0
@@ -729,9 +729,9 @@ Event AddCompletedCreationsPage()
 				endIf
 				_Index +=1
 				
-				if _IndexOpt == (RN_SupportedCreationCount.GetValue() as Int / 2)
+				if _IndexOpt > (RN_SupportedCreationCount.GetValue() as Int / 2)
 					SetCursorPosition(1)
-					AddHeaderOption("Completed: " + self.GetCurrentCount(iCreationComplete, RN_SupportedCreationCount) + " Supported Creations", 0)
+					AddHeaderOption("", 0)
 				endIf
 			endWhile						
 		else

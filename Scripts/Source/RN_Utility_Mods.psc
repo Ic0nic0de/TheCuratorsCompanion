@@ -519,10 +519,10 @@ Event CheckSupportedMods()
 
 ;--------------------------
 
-	if Game.GetModByName("LOTD_TCC_NTHunter.esp") != 255 || Game.GetModByName("LOTD_TCC_NTHunterESL.esp") != 255
+	if Game.GetModByName("LOTD_TCC_NTHunter.esp") != 255
 		RN_Installed_NTHunter.SetValue(1)
 		
-	elseif Game.GetModByName("LOTD_TCC_NTHunter.esp") == 255 && RN_Installed_NTHunter.GetValue() || !Game.GetModByName("LOTD_TCC_NTHunterESL.esp") == 255 && RN_Installed_NTHunter.GetValue()
+	elseif Game.GetModByName("LOTD_TCC_NTHunter.esp") == 255 && RN_Installed_NTHunter.GetValue()
 		SendError(RN_Installed_NTHunter)
 		_PatchError.Show()
 		

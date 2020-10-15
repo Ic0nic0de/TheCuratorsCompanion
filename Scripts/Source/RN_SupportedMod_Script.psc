@@ -111,7 +111,6 @@ endEvent
 
 Event _onSetup(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 
-	Debug.Notification("Received")
 	_RunSetup()
 endEvent
 
