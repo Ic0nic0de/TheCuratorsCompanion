@@ -76,6 +76,7 @@ globalvariable property RN_Installed_HeavyArm auto
 globalvariable property RN_Installed_Helgen auto
 globalvariable property RN_Installed_ICOW auto
 globalvariable property RN_Installed_IceBlade auto
+globalvariable property RN_Installed_IdentityCrisis auto
 globalvariable property RN_Installed_ImmArm auto
 globalvariable property RN_Installed_ImmWeap auto
 globalvariable property RN_Installed_Jaysus auto
@@ -850,6 +851,19 @@ Event CheckSupportedMods()
 		RN_Installed_HeavyArm.SetValue(0)
 	endIf
 
+;--------------------------
+
+	if Game.GetModByName("LOTD_TCC_IdentityCrisis.esp") != 255
+		RN_Installed_IdentityCrisis.SetValue(1)
+		
+	elseif Game.GetModByName("LOTD_TCC_IdentityCrisis.esp") == 255 && RN_Installed_IdentityCrisis.GetValue()
+		SendError(RN_Installed_IdentityCrisis)
+		_PatchError.Show()
+		
+	else
+		RN_Installed_IdentityCrisis.SetValue(0)
+	endIf
+	
 ;--------------------------
 
 	if Game.GetModByName("LOTD_TCC_ImmArm.esp") != 255

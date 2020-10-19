@@ -686,7 +686,7 @@ Event AddCompletedModsPage()
 				endIf
 				_Index +=1
 				
-				if _IndexOpt > (RN_SupportedModCount.GetValue() as Int / 2)
+				if _IndexOpt == (RN_SupportedModCount.GetValue() as Int / 2)
 					SetCursorPosition(1)
 					AddHeaderOption("", 0)
 				endIf
@@ -729,7 +729,7 @@ Event AddCompletedCreationsPage()
 				endIf
 				_Index +=1
 				
-				if _IndexOpt > (RN_SupportedCreationCount.GetValue() as Int / 2)
+				if _IndexOpt == (RN_SupportedCreationCount.GetValue() as Int / 2)
 					SetCursorPosition(1)
 					AddHeaderOption("", 0)
 				endIf
@@ -2612,7 +2612,7 @@ Event Build_Arrays()
 	
 	Int _Index
 	
-	RN_Patches_Count_Array = new globalvariable[54]
+	RN_Patches_Count_Array = new globalvariable[55]
 	_Index = 0
 	While _Index < RN_Patches_Count.GetSize()
 		globalvariable akvariable = RN_Patches_Count.GetAt(_Index) as globalvariable
@@ -2620,7 +2620,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Total_Array = new globalvariable[54]
+	RN_Patches_Total_Array = new globalvariable[55]
 	_Index = 0
 	While _Index < RN_Patches_Total.GetSize()
 		globalvariable akvariable = RN_Patches_Total.GetAt(_Index) as globalvariable
@@ -2628,7 +2628,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Complete_Array = new globalvariable[54]
+	RN_Patches_Complete_Array = new globalvariable[55]
 	_Index = 0
 	While _Index < RN_Patches_Complete.GetSize()
 		globalvariable akvariable = RN_Patches_Complete.GetAt(_Index) as globalvariable
@@ -2636,7 +2636,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Installed_Array = new globalvariable[54]
+	RN_Patches_Installed_Array = new globalvariable[55]
 	_Index = 0
 	While _Index < RN_Patches_Installed.GetSize()
 		globalvariable akvariable = RN_Patches_Installed.GetAt(_Index) as globalvariable
@@ -2678,7 +2678,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 	
-	RN_Patches_Name = new string[54]
+	RN_Patches_Name = new string[55]
 	RN_Patches_Name[0] = "Aetherium Armor and Weapons"
 	RN_Patches_Name[1] = "Amulets of Skyrim"
 	RN_Patches_Name[2] = "Animated Armory"
@@ -2689,51 +2689,52 @@ Event Build_Arrays()
 	RN_Patches_Name[7] = "Clockwork"
 	RN_Patches_Name[8] = "Dawnguard Arsenal"
 	RN_Patches_Name[9] = "Dwemer Spectres"
-	RN_Patches_Name[10] = "Falskaar"
+	RN_Patches_Name[10] = "Falskaar" ;;10
 	RN_Patches_Name[11] = "Follower: Auri"
 	RN_Patches_Name[12] = "Follower: Inigo"
 	RN_Patches_Name[13] = "Follower: Kaidan"
 	RN_Patches_Name[14] = "Follower: M'rissi"
 	RN_Patches_Name[15] = "Fossil Mining"
-	RN_Patches_Name[16] = "The Gray Cowl Of Nocturnal"
+	RN_Patches_Name[16] = "The Gray Cowl Of octurnal"
 	RN_Patches_Name[17] = "Guard Armor Replacer"
 	RN_Patches_Name[18] = "Heavy Armory"
 	RN_Patches_Name[19] = "Helgen Reborn"
-	RN_Patches_Name[20] = "Ice Blade of the Monarch"
-	RN_Patches_Name[21] = "Immersive College Of Winterhold"
-	RN_Patches_Name[22] = "Immersive Armors"
-	RN_Patches_Name[23] = "Immersive Weapons"
-	RN_Patches_Name[24] = "Inn Soaps"
-	RN_Patches_Name[25] = "Interesting NPC's"
-	RN_Patches_Name[26] = "Jaysus Swords"
-	RN_Patches_Name[27] = "konahrik's accoutrements"
-	RN_Patches_Name[28] = "Kthonia's Weapon Pack"
-	RN_Patches_Name[29] = "Moonpath To Elsweyr"
-	RN_Patches_Name[30] = "Moon And Star"
-	RN_Patches_Name[31] = "New Treasure Hunt"
-	RN_Patches_Name[32] = "Oblivion Artifacts"
-	RN_Patches_Name[33] = "Path of the Revanant"
-	RN_Patches_Name[34] = "Project AHO"
-	RN_Patches_Name[35] = "Reliquary of Myth"
-	RN_Patches_Name[36] = "Royal Armory"
-	RN_Patches_Name[37] = "Ruins Edge"
-	RN_Patches_Name[38] = "Skyrim Sewers"
-	RN_Patches_Name[39] = "Skyrim Underground"
-	RN_Patches_Name[40] = "Skyrim Unique Treasures"
-	RN_Patches_Name[41] = "Staff of Sheogorath"
-	RN_Patches_Name[42] = "Teldryn Serious"
-	RN_Patches_Name[43] = "The Brotherhood of Old"
-	RN_Patches_Name[44] = "The Forgotten City"
-	RN_Patches_Name[45] = "The Wheels Of Lull"
-	RN_Patches_Name[46] = "Tools of Kagrenac"
-	RN_Patches_Name[47] = "Treasure Hunter"
-	RN_Patches_Name[48] = "Undeath"
-	RN_Patches_Name[49] = "Vigilant."
-	RN_Patches_Name[50] = "Volkihar Knight"
-	RN_Patches_Name[51] = "Wintersun"
-	RN_Patches_Name[52] = "Wyrmstooth"
-	RN_Patches_Name[53] = "Zim's Thane Weapons"	
-
+	RN_Patches_Name[20] = "Ice Blade of the Monarch" ;;20
+	RN_Patches_Name[21] = "Identity Crisis"
+	RN_Patches_Name[22] = "Immersive College Of Winterhold"
+	RN_Patches_Name[23] = "Immersive Armors"
+	RN_Patches_Name[24] = "Immersive Weapons"
+	RN_Patches_Name[25] = "Inn Soaps"
+	RN_Patches_Name[26] = "Interesting NPC's"
+	RN_Patches_Name[27] = "Jaysus Swords"
+	RN_Patches_Name[28] = "konahrik's accoutrements"
+	RN_Patches_Name[29] = "Kthonia's Weapon Pack"
+	RN_Patches_Name[30] = "Moonpath To Elsweyr" ;;30
+	RN_Patches_Name[31] = "Moon And Star"
+	RN_Patches_Name[32] = "New Treasure Hunt"
+	RN_Patches_Name[33] = "Oblivion Artifacts"
+	RN_Patches_Name[34] = "Path of the Revanant"
+	RN_Patches_Name[35] = "Project AHO"
+	RN_Patches_Name[36] = "Reliquary of Myth"
+	RN_Patches_Name[37] = "Royal Armory"
+	RN_Patches_Name[38] = "Ruins Edge"
+	RN_Patches_Name[39] = "Skyrim Sewers"
+	RN_Patches_Name[40] = "Skyrim Underground" ;;40
+	RN_Patches_Name[41] = "Skyrim Unique Treasures"
+	RN_Patches_Name[42] = "Staff of Sheogorath"
+	RN_Patches_Name[43] = "Teldryn Serious"
+	RN_Patches_Name[44] = "The Brotherhood of Old"
+	RN_Patches_Name[45] = "The Forgotten City"
+	RN_Patches_Name[46] = "The Wheels Of Lull"
+	RN_Patches_Name[47] = "Tools of Kagrenac"
+	RN_Patches_Name[48] = "Treasure Hunter"
+	RN_Patches_Name[49] = "Undeath"
+	RN_Patches_Name[50] = "Vigilant." ;;50
+	RN_Patches_Name[51] = "Volkihar Knight"
+	RN_Patches_Name[52] = "Wintersun"
+	RN_Patches_Name[53] = "Wyrmstooth"
+	RN_Patches_Name[54] = "Zim's Thane Weapons"	
+	
 	RN_Creations_Name = new string[40]
 	RN_Creations_Name[0] = "Adventurer's Backpack"
 	RN_Creations_Name[1] = "Alternate Armors - Daedric Mail"
@@ -2745,7 +2746,7 @@ Event Build_Arrays()
 	RN_Creations_Name[7] = "Alternate Armors - Steel Soldier"
 	RN_Creations_Name[8] = "Arcane Accessories"
 	RN_Creations_Name[9] = "Arcane Archer Pack"
-	RN_Creations_Name[10] = "Arms of Chaos"
+	RN_Creations_Name[10] = "Arms of Chaos" ;;10
 	RN_Creations_Name[11] = "Bone Wolf"
 	RN_Creations_Name[12] = "Camping"
 	RN_Creations_Name[13] = "Civil War Champions"
@@ -2755,7 +2756,7 @@ Event Build_Arrays()
 	RN_Creations_Name[17] = "Dwarven Armored Mudcrab"
 	RN_Creations_Name[18] = "Elite Crossbows"
 	RN_Creations_Name[19] = "Expanded Crossbow Pack"
-	RN_Creations_Name[20] = "Forgotten Seasons"
+	RN_Creations_Name[20] = "Forgotten Seasons" ;;20
 	RN_Creations_Name[21] = "Goblins"
 	RN_Creations_Name[22] = "Netch Leather Armor"
 	RN_Creations_Name[23] = "Nix-Hound"
@@ -2765,7 +2766,7 @@ Event Build_Arrays()
 	RN_Creations_Name[27] = "Rare Curios"
 	RN_Creations_Name[28] = "Ruin's Edge"
 	RN_Creations_Name[29] = "Saints & Seducers"
-	RN_Creations_Name[30] = "Saturalia Holiday Pack"
+	RN_Creations_Name[30] = "Saturalia Holiday Pack" ;;30
 	RN_Creations_Name[31] = "Shadowrend"
 	RN_Creations_Name[32] = "Spell Knight Armor"
 	RN_Creations_Name[33] = "Staff of Hasedoki"
@@ -2774,7 +2775,7 @@ Event Build_Arrays()
 	RN_Creations_Name[36] = "The Gray Cowl Returns!"
 	RN_Creations_Name[37] = "Umbra"
 	RN_Creations_Name[38] = "Vigil Enforcer Armor Set"
-	RN_Creations_Name[39] = "Wild Horses"
+	RN_Creations_Name[39] = "Wild Horses" ;;39
 endEvent
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
