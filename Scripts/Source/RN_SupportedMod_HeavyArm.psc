@@ -335,7 +335,7 @@ endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event OnRunHADisplayCheck(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (DBM_RN_ScanHandler)
+Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (DBM_RN_ScanHandler)
 	
 	RN_Scan_Registered.Mod(1)
 	
