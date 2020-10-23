@@ -326,7 +326,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", "Version 3.0.1", 0)		
+		AddTextOption("", "Version 3.0.2", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -362,6 +362,7 @@ Event AddAdvancedPage()
 		else
 			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 0)
 		endIf
+		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
 
 		SetCursorPosition(1)
 
@@ -761,7 +762,6 @@ Event AddDebugPage()
 		AddTextOption("moreHUD Displayed count:", dbmDisp.GetSize() As Int, 0)
 		AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 0)
 		AddEmptyOption()
-		AddTextOptionST("RebuildLists", "Rebuild moreHUD Items Lists", "Rebuild", 0)
 			
 		SetCursorPosition(1)
 		

@@ -561,6 +561,7 @@ endFunction
 Function RebuildLists()
 	
 	Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists...")
+	Debug.Notification("The Curators Companion: Do not add / remove any items from inventory")
 	
 	DBM_SortWait.SetValue(1)
 	
@@ -575,6 +576,7 @@ Function RebuildLists()
 		dbmNew.AddForm(_item)	
 		if _Index == 500 || _Index == 1000 || _Index == 1500 || _Index == 2000 || _Index == 2500 || _Index == 3000 || _Index == 3500 || _Index == 4000
 			Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists... (" + _Index + " / " + _Total + ")")
+			Debug.Notification("The Curators Companion: Do not add / remove any items from inventory")
 		endIf
 		_Index += 1
 	endWhile
@@ -626,7 +628,7 @@ Function SetUpSafehouse()
 				endWhile
 				Index += 1
 			endWhile
-
+			
 			Index = RN_TokenFormlist.GetSize() ;; Check player and custom storage for found items.
 			While Index
 				Index -= 1
