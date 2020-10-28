@@ -200,21 +200,25 @@ Bool _setupDone
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-;;-- Events ---------------------------------------	
-
 Event onInit()
-		
+	
+	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
 	RegisterForModEvent("TCCScan", "_onScan")
-	_RunSetup()
 endEvent
 
 ;;-- Events ---------------------------------------		
 
 Event onPlayerLoadGame()
 	
-	RegisterForModEvent("TCCScan", "_onScan")
+	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
+	RegisterForModEvent("TCCScan", "_onScan")	
+endEvent	
+
+;;-- Events ---------------------------------------	
+
+Event _onSetup(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+
 	_RunSetup()
-	
 endEvent
 
 ;;-- Events ---------------------------------------	

@@ -86,6 +86,8 @@ formlist property RN_Safehouse_Items_Found auto
 formlist property DBM_RN_QuestDisplays auto
 formlist property DBM_RN_Quest_Stage_Displays auto
 formlist property DBM_RN_ExplorationDisplays auto
+formlist property RN_Museum_Paintings auto
+formlist property RN_Museum_Dibella_Statues auto
 
 ;;Custom Storage
 formlist property RN_TokenFormlist auto
@@ -124,6 +126,8 @@ globalvariable property RN_found_Registered auto
 
 globalvariable property RN_Quest_Listener_Total auto
 globalvariable property RN_Exploration_Listener_Total auto
+globalvariable property RN_Museum_Paintings_Total auto
+globalvariable property RN_Museum_Dibella_Statues_Total auto
 
 globalvariable property GV_SectionHallofHeroes auto
 globalvariable property GV_SectionDaedricGallery auto
@@ -296,10 +300,14 @@ Event InitGlobals()
 
 	RN_Quest_Listener_Total.setvalue(0)
 	RN_Exploration_Listener_Total.setvalue(0)
+	RN_Museum_Paintings_Total.setvalue(0)
+	RN_Museum_Dibella_Statues_Total.setvalue(0)
 	
 	RN_Quest_Listener_Total.Mod(DBM_RN_QuestDisplays.GetSize())
 	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
 	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
+	RN_Museum_Paintings_Total.Mod(RN_Museum_Paintings.GetSize())
+	RN_Museum_Dibella_Statues_Total.Mod(RN_Museum_Dibella_Statues.GetSize())
 	
 	if (RN_Installed_TFC.GetValue())
 		RN_Quest_Listener_Total.Mod(3) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood] [+1 The Forgotten City] 
@@ -456,6 +464,8 @@ Function Maintenance()
 	RN_Setup_Finish.setvalue(1)		
 	RN_Setup_Done.setvalue(0)
 	RN_Setup_Registered.setvalue(0)	
+	RN_Safehouse_Registered.setvalue(0)
+	RN_Safehouse_Done.setvalue(0)
 	DBM_SortWait.setvalue(0)
 
 	if RN_MCM.ShowStartup

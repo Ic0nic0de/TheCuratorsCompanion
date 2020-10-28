@@ -45,7 +45,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 
 ;;----------	
 	If _SectionToScan == 8 && !RN_SupportedCreationCount.Getvalue() || _SectionToScan == 11 && !RN_Installed_SafehouseGeneral.GetValue()
-
+		
 		RN_Scan_Done.Mod(1)
 		If MCM.DevDebugVal
 			DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Not Run for: " + _RoomName)

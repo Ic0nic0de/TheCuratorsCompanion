@@ -59,6 +59,7 @@ globalvariable property RN_Installed_Amulets auto
 globalvariable property RN_Installed_AnimatedArmory auto
 globalvariable property RN_Installed_ArtifactsSkyrim auto
 globalvariable property RN_Installed_Boethiah auto
+globalvariable property RN_Installed_Bruma auto
 globalvariable property RN_Installed_Cloaks auto
 globalvariable property RN_Installed_Clockwork auto
 globalvariable property RN_Installed_DawnguardArsenal auto
@@ -204,6 +205,19 @@ Event CheckSupportedMods()
 		RN_Installed_Boethiah.SetValue(0)
 	endIf
 
+;--------------------------
+
+	if Game.GetModByName("LOTD_TCC_Bruma.esp") != 255
+		RN_Installed_Bruma.SetValue(1)
+		
+	elseif Game.GetModByName("LOTD_TCC_Bruma.esp") == 255 && RN_Installed_Bruma.GetValue()
+		SendError(RN_Installed_Bruma)
+		_PatchError.Show()
+		
+	else
+		RN_Installed_Bruma.SetValue(0)
+	endIf
+	
 ;--------------------------
 	
 	if Game.GetModByName("LOTD_TCC_Cloaks.esp") != 255

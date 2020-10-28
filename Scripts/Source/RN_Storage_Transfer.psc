@@ -80,8 +80,7 @@ endFunction
 
 Function ProcessForm(Form akBaseItem)
 
-	RN_Storage_Container.AddItem(akBaseItem, 1, TRUE)
-	PlayerRef.RemoveItem(akBaseItem, 1, TRUE)
+	PlayerRef.RemoveItem(akBaseItem, 1, TRUE, RN_Storage_Container)
 endFunction
 
 ;;------------------------------------------------------------------------------------------

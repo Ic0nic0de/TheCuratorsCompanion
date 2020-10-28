@@ -182,6 +182,14 @@ globalvariable property RN_Skills_Listener_Total auto
 globalvariable property RN_Skills_Listener_Count auto
 globalvariable property RN_Skills_Listener_Complete auto
 
+globalvariable property RN_Museum_Paintings_Total auto
+globalvariable property RN_Museum_Paintings_Count auto
+globalvariable property RN_Museum_Paintings_Complete auto
+
+globalvariable property RN_Museum_Dibella_Statues_Total auto
+globalvariable property RN_Museum_Dibella_Statues_Count auto
+globalvariable property RN_Museum_Dibella_Statues_Complete auto
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Patches -----------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -326,7 +334,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", "Version 3.0.2", 0)		
+		AddTextOption("", "Version 3.0.3", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -497,6 +505,12 @@ Event AddMuseumSetsPage()
 			
 		AddEmptyOption()
 		AddHeaderOption("Museum Displays:")
+
+		if (RN_Museum_Dibella_Statues_Complete.GetValue()) == 1
+			AddTextOption("Dibella Statues:", "Complete", 1)
+		else
+			AddTextOption("Dibella Statues:", self.GetCurrentCount(RN_Museum_Dibella_Statues_Count, RN_Museum_Dibella_Statues_Total), 0)
+		endIf	
 		
 		if (RN_Quest_Listener_Complete.GetValue()) == 1
 			AddTextOption("Quest Displays:", "Complete", 1)
@@ -510,6 +524,12 @@ Event AddMuseumSetsPage()
 			AddTextOption("Exploration Displays:", self.GetCurrentCount(RN_Exploration_Listener_Count, RN_Exploration_Listener_Total), 0)
 		endIf
 
+		if (RN_Museum_Paintings_Complete.GetValue()) == 1
+			AddTextOption("Museum Paintings:", "Complete", 1)
+		else
+			AddTextOption("Museum Paintings:", self.GetCurrentCount(RN_Museum_Paintings_Count, RN_Museum_Paintings_Total), 0)
+		endIf
+		
 		if (RN_Skills_Listener_Complete.GetValue()) == 1
 			AddTextOption("Skills Displays:", "Complete", 1)
 		else
@@ -521,7 +541,7 @@ Event AddMuseumSetsPage()
 		else
 			AddTextOption("Thane of the Holds:", self.GetCurrentCount(RN_Thane_Listener_Count, RN_Thane_Listener_Total), 0)
 		endIf
-		
+
 		AddEmptyOption()
 		AddHeaderOption("Player Wealth:")
 		AddTextOption("Safehouse Treasury Value:", RN_Treasury_Count.GetValue() as Int, 0)
@@ -549,9 +569,11 @@ Event AddMuseumSetsPage()
 		AddTextOption("Completed:", self.GetCurrentMuseumCount(iMuseumSets), 0)
 		AddEmptyOption()
 		AddHeaderOption("Display Information:")
-		AddTextOption("This section automatically updates and tracks the", "", 0)
-		AddTextOption("displays being added to the Museum as a result of", "", 0)
-		AddTextOption("quest completion, Exploration and skill levelling.", "", 0)
+		AddTextOption("This section can be used to keep track of displays from", "", 0)
+		AddTextOption("completing quests, exploring the world, levelling your", "", 0)
+		AddTextOption("skills and finding certain items hidden around the world", "", 0)
+		AddTextOption("such as paintings and Dibella statues.", "", 0)
+		AddEmptyOption()
 		AddTextOption("Completed:", self.GetDisplaySectionCount(iDisplaySectionComplete), 0)
 		AddEmptyOption()
 		AddHeaderOption("Wealth Information:")
@@ -2529,7 +2551,7 @@ string function GetDisplaySectionCount(GlobalVariable akVariable)
 	
 	Int Current_Count = (akVariable.GetValue()) as Int	
 	
-		Status_Return = (Current_Count + "/4 Sections")
+		Status_Return = (Current_Count + "/6 Sections")
 	return Status_Return
 endFunction
 
@@ -2612,7 +2634,7 @@ Event Build_Arrays()
 	
 	Int _Index
 	
-	RN_Patches_Count_Array = new globalvariable[55]
+	RN_Patches_Count_Array = new globalvariable[56]
 	_Index = 0
 	While _Index < RN_Patches_Count.GetSize()
 		globalvariable akvariable = RN_Patches_Count.GetAt(_Index) as globalvariable
@@ -2620,7 +2642,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Total_Array = new globalvariable[55]
+	RN_Patches_Total_Array = new globalvariable[56]
 	_Index = 0
 	While _Index < RN_Patches_Total.GetSize()
 		globalvariable akvariable = RN_Patches_Total.GetAt(_Index) as globalvariable
@@ -2628,7 +2650,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Complete_Array = new globalvariable[55]
+	RN_Patches_Complete_Array = new globalvariable[56]
 	_Index = 0
 	While _Index < RN_Patches_Complete.GetSize()
 		globalvariable akvariable = RN_Patches_Complete.GetAt(_Index) as globalvariable
@@ -2636,7 +2658,7 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Patches_Installed_Array = new globalvariable[55]
+	RN_Patches_Installed_Array = new globalvariable[56]
 	_Index = 0
 	While _Index < RN_Patches_Installed.GetSize()
 		globalvariable akvariable = RN_Patches_Installed.GetAt(_Index) as globalvariable
@@ -2678,62 +2700,63 @@ Event Build_Arrays()
 		_Index += 1
 	endWhile
 	
-	RN_Patches_Name = new string[55]
+	RN_Patches_Name = new string[56]
 	RN_Patches_Name[0] = "Aetherium Armor and Weapons"
 	RN_Patches_Name[1] = "Amulets of Skyrim"
 	RN_Patches_Name[2] = "Animated Armory"
 	RN_Patches_Name[3] = "Artifacts of Boethiah"
 	RN_Patches_Name[4] = "Artifacts of Skyrim"
 	RN_Patches_Name[5] = "Bad Gremlins Collectables"
-	RN_Patches_Name[6] = "Cloaks of Skyrim"
-	RN_Patches_Name[7] = "Clockwork"
-	RN_Patches_Name[8] = "Dawnguard Arsenal"
-	RN_Patches_Name[9] = "Dwemer Spectres"
-	RN_Patches_Name[10] = "Falskaar" ;;10
-	RN_Patches_Name[11] = "Follower: Auri"
-	RN_Patches_Name[12] = "Follower: Inigo"
-	RN_Patches_Name[13] = "Follower: Kaidan"
-	RN_Patches_Name[14] = "Follower: M'rissi"
-	RN_Patches_Name[15] = "Fossil Mining"
-	RN_Patches_Name[16] = "The Gray Cowl Of octurnal"
-	RN_Patches_Name[17] = "Guard Armor Replacer"
-	RN_Patches_Name[18] = "Heavy Armory"
-	RN_Patches_Name[19] = "Helgen Reborn"
-	RN_Patches_Name[20] = "Ice Blade of the Monarch" ;;20
-	RN_Patches_Name[21] = "Identity Crisis"
-	RN_Patches_Name[22] = "Immersive College Of Winterhold"
-	RN_Patches_Name[23] = "Immersive Armors"
-	RN_Patches_Name[24] = "Immersive Weapons"
-	RN_Patches_Name[25] = "Inn Soaps"
-	RN_Patches_Name[26] = "Interesting NPC's"
-	RN_Patches_Name[27] = "Jaysus Swords"
-	RN_Patches_Name[28] = "konahrik's accoutrements"
-	RN_Patches_Name[29] = "Kthonia's Weapon Pack"
-	RN_Patches_Name[30] = "Moonpath To Elsweyr" ;;30
-	RN_Patches_Name[31] = "Moon And Star"
-	RN_Patches_Name[32] = "New Treasure Hunt"
-	RN_Patches_Name[33] = "Oblivion Artifacts"
-	RN_Patches_Name[34] = "Path of the Revanant"
-	RN_Patches_Name[35] = "Project AHO"
-	RN_Patches_Name[36] = "Reliquary of Myth"
-	RN_Patches_Name[37] = "Royal Armory"
-	RN_Patches_Name[38] = "Ruins Edge"
-	RN_Patches_Name[39] = "Skyrim Sewers"
-	RN_Patches_Name[40] = "Skyrim Underground" ;;40
-	RN_Patches_Name[41] = "Skyrim Unique Treasures"
-	RN_Patches_Name[42] = "Staff of Sheogorath"
-	RN_Patches_Name[43] = "Teldryn Serious"
-	RN_Patches_Name[44] = "The Brotherhood of Old"
-	RN_Patches_Name[45] = "The Forgotten City"
-	RN_Patches_Name[46] = "The Wheels Of Lull"
-	RN_Patches_Name[47] = "Tools of Kagrenac"
-	RN_Patches_Name[48] = "Treasure Hunter"
-	RN_Patches_Name[49] = "Undeath"
-	RN_Patches_Name[50] = "Vigilant." ;;50
-	RN_Patches_Name[51] = "Volkihar Knight"
-	RN_Patches_Name[52] = "Wintersun"
-	RN_Patches_Name[53] = "Wyrmstooth"
-	RN_Patches_Name[54] = "Zim's Thane Weapons"	
+	RN_Patches_Name[6] = "Beyond Skyrim: Bruma"
+	RN_Patches_Name[7] = "Cloaks of Skyrim"
+	RN_Patches_Name[8] = "Clockwork"
+	RN_Patches_Name[9] = "Dawnguard Arsenal"
+	RN_Patches_Name[10] = "Dwemer Spectres"
+	RN_Patches_Name[11] = "Falskaar" ;;10
+	RN_Patches_Name[12] = "Follower: Auri"
+	RN_Patches_Name[13] = "Follower: Inigo"
+	RN_Patches_Name[14] = "Follower: Kaidan"
+	RN_Patches_Name[15] = "Follower: M'rissi"
+	RN_Patches_Name[16] = "Fossil Mining"
+	RN_Patches_Name[17] = "The Gray Cowl Of Nocturnal"
+	RN_Patches_Name[18] = "Guard Armor Replacer"
+	RN_Patches_Name[19] = "Heavy Armory"
+	RN_Patches_Name[20] = "Helgen Reborn"
+	RN_Patches_Name[21] = "Ice Blade of the Monarch" ;;20
+	RN_Patches_Name[22] = "Identity Crisis"
+	RN_Patches_Name[23] = "Immersive College Of Winterhold"
+	RN_Patches_Name[24] = "Immersive Armors"
+	RN_Patches_Name[25] = "Immersive Weapons"
+	RN_Patches_Name[26] = "Inn Soaps"
+	RN_Patches_Name[27] = "Interesting NPC's"
+	RN_Patches_Name[28] = "Jaysus Swords"
+	RN_Patches_Name[29] = "konahrik's accoutrements"
+	RN_Patches_Name[30] = "Kthonia's Weapon Pack"
+	RN_Patches_Name[31] = "Moonpath To Elsweyr" ;;30
+	RN_Patches_Name[32] = "Moon And Star"
+	RN_Patches_Name[33] = "New Treasure Hunt"
+	RN_Patches_Name[34] = "Oblivion Artifacts"
+	RN_Patches_Name[35] = "Path of the Revanant"
+	RN_Patches_Name[36] = "Project AHO"
+	RN_Patches_Name[37] = "Reliquary of Myth"
+	RN_Patches_Name[38] = "Royal Armory"
+	RN_Patches_Name[39] = "Ruins Edge"
+	RN_Patches_Name[40] = "Skyrim Sewers"
+	RN_Patches_Name[41] = "Skyrim Underground" ;;40
+	RN_Patches_Name[42] = "Skyrim Unique Treasures"
+	RN_Patches_Name[43] = "Staff of Sheogorath"
+	RN_Patches_Name[44] = "Teldryn Serious"
+	RN_Patches_Name[45] = "The Brotherhood of Old"
+	RN_Patches_Name[46] = "The Forgotten City"
+	RN_Patches_Name[47] = "The Wheels Of Lull"
+	RN_Patches_Name[48] = "Tools of Kagrenac"
+	RN_Patches_Name[49] = "Treasure Hunter"
+	RN_Patches_Name[50] = "Undeath"
+	RN_Patches_Name[51] = "Vigilant." ;;50
+	RN_Patches_Name[52] = "Volkihar Knight"
+	RN_Patches_Name[53] = "Wintersun"
+	RN_Patches_Name[54] = "Wyrmstooth"
+	RN_Patches_Name[55] = "Zim's Thane Weapons"	
 	
 	RN_Creations_Name = new string[40]
 	RN_Creations_Name[0] = "Adventurer's Backpack"
