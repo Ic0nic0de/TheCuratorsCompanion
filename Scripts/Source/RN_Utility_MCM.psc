@@ -158,6 +158,8 @@ globalvariable property RN_Installed_SkyUI auto
 globalvariable property RN_Installed_Fiss auto
 globalvariable property RN_Installed_ImmWeap auto
 globalvariable property RN_Installed_HeavyArm auto
+globalvariable property RN_Installed_SafehousePlus auto
+globalvariable property RN_Installed_CheeseMod auto
 
 ;; Treasury Globals
 globalvariable property RN_Total_Value auto
@@ -221,7 +223,6 @@ String[]  RN_Creations_Name
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Event OnConfigInit()
-	
 	RN_Thane_Listener_Total.SetValue(9)
 	RN_Skills_Listener_Total.SetValue(6)
 	CustomContainer.SetValue(1)
@@ -334,7 +335,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", "Version 3.0.3", 0)		
+		AddTextOption("", "Version 4.0.0", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -358,20 +359,40 @@ Event AddAdvancedPage()
 		AddHeaderOption("moreHUD Settings:")
 		
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017 || SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-			AddMenuOptionST("moreHUDOptions", "moreHUD Icon Settings:", moreHUDChoiceList[IndexmoreHUD])	
+			AddMenuOptionST("moreHUDOptions", "moreHUD Icons Settings:", moreHUDChoiceList[IndexmoreHUD])	
 		else
 			AddtextOption("moreHUD Icon Settings:", "<font color='#750e0e'>Not Found</font>")
 		endif
 		
-		if Safehouse_Enabled
-			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 1)
-		elseif RN_Setup_Start.GetValue()
-			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", "Wait For Setup...", 1)
-		else
-			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 0)
-		endIf
 		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
-
+		
+		AddEmptyOption()
+		
+		AddHeaderOption("moreHUD Integration:")
+		if Safehouse_Enabled
+			AddTextOptionST("Safehouse_Disp", "Safehouse Integration:", self.GetSafehouseOptions(), 1)		
+		elseif RN_Setup_Start.GetValue()
+			AddTextOptionST("Safehouse_Disp", "Safehouse Integration:", "Wait For Setup...", 1)
+		else
+			AddTextOptionST("Safehouse_Disp", "Safehouse Integration:", self.GetSafehouseOptions(), 0)
+		endIf
+		
+		AddEmptyOption()
+		
+		if Safehouse_Enabled
+			if RN_Installed_SafehousePlus.GetValue()
+				AddTextOption("Safehouse Plus", "Integrated", 1)
+			else
+				AddTextOption("Safehouse Plus", "Not Installed", 0)
+			endIf
+				
+			if RN_Installed_CheeseMod.GetValue()
+				AddTextOption("Cheesemod for Everyone", "Integrated", 1)
+			else
+				AddTextOption("Cheesemod for Everyone", "Not Installed", 0)
+			endIf
+		endIf
+		
 		SetCursorPosition(1)
 
 		AddHeaderOption("Museum Scan:")
@@ -511,12 +532,6 @@ Event AddMuseumSetsPage()
 		else
 			AddTextOption("Dibella Statues:", self.GetCurrentCount(RN_Museum_Dibella_Statues_Count, RN_Museum_Dibella_Statues_Total), 0)
 		endIf	
-		
-		if (RN_Quest_Listener_Complete.GetValue()) == 1
-			AddTextOption("Quest Displays:", "Complete", 1)
-		else
-			AddTextOption("Quest Displays:", self.GetCurrentCount(RN_Quest_Listener_Count, RN_Quest_Listener_Total), 0)
-		endIf			
 
 		if (RN_Exploration_Listener_Complete.GetValue()) == 1
 			AddTextOption("Exploration Displays:", "Complete", 1)
@@ -530,6 +545,12 @@ Event AddMuseumSetsPage()
 			AddTextOption("Museum Paintings:", self.GetCurrentCount(RN_Museum_Paintings_Count, RN_Museum_Paintings_Total), 0)
 		endIf
 		
+		if (RN_Quest_Listener_Complete.GetValue()) == 1
+			AddTextOption("Quest Displays:", "Complete", 1)
+		else
+			AddTextOption("Quest Displays:", self.GetCurrentCount(RN_Quest_Listener_Count, RN_Quest_Listener_Total), 0)
+		endIf			
+
 		if (RN_Skills_Listener_Complete.GetValue()) == 1
 			AddTextOption("Skills Displays:", "Complete", 1)
 		else
@@ -559,7 +580,7 @@ Event AddMuseumSetsPage()
 		AddTextOption("will scan the Museum and Armory for items on display", "", 0)
 		AddTextOption("then update the figures in the MCM, it is recommended", "", 0)
 		AddTextOption("to scan after using the Prep Station to display items", "", 0)
-		if RN_SupportedCreationCount.GetValue() > 0
+		if RN_SupportedCreationCount.GetValue()
 			AddEmptyOption()
 		endIf
 		if RN_Installed_SafehouseGeneral.GetValue()
@@ -688,6 +709,9 @@ Event AddCompletedModsPage()
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)				
 		AddHeaderOption(self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Supported Mods Completed", 0)
+		
+		
+			
 		if RN_SupportedModCount.GetValue() > 0	
 			Int _IndexOpt = 0
 			Int _Index = 0
@@ -713,9 +737,10 @@ Event AddCompletedModsPage()
 					SetCursorPosition(1)
 					AddHeaderOption("", 0)
 				endIf
-			endWhile					
+			endWhile
+		
 		else
-			AddTextOption("No Patches Installed", "", 1)
+			AddTextOption("No Trackable Patches Installed", "", 1)
 		endIf
 	endIf
 endEvent
@@ -725,13 +750,13 @@ endEvent
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Event AddCompletedCreationsPage()
-
+	
 	if CurrentPage == "Supported Creations"
 		BuildTotals(iCreationComplete, RN_Creations_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetCursorPosition(0)		
-		AddHeaderOption(self.GetCurrentCount(iCreationComplete, RN_SupportedCreationCount) + " Supported Creations Completed")
-		if RN_SupportedCreationCount.GetValue() > 0
+		SetCursorPosition(0)
+		AddHeaderOption(self.GetCurrentCount(iCreationComplete, RN_SupportedCreationCount) + " Supported Creations Completed", 0)		
+		if RN_SupportedCreationCount.GetValue()	
 			Int _IndexOpt = 0
 			Int _Index = 0
 			While _Index < RN_Creations_Name.length
@@ -2471,7 +2496,7 @@ state Safehouse_Disp
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Enable this to show moreHUD icons and add functionality to general Safehouse items.\n Default: Disabled \n (THIS FEATURE CAN NOT BE DISABLED ONCE TURNED ON)")
+		self.SetInfoText("Enable this to show moreHUD icons and add functionality to general Safehouse items including Safehouse Plus & CheeseMod for Everyone\n Default: Disabled \n (THIS FEATURE CAN NOT BE DISABLED ONCE TURNED ON)")
 	EndEvent
 endState
 
@@ -2533,7 +2558,7 @@ string function GetCurrentMuseumCount(GlobalVariable akVariable)
 	Int Current_Count = (akVariable.GetValue()) as Int	
 	Int Total_Room = 11
 		
-		if RN_SupportedCreationCount.GetValue() > 0
+		if RN_SupportedCreationCount.GetValue()
 			Total_Room += 1
 		endIf
 
@@ -2712,7 +2737,7 @@ Event Build_Arrays()
 	RN_Patches_Name[8] = "Clockwork"
 	RN_Patches_Name[9] = "Dawnguard Arsenal"
 	RN_Patches_Name[10] = "Dwemer Spectres"
-	RN_Patches_Name[11] = "Falskaar" ;;10
+	RN_Patches_Name[11] = "Falskaar"
 	RN_Patches_Name[12] = "Follower: Auri"
 	RN_Patches_Name[13] = "Follower: Inigo"
 	RN_Patches_Name[14] = "Follower: Kaidan"
@@ -2722,7 +2747,7 @@ Event Build_Arrays()
 	RN_Patches_Name[18] = "Guard Armor Replacer"
 	RN_Patches_Name[19] = "Heavy Armory"
 	RN_Patches_Name[20] = "Helgen Reborn"
-	RN_Patches_Name[21] = "Ice Blade of the Monarch" ;;20
+	RN_Patches_Name[21] = "Ice Blade of the Monarch"
 	RN_Patches_Name[22] = "Identity Crisis"
 	RN_Patches_Name[23] = "Immersive College Of Winterhold"
 	RN_Patches_Name[24] = "Immersive Armors"
@@ -2732,7 +2757,7 @@ Event Build_Arrays()
 	RN_Patches_Name[28] = "Jaysus Swords"
 	RN_Patches_Name[29] = "konahrik's accoutrements"
 	RN_Patches_Name[30] = "Kthonia's Weapon Pack"
-	RN_Patches_Name[31] = "Moonpath To Elsweyr" ;;30
+	RN_Patches_Name[31] = "Moonpath To Elsweyr"
 	RN_Patches_Name[32] = "Moon And Star"
 	RN_Patches_Name[33] = "New Treasure Hunt"
 	RN_Patches_Name[34] = "Oblivion Artifacts"
@@ -2742,7 +2767,7 @@ Event Build_Arrays()
 	RN_Patches_Name[38] = "Royal Armory"
 	RN_Patches_Name[39] = "Ruins Edge"
 	RN_Patches_Name[40] = "Skyrim Sewers"
-	RN_Patches_Name[41] = "Skyrim Underground" ;;40
+	RN_Patches_Name[41] = "Skyrim Underground"
 	RN_Patches_Name[42] = "Skyrim Unique Treasures"
 	RN_Patches_Name[43] = "Staff of Sheogorath"
 	RN_Patches_Name[44] = "Teldryn Serious"
@@ -2752,7 +2777,7 @@ Event Build_Arrays()
 	RN_Patches_Name[48] = "Tools of Kagrenac"
 	RN_Patches_Name[49] = "Treasure Hunter"
 	RN_Patches_Name[50] = "Undeath"
-	RN_Patches_Name[51] = "Vigilant." ;;50
+	RN_Patches_Name[51] = "Vigilant."
 	RN_Patches_Name[52] = "Volkihar Knight"
 	RN_Patches_Name[53] = "Wintersun"
 	RN_Patches_Name[54] = "Wyrmstooth"
@@ -2769,7 +2794,7 @@ Event Build_Arrays()
 	RN_Creations_Name[7] = "Alternate Armors - Steel Soldier"
 	RN_Creations_Name[8] = "Arcane Accessories"
 	RN_Creations_Name[9] = "Arcane Archer Pack"
-	RN_Creations_Name[10] = "Arms of Chaos" ;;10
+	RN_Creations_Name[10] = "Arms of Chaos"
 	RN_Creations_Name[11] = "Bone Wolf"
 	RN_Creations_Name[12] = "Camping"
 	RN_Creations_Name[13] = "Civil War Champions"
@@ -2779,7 +2804,7 @@ Event Build_Arrays()
 	RN_Creations_Name[17] = "Dwarven Armored Mudcrab"
 	RN_Creations_Name[18] = "Elite Crossbows"
 	RN_Creations_Name[19] = "Expanded Crossbow Pack"
-	RN_Creations_Name[20] = "Forgotten Seasons" ;;20
+	RN_Creations_Name[20] = "Forgotten Seasons"
 	RN_Creations_Name[21] = "Goblins"
 	RN_Creations_Name[22] = "Netch Leather Armor"
 	RN_Creations_Name[23] = "Nix-Hound"
@@ -2789,7 +2814,7 @@ Event Build_Arrays()
 	RN_Creations_Name[27] = "Rare Curios"
 	RN_Creations_Name[28] = "Ruin's Edge"
 	RN_Creations_Name[29] = "Saints & Seducers"
-	RN_Creations_Name[30] = "Saturalia Holiday Pack" ;;30
+	RN_Creations_Name[30] = "Saturalia Holiday Pack"
 	RN_Creations_Name[31] = "Shadowrend"
 	RN_Creations_Name[32] = "Spell Knight Armor"
 	RN_Creations_Name[33] = "Staff of Hasedoki"
@@ -2798,7 +2823,7 @@ Event Build_Arrays()
 	RN_Creations_Name[36] = "The Gray Cowl Returns!"
 	RN_Creations_Name[37] = "Umbra"
 	RN_Creations_Name[38] = "Vigil Enforcer Armor Set"
-	RN_Creations_Name[39] = "Wild Horses" ;;39
+	RN_Creations_Name[39] = "Wild Horses"
 endEvent
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -105,6 +105,7 @@ formlist property _SafehouseContainerList_WP auto
 globalvariable property RN_SupportedModCount auto
 globalvariable property RN_SupportedCreationCount auto
 globalvariable property RN_SupportedSafehouseCount auto
+globalvariable property RN_SupportedPatchTotal auto
 
 globalvariable property RN_moreHUD_Option auto
 
@@ -133,9 +134,7 @@ globalvariable property GV_SectionHallofHeroes auto
 globalvariable property GV_SectionDaedricGallery auto
 globalvariable property GV_SectionHOLE auto
 
-GlobalVariable Property RN_Installed_SafehouseGeneral Auto
 GlobalVariable Property RN_Installed_TFC Auto
-GlobalVariable Property RN_Installed_SafehousePlus Auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Patches -----------------------------------------------------------------------------------------------------------
@@ -219,7 +218,9 @@ Event RunSetup()
 					UserSettingsNone.Show()
 				endIf
 				
-				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedCreationCount.GetValue() > 0 || RN_SupportedSafehouseCount.GetValue() > 0				
+				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedCreationCount.GetValue() > 0 || RN_SupportedSafehouseCount.GetValue() > 0	
+					RN_SupportedPatchTotal.SetValue(RN_SupportedModCount.GetValue() as Int + RN_SupportedCreationCount.GetValue() as Int)
+					UpdateCurrentInstanceGlobal(RN_SupportedPatchTotal)
 					ModConfigFinished.Show()
 				else
 					ModConfigFinishedNoPatches.Show()

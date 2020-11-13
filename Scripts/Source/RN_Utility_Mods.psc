@@ -116,6 +116,7 @@ globalvariable property RN_Installed_ASLAL auto
 globalvariable property RN_Installed_Fiss auto
 globalvariable property RN_Installed_RelicHunter auto
 globalvariable property RN_Installed_SkyUI auto
+globalvariable property RN_Installed_CheeseMod auto
 
 objectreference property DBM_CloaksStorage auto
 
@@ -661,7 +662,7 @@ Event CheckSupportedMods()
 		
 	else
 		RN_Installed_Underground.SetValue(0)
-	endIf
+	endIf	
 
 ;--------------------------
 	
@@ -759,6 +760,20 @@ Event CheckSupportedMods()
 		RN_Installed_SafehousePlus.SetValue(0)
 	endIf
 
+;--------------------------
+
+	if Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255
+		RN_Installed_CheeseMod.SetValue(1)
+		RN_Installed_SafehouseGeneral.SetValue(1)
+		
+	elseif Game.GetModByName("LOTD_TCC_CheeseMod.esp") == 255 && RN_Installed_CheeseMod.GetValue()
+		SendError(RN_Installed_CheeseMod)
+		_PatchError.Show()
+		
+	else
+		RN_Installed_CheeseMod.SetValue(0)
+	endIf
+	
 ;--------------------------
 
 	if Game.GetModByName("LOTD_TCC_TeldrynSerious.esp") != 255

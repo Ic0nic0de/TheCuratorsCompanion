@@ -71,7 +71,7 @@ globalvariable property _Global_Display_Count auto
 globalvariable property _Global_Display_Total auto
 
 ;;AddForm to quest display listener. 
-ObjectReference[] property _questDisplays auto
+Formlist Property _questDisplays auto
 
 ;;Shrine Display Properties
 Formlist property _wintersunShrine auto
@@ -170,12 +170,13 @@ Event _RunSetup()
 		endIf
 	
 ;;------------
-		
+
 		if _questDisplays
-			Index = _questDisplays.Length
-			while Index > 0
-				Index -= 1		
-				DBM_RN_QuestDisplays.AddForm(_questDisplays[Index])
+			Index = 0
+			while Index < _questDisplays.GetSize()
+				ObjectReference _Display = _questDisplays.GetAt(Index) as ObjectReference		
+				DBM_RN_QuestDisplays.AddForm(_Display)
+				Index += 1
 			EndWhile
 		endIf
 
