@@ -12,11 +12,11 @@ message property RN_Paintings_Complete_Notification auto
 message property RN_Dibella_Complete_Message auto
 message property RN_Dibella_Complete_Notification auto
 
-formlist property RN_Museum_Paintings auto
-formlist property RN_Museum_Paintings_Enabled auto
+formlist property TCC_DisplayList_Paintings auto
+formlist property TCC_EnabledList_Paintings auto
 
-formlist property RN_Museum_Dibella_Statues auto
-formlist property RN_Museum_Dibella_Statues_Enabled auto
+formlist property TCC_DisplayList_DibellaStatues auto
+formlist property TCC_EnabledList_DibellaStatues auto
 
 globalvariable property RN_Museum_Paintings_Complete auto
 globalvariable property RN_Museum_Paintings_Count auto
@@ -59,7 +59,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 
 	if RN_Museum_Paintings_Complete.GetValue() == 0
 	
-		_onDisplayCheck(RN_Museum_Paintings, RN_Museum_Paintings_Enabled, RN_Museum_Paintings_Count)
+		_onDisplayCheck(TCC_DisplayList_Paintings, TCC_EnabledList_Paintings, RN_Museum_Paintings_Count)
 		
 		if (CheckValueCount1(RN_Museum_Paintings_Count, RN_Museum_Paintings_Total, RN_Museum_Paintings_Complete) && (MCM.ShowSetCompleteVal)) 
 			if (MCM.ShowSimpleNotificationVal)
@@ -72,7 +72,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 
 	if RN_Museum_Dibella_Statues_Complete.GetValue() == 0
 	
-		_onDisplayCheck(RN_Museum_Dibella_Statues, RN_Museum_Dibella_Statues_Enabled, RN_Museum_Dibella_Statues_Count)
+		_onDisplayCheck(TCC_DisplayList_DibellaStatues, TCC_EnabledList_DibellaStatues, RN_Museum_Dibella_Statues_Count)
 		
 		if (CheckValueCount1(RN_Museum_Dibella_Statues_Count, RN_Museum_Dibella_Statues_Total, RN_Museum_Dibella_Statues_Complete) && (MCM.ShowSetCompleteVal)) 
 			if (MCM.ShowSimpleNotificationVal)

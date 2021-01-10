@@ -10,7 +10,7 @@ bool _setupDone
 formlist[] property _itemsArray auto
 
 ;;Formlists to control item lists. - Merged Formlist 1. (HOH, Lib)
-formlist property RN_Safehouse_Items_Merged auto ;;Merged Item List.
+formlist property TCC_ItemList_Safehouse auto ;;Merged Item List.
 
 ;;Formlist to control item lists. - MoreHud.
 Formlist Property dbmNew auto
@@ -54,7 +54,7 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 		While _index
 			_index -= 1
 			Formlist _List = _itemsArray[_index]
-			_onConsolidateItems(_List, RN_Safehouse_Items_Merged, dbmNew, dbmMaster)			
+			_onConsolidateItems(_List, TCC_ItemList_Safehouse, dbmNew, dbmMaster)			
 		endWhile
 		
 		Utility.Wait(5)

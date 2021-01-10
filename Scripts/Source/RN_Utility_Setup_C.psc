@@ -12,13 +12,13 @@ formlist property DBM_SectionLibraryLowerFloorRight auto
 formlist property DBM_SectionLibraryUpperFloor auto
 formlist property DBM_SectionLibraryRareBooks auto
 formlist property DBM_SectionLibraryMaps auto
-formlist property DBM_SectionLibrary_Merged auto
+formlist property TCC_DisplayList_Library auto
 
 ;Display Ref List - Natural Science
 formlist property DBM_SectionNaturalScienceAnimals auto
 formlist property DBM_SectionNSGemstone auto
 formlist property DBM_SectionNSShells auto
-formlist property DBM_SectionNS_Merged auto
+formlist property TCC_DisplayList_NaturalScience auto
 
 ;; Global for ModEvent Return.
 GlobalVariable Property RN_Setup_Done Auto
@@ -54,16 +54,16 @@ function _RunSetup(bool forced)
 		endIf
 	
 		;;Merge Library Display Lists
-		_onConsolidateDisplays(DBM_SectionLibraryLowerFloorLeft, DBM_SectionLibrary_Merged)
-		_onConsolidateDisplays(DBM_SectionLibraryLowerFloorRight, DBM_SectionLibrary_Merged)
-		_onConsolidateDisplays(DBM_SectionLibraryUpperFloor, DBM_SectionLibrary_Merged)
-		_onConsolidateDisplays(DBM_SectionLibraryRareBooks, DBM_SectionLibrary_Merged)
-		_onConsolidateDisplays(DBM_SectionLibraryMaps, DBM_SectionLibrary_Merged)
+		_onConsolidateDisplays(DBM_SectionLibraryLowerFloorLeft, TCC_DisplayList_Library)
+		_onConsolidateDisplays(DBM_SectionLibraryLowerFloorRight, TCC_DisplayList_Library)
+		_onConsolidateDisplays(DBM_SectionLibraryUpperFloor, TCC_DisplayList_Library)
+		_onConsolidateDisplays(DBM_SectionLibraryRareBooks, TCC_DisplayList_Library)
+		_onConsolidateDisplays(DBM_SectionLibraryMaps, TCC_DisplayList_Library)
 
 		;;Merge Gallery Of Natural Science Display Lists
-		_onConsolidateDisplays(DBM_SectionNaturalScienceAnimals, DBM_SectionNS_Merged)
-		_onConsolidateDisplays(DBM_SectionNSGemstone, DBM_SectionNS_Merged)  
-		_onConsolidateDisplays(DBM_SectionNSShells, DBM_SectionNS_Merged)
+		_onConsolidateDisplays(DBM_SectionNaturalScienceAnimals, TCC_DisplayList_NaturalScience)
+		_onConsolidateDisplays(DBM_SectionNSGemstone, TCC_DisplayList_NaturalScience)  
+		_onConsolidateDisplays(DBM_SectionNSShells, TCC_DisplayList_NaturalScience)
 		
 		RN_Setup_Done.Mod(1)
 		_setupDone = true

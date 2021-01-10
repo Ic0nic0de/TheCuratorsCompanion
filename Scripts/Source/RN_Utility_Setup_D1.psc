@@ -14,7 +14,7 @@ formlist property DBM_DishDisplay auto
 formlist property DBM_SilverDisplay auto
 formlist property DBM_DisplayClosetList auto
 
-formlist property DBM_SectionSafehouse_Merged auto
+formlist property TCC_DisplayList_Safehouse auto
 
 ;; Global for ModEvent Return.
 globalvariable property RN_Safehouse_Done auto
@@ -51,12 +51,12 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 		endIf
 	
 		;;Merge Safehouse Display Lists
-		_onConsolidateDisplays(DBM_FoodDisplayList, DBM_SectionSafehouse_Merged)
-		_onConsolidateDisplays(DBM_FoodRawDisplayList, DBM_SectionSafehouse_Merged)
-		_onConsolidateDisplays(DBM_LiquorDisplayList, DBM_SectionSafehouse_Merged)
-		_onConsolidateDisplays(DBM_DishDisplay, DBM_SectionSafehouse_Merged)
-		_onConsolidateDisplays(DBM_SilverDisplay, DBM_SectionSafehouse_Merged)
-		_onConsolidateDisplays(DBM_DisplayClosetList, DBM_SectionSafehouse_Merged)	
+		_onConsolidateDisplays(DBM_FoodDisplayList, TCC_DisplayList_Safehouse)
+		_onConsolidateDisplays(DBM_FoodRawDisplayList, TCC_DisplayList_Safehouse)
+		_onConsolidateDisplays(DBM_LiquorDisplayList, TCC_DisplayList_Safehouse)
+		_onConsolidateDisplays(DBM_DishDisplay, TCC_DisplayList_Safehouse)
+		_onConsolidateDisplays(DBM_SilverDisplay, TCC_DisplayList_Safehouse)
+		_onConsolidateDisplays(DBM_DisplayClosetList, TCC_DisplayList_Safehouse)	
 		
 		Utility.Wait(5)
 		

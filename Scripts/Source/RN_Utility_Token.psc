@@ -7,10 +7,11 @@ message property TCC_TokenAdded auto
 message property TCC_TokenUpdated auto
 message property TCC_TokenExisting auto
 message property TCC_TokenMax auto
+message property TCC_TokenVendor auto
 
-Formlist property RN_TokenFormlist auto
-Formlist property RN_TokenFormlist_NoShipment auto
-Formlist property RN_TokenFormlistExcluded auto
+Formlist property TCC_TokenList auto
+Formlist property TCC_TokenList_NoShipmentCrates auto
+Formlist property TCC_TokenList_ExcludedItems auto
 
 ObjectReference property PlayerRef auto
 ObjectReference property RN_Storage_Container auto
@@ -24,26 +25,49 @@ formlist property dbmMaster auto					;; Total items list
 
 MiscObject property TCCToken auto
 
+Faction property JobMerchantFaction auto
+
+Int Handle
+
 ;;Alias to force the base item into.
-ReferenceAlias property RN_Alias_Found auto
-					
+ReferenceAlias property FoundAlias auto
+
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)
 	
-	if akOldContainer == PlayerRef && akNewContainer && !RN_TokenFormlist.HasForm(akNewContainer) && !RN_TokenFormlistExcluded.HasForm(akNewContainer)
-	
+	if akOldContainer == PlayerRef && akNewContainer && !TCC_TokenList.HasForm(akNewContainer) && !TCC_TokenList_ExcludedItems.HasForm(akNewContainer)
+		
 		if CustomContainer.GetValue() as Int == 6               
 			
-			RN_Alias_Found.ForceRefTo(akNewContainer)
+			FoundAlias.ForceRefTo(akNewContainer)
 			
 			TCC_TokenMax.Show()
 			
-			RN_Alias_Found.Clear()
+			FoundAlias.Clear()
 			
 			akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
-		
 		else
 		
-			RN_Alias_Found.ForceRefTo(akNewContainer)
+			if akNewContainer as Actor
+			
+				Actor _o = akNewContainer as Actor
+				
+				if _o.IsInFaction(JobMerchantFaction) && !RN_MCM.TOV
+				
+					FoundAlias.ForceRefTo(_o)
+					
+					TCC_TokenVendor.Show()
+					
+					FoundAlias.Clear()
+					
+					akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
+					
+					Return
+					
+				endIf
+				
+			endIf
+		
+			FoundAlias.ForceRefTo(akNewContainer)
 			
 			Int _MenuButton = TCC_TokenAdded.Show()
 			
@@ -60,10 +84,18 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 					endIf
 				endWhile
 			
-				RN_TokenFormlist.AddForm(akNewContainer)
-				RN_TokenFormlist_NoShipment.AddForm(akNewContainer)
+				TCC_TokenList.AddForm(akNewContainer)
+				TCC_TokenList_NoShipmentCrates.AddForm(akNewContainer)
+				Handle = ModEvent.Create("Update_TokenArray")
+				if (Handle)
+					ModEvent.PushString(Handle, "")
+					ModEvent.PushString(Handle, "Updating Token Array")
+					ModEvent.PushFloat(Handle, 0.0)
+					ModEvent.PushForm(Handle, self)
+					ModEvent.Send(Handle)
+				endIf
 				CustomContainer.Mod(1)
-				RN_Alias_Found.Clear()
+				FoundAlias.Clear()
 			
 				TCC_TokenUpdated.Show()
 				
@@ -75,11 +107,11 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 
 		endIf
 		
-	elseIf akOldContainer == PlayerRef && akNewContainer && RN_TokenFormlist.HasForm(akOldContainer) && !RN_TokenFormlistExcluded.HasForm(akNewContainer)
+	elseIf akOldContainer == PlayerRef && akNewContainer && TCC_TokenList.HasForm(akOldContainer) && !TCC_TokenList_ExcludedItems.HasForm(akNewContainer)
 		
 		if akNewContainer != RN_Storage_Container
 		
-			RN_Alias_Found.ForceRefTo(akNewContainer)
+			FoundAlias.ForceRefTo(akNewContainer)
 
 			Int _MenuButton = TCC_TokenRemoval.Show()
 			
@@ -96,10 +128,18 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 					endIf
 				endWhile
 				
-				RN_TokenFormlist.RemoveAddedForm(akNewContainer)
-				RN_TokenFormlist_NoShipment.RemoveAddedForm(akNewContainer)
+				TCC_TokenList.RemoveAddedForm(akNewContainer)
+				TCC_TokenList_NoShipmentCrates.RemoveAddedForm(akNewContainer)
+				Handle = ModEvent.Create("Update_TokenArray")
+				if (Handle)
+					ModEvent.PushString(Handle, "")
+					ModEvent.PushString(Handle, "Updating Token Array")
+					ModEvent.PushFloat(Handle, 0.0)
+					ModEvent.PushForm(Handle, self)
+					ModEvent.Send(Handle)
+				endIf
 				CustomContainer.Mod(-1)
-				RN_Alias_Found.Clear()
+				FoundAlias.Clear()
 				
 				TCC_TokenUpdated.Show()
 				
@@ -111,11 +151,11 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 		
 		else
 			
-			RN_Alias_Found.ForceRefTo(akNewContainer)
+			FoundAlias.ForceRefTo(akNewContainer)
 			
 			TCC_TokenExisting.Show()
 			
-			RN_Alias_Found.Clear()
+			FoundAlias.Clear()
 			
 			akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
 		endIf

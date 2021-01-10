@@ -4,36 +4,30 @@ RN_Utility_QuestTracker_MCM property MCM auto
 
 RN_Utility_QuestTracker_Arrays property Array auto
 
-GlobalVariable Property RN_Installed_Moonpath Auto
-
 ;-- Events --------------------------------------
 
 Event _Build_Quests()
-			
+
 	if MCM._MCM_Page == Array.page[0] ;---------------COMPLETE (10) - Museum Quests			
-	
-		If MCM._Legacy_Index == 1
-		
+
+		if MCM._Legacy_Index == 1 || Game.GetModByName("Alternate Start - Live Another Life.esp") == 255
 			MCM._Add_Quest_Data(Array.Museum_Radiant[0], Array.Museum_First[0], Array.Museum_Final[0], Array.Museum_ID[0], Array.Museum_Name[0], Array.page[0], Array.Museum_Giver[0], Array.Museum_Reqs[0], Array.Museum_Notes[0])	
-			
-		ElseIf MCM._Legacy_Index == 2
-		
+	
+		elseif MCM._Legacy_Index == 2
 			MCM._Add_Quest_Data(Array.Museum_Radiant[1], Array.Museum_First[1], Array.Museum_Final[1], Array.Museum_ID[1], Array.Museum_Name[1], Array.page[0], Array.Museum_Giver[1], Array.Museum_Reqs[1], Array.Museum_Notes[1])
 			
-		ElseIf MCM._Legacy_Index == 3
-		
+		elseif MCM._Legacy_Index == 3
 			MCM._Add_Quest_Data(Array.Museum_Radiant[2], 	Array.Museum_First[2], Array.Museum_Final[2], Array.Museum_ID[2], Array.Museum_Name[2], Array.page[0], Array.Museum_Giver[2], Array.Museum_Reqs[2], Array.Museum_Notes[2])		
 			MCM._Add_Quest_Data(Array.Museum_Radiant[3], 	Array.Museum_First[3], Array.Museum_Final[3], Array.Museum_ID[3], Array.Museum_Name[3], Array.page[0], Array.Museum_Giver[3], Array.Museum_Reqs[3], Array.Museum_Notes[3])		
 			MCM._Add_Quest_Data(Array.Museum_Radiant[4], 	Array.Museum_First[4], Array.Museum_Final[4], Array.Museum_ID[4], Array.Museum_Name[4], Array.page[0], Array.Museum_Giver[4], Array.Museum_Reqs[4], Array.Museum_Notes[4])
-			
 		endIf
 		
-			MCM._Add_Quest_Data(Array.Museum_Radiant[5], 	Array.Museum_First[5], Array.Museum_Final[5], Array.Museum_ID[5], Array.Museum_Name[5], Array.page[0], Array.Museum_Giver[5], Array.Museum_Reqs[5], Array.Museum_Notes[5])		
-			MCM._Add_Quest_Data(Array.Museum_Radiant[6], 	Array.Museum_First[6], Array.Museum_Final[6], Array.Museum_ID[6], Array.Museum_Name[6], Array.page[0], Array.Museum_Giver[6], Array.Museum_Reqs[6], Array.Museum_Notes[6])		
-			MCM._Add_Quest_Data(Array.Museum_Radiant[7], 	Array.Museum_First[7], Array.Museum_Final[7], Array.Museum_ID[7], Array.Museum_Name[7], Array.page[0], Array.Museum_Giver[7], Array.Museum_Reqs[7], Array.Museum_Notes[7])		
-			MCM._Add_Quest_Data(Array.Museum_Radiant[8], 	Array.Museum_First[8], Array.Museum_Final[8], Array.Museum_ID[8], Array.Museum_Name[8], Array.page[0], Array.Museum_Giver[8], Array.Museum_Reqs[8], Array.Museum_Notes[8])		
+		MCM._Add_Quest_Data(Array.Museum_Radiant[5], 	Array.Museum_First[5], Array.Museum_Final[5], Array.Museum_ID[5], Array.Museum_Name[5], Array.page[0], Array.Museum_Giver[5], Array.Museum_Reqs[5], Array.Museum_Notes[5])		
+		MCM._Add_Quest_Data(Array.Museum_Radiant[6], 	Array.Museum_First[6], Array.Museum_Final[6], Array.Museum_ID[6], Array.Museum_Name[6], Array.page[0], Array.Museum_Giver[6], Array.Museum_Reqs[6], Array.Museum_Notes[6])		
+		MCM._Add_Quest_Data(Array.Museum_Radiant[7], 	Array.Museum_First[7], Array.Museum_Final[7], Array.Museum_ID[7], Array.Museum_Name[7], Array.page[0], Array.Museum_Giver[7], Array.Museum_Reqs[7], Array.Museum_Notes[7])		
+		MCM._Add_Quest_Data(Array.Museum_Radiant[8], 	Array.Museum_First[8], Array.Museum_Final[8], Array.Museum_ID[8], Array.Museum_Name[8], Array.page[0], Array.Museum_Giver[8], Array.Museum_Reqs[8], Array.Museum_Notes[8])		
 		
-		if RN_Installed_Moonpath.GetValue()
+		if Game.GetModByName("LOTD_TCC_Moonpath.esp") != 255
 			MCM._Add_Quest_Data(Array.Museum_Radiant[9],	Array.Museum_First[9], Array.Museum_Final[9], Array.Museum_ID[9], Array.Museum_Name[9], Array.page[0], Array.Museum_Giver[9], Array.Museum_Reqs[9], Array.Museum_Notes[9])		
 		else
 			MCM._Add_Quest_Data(Array.Museum_Radiant[10], 	Array.Museum_First[10], Array.Museum_Final[10], Array.Museum_ID[10], Array.Museum_Name[10], Array.page[0], Array.Museum_Giver[10], Array.Museum_Reqs[10], Array.Museum_Notes[10])		
@@ -43,8 +37,8 @@ Event _Build_Quests()
 			MCM._Add_Quest_Data(Array.Museum_Radiant[11], 	Array.Museum_First[11], Array.Museum_Final[11], Array.Museum_ID[11], Array.Museum_Name[11], Array.page[0], Array.Museum_Giver[11], Array.Museum_Reqs[11], Array.Museum_Notes[11])		
 		endIf
 					
-			MCM._Add_Quest_Data(Array.Museum_Radiant[12], 	Array.Museum_First[12], Array.Museum_Final[12], Array.Museum_ID[12], Array.Museum_Name[12], Array.page[0], Array.Museum_Giver[12], Array.Museum_Reqs[12], Array.Museum_Notes[12])		
-			MCM._Add_Quest_Data(Array.Museum_Radiant[13], 	Array.Museum_First[13], Array.Museum_Final[13], Array.Museum_ID[13], Array.Museum_Name[13], Array.page[0], Array.Museum_Giver[13], Array.Museum_Reqs[13], Array.Museum_Notes[13])		
+		MCM._Add_Quest_Data(Array.Museum_Radiant[12], 	Array.Museum_First[12], Array.Museum_Final[12], Array.Museum_ID[12], Array.Museum_Name[12], Array.page[0], Array.Museum_Giver[12], Array.Museum_Reqs[12], Array.Museum_Notes[12])		
+		MCM._Add_Quest_Data(Array.Museum_Radiant[13], 	Array.Museum_First[13], Array.Museum_Final[13], Array.Museum_ID[13], Array.Museum_Name[13], Array.page[0], Array.Museum_Giver[13], Array.Museum_Reqs[13], Array.Museum_Notes[13])		
 		
 ;;------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ bool _setupDone
 formlist[] property _itemsArray auto
 
 ;;Formlists to control item lists. - Merged Formlist 1. (HOH, Lib)
-formlist property RN_Safehouse_Items_Merged auto ;;Merged Item List.
+formlist property TCC_ItemList_Safehouse auto ;;Merged Item List.
 
 ;;Formlist to control item lists. - MoreHud.
 Formlist property dbmNew auto
@@ -21,11 +21,11 @@ Objectreference[] property _Containers auto
 formlist property _SafehouseContainerList auto
 formlist property _SafehouseContainerList_WP auto
 
-formlist property RN_TokenFormlist auto
-formlist property RN_TokenFormlistExcluded auto
+formlist property TCC_TokenList auto
+formlist property TCC_TokenList_ExcludedItems auto
 
 formlist property DBM_DwemerDishDisplay auto
-formlist property DBM_SectionSafehouse_Merged auto
+formlist property TCC_DisplayList_Safehouse auto
 
 ;; Global for ModEvent Return.
 globalvariable property RN_Safehouse_Done auto
@@ -66,19 +66,20 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 		While _index
 			_index -= 1
 			Formlist _List = _itemsArray[_index]
-			_onConsolidateItems(_List, RN_Safehouse_Items_Merged, dbmNew, dbmMaster)			
+			_onConsolidateItems(_List, TCC_ItemList_Safehouse, dbmNew, dbmMaster)			
 		endWhile
 		
 		_index = _Containers.length
 		While _index
 			_index -= 1
-			RN_TokenFormlist.AddForm(_Containers[_index])
-			RN_TokenFormlistExcluded.AddForm(_Containers[_index])
+			TCC_TokenList.AddForm(_Containers[_index])
+			TCC_TokenList_ExcludedItems.AddForm(_Containers[_index])
 			_SafehouseContainerList.AddForm(_Containers[_index])
 			_SafehouseContainerList_WP.AddForm(_Containers[_index])
+			SendModEvent("Update_TokenArray", "Updating Token Array")
 		endWhile
 		
-		_onConsolidateDisplays(DBM_DwemerDishDisplay, DBM_SectionSafehouse_Merged)
+		_onConsolidateDisplays(DBM_DwemerDishDisplay, TCC_DisplayList_Safehouse)
 
 		RN_SupportedSafehouseCount.Mod(1)
 		

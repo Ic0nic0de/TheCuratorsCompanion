@@ -6,16 +6,24 @@ Import RN_Utility_Global
 
 RN_Utility_MCM property MCM auto
 
-RN_Utility_ArrayHolder property RN_Array auto
-
 int property _SectionToScan auto
 
 string property _RoomName auto
 
+ObjectReference[] property _Armory_Helms_Displays auto
+
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 globalvariable property RN_SupportedCreationCount auto
-globalvariable property RN_Installed_SafehouseGeneral auto
+globalvariable property RN_SafeouseContent_Installed auto
+
+Formlist property _Museum_Formlist_Merged auto
+Formlist property _Museum_Formlist_Enabled auto
+Formlist property _Museum_Global_Complete auto
+Formlist property _Museum_Global_Count auto
+Formlist property _Museum_Global_Total auto
+Formlist property _Museum_Message_Notification auto
+Formlist property _Museum_Message_Default auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,7 +52,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	endIf
 
 ;;----------	
-	If _SectionToScan == 8 && !RN_SupportedCreationCount.Getvalue() || _SectionToScan == 11 && !RN_Installed_SafehouseGeneral.GetValue()
+	If _SectionToScan == 8 && !RN_SupportedCreationCount.Getvalue() || _SectionToScan == 11 && !RN_SafeouseContent_Installed.GetValue()
 		
 		RN_Scan_Done.Mod(1)
 		If MCM.DevDebugVal
@@ -53,32 +61,40 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 		
 	else
 
-		if RN_Array._Museum_Global_Complete[_SectionToScan].GetValue() == 0
+		Formlist _DisplayList = _Museum_Formlist_Merged.GetAt(_SectionToScan) as Formlist
+		Formlist _EnabledList = _Museum_Formlist_Enabled.GetAt(_SectionToScan) as Formlist
+		GlobalVariable _Complete = _Museum_Global_Complete.GetAt(_SectionToScan) as GlobalVariable
+		GlobalVariable _Count = _Museum_Global_Count.GetAt(_SectionToScan) as GlobalVariable
+		GlobalVariable _Total = _Museum_Global_Total.GetAt(_SectionToScan) as GlobalVariable	
+		Message _Notification = _Museum_Message_Notification.GetAt(_SectionToScan) as Message
+		Message _Message = _Museum_Message_Default.GetAt(_SectionToScan) as Message
 		
-			_onDisplayCheck(RN_Array._Museum_Formlist_Merged[_SectionToScan], RN_Array._Museum_Formlist_Enabled[_SectionToScan], RN_Array._Museum_Global_Count[_SectionToScan])
+		if !_Complete.GetValue()
+		
+			_onDisplayCheck(_DisplayList, _EnabledList, _Count)
 			
 			if _SectionToScan == 0
 				Int _Index2 = 0
-				Int _Length2 = RN_Array._Armory_Helms_Displays.length
+				Int _Length2 = _Armory_Helms_Displays.length
 				While _Index2 < _Length2
-				ObjectReference formToProcess = RN_Array._Armory_Helms_Displays[_Index2] As ObjectReference
-					if !RN_Array._Museum_Formlist_Enabled[_SectionToScan].HasForm(formToProcess) && !formToProcess.IsDisabled()
-						RN_Array._Museum_Formlist_Enabled[_SectionToScan].AddForm(formToProcess)
+				ObjectReference formToProcess = _Armory_Helms_Displays[_Index2] As ObjectReference
+					if !_EnabledList.HasForm(formToProcess) && !formToProcess.IsDisabled()
+						_EnabledList.AddForm(formToProcess)
 						
-					elseif RN_Array._Museum_Formlist_Enabled[_SectionToScan].HasForm(formToProcess) && formToProcess.IsDisabled()
-						RN_Array._Museum_Formlist_Enabled[_SectionToScan].RemoveAddedForm(formToProcess)	
+					elseif _EnabledList.HasForm(formToProcess) && formToProcess.IsDisabled()
+						_EnabledList.RemoveAddedForm(formToProcess)	
 					endIf
 					_Index2 += 1
 				endWhile		
 				
-				RN_Array._Museum_Global_Count[_SectionToScan].setvalue(RN_Array._Museum_Formlist_Enabled[_SectionToScan].GetSize())
+				_Count.setvalue(_EnabledList.GetSize())
 			endIf
 			
-			if (CheckValueCount1(RN_Array._Museum_Global_Count[_SectionToScan], RN_Array._Museum_Global_Total[_SectionToScan], RN_Array._Museum_Global_Complete[_SectionToScan]) && (MCM.ShowSetCompleteVal)) 
+			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
 				if (MCM.ShowSimpleNotificationVal)
-					RN_Array._Museum_Message_Notification[_SectionToScan].Show()
+					_Notification.Show()
 				else
-					RN_Array._Museum_Message_Default[_SectionToScan].Show()
+					_Message.Show()
 				endif
 			endif
 		endIf

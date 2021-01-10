@@ -10,15 +10,15 @@ import AhzMoreHudIE
 import utility
 
 RN_Utility_MCM property RN_MCM auto
-RN_Utility_Mods property RN_Mod auto
-RN_Utility_ArrayHolder property RN_Array auto
 RN_Storage_Transfer property RN_Transfer auto
 RN_Utility_PlayerInventoryMonitor property RN_Inventory auto
-
+RN_Utility_PlayerInventoryMonitor_SH property RN_InventorySH auto
 RN_Listener_Explore property RN_Explore auto
 RN_Listener_Skills property RN_Skills auto
 RN_Listener_Quest property RN_Quest auto
 RN_Listener_Thane property RN_Thane auto
+
+ObjectReference Property TCC_Achievements_Xmarker auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties -------------------------------------------------------------------------------------------------
@@ -33,6 +33,9 @@ Message property ModConfigProgress Auto
 Message property ModConfigFinished auto
 message property ModConfigFinishedNoPatches auto
 
+message property ModUpdateStartup auto
+Message property ModUpdateFinished auto
+
 message property SetupComplete auto
 message property ModStartup auto
 message property ModStartupDone auto
@@ -40,7 +43,7 @@ message property ModStartup_UpdatingLists auto
 
 message property UserSettingsLoaded auto
 message property UserSettingsNone auto
-
+message property TCC_UniquesSetupFinished auto
 message property moreHUDListRebuilt auto
 
 bool bSettingup
@@ -49,28 +52,28 @@ bool bScanAll
 bool bUpdating
 bool bMoreHUDListsCreated
 bool bSetupStarted
+Bool bMaintenance
 
-;;Treasury 
-miscobject property Gold001 auto
+;;Do Not Fill this property.
+objectreference property DBM_CloaksStorage auto
 
 ;;Player Ref 
 objectreference property PlayerRef auto
 
 int _OldPatchCount
-int _OldCreationCount
 int _OldSafehouseCount
-	
+int _OldCustomCount
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Formlist Properties ------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;;Merged & Found Item list 1
-formlist property DBM_Section_DG_HOLE_HOO_NS_GH_HOS_Merged auto
-formlist property DBM_Section_DG_HOLE_HOO_NS_GH_HOS_Found auto
+formlist property TCC_ItemList_Museum_2 auto
+formlist property TCC_FoundList_Museum_2 auto
 
 ;;Merged & Found Item list 2
-formlist property DBM_Section_HOH_LIB_Merged auto
-formlist property DBM_Section_HOH_LIB_Found auto
+formlist property TCC_ItemList_Museum_1 auto
+formlist property TCC_FoundList_Museum_1 auto
 
 ;;MoreHud
 formlist property dbmNew auto
@@ -79,18 +82,18 @@ formlist property dbmFound auto
 formlist property dbmMaster auto
 
 ;;Safehouse formlists
-formlist property RN_Safehouse_Items_Merged auto
-formlist property RN_Safehouse_Items_Found auto
+formlist property TCC_ItemList_Safehouse auto
+formlist property TCC_FoundList_Safehouse auto
 
 ;;Listeners
 formlist property DBM_RN_QuestDisplays auto
 formlist property DBM_RN_Quest_Stage_Displays auto
 formlist property DBM_RN_ExplorationDisplays auto
-formlist property RN_Museum_Paintings auto
-formlist property RN_Museum_Dibella_Statues auto
+formlist property TCC_DisplayList_Paintings auto
+formlist property TCC_DisplayList_DibellaStatues auto
 
 ;;Custom Storage
-formlist property RN_TokenFormlist auto
+formlist property TCC_TokenList auto
 
 ;;Main Storage
 formlist property _MuseumContainerList auto
@@ -98,15 +101,20 @@ formlist property _MuseumContainerList_WP auto
 formlist property _SafehouseContainerList auto
 formlist property _SafehouseContainerList_WP auto
 
+Formlist property _Armory_Formlist_Displays auto
+Formlist property _Armory_Global_Total auto
+
+Formlist property _Museum_Formlist_Merged auto
+Formlist property _Museum_Global_Total auto
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Global Variables --------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 globalvariable property RN_SupportedModCount auto
-globalvariable property RN_SupportedCreationCount auto
+globalvariable property RN_CustomModCount auto
 globalvariable property RN_SupportedSafehouseCount auto
 globalvariable property RN_SupportedPatchTotal auto
-
 globalvariable property RN_moreHUD_Option auto
 
 globalvariable property DBM_SortWait auto
@@ -134,22 +142,6 @@ globalvariable property GV_SectionHallofHeroes auto
 globalvariable property GV_SectionDaedricGallery auto
 globalvariable property GV_SectionHOLE auto
 
-GlobalVariable Property RN_Installed_TFC Auto
-
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;------------------------------------------------------------------------------ Patches -----------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-Formlist Property RN_Patches_Installed auto
-Formlist Property RN_Patches_Complete auto
-Formlist Property RN_Patches_Count auto
-Formlist Property RN_Patches_Total auto
-
-Formlist Property RN_Creations_Installed auto
-Formlist Property RN_Creations_Complete auto
-Formlist Property RN_Creations_Count auto
-Formlist Property RN_Creations_Total auto
-
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------- Start of Script -----------------------------------------------------------------------------------------------------
@@ -158,13 +150,10 @@ Formlist Property RN_Creations_Total auto
 		
 Event OnInit()
 
-	RN_TokenFormlist.AddForm(PlayerRef)
-	_MuseumContainerList_WP.AddForm(PlayerRef)
-	_SafehouseContainerList_WP.AddForm(PlayerRef)
 	Wait(5)
 	RunSetup()	
 endEvent
-
+	
 ;;-- Events ---------------------------------------
 
 Event RunSetup()
@@ -173,35 +162,51 @@ Event RunSetup()
 		SetupComplete.Show()		
 	else
 		
-		RN_Mod.CheckSupportedMods()
 		DBM_SortWait.setvalue(1)
 		RN_Setup_Start.setvalue(1)
 		bSetupStarted = True
+		RN_MCM.BuildPatchArray(true, false)
+		RN_MCM.Build_Arrays()
+		
+		
 		SendModEvent("TCCSetup_Patches")
+		
+		if RN_MCM.Achievements_Enabled
+			SendModEvent("TCCSetup_Uniques")
+		endIf
 		
 		ModConfigStartup.Show() 
 		
+		AddPlayerToFormlists()
 		Wait(5)
 		
 ;;------------------------------------	
 
 		while bSetupStarted	
 			if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
-				
 				CreateMoreHudLists()
 				InitGlobals()
 				
-				RN_Explore.OnPlayerLoadGame()	;; Fire off Exploration Listener.
-				RN_Quest.OnPlayerLoadGame()		;; Fire off Quest Listener.
-				RN_Thane.OnPlayerLoadGame()		;; Fire off Thane Listener.
-				RN_Skills.OnPlayerLoadGame()	;; Fire off Skills Listener.		
-				RN_Transfer.OnPlayerLoadGame()	;; Fire off Auto Transfer.
-				RN_Inventory.OnPlayerLoadGame()	;; Fire off Inventory Manager.
+				RN_Explore.OnPlayerLoadGame()		;; Fire off Exploration Listener.
+				RN_Quest.OnPlayerLoadGame()			;; Fire off Quest Listener.
+				RN_Thane.OnPlayerLoadGame()			;; Fire off Thane Listener.
+				RN_Skills.OnPlayerLoadGame()		;; Fire off Skills Listener.		
+				RN_Transfer.OnPlayerLoadGame()		;; Fire off Auto Transfer.
+				RN_Inventory.OnPlayerLoadGame()		;; Fire off Inventory Manager.
+				RN_InventorySH.OnPlayerLoadGame()   ;; Fire off Inventory Manager. (Safehouse)
 				
 				UpdateCurrentInstanceGlobal(RN_SupportedModCount)
-				UpdateCurrentInstanceGlobal(RN_SupportedCreationCount)
+				UpdateCurrentInstanceGlobal(RN_CustomModCount)
 				UpdateCurrentInstanceGlobal(RN_SupportedSafehouseCount)
-	
+				
+				SendModEvent("TCCUpdate_Counts")
+				
+				if RN_MCM.Achievements_Enabled
+					SendModEvent("TCCUpdate_Counts_Uniques")
+				endIf
+				
+				Wait(5)
+				
 				Int _Menu = ModConfigProgress.Show() 
 				if _Menu == 0
 					UpdateAllFound()
@@ -218,8 +223,8 @@ Event RunSetup()
 					UserSettingsNone.Show()
 				endIf
 				
-				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedCreationCount.GetValue() > 0 || RN_SupportedSafehouseCount.GetValue() > 0	
-					RN_SupportedPatchTotal.SetValue(RN_SupportedModCount.GetValue() as Int + RN_SupportedCreationCount.GetValue() as Int)
+				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedSafehouseCount.GetValue() > 0 || RN_CustomModCount.GetValue() > 0
+					RN_SupportedPatchTotal.SetValue(RN_SupportedModCount.GetValue() as Int + RN_CustomModCount.GetValue() as Int) 
 					UpdateCurrentInstanceGlobal(RN_SupportedPatchTotal)
 					ModConfigFinished.Show()
 				else
@@ -236,6 +241,15 @@ Event RunSetup()
 			endIf
 		endWhile	
 	endIf
+endEvent
+
+;;-- Functions ---------------------------------------
+
+Event AddPlayerToFormlists()
+	TCC_TokenList.AddForm(PlayerRef)
+	_MuseumContainerList_WP.AddForm(PlayerRef)
+	_SafehouseContainerList_WP.AddForm(PlayerRef)
+	SendModEvent("Update_TokenArray", "Updating Token Array")
 endEvent
 				
 ;;-- Functions ---------------------------------------
@@ -258,10 +272,10 @@ function CreateMoreHudLists()
 		endWhile
 	endWhile
 			
-	_Index = RN_TokenFormlist.GetSize() ;; Check player and custom storage for found items.
+	_Index = TCC_TokenList.GetSize() ;; Check player and custom storage for found items.
 	While _Index
 		_Index -= 1
-		ObjectReference _Container = RN_TokenFormlist.GetAt(_Index) as ObjectReference		
+		ObjectReference _Container = TCC_TokenList.GetAt(_Index) as ObjectReference		
 		Int _Index2 = _Container.GetNumItems()
 		While _Index2
 			_Index2 -= 1
@@ -307,37 +321,47 @@ Event InitGlobals()
 	RN_Quest_Listener_Total.Mod(DBM_RN_QuestDisplays.GetSize())
 	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
 	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
-	RN_Museum_Paintings_Total.Mod(RN_Museum_Paintings.GetSize())
-	RN_Museum_Dibella_Statues_Total.Mod(RN_Museum_Dibella_Statues.GetSize())
+	RN_Museum_Paintings_Total.Mod(TCC_DisplayList_Paintings.GetSize())
+	RN_Museum_Dibella_Statues_Total.Mod(TCC_DisplayList_DibellaStatues.GetSize())
 	
-	if (RN_Installed_TFC.GetValue())
+	if (Game.GetModByName("LOTD_TCC_TFC.esp") != 255)
 		RN_Quest_Listener_Total.Mod(3) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood] [+1 The Forgotten City] 
 	else
 		RN_Quest_Listener_Total.Mod(2) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood]
 	endIf
 	
 	Int _Index = 0
-	Int _Length = RN_Array._Armory_Global_Total.length
+	Int _Length = _Armory_Global_Total.GetSize()
 	While _Index < _Length
+		Formlist _DisplayList = _Armory_Formlist_Displays.GetAt(_Index) as Formlist
+		GlobalVariable _Total = _Armory_Global_Total.GetAt(_Index) as GlobalVariable	
 		if _Index == 11
-			RN_Array._Armory_Global_Total[_Index].SetValue(RN_Array._Armory_Formlist_Displays[_Index].GetSize() + 9)
+			_Total.SetValue(_DisplayList.GetSize() + 9)
+		elseif _Index == 19
+			_Total.SetValue(_DisplayList.GetSize() - 6)
 		else
-			RN_Array._Armory_Global_Total[_Index].SetValue(RN_Array._Armory_Formlist_Displays[_Index].GetSize())
+			_Total.SetValue(_DisplayList.GetSize())
+		endIf
+		_Index += 1
+	endWhile
+
+	_Index = 0
+	_Length = _Museum_Global_Total.GetSize()
+	While _Index < _Length
+		Formlist _DisplayList = _Museum_Formlist_Merged.GetAt(_Index) as Formlist
+		GlobalVariable _Total = _Museum_Global_Total.GetAt(_Index) as GlobalVariable	
+		if _Index == 0
+			_Total.SetValue(_DisplayList.GetSize() + 3)
+		else
+			_Total.SetValue(_DisplayList.GetSize())
 		endIf
 		_Index += 1
 	endWhile
 	
-	 _Index = 0
-	 _Length = RN_Array._Museum_Global_Total.length
-	While _Index < _Length
-		if _Index == 0
-			RN_Array._Museum_Global_Total[_Index].SetValue(RN_Array._Museum_Formlist_Merged[_Index].GetSize() + 9)
-		else
-			RN_Array._Museum_Global_Total[_Index].SetValue(RN_Array._Museum_Formlist_Merged[_Index].GetSize())
-		endIf
-		_Index += 1
-	endWhile
-endEvent	
+	if (Game.GetModByName("LOTD_TCC_Cloaks.esp") != 255)
+		DBM_CloaksStorage = Game.GetFormFromFile(2122, "DBM_CloaksofSkyrim_Patch.esp") as objectreference
+	endIf
+endEvent
 	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -346,19 +370,29 @@ endEvent
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		
 Function Maintenance()
+	
+	bMaintenance = false
+	
+	While !bMaintenance
+	
+		RegisterForSingleUpdate(2.0)
+		Wait(3.0)
+	endWhile
+endFunction
+
+Event onUpdate()
+	
+	bMaintenance = true
 
 	_OldPatchCount = RN_SupportedModCount.GetValue() as Int
-	_OldCreationCount = RN_SupportedCreationCount.GetValue() as Int
+	_OldCustomCount = RN_CustomModCount.GetValue() as Int
 	_OldSafehouseCount = RN_SupportedSafehouseCount.GetValue() as Int
 	
 	if RN_MCM.ShowStartup
 		ModStartup.Show()
 	endIf
 	
-	RN_Mod.CheckSupportedMods()
-	
-	RN_TokenFormlist.AddForm(PlayerRef)
-	_SafehouseContainerList_WP.AddForm(PlayerRef)
+	AddPlayerToFormlists()
 
 ;;--------------
 
@@ -369,7 +403,11 @@ Function Maintenance()
 	DBM_SortWait.setvalue(1)
 	
 	SendModEvent("TCCSetup_Patches")
-
+	
+	if RN_MCM.Achievements_Enabled
+		SendModEvent("TCCSetup_Uniques")
+	endIf
+		
 	if (RN_MCM.GetSafehouseOptions() == "Enabled") ; Check safehouse storage for displayed items.		
 		sendmodevent("TCCSetup_SH")
 	endIf	
@@ -380,10 +418,10 @@ Function Maintenance()
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() &&  RN_Safehouse_Done.GetValue() == RN_Safehouse_Registered.GetValue()
 		
 			UpdateCurrentInstanceGlobal(RN_SupportedModCount)
-			UpdateCurrentInstanceGlobal(RN_SupportedCreationCount)
+			UpdateCurrentInstanceGlobal(RN_CustomModCount)
 			UpdateCurrentInstanceGlobal(RN_SupportedSafehouseCount)			
 			
-			if RN_SupportedModCount.GetValue() > _OldPatchCount || RN_SupportedCreationCount.GetValue() > _OldCreationCount || RN_SupportedSafehouseCount.GetValue() > _OldSafehouseCount
+			if RN_SupportedModCount.GetValue() > _OldPatchCount || RN_SupportedSafehouseCount.GetValue() > _OldSafehouseCount || RN_CustomModCount.GetValue() > _OldCustomCount
 				ModStartup_UpdatingLists.Show()
 				CreateMoreHudLists()
 				UpdateAllFound()
@@ -392,6 +430,12 @@ Function Maintenance()
 			bSetupStarted = False
 		endIf
 	endWhile	
+
+	SendModEvent("TCCUpdate_Counts")
+	
+	if RN_MCM.Achievements_Enabled
+		SendModEvent("TCCUpdate_Counts_Uniques")
+	endIf	
 	
 	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
 		if !bMoreHUDListsCreated
@@ -467,13 +511,12 @@ Function Maintenance()
 	RN_Setup_Registered.setvalue(0)	
 	RN_Safehouse_Registered.setvalue(0)
 	RN_Safehouse_Done.setvalue(0)
-	DBM_SortWait.setvalue(0)
-
+	DBM_SortWait.setvalue(0)	
+	
 	if RN_MCM.ShowStartup
 		ModStartupDone.Show()
 	endIf
-	
-endFunction
+endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -491,6 +534,11 @@ function ScanMuseum()
 	DBM_SortWait.setvalue(1)
 
 	SendModEvent("TCCScan")
+	
+	if RN_MCM.Achievements_Enabled
+		SendModEvent("TCCScan_Uniques")
+	endIf
+	
 	FinishScan(5)
 endFunction
 
@@ -525,7 +573,7 @@ function UpdateAllFound()
 	bUpdating = True
 	DBM_SortWait.setvalue(1)
 	
-	SendModEvent("TCCUpdate")
+	SendModEvent("TCCUpdate")	
 	FinishUpdate(5)
 endFunction
 
@@ -548,27 +596,6 @@ endFunction
 
 ;;-- Functions ---------------------------------------
 
-Function UpdateTreasuryValue(ObjectReference _akContainer, GlobalVariable _akVariable)
-	
-	_akVariable.setvalue(0)
-	
-	Int _Index = _akContainer.GetNumItems()
-	
-	while _Index > 0
-		_Index -= 1
-		Form _Item = _akContainer.GetNthForm(_Index)
-		Int _Count = _akContainer.GetItemCount(_Item)
-		
-		if _Item != Gold001
-			_akVariable.Mod(_Item.GetGoldValue() * _Count)
-		endIf
-	endWhile
-	
-	_akVariable.Mod(_akContainer.GetItemCount(Gold001))	
-endFunction
-
-;;-- Functions ---------------------------------------
-
 Function RebuildLists()
 	
 	Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists...")
@@ -579,7 +606,7 @@ Function RebuildLists()
 	dbmNew.revert()
 	dbmFound.revert()
 	dbmDisp.revert()	
-	
+			
 	Int _Total = dbmMaster.GetSize()
 	Int _Index = 0
 	While _Index < _Total
@@ -610,9 +637,9 @@ Function SetUpSafehouse()
 	While _Index
 		_Index -= 1
 		ObjectReference _Container = _SafehouseContainerList.GetAT(_Index) as ObjectReference
-		RN_TokenFormlist.AddForm(_Container)
+		TCC_TokenList.AddForm(_Container)
 	endWhile
-	
+	SendModEvent("Update_TokenArray", "Updating Token Array")
 	SendModEvent("TCCSetup_SH")
 	
 	Debug.Notification("The Curators Companion: Adding Safehouse Integration...")
@@ -630,9 +657,9 @@ Function SetUpSafehouse()
 				Int ContainerList = _Container.GetNumItems()
 				while Index2 < ContainerList	
 					Form _ItemRelic = _Container.GetNthForm(Index2)			
-					if RN_Safehouse_Items_Merged.HasForm(_ItemRelic)
-						if !RN_Safehouse_Items_Found.HasForm(_ItemRelic)
-							RN_Safehouse_Items_Found.AddForm(_ItemRelic)
+					if TCC_ItemList_Safehouse.HasForm(_ItemRelic)
+						if !TCC_FoundList_Safehouse.HasForm(_ItemRelic)
+							TCC_FoundList_Safehouse.AddForm(_ItemRelic)
 						endIf
 					endIf
 					Index2 += 1
@@ -640,10 +667,10 @@ Function SetUpSafehouse()
 				Index += 1
 			endWhile
 			
-			Index = RN_TokenFormlist.GetSize() ;; Check player and custom storage for found items.
+			Index = TCC_TokenList.GetSize() ;; Check player and custom storage for found items.
 			While Index
 				Index -= 1
-				ObjectReference _Container = RN_TokenFormlist.GetAt(Index) as ObjectReference		
+				ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference		
 				Int _Index2 = _Container.GetNumItems()
 				While _Index2
 					_Index2 -= 1
@@ -668,6 +695,75 @@ Function SetUpSafehouse()
 		endIf		
 	endWhile
 endFunction
+
+;;-- Functions ---------------------------------------
+
+Event SetUpAchievements()
+
+	DBM_SortWait.setvalue(1)
+	RN_Setup_Start.setvalue(1)
+	bSetupStarted = True
+	SendModEvent("TCCSetup_Uniques")
+	Wait(5)
+
+	while bSetupStarted	
+		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
+			CreateMoreHudLists()
+			InitGlobals()
+			SendModEvent("TCCUpdate_Counts_Uniques")
+			
+			TCC_Achievements_Xmarker.Enable()
+	
+			RN_Setup_Start.setvalue(0)
+			RN_Setup_Done.setvalue(0)
+			RN_Setup_Registered.setvalue(0)
+			DBM_SortWait.setvalue(0)				
+			bSetupStarted = False
+			TCC_UniquesSetupFinished.Show()
+		endIf
+	endWhile	
+endEvent
+
+;;-- Functions ---------------------------------------
+
+Event UpdatePatches()
+		
+	DBM_SortWait.setvalue(1)
+	RN_Setup_Start.setvalue(1)
+	bSetupStarted = True
+	RN_SupportedModCount.setvalue(0)
+	RN_CustomModCount.setvalue(0)
+	
+	SendModEvent("TCCUpdate_Patches")
+	
+	if RN_MCM.Achievements_Enabled
+		SendModEvent("TCCUpdate_Uniques")
+	endIf	
+	
+	ModUpdateStartup.Show()
+	Wait(5)
+	
+	while bSetupStarted	
+		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
+			CreateMoreHudLists()
+			InitGlobals()
+			
+			SendModEvent("TCCUpdate_Counts")
+			
+			if RN_MCM.Achievements_Enabled
+				SendModEvent("TCCUpdate_Counts_Uniques")
+			endIf				
+			
+			ModUpdateFinished.Show()
+			
+			RN_Setup_Start.setvalue(0)
+			RN_Setup_Done.setvalue(0)
+			RN_Setup_Registered.setvalue(0)
+			DBM_SortWait.setvalue(0)				
+			bSetupStarted = False	
+		endIf
+	endWhile	
+endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

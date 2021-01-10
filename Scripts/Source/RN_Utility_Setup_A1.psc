@@ -10,7 +10,7 @@ Import Debug
 formlist[] property _itemsArray auto
 
 ;;Formlists to control item lists. - Merged Formlist 1. (HOH, Lib)
-formlist property DBM_Section_HOH_LIB_Merged auto ;;Merged Item List.
+formlist property TCC_ItemList_Museum_1 auto ;;Merged Item List.
 
 ;;Formlist to control item lists. - MoreHud.
 Formlist Property dbmNew auto
@@ -52,7 +52,7 @@ function _RunSetup(bool forced)
 		While _index
 			_index -= 1
 			Formlist _List = _itemsArray[_index]
-			_onConsolidateItems(_List, DBM_Section_HOH_LIB_Merged, dbmNew, dbmMaster)			
+			_onConsolidateItems(_List, TCC_ItemList_Museum_1, dbmNew, dbmMaster)			
 		endWhile
 		
 		RN_Setup_Done.Mod(1)

@@ -11,8 +11,8 @@ RN_Utility_MCM Property MCM auto
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;;Formlists to control item lists - Merged Formlist
-formlist property DBM_SectionArmory_Merged auto ;;Merged Item List.
-formlist property DBM_SectionArmory_Found auto ;;Found Item List
+formlist property TCC_ItemList_Armory auto ;;Merged Item List.
+formlist property TCC_FoundList_Armory auto ;;Found Item List
 
 ;;Formlists to control item lists - MoreHUD
 formlist property dbmNew auto
@@ -30,7 +30,7 @@ Message property DBM_FoundRelicMessageComplete auto
 Message property DBM_FoundRelicNotification auto
 
 ;;Alias to force the item into for messages / notifications.
-ReferenceAlias Property RN_Alias_Found auto
+ReferenceAlias Property FoundAlias auto
 
 ;;Check if Museum Intro is Complete.
 Quest Property DBM_MuseumIntro Auto
@@ -70,19 +70,19 @@ endEvent
 Event AddInventoryEventFilters()
 
 	RemoveAllInventoryEventFilters()
-	AddInventoryEventFilter(DBM_SectionArmory_Merged as Form)
+	AddInventoryEventFilter(TCC_ItemList_Armory as Form)
 endEvent
 
 ;;-- Events ---------------------------------------
 
 Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 			
-	if DBM_SectionArmory_Merged.HasForm(akBaseItem) && !DBM_SectionArmory_Found.HasForm(akBaseItem) 
-		DBM_SectionArmory_Found.AddForm(akBaseItem)	
+	if TCC_ItemList_Armory.HasForm(akBaseItem) && !TCC_FoundList_Armory.HasForm(akBaseItem) 
+		TCC_FoundList_Armory.AddForm(akBaseItem)	
 		
 		if (MCM.ShowArmoryVal)
 			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
-			RN_Alias_Found.ForceRefTo(FoundRelic)
+			FoundAlias.ForceRefTo(FoundRelic)
 			if (!MCM.ShowSimpleNotificationVal)
 				if (DBM_MuseumIntro.IsCompleted())
 					DBM_FoundRelicMessageComplete.Show()
@@ -92,7 +92,7 @@ Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemRefer
 			else
 				DBM_FoundRelicNotification.Show()
 			endIf
-			RN_Alias_Found.Clear()
+			FoundAlias.Clear()
 			FoundRelic.Delete()
 		endIf
 	endIf
@@ -116,8 +116,8 @@ Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;;Au
 		while Index2
 			Index2 -=1		
 			Form ItemRelic = _Container.GetNthForm(Index2)			
-			if DBM_SectionArmory_Merged.HasForm(ItemRelic) && !DBM_SectionArmory_Found.HasForm(ItemRelic)
-				DBM_SectionArmory_Found.AddForm(ItemRelic)
+			if TCC_ItemList_Armory.HasForm(ItemRelic) && !TCC_FoundList_Armory.HasForm(ItemRelic)
+				TCC_FoundList_Armory.AddForm(ItemRelic)
 			endIf		
 		endWhile
 	endWhile

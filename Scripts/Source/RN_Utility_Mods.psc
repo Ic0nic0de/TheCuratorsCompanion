@@ -56,10 +56,8 @@ globalvariable property RN_Installed_NixHound auto
 globalvariable property RN_Installed_3DNPC auto
 globalvariable property RN_Installed_Aetherium auto
 globalvariable property RN_Installed_Amulets auto
-globalvariable property RN_Installed_AnimatedArmory auto
 globalvariable property RN_Installed_ArtifactsSkyrim auto
 globalvariable property RN_Installed_Boethiah auto
-globalvariable property RN_Installed_Bruma auto
 globalvariable property RN_Installed_Cloaks auto
 globalvariable property RN_Installed_Clockwork auto
 globalvariable property RN_Installed_DawnguardArsenal auto
@@ -77,7 +75,6 @@ globalvariable property RN_Installed_HeavyArm auto
 globalvariable property RN_Installed_Helgen auto
 globalvariable property RN_Installed_ICOW auto
 globalvariable property RN_Installed_IceBlade auto
-globalvariable property RN_Installed_IdentityCrisis auto
 globalvariable property RN_Installed_ImmArm auto
 globalvariable property RN_Installed_ImmWeap auto
 globalvariable property RN_Installed_Jaysus auto
@@ -94,13 +91,12 @@ globalvariable property RN_Installed_RoM auto
 globalvariable property RN_Installed_Royal auto
 globalvariable property RN_Installed_RuinsEdge auto
 globalvariable property RN_Installed_SUT auto
-globalvariable property RN_Installed_SafehouseGeneral auto
+globalvariable property RN_SafeouseContent_Installed auto
 globalvariable property RN_Installed_SafehousePlus auto
 globalvariable property RN_Installed_SheoStaff auto
 globalvariable property RN_Installed_SkyrimSewers auto
 globalvariable property RN_Installed_Soaps auto
 globalvariable property RN_Installed_Teldryn auto
-globalvariable property RN_Installed_Brotherhood auto
 globalvariable property RN_Installed_TFC auto
 globalvariable property RN_Installed_TreasureHunter auto
 globalvariable property RN_Installed_Undeath auto
@@ -205,25 +201,12 @@ Event CheckSupportedMods()
 	else
 		RN_Installed_Boethiah.SetValue(0)
 	endIf
-
-;--------------------------
-
-	if Game.GetModByName("LOTD_TCC_Bruma.esp") != 255
-		RN_Installed_Bruma.SetValue(1)
-		
-	elseif Game.GetModByName("LOTD_TCC_Bruma.esp") == 255 && RN_Installed_Bruma.GetValue()
-		SendError(RN_Installed_Bruma)
-		_PatchError.Show()
-		
-	else
-		RN_Installed_Bruma.SetValue(0)
-	endIf
 	
 ;--------------------------
 	
 	if Game.GetModByName("LOTD_TCC_Cloaks.esp") != 255
 		RN_Installed_Cloaks.SetValue(1)
-		RN_Installed_SafehouseGeneral.SetValue(1)
+		RN_SafeouseContent_Installed.SetValue(1)
 		DBM_CloaksStorage = Game.GetFormFromFile(2122, "DBM_CloaksofSkyrim_Patch.esp") as objectreference
 		
 	elseif Game.GetModByName("LOTD_TCC_Cloaks.esp") == 255 && RN_Installed_Cloaks.GetValue()
@@ -563,7 +546,7 @@ Event CheckSupportedMods()
 
 	if Game.GetModByName("LOTD_TCC_Soaps.esp") != 255 || Game.GetModByName("LOTD_TCC_Soaps_KIC.esp") != 255
 		RN_Installed_Soaps.SetValue(1)
-		RN_Installed_SafehouseGeneral.SetValue(1)
+		RN_SafeouseContent_Installed.SetValue(1)
 		
 	elseif Game.GetModByName("LOTD_TCC_Soaps.esp") == 255 && RN_Installed_Soaps.GetValue() || !Game.GetModByName("LOTD_TCC_Soaps_KIC.esp") == 255 && RN_Installed_Soaps.GetValue()
 		SendError(RN_Installed_Soaps)
@@ -678,23 +661,10 @@ Event CheckSupportedMods()
 	endIf
 
 ;--------------------------
-	
-	if Game.GetModByName("LOTD_TCC_AnimatedArmory.esp") != 255
-		RN_Installed_AnimatedArmory.SetValue(1)
-		
-	elseif Game.GetModByName("LOTD_TCC_AnimatedArmory.esp") == 255 && RN_Installed_AnimatedArmory.GetValue()
-		SendError(RN_Installed_AnimatedArmory)
-		_PatchError.Show()
-		
-	else
-		RN_Installed_AnimatedArmory.SetValue(0)
-	endIf
-
-;--------------------------
 
 	if Game.GetModByName("LOTD_TCC_Follower_Auri.esp") != 255
 		RN_Installed_Follower_Auri.SetValue(1)
-		RN_Installed_SafehouseGeneral.SetValue(1)
+		RN_SafeouseContent_Installed.SetValue(1)
 		
 	elseif Game.GetModByName("LOTD_TCC_Follower_Auri.esp") == 255 && RN_Installed_Follower_Auri.GetValue()
 		SendError(RN_Installed_Follower_Auri)
@@ -708,7 +678,7 @@ Event CheckSupportedMods()
 
 	if Game.GetModByName("LOTD_TCC_Follower_Inigo.esp") != 255
 		RN_Installed_Follower_Inigo.SetValue(1)
-		RN_Installed_SafehouseGeneral.SetValue(1)
+		RN_SafeouseContent_Installed.SetValue(1)
 		
 	elseif Game.GetModByName("LOTD_TCC_Follower_Inigo.esp") == 255 && RN_Installed_Follower_Inigo.GetValue()
 		SendError(RN_Installed_Follower_Inigo)
@@ -722,7 +692,7 @@ Event CheckSupportedMods()
 
 	if Game.GetModByName("LOTD_TCC_Follower_Kaidan.esp") != 255
 		RN_Installed_Follower_Kaidan.SetValue(1)
-		RN_Installed_SafehouseGeneral.SetValue(1)
+		RN_SafeouseContent_Installed.SetValue(1)
 		
 	elseif Game.GetModByName("LOTD_TCC_Follower_Kaidan.esp") == 255 && RN_Installed_Follower_Kaidan.GetValue()
 		SendError(RN_Installed_Follower_Kaidan)
@@ -736,7 +706,7 @@ Event CheckSupportedMods()
 
 	if Game.GetModByName("LOTD_TCC_Follower_Mrissi.esp") != 255
 		RN_Installed_Follower_Mrissi.SetValue(1)
-		RN_Installed_SafehouseGeneral.SetValue(1)
+		RN_SafeouseContent_Installed.SetValue(1)
 		
 	elseif Game.GetModByName("LOTD_TCC_Follower_Mrissi.esp") == 255 && RN_Installed_Follower_Mrissi.GetValue()
 		SendError(RN_Installed_Follower_Mrissi)
@@ -750,7 +720,6 @@ Event CheckSupportedMods()
 
 	if Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255
 		RN_Installed_SafehousePlus.SetValue(1)
-		RN_Installed_SafehouseGeneral.SetValue(1)
 		
 	elseif Game.GetModByName("LOTD_TCC_SafehousePlus.esp") == 255 && RN_Installed_SafehousePlus.GetValue()
 		SendError(RN_Installed_SafehousePlus)
@@ -764,7 +733,6 @@ Event CheckSupportedMods()
 
 	if Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255
 		RN_Installed_CheeseMod.SetValue(1)
-		RN_Installed_SafehouseGeneral.SetValue(1)
 		
 	elseif Game.GetModByName("LOTD_TCC_CheeseMod.esp") == 255 && RN_Installed_CheeseMod.GetValue()
 		SendError(RN_Installed_CheeseMod)
@@ -879,19 +847,6 @@ Event CheckSupportedMods()
 	else
 		RN_Installed_HeavyArm.SetValue(0)
 	endIf
-
-;--------------------------
-
-	if Game.GetModByName("LOTD_TCC_IdentityCrisis.esp") != 255
-		RN_Installed_IdentityCrisis.SetValue(1)
-		
-	elseif Game.GetModByName("LOTD_TCC_IdentityCrisis.esp") == 255 && RN_Installed_IdentityCrisis.GetValue()
-		SendError(RN_Installed_IdentityCrisis)
-		_PatchError.Show()
-		
-	else
-		RN_Installed_IdentityCrisis.SetValue(0)
-	endIf
 	
 ;--------------------------
 
@@ -943,19 +898,6 @@ Event CheckSupportedMods()
 		
 	else
 		RN_Installed_ZimThane.SetValue(0)
-	endIf
-
-;--------------------------
-
-	if Game.GetModByName("LOTD_TCC_BrotherhoodofOld.esp") != 255 || Game.GetModByName("LOTD_TCC_BrotherhoodofOld_OAP.esp") != 255	
-		RN_Installed_Brotherhood.SetValue(1)
-		
-	elseif Game.GetModByName("LOTD_TCC_BrotherhoodofOld.esp") == 255 && RN_Installed_Brotherhood.GetValue() || !Game.GetModByName("LOTD_TCC_BrotherhoodofOld_OAP.esp") == 255 && RN_Installed_Brotherhood.GetValue()
-		SendError(RN_Installed_Brotherhood)
-		_PatchError.Show()
-		
-	else
-		RN_Installed_Brotherhood.SetValue(0)
 	endIf
 	
 ;--------------------------

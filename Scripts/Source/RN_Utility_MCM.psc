@@ -11,13 +11,9 @@ RN_Utility_autoScan property RN_AutoScan auto
 
 RN_Utility_Script property RN_Utility auto
 
-RN_Utility_Mods property RN_Mod auto
-
 RN_Storage_Transfer property RN_Transfer auto
 
 RN_Utility_QuestTracker_MCM property RN_Tracker auto
-
-RN_Utility_ArrayHolder property RN_Array auto
 
 RN_Utility_QuestTracker_Arrays property RN_Tracker_Array auto
 
@@ -31,18 +27,19 @@ string Status_Return
 
 bool Token_Vis
 bool Safehouse_Enabled 
+bool Ach_Highlight
+bool property RUI auto hidden
+bool property TOV auto hidden
+bool Property Achievements_Enabled auto hidden
+bool Property Ach_Perks auto hidden
 
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
-
-String Property _ModVersion auto
 
 ;; Player Ref for Game.GetPlayer()
 objectreference property PlayerRef auto
 
 ;; Storage Options
-spell property RN_Storage_Spell auto
-spell property RN_Storage_Summon_Spell auto
 globalvariable property CustomContainer auto
 
 ;; Treasury Value
@@ -54,87 +51,62 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
-formlist property RN_Safehouse_Items_Merged auto
-formlist property RN_TokenFormlist_NoShipment auto
+formlist property TCC_ItemList_Safehouse auto
+formlist property TCC_TokenList_NoShipmentCrates auto
 globalvariable property RN_moreHUD_Option auto
+
+formlist property RN_Achievement_Globals auto
 
 string[] moreHUDChoiceList 
 int IndexmoreHUD = 0
 int moreHUDOptions
 
+string[] AchievementSoundList
+int property IndexSounds auto hidden
+int SoundListOptions
+
+string[] AttributeList
+int property IndexAttribute auto hidden
+int AttributeListOptions
+
 ;; DBM Debug
 globalvariable property DBM_DebuggingON auto
 quest property DBM_Debugging auto
-
-;; Custom Storage
-formlist property RN_TokenFormlist auto
 
 bool property _UserSettings auto hidden
 
 ;; bool Properties
 bool property ShowMuseumVal = true auto hidden ;;Museum Notifications
-bool iRelicMuseumNotifications = false
-
 bool property ShowArmoryVal = true auto hidden ;;Armory Notifications
-bool iRelicArmoryNotifications = false
-
 bool property ShowModsVal = true auto hidden ;;Supported Mod Notifications
-bool iRelicModsNotifications = false
-
 bool property ShowSetCompleteVal = true auto hidden ;;Section / Set Completion Notifications
-bool iRelicSetCompleteNotifications = false
-
 bool property ShowSimpleNotificationVal = true auto hidden ;;Simple Notification (No MessageBox)
-bool iRelicSimpleNotifications = false
-
 bool property ShowListenerVal = true auto hidden ;;Notifications for Display Listeners
-bool iRelicListenerNotifications = false
-
-bool property StorageSpellVal auto hidden ;;Storage spell Value
-bool iRelicStorageOptions = false
-
-bool property SummonSpellVal auto hidden ;;Summon Type Value
-bool iRelicStorageSummon = false
-
+bool property Restricted auto hidden ;;Storage Restriction Value
 bool property AutoTransferRelics auto hidden ;;auto Transfer To Storage Container
-bool iRelicStorageTransfer = false
-
 bool property AllowWeapon auto hidden ;;auto Transfer To Storage Container
-bool Transfer_Weapon = false
-
 bool property AllowArmor auto hidden ;;auto Transfer To Storage Container
-bool Transfer_Armor = false
-
 bool property AllowBook auto hidden ;;auto Transfer To Storage Container
-bool Transfer_Book = false
-
 bool property AllowKey auto hidden ;;auto Transfer To Storage Container
-bool Transfer_Key = false
-
 bool property AllowGems auto hidden ;;auto Transfer To Storage Container
-bool Transfer_Gems = false
-
 bool property AllowMisc auto hidden ;;auto Transfer To Storage Container
-bool Transfer_Misc = false
-
 bool property AllowPotion auto hidden ;;auto Transfer To Storage Container
-bool Transfer_Potion = false
-
-bool property AllowProtectedItems auto hidden ;; Allow Protected Items.
-bool Transfer_Protected = false
-
 bool property DevDebugVal auto hidden ;; Debug alerts for Dev usage.
-bool Dev_Alerts = false
-
 bool property ShowStartup = true auto hidden ;; Shows Startup Messages
-bool iRelicShowStartup = false
 
 Int property PrepTransfer auto hidden ;; Prep Station transfer settings.
-bool PrepStationTransfer = false
 
 bool property ScanNotificationsval auto hidden ;; Museum Scan Notifications
 bool property autoScanVal auto hidden ;; Auto Museum Scan
 int property _ScanInterval auto ;; museum scan interval
+
+bool property Ach_Notify = true auto hidden
+bool property Ach_Visual = true auto hidden
+
+;Relic Storage
+Book Property RN_RSC_SpellTome auto
+Spell Property RN_Storage_Summon_Spell auto
+Leveleditem Property LItemSpellTomes00AllSpells auto
 
 ;; Globals for Complete Set Listings.
 globalvariable property iMuseumSets auto
@@ -142,24 +114,17 @@ globalvariable property iArmorySets auto
 globalvariable property iImmWeapSets auto
 globalvariable property iHeavyArmSets auto
 globalvariable property iModComplete auto
-globalvariable property iCreationComplete auto
+globalvariable property iCustomComplete auto
 globalvariable property iDisplaySectionComplete auto
 globalvariable property RN_SupportedModCount auto
-globalvariable property RN_SupportedCreationCount auto
+globalvariable property RN_CustomModCount auto
+globalvariable property RN_CreationClubContent_Installed auto
+globalvariable property RN_SafeouseContent_Installed auto
 
 ;; General Globals
-globalvariable property DBM_ArcSkill auto
 globalvariable property DBM_SortWait auto
 globalvariable property RN_Setup_Start auto
 globalvariable property RN_Token_Visibility auto
-
-globalvariable property RN_Installed_SafehouseGeneral auto
-globalvariable property RN_Installed_SkyUI auto
-globalvariable property RN_Installed_Fiss auto
-globalvariable property RN_Installed_ImmWeap auto
-globalvariable property RN_Installed_HeavyArm auto
-globalvariable property RN_Installed_SafehousePlus auto
-globalvariable property RN_Installed_CheeseMod auto
 
 ;; Treasury Globals
 globalvariable property RN_Total_Value auto
@@ -192,42 +157,96 @@ globalvariable property RN_Museum_Dibella_Statues_Total auto
 globalvariable property RN_Museum_Dibella_Statues_Count auto
 globalvariable property RN_Museum_Dibella_Statues_Complete auto
 
+globalvariable property RN_Achievements_Listener_Total auto
+globalvariable property RN_Achievements_Listener_Count auto
+globalvariable property RN_Achievements_Listener_Complete auto
+
+GlobalVariable Property RN_Ach01Complete Auto
+GlobalVariable Property RN_Ach02Complete Auto
+GlobalVariable Property RN_Ach03Complete Auto
+GlobalVariable Property RN_Ach04Complete Auto
+GlobalVariable Property RN_Ach05Complete Auto
+GlobalVariable Property RN_Ach06Complete Auto
+GlobalVariable Property RN_Ach07Complete Auto
+GlobalVariable Property RN_Ach08Complete Auto
+GlobalVariable Property RN_Ach09Complete Auto
+GlobalVariable Property RN_Ach10Complete Auto
+GlobalVariable Property RN_Ach11Complete Auto
+GlobalVariable Property RN_Ach12Complete Auto
+GlobalVariable Property RN_Ach13Complete Auto
+GlobalVariable Property RN_Ach14Complete Auto
+GlobalVariable Property RN_Ach15Complete Auto
+GlobalVariable Property RN_Ach16Complete Auto
+GlobalVariable Property RN_Ach17Complete Auto
+GlobalVariable Property RN_Ach18Complete Auto
+GlobalVariable Property RN_Ach19Complete Auto
+GlobalVariable Property RN_Ach20Complete Auto
+GlobalVariable Property RN_Ach21Complete Auto
+GlobalVariable Property RN_Ach22Complete Auto
+GlobalVariable Property RN_Ach23Complete Auto
+GlobalVariable Property RN_Ach24Complete Auto
+GlobalVariable Property RN_Ach25Complete Auto
+GlobalVariable Property RN_Ach26Complete Auto
+GlobalVariable Property RN_Ach27Complete Auto
+GlobalVariable Property RN_Ach28Complete Auto
+GlobalVariable Property RN_Ach29Complete Auto
+GlobalVariable Property RN_Ach30Complete Auto
+GlobalVariable Property RN_Ach31Complete Auto
+GlobalVariable Property RN_Ach32Complete Auto
+GlobalVariable Property RN_Ach33Complete Auto
+GlobalVariable Property RN_Ach34Complete Auto
+
+Formlist property _Museum_Global_Complete auto
+Formlist property _Museum_Global_Count auto
+Formlist property _Museum_Global_Total auto
+GlobalVariable[] RN_Museum_Global_Complete 
+GlobalVariable[] RN_Museum_Global_Count 
+GlobalVariable[] RN_Museum_Global_Total 
+String[] _Museum_Section_names
+
+Formlist property _Armory_Global_Complete auto
+Formlist property _Armory_Global_Count auto
+Formlist property _Armory_Global_Total auto
+GlobalVariable[] RN_Armory_Global_Complete
+GlobalVariable[] RN_Armory_Global_Count
+GlobalVariable[] RN_Armory_Global_Total
+String[] _Armory_Section_names
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Patches -----------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Formlist Property RN_Patches_Installed auto
-Formlist Property RN_Patches_Complete auto
-Formlist Property RN_Patches_Count auto
-Formlist Property RN_Patches_Total auto
-
-GlobalVariable[] RN_Patches_Installed_Array
 GlobalVariable[] RN_Patches_Complete_Array
 GlobalVariable[] RN_Patches_Count_Array
 GlobalVariable[] RN_Patches_Total_Array
 String[]  RN_Patches_Name
 
-Formlist Property RN_Creations_Installed auto
-Formlist Property RN_Creations_Complete auto
-Formlist Property RN_Creations_Count auto
-Formlist Property RN_Creations_Total auto
+GlobalVariable[] RN_Custom_Complete_Array
+GlobalVariable[] RN_Custom_Count_Array
+GlobalVariable[] RN_Custom_Total_Array
+String[]  RN_Custom_Name
 
-GlobalVariable[] RN_Creations_Installed_Array
-GlobalVariable[] RN_Creations_Complete_Array
-GlobalVariable[] RN_Creations_Count_Array
-GlobalVariable[] RN_Creations_Total_Array
-String[]  RN_Creations_Name
+GlobalVariable[] RN_Section_Complete_Array
+GlobalVariable[] RN_Section_Count_Array
+GlobalVariable[] RN_Section_Total_Array
+String[]  RN_Section_Name
+Int Index_Section
+
+GlobalVariable[] RN_Section2_Complete_Array
+GlobalVariable[] RN_Section2_Count_Array
+GlobalVariable[] RN_Section2_Total_Array
+String[]  RN_Section2_Name
+Int Index_Section2
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Event OnConfigInit()
-	RN_Thane_Listener_Total.SetValue(9)
-	RN_Skills_Listener_Total.SetValue(6)
-	CustomContainer.SetValue(1)
-	AddDynamicPagesList()
+	
 	Build_Arrays()
+	AddDynamicPagesList()
+	LItemSpellTomes00AllSpells.AddForm(RN_RSC_SpellTome,1 , 1)
 EndEvent
 
 ;-- Events --------------------------------
@@ -235,21 +254,33 @@ EndEvent
 Event AddDynamicPagesList()
 
 	ModName = "LOTD: The Curators Companion"
-	PagesList = new String[11]
+	PagesList = new String[12]
 	PagesList[0] = "General Settings"
 	PagesList[1] = "moreHUD & Scan"
 	PagesList[2] = "Relic Storage"
-	PagesList[3] = ""
-	PagesList[4] = "~~Completion~~"
-	PagesList[5] = "Museum Sections"
-	PagesList[6] = "Armory Sections"
-	PagesList[7] = "Supported Mods"
-	PagesList[8] = "Supported Creations"
-	PagesList[9] = ""
-	PagesList[10] = "Debug Options"
-	
+	PagesList[3] = "Achievements"
+	PagesList[4] = " "
+	PagesList[5] = "~~Completion~~"
+	PagesList[6] = "Museum Sections"
+	PagesList[7] = "Armory Sections"
+	PagesList[8] = "Official Patches"		
+
 	Int Q = 0
-	Int x = 11
+	Int x = 9
+
+	if RN_CustomModCount.GetValue()
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Custom Patches"
+		x += 1
+	endif
+
+	Q = PagesList.Find("")	
+		PagesList[Q] = " "
+	x += 1	
+		
+	Q = PagesList.Find("")	
+		PagesList[Q] = "Debug Options"
+	x += 1
 	
   Pages = Utility.CreateStringArray(x)
   Int index = x
@@ -269,15 +300,19 @@ Event OnPageReset(string page)
 		UnloadCustomContent()
 	endIf
 	
+	AddDynamicPagesList()
 	AddSettingsPage()
 	AddAdvancedPage()
 	AddRelicStoragePage()
+	AddAchievementsPage()
 	AddMuseumSetsPage()
 	AddArmorySetsPage()
 	AddCompletedModsPage()
-	AddCompletedCreationsPage()
+	AddCustomModsPage()
 	AddDebugPage()
 	InitmoreHUDChoiceList()
+	InitAchievementSoundList()
+	InitAttributeList()
 EndEvent
 
 ;-- Events --------------------------------
@@ -292,12 +327,27 @@ Event InitmoreHUDChoiceList()
 	moreHUDChoiceList[4] = "Hide All Icons"
 EndEvent
 
-	;;<font color='COLORHERE'>
+;-- Events --------------------------------
 
-	;;</font>
+Event InitAchievementSoundList()
 
-	;;#2b6320 - Green
-	;;#750e0e - Red
+	AchievementSoundList = new string[3]
+	AchievementSoundList[0] = "Default Sound FX"
+	AchievementSoundList[1] = "Crowd Cheer FX"
+	AchievementSoundList[2] = "No Sound FX"
+EndEvent
+
+;-- Events --------------------------------
+
+Event InitAttributeList()
+
+	AttributeList = new string[5]
+	AttributeList[0] = "No Attribute Reward"
+	AttributeList[1] = "Increase Magicka"
+	AttributeList[2] = "Increase Health"
+	AttributeList[3] = "Increase Stamina"
+	AttributeList[4] = "Random Attribute"
+EndEvent
 	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Settings Page ------------------------------------------------------------------------------------------------------
@@ -313,13 +363,13 @@ Event AddSettingsPage()
 		AddTextOptionST("iRelicMuseumNotifications", "Museum Items:", self.GetMuseumNotificationsString(), 0)
 		AddTextOptionST("iRelicArmoryNotifications", "Armory Items:", self.GetArmoryNotificationsString(), 0)	
 		
-		if RN_SupportedModCount.GetValue() > 0 || RN_SupportedCreationCount.GetValue() > 0
+		if RN_SupportedModCount.GetValue() > 0 || RN_CustomModCount.GetValue() > 0
 			AddTextOptionST("iRelicModsNotifications", "Creations & Mods Items:", self.GetModsNotificationsString(), 0)
 		else
 			AddTextOptionST("iRelicModsNotifications", "Creations & Mods Items:", "No Patches Found", 1)
 		endIF
 		
-		AddTextOptionST("iRelicListenerNotifications", "Exploration & Quest Displays:", self.GetListenerString(), 0)
+		AddTextOptionST("iRelicListenerNotifications", "Listeners:", self.GetListenerString(), 0)
 		AddTextOptionST("iRelicSetCompleteNotifications", "Collection / Set Completion:", self.GetCompleteNotificationsString(), 0)
 		AddEmptyOption()		
 		AddHeaderOption("General Settings:")
@@ -331,11 +381,11 @@ Event AddSettingsPage()
 		
 		SetCursorPosition(1)			
 		AddHeaderOption("Mod Info:")
-		AddTextOption("Thanks for using The Curators Companion, a full", "", 0)
+		AddTextOption("Thanks for downloading The Curators Companion, a full", "", 0)
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", "Version 4.0.0", 0)		
+		AddTextOption("", "Version 5.0.0", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -364,34 +414,15 @@ Event AddAdvancedPage()
 			AddtextOption("moreHUD Icon Settings:", "<font color='#750e0e'>Not Found</font>")
 		endif
 		
-		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
-		
-		AddEmptyOption()
-		
-		AddHeaderOption("moreHUD Integration:")
 		if Safehouse_Enabled
-			AddTextOptionST("Safehouse_Disp", "Safehouse Integration:", self.GetSafehouseOptions(), 1)		
+			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 1)		
 		elseif RN_Setup_Start.GetValue()
-			AddTextOptionST("Safehouse_Disp", "Safehouse Integration:", "Wait For Setup...", 1)
+			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", "Wait For Setup...", 1)
 		else
-			AddTextOptionST("Safehouse_Disp", "Safehouse Integration:", self.GetSafehouseOptions(), 0)
+			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", self.GetSafehouseOptions(), 0)
 		endIf
 		
-		AddEmptyOption()
-		
-		if Safehouse_Enabled
-			if RN_Installed_SafehousePlus.GetValue()
-				AddTextOption("Safehouse Plus", "Integrated", 1)
-			else
-				AddTextOption("Safehouse Plus", "Not Installed", 0)
-			endIf
-				
-			if RN_Installed_CheeseMod.GetValue()
-				AddTextOption("Cheesemod for Everyone", "Integrated", 1)
-			else
-				AddTextOption("Cheesemod for Everyone", "Not Installed", 0)
-			endIf
-		endIf
+		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
 		
 		SetCursorPosition(1)
 
@@ -413,43 +444,23 @@ endEvent
 Event AddRelicStoragePage()
 
 	if CurrentPage == "Relic Storage"
+		CustomContainer.SetValue(TCC_TokenList_NoShipmentCrates.GetSize() as Int)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
 		
 		AddHeaderOption("Relic Storage Settings:")
 		
-			 if DBM_ArcSkill.GetValue() >= 5 
-				AddTextOptionST("iRelicStorageOptions", "Relic Storage Container:", self.GetStorageOptions(), 0)
-			else
-				AddTextOptionST("iRelicStorageOptions", "Relic Storage Container:", self.GetStorageOptions(), 1)
-			endIf
-
-			 if DBM_ArcSkill.GetValue() >= 5 && StorageSpellVal 
-				AddTextOptionST("iRelicStorageSummon", "Container Access Type:", self.GetSummonOptions(), 0)
-			else
-				AddTextOptionST("iRelicStorageSummon", "Container Access Type:", self.GetSummonOptions(), 1)
-			endIf
-			
-			if StorageSpellVal 
-				AddTextOptionST("iRelicStorageTransfer", "Auto Relic Storage:", self.GetTransferOptions(), 0)
-			else
-				AddTextOptionST("iRelicStorageTransfer", "Auto Relic Storage:", self.GetTransferOptions(), 1)
-			endIf
-		
-		AddTextOptionST("Token_Visibility", "Storage Token Crafting:", self.GetTokenVisibility(), 0)
-		AddEmptyOption()
+		AddTextOptionST("iRelicRestrictionOptions", "Relic Storage Restriction:" , self.GetRestrictionOptions(), 0)
+		AddTextOptionST("Token_Visibility", "Storage Token Recipe:", self.GetTokenVisibility(), 0)
 		AddHeaderOption("Auto Storage Options:")
-			if !StorageSpellVal || !AutoTransferRelics
-				AddToggleOptionST("Transfer_Protected", "Quest / Protected Items", AllowProtectedItems, 1)
-				AddToggleOptionST("Transfer_Armor", "Armor", AllowArmor, 1)
-				AddToggleOptionST("Transfer_Book", "Books", AllowBook, 1)
-				AddToggleOptionST("Transfer_Gems", "Gems", AllowGems, 1)
-				AddToggleOptionST("Transfer_Key", "Keys", AllowKey, 1)
-				AddToggleOptionST("Transfer_Misc", "Misc Items", AllowMisc, 1)
-				AddToggleOptionST("Transfer_Potion", "Potions", AllowPotion, 1)
-				AddToggleOptionST("Transfer_Weapon", "Weapons", AllowWeapon, 1)
-			else
-				AddToggleOptionST("Transfer_Protected", "Quest / Protected Items", AllowProtectedItems, 0)
+		
+		if GetTransferOptions() == "Spell Required"
+			AddTextOptionST("iRelicStorageTransfer", "Automatic Relic Storage:", self.GetTransferOptions(), 1)
+		else
+			AddTextOptionST("iRelicStorageTransfer", "Automatic Relic Storage:", self.GetTransferOptions(), 0)
+		endIf
+		
+			if GetTransferOptions() == "Enabled" && Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)
 				AddToggleOptionST("Transfer_Armor", "Armor", AllowArmor, 0)
 				AddToggleOptionST("Transfer_Book", "Books", AllowBook, 0)
 				AddToggleOptionST("Transfer_Gems", "Gems", AllowGems, 0)
@@ -457,7 +468,7 @@ Event AddRelicStoragePage()
 				AddToggleOptionST("Transfer_Misc", "Misc Items", AllowMisc, 0)
 				AddToggleOptionST("Transfer_Potion", "Potions", AllowPotion, 0)
 				AddToggleOptionST("Transfer_Weapon", "Weapons", AllowWeapon, 0)
-			endIf
+			endIF
 		
 		SetCursorPosition(1)
 		AddHeaderOption("Custom Storage Containers: (" + CustomContainer.GetValue() as int + "/6)")
@@ -466,10 +477,10 @@ Event AddRelicStoragePage()
 		ObjectReference _Container
 		String _ContainerLocation
 		
-		Int _Index = RN_TokenFormlist_NoShipment.GetSize()
+		Int _Index = TCC_TokenList_NoShipmentCrates.GetSize()
 		While _Index
 			_Index -= 1
-			_Container = RN_TokenFormlist_NoShipment.GetAt(_Index) as ObjectReference				
+			_Container = TCC_TokenList_NoShipmentCrates.GetAt(_Index) as ObjectReference				
 			_ContainerLocation = _Container.GetCurrentLocation().GetName()
 				if !_ContainerLocation
 					_ContainerLocation = _Container.GetparentCell().GetName()
@@ -483,7 +494,250 @@ Event AddRelicStoragePage()
 		
 		AddEmptyOption()
 		AddTextOptionST("ShowCustomContainerInfo", "Custom Storage Info:", "Show Information", 0)
+		
 	endIf
+endEvent
+
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;----------------------------------------------------------------------------- Settings Page ------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+Event AddAchievementsPage()
+
+	if CurrentPage == "Achievements"
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		SetCursorPosition(0)
+
+		if !Achievements_Enabled
+			if RN_Setup_Start.GetValue()
+				AddTextOptionST("iAchievement_Enabled", "Enable Achievements System", "Wait For Setup...", 1)
+			else
+				AddToggleOptionST("iAchievement_Enabled", "Enable Achievements System", Achievements_Enabled, 0)	
+			endIf
+		
+		else
+			
+			AddHeaderOption("Settings:")	
+			AddToggleOptionST("AchievementSet01", "Notifications:", Ach_Notify, 0)
+			AddToggleOptionST("AchievementSet02", "Visual effect:", Ach_Visual, 0)
+			AddMenuOptionST("SoundListOptions", "Sound effect:", AchievementSoundList[IndexSounds])
+			
+			AddHeaderOption("Achievements:")	
+			
+			if RN_Ach01Complete.GetValue()
+				AddTextOptionST("iAchievement01", "Collector", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement01", "Collector", "Locked", 1)
+			endIf
+
+			if RN_Ach02Complete.GetValue()
+				AddTextOptionST("iAchievement02", "Hoarder", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement02", "Hoarder", "Locked", 1)
+			endIf
+
+			if RN_Ach03Complete.GetValue()
+				AddTextOptionST("iAchievement03", "Junior Librarian", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement03", "Junior Librarian", "Locked", 1)
+			endIf
+
+			if RN_Ach04Complete.GetValue()
+				AddTextOptionST("iAchievement04", "Bibliophile", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement04", "Bibliophile", "Locked", 1)
+			endIf
+
+			if RN_Ach05Complete.GetValue()
+				AddTextOptionST("iAchievement05", "Spelunker", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement05", "Spelunker", "Locked", 1)
+			endIf
+
+			if RN_Ach06Complete.GetValue()
+				AddTextOptionST("iAchievement06", "Lapidarist", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement06", "Lapidarist", "Locked", 1)
+			endIf
+
+			if RN_Ach07Complete.GetValue()
+				AddTextOptionST("iAchievement07", "Conchologist", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement07", "Conchologist", "Locked", 1)
+			endIf
+
+			if RN_Ach08Complete.GetValue()
+				AddTextOptionST("iAchievement08", "Fusilatelist", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement08", "Fusilatelist", "Locked", 1)
+			endIf
+
+			if RN_Ach09Complete.GetValue()
+				AddTextOptionST("iAchievement09", "Numismatist", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement09", "Numismatist", "Locked", 1)
+			endIf
+			
+			if RN_Ach10Complete.GetValue()
+				AddTextOptionST("iAchievement10", "Expert Sleuth", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement10", "Expert Sleuth", "Locked", 1)
+			endIf
+
+			if RN_Ach11Complete.GetValue()
+				AddTextOptionST("iAchievement11", "Pillar of Nirn", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement11", "Pillar of Nirn", "Locked", 1)
+			endIf
+
+			if RN_Ach12Complete.GetValue()
+				AddTextOptionST("iAchievement12", "Noise Complaint", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement12", "Noise Complaint", "Locked", 1)
+			endIf
+
+			if RN_Ach13Complete.GetValue()
+				AddTextOptionST("iAchievement13", "Masquerader", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement13", "Masquerader", "Locked", 1)
+			endIf
+
+			if RN_Ach14Complete.GetValue()
+				AddTextOptionST("iAchievement14", "That's Sir Thane to You", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement14", "That's Sir Thane to You", "Locked", 1)
+			endIf
+
+			if RN_Ach15Complete.GetValue()
+				AddTextOptionST("iAchievement15", "Guardian of the Divine", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement15", "Guardian of the Divine", "Locked", 1)
+			endIf
+
+			if RN_Ach16Complete.GetValue()
+				AddTextOptionST("iAchievement16", "Cut the Ribbon", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement16", "Cut the Ribbon", "Locked", 1)
+			endIf
+			
+			if RN_Ach17Complete.GetValue()
+				AddTextOptionST("iAchievement17", "Tentacle Afficianado", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement17", "Tentacle Afficianado", "Locked", 1)
+			endIf
+			
+			SetCursorPosition(1)			
+			AddHeaderOption("")	
+			
+			AddToggleOptionST("Enable_Highlights", "Achievement Descriptions:", Ach_Highlight, 0)
+			AddToggleOptionST("Disable_AchievementPerks", "Reward Perk Points:", Ach_Perks, 0)			
+			AddMenuOptionST("AttributeListOptions", "Reward Attribute:", AttributeList[IndexAttribute])
+			
+			AddHeaderOption("Awarded: " + self.GetCurrentAchievementCount(RN_Achievements_Listener_Count, RN_Achievement_Globals) + " Achievements")
+
+			if RN_Ach18Complete.GetValue()
+				AddTextOptionST("iAchievement18", "Temper Tantrum", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement18", "Temper Tantrum", "Locked", 1)
+			endIf
+			
+			if RN_Ach19Complete.GetValue()
+				AddTextOptionST("iAchievement19", "Taxidermist", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement19", "Taxidermist", "Locked", 1)
+			endIf
+
+			if RN_Ach20Complete.GetValue()
+				AddTextOptionST("iAchievement20", "By All of the Gods!", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement20", "By All of the Gods!", "Locked", 1)
+			endIf
+
+			if RN_Ach21Complete.GetValue()
+				AddTextOptionST("iAchievement21", "Gearhead", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement21", "Gearhead", "Locked", 1)
+			endIf
+
+			if RN_Ach22Complete.GetValue()
+				AddTextOptionST("iAchievement22", "Blind Construction", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement22", "Blind Construction", "Locked", 1)
+			endIf
+			
+			if RN_Ach23Complete.GetValue()
+				AddTextOptionST("iAchievement23", "Children of the Sky", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement23", "Children of the Sky", "Locked", 1)
+			endIf
+
+			if RN_Ach24Complete.GetValue()
+				AddTextOptionST("iAchievement24", "Ghostbuster", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement24", "Ghostbuster", "Locked", 1)
+			endIf
+
+			if RN_Ach25Complete.GetValue()
+				AddTextOptionST("iAchievement25", "Canvas Collector", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement25", "Canvas Collector", "Locked", 1)
+			endIf
+	
+			if RN_Ach26Complete.GetValue()
+				AddTextOptionST("iAchievement26", "That's all Folks", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement26", "That's all Folks", "Locked", 1)
+			endIf
+			
+			if RN_Ach27Complete.GetValue()
+				AddTextOptionST("iAchievement27", "Expansionist", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement27", "Expansionist", "Locked", 1)
+			endIf
+			
+			if RN_Ach28Complete.GetValue()
+				AddTextOptionST("iAchievement28", "Forgive and Forget", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement28", "Forgive and Forget", "Locked", 1)
+			endIf
+			
+			if RN_Ach29Complete.GetValue()
+				AddTextOptionST("iAchievement29", "Yer a Wizard " + PlayerRef.GetBaseObject().GetName(), "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement29", "Yer a Wizard " + PlayerRef.GetBaseObject().GetName(), "Locked", 1)
+			endIf
+			
+			if RN_Ach30Complete.GetValue()
+				AddTextOptionST("iAchievement30", "Master of Secrets", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement30", "Master of Secrets", "Locked", 1)
+			endIf
+			
+			if RN_Ach31Complete.GetValue()
+				AddTextOptionST("iAchievement31", "Deep Pockets", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement31", "Deep Pockets", "Locked", 1)
+			endIf
+			
+			if RN_Ach32Complete.GetValue()
+				AddTextOptionST("iAchievement32", "Guild Master Master", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement32", "Guild Master Master", "Locked", 1)
+			endIf
+			
+			if RN_Ach33Complete.GetValue()
+				AddTextOptionST("iAchievement33", "Champion of All", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement33", "Champion of All", "Locked", 1)
+			endIf
+			
+			if RN_Ach34Complete.GetValue()
+				AddTextOptionST("iAchievement34", "Midas Touch", "Awarded", 0)
+			else
+				AddTextOptionST("iAchievement34", "Midas Touch", "Locked", 1)
+			endIf
+		endif		
+	endif
 endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -493,32 +747,35 @@ endEvent
 Event AddMuseumSetsPage()
 
 	if CurrentPage == "Museum Sections"
-		BuildTotals(iMuseumSets, RN_Array._Museum_Global_Complete)
+		RN_Thane_Listener_Total.SetValue(9)
+		RN_Skills_Listener_Total.SetValue(6)
+		BuildTotalsArray(iMuseumSets, RN_Museum_Global_Complete)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)	
 		AddHeaderOption("Museum Sections:")	
 				
 		Int _Index = 0
-		Int _Length = RN_Array._Museum_Section_names.length
-		While _Index < _Length 
-			if RN_Array._Museum_Global_Complete[_Index].GetValue() == 1
-				if RN_Array._Museum_Global_Total[_Index].GetValue() > RN_Array._Museum_Global_Count[_Index].GetValue() 
-					RN_Array._Museum_Global_Complete[_Index].SetValue(0)
+		Int _Length = RN_Museum_Global_Complete.length
+		While _Index < _Length 			
+			
+			if RN_Museum_Global_Complete[_Index].GetValue() == 1
+				if RN_Museum_Global_Total[_Index].GetValue() > RN_Museum_Global_Count[_Index].GetValue() 
+					RN_Museum_Global_Complete[_Index].SetValue(0)
 				else
-					AddTextOption(RN_Array._Museum_Section_names[_Index], "Complete", 1)
+					AddTextOption(_Museum_Section_names[_Index], "Complete", 1)
 				endIF
 			elseif RN_Scan_Registered.GetValue()
-				AddTextOption(RN_Array._Museum_Section_names[_Index], "Updating...", 1)
+				AddTextOption(_Museum_Section_names[_Index], "Updating...", 1)
 			else
-				AddTextOption(RN_Array._Museum_Section_names[_Index], self.GetCurrentCount(RN_Array._Museum_Global_Count[_Index], RN_Array._Museum_Global_Total[_Index]), 0)
+				AddTextOption(_Museum_Section_names[_Index], self.GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
 			endIf
 			_Index += 1
 			
-			if _Index == 8 && !RN_SupportedCreationCount.GetValue()
+			if _Index == 8 && !RN_CreationClubContent_Installed.GetValue()
 				_Index += 1
 			endIf
 			
-			if _Index == 11 && !RN_Installed_SafehouseGeneral.GetValue()
+			if _Index == 11 && !RN_SafeouseContent_Installed.GetValue()
 				_Index += 1
 			endIf
 			
@@ -571,19 +828,19 @@ Event AddMuseumSetsPage()
 		
 		SetCursorPosition(1)
 		AddHeaderOption("Page Information:")
-		AddTextOption("This page lists all Museum sections that can be completed.", "", 0)
+		AddTextOption("This page lists all completable Museum sections.", "", 0)
 		AddEmptyOption()
-		AddTextOption("As you collect and display your items, the page will keep", "", 0)
-		AddTextOption("track of your progess.", "", 0)
+		AddTextOption("As items are collected and displayed, this page will", "", 0)
+		AddTextOption("keep track of your progess.", "", 0)
 		AddEmptyOption()
 		AddTextOption("Running the Museum Scan from the MCM or Prep Station", "", 0)
 		AddTextOption("will scan the Museum and Armory for items on display", "", 0)
 		AddTextOption("then update the figures in the MCM, it is recommended", "", 0)
-		AddTextOption("to scan after using the Prep Station to display items", "", 0)
-		if RN_SupportedCreationCount.GetValue()
+		AddTextOption("to use the autoscanner which can be enabled in the MCM", "", 0)
+		if RN_CreationClubContent_Installed.GetValue()
 			AddEmptyOption()
 		endIf
-		if RN_Installed_SafehouseGeneral.GetValue()
+		if RN_SafeouseContent_Installed.GetValue()
 			AddEmptyOption()
 		endIf
 		AddEmptyOption()			
@@ -612,22 +869,22 @@ endEvent
 Event AddArmorySetsPage()
 
 	if CurrentPage == "Armory Sections"
-		BuildTotals(iArmorySets, RN_Array._Armory_Global_Complete)
-		BuildTotals(iHeavyArmSets, RN_Array._HeavyArmory_Global_Complete)
-		BuildTotals(iImmWeapSets, RN_Array._ImmersiveWeapons_Global_Complete)
+		BuildTotalsArray(iArmorySets, RN_Armory_Global_Complete)
+		BuildTotalsArray(iHeavyArmSets, RN_Section_Complete_Array)
+		BuildTotalsArray(iImmWeapSets, RN_Section2_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)						
 		AddHeaderOption("Armory Sets:")
 		Int _Index = 0
-		Int _Length = RN_Array._Armory_Section_names.length
+		Int _Length = RN_Armory_Global_Complete.length
 		While _Index < _Length 
-		
-			if RN_Array._Armory_Global_Complete[_Index].GetValue() == 1
-				AddTextOption(RN_Array._Armory_Section_names[_Index], "Complete", 1)
+			
+			if RN_Armory_Global_Complete[_Index].GetValue() == 1
+				AddTextOption(_Armory_Section_names[_Index], "Complete", 1)
 			elseif RN_Scan_Registered.GetValue()
-				AddTextOption(RN_Array._Armory_Section_names[_Index], "Updating...", 1)
+				AddTextOption(_Armory_Section_names[_Index], "Updating...", 1)
 			else
-				AddTextOption(RN_Array._Armory_Section_names[_Index], self.GetCurrentCount(RN_Array._Armory_Global_Count[_Index], RN_Array._Armory_Global_Total[_Index]), 0)
+				AddTextOption(_Armory_Section_names[_Index], self.GetCurrentCount(RN_Armory_Global_Count[_Index], RN_Armory_Global_Total[_Index]), 0)
 			endIf
 			_Index +=1
 			
@@ -640,19 +897,21 @@ Event AddArmorySetsPage()
 		
 		SetCursorPosition(24)
 		
-		if (RN_Installed_HeavyArm.GetValue())
+		if (Game.GetModByName("LOTD_TCC_HeavyArm.esp") != 255)
 			AddHeaderOption("Heavy Armory Sets:")
 			
 			_Index = 0
-			_Length = RN_Array._HeavyArmory_Section_names.length
+			_Length = Index_Section
 			While _Index < _Length 
-			
-				if RN_Array._HeavyArmory_Global_Complete[_Index].GetValue() == 1
-					AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], "Complete", 1)
-				elseif RN_Scan_Registered.GetValue()
-					AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], "Updating...", 1)
-				else
-					AddTextOption(RN_Array._HeavyArmory_Section_names[_Index], self.GetCurrentCount(RN_Array._HeavyArmory_Global_Count[_Index], RN_Array._HeavyArmory_Global_Total[_Index]), 0)
+				
+				if RN_Section_Name[_Index] != ""
+					if RN_Section_Complete_Array[_Index].GetValue() == 1
+						AddTextOption(RN_Section_Name[_Index], "Complete", 1)
+					elseif RN_Scan_Registered.GetValue()
+						AddTextOption(RN_Section_Name[_Index], "Updating...", 1)
+					else
+						AddTextOption(RN_Section_Name[_Index], self.GetCurrentCount(RN_Section_Count_Array[_Index], RN_Section_Total_Array[_Index]), 0)
+					endIf
 				endIf
 				_Index +=1
 				
@@ -663,30 +922,34 @@ Event AddArmorySetsPage()
 			endWhile
 		endIf
 		
-		if (RN_Installed_HeavyArm.GetValue())
+		if (Game.GetModByName("LOTD_TCC_HeavyArm.esp") != 255)
 			SetCursorPosition(48)
 		else
 			SetCursorPosition(24)
 		endIf
 		
-		if (RN_Installed_ImmWeap.GetValue())
+		if (Game.GetModByName("LOTD_TCC_ImmWeap.esp") != 255)
 			AddHeaderOption("Immersive Weapons Sets:")
 			
 			_Index = 0
-			_Length = RN_Array._ImmersiveWeapons_Section_names.length
+			_Length = Index_Section2
 			While _Index < _Length 
-			
-				if RN_Array._ImmersiveWeapons_Global_Complete[_Index].GetValue() == 1
-					AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], "Complete", 1)
-				elseif RN_Scan_Registered.GetValue()
-					AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], "Updating...", 1)
-				else
-					AddTextOption(RN_Array._ImmersiveWeapons_Section_names[_Index], self.GetCurrentCount(RN_Array._ImmersiveWeapons_Global_Count[_Index], RN_Array._ImmersiveWeapons_Global_Total[_Index]), 0)
+				
+				if RN_Section2_Name[_Index] != ""				
+					if RN_Section2_Complete_Array[_Index].GetValue() == 1
+						AddTextOption(RN_Section2_Name[_Index], "Complete", 1)
+						
+					elseif RN_Scan_Registered.GetValue()
+						AddTextOption(RN_Section2_Name[_Index], "Updating...", 1)
+						
+					else
+						AddTextOption(RN_Section2_Name[_Index], self.GetCurrentCount(RN_Section2_Count_Array[_Index], RN_Section2_Total_Array[_Index]), 0)
+					endIf
 				endIf
 				_Index +=1
 				
 				if _Index == _Length / 2
-					if (RN_Installed_HeavyArm.GetValue()) 
+					if (Game.GetModByName("LOTD_TCC_HeavyArm.esp") != 255) 
 						SetCursorPosition(49)
 					else
 						SetCursorPosition(25)
@@ -704,28 +967,35 @@ endEvent
 
 Event AddCompletedModsPage()
 
-	if CurrentPage == "Supported Mods"
-		BuildTotals(iModComplete, RN_Patches_Complete_Array)
+	if CurrentPage == "Official Patches"
+		BuildTotalsArray(iModComplete, RN_Patches_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)				
-		AddHeaderOption(self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Supported Mods Completed", 0)
+
+		if Safehouse_Enabled
+			AddHeaderOption("Untracked Mods:", 0)
+			if (Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255)
+				AddTextOption("Safehouse Plus", "Installed", 1)
+			endIf
+				
+			if (Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255)
+				AddTextOption("Cheesemod for Everyone", "Installed", 1)
+			endIf
+		endIf		
 		
+		AddHeaderOption(self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Official Patches Completed", 0)
 		
-			
 		if RN_SupportedModCount.GetValue() > 0	
 			Int _IndexOpt = 0
 			Int _Index = 0
 			While _Index < RN_Patches_Name.length
-			
-				if RN_Patches_Installed_Array[_Index].GetValue()
+				if RN_Patches_Name[_Index] != ""
 					if RN_Patches_Complete_Array[_Index].GetValue()
 						AddTextOption(RN_Patches_Name[_Index], "Complete", 1)
 						_IndexOpt += 1
-				
 					elseif RN_Scan_Registered.GetValue()
 						AddTextOption(RN_Patches_Name[_Index], "Updating...", 1)
 						_IndexOpt += 1
-						
 					else
 						AddTextOption(RN_Patches_Name[_Index], self.GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]), 0)
 						_IndexOpt += 1
@@ -737,61 +1007,65 @@ Event AddCompletedModsPage()
 					SetCursorPosition(1)
 					AddHeaderOption("", 0)
 				endIf
-			endWhile
-		
+			endWhile	
 		else
+			SetCursorPosition(0)
+			AddHeaderOption("Official Patches", 0)
 			AddTextOption("No Trackable Patches Installed", "", 1)
 		endIf
 	endIf
 endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------Creations Page --------------------------------------------------------------------------------------------------
+;;---------------------------------------------------------------------------------Mods Page -------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Event AddCompletedCreationsPage()
-	
-	if CurrentPage == "Supported Creations"
-		BuildTotals(iCreationComplete, RN_Creations_Complete_Array)
+Event AddCustomModsPage()
+
+	if CurrentPage == "Custom Patches"
+		BuildTotalsArray(iCustomComplete, RN_Custom_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetCursorPosition(0)
-		AddHeaderOption(self.GetCurrentCount(iCreationComplete, RN_SupportedCreationCount) + " Supported Creations Completed", 0)		
-		if RN_SupportedCreationCount.GetValue()	
+		SetCursorPosition(0)					
+		
+		AddHeaderOption(self.GetCurrentCount(iCustomComplete, RN_CustomModCount) + " Custom Patches Completed", 0)
+		
+		if RN_CustomModCount.GetValue() > 0	
 			Int _IndexOpt = 0
 			Int _Index = 0
-			While _Index < RN_Creations_Name.length
-			
-				if RN_Creations_Installed_Array[_Index].GetValue()
-					if RN_Creations_Complete_Array[_Index].GetValue()
-						AddTextOption(RN_Creations_Name[_Index], "Complete", 1)
+			While _Index < RN_Custom_Name.length
+				
+				if RN_Custom_Name[_Index] != ""
+					if RN_Custom_Complete_Array[_Index].GetValue()
+						AddTextOption(RN_Custom_Name[_Index], "Complete", 1)
 						_IndexOpt += 1
-					
+				
 					elseif RN_Scan_Registered.GetValue()
-						AddTextOption(RN_Creations_Name[_Index], "Updating...", 1)
+						AddTextOption(RN_Custom_Name[_Index], "Updating...", 1)
 						_IndexOpt += 1
 						
 					else
-						AddTextOption(RN_Creations_Name[_Index], self.GetCurrentCount(RN_Creations_Count_Array[_Index], RN_Creations_Total_Array[_Index]), 0)
+						AddTextOption(RN_Custom_Name[_Index], self.GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]), 0)
 						_IndexOpt += 1
 					endIf
 				endIf
 				_Index +=1
-				
-				if _IndexOpt == (RN_SupportedCreationCount.GetValue() as Int / 2)
+				if _IndexOpt == (RN_CustomModCount.GetValue() as Int / 2)
 					SetCursorPosition(1)
 					AddHeaderOption("", 0)
 				endIf
-			endWhile						
+			endWhile	
 		else
-			AddTextOption("No Creations Installed", "", 1)
-		endIf		
+			SetCursorPosition(0)
+			AddHeaderOption("", 0)
+			AddTextOption("No Trackable Patches Installed", "", 1)
+		endIf
 	endIf
 endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;-------------------------------------------------------------------------------- Debug Page ------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+ 
 Event AddDebugPage()
 
 	if CurrentPage == "Debug Options"
@@ -800,8 +1074,8 @@ Event AddDebugPage()
 		AddHeaderOption("Debug Options:")
 		
 		AddToggleOptionST("Dev_Alerts", "Developer Debugging", DevDebugVal)
+		AddTextOptionST("Update_Patches", "Update Installed Patches", "", 0)
 		AddTextOptionST("Scan_Debug", "Reset Museum Scanner", "", 0)
-		AddEmptyOption()
 		AddEmptyOption()
 		AddHeaderOption("moreHUD Debug:")
 		AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 0)
@@ -809,48 +1083,35 @@ Event AddDebugPage()
 		AddTextOption("moreHUD Displayed count:", dbmDisp.GetSize() As Int, 0)
 		AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 0)
 		AddEmptyOption()
-			
+		
+		AddHeaderOption("Dev Handlers:")
+		AddTextOption("These options can and will break your game.", "", 1)
+		AddToggleOptionST("RUI_Handler", "RUI = (" + Utility.RandomInt(0,249) + "/" + Utility.RandomInt(250,500) + ")" , RUI)
+		AddToggleOptionST("TOV_Handler", "TOV = (" + Utility.RandomInt(0,249) + "/" + Utility.RandomInt(250,500) + ")" , TOV)
 		SetCursorPosition(1)
 		
 		AddHeaderOption("Mod Requirements:")
 
 		if SKSE.GetPluginVersion("fisses") > 0
-		
 			AddTextOption("FISSES:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("fisses") + "]", 0)
-			
 		else
-		
 			AddTextOption("FISSES:", "<font color='#750e0e'>Not Found</font>", 0)
-			
 		endIf
 
-		if SKSE.GetVersion() > 0
-			Int fSKSE = SKSE.GetVersion() * 10000 + SKSE.GetVersionMinor() * 100 + SKSE.GetVersionBeta()
-			AddTextOption("SKSE:", "<font color='#2b6320'>Installed</font>" + " [" + fSKSE + "]", 0)
-			
+		if SKSE.GetVersion() > 0			
+			AddTextOption("SKSE:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetVersion()+"."+SKSE.GetVersionMinor()+"."+SKSE.GetVersionBeta() + "]", 0)
 		else
-		
-			AddTextOption("SKSE:", "<font color='#750e0e'>Not Found</font>", 0)
-			
+			AddTextOption("SKSE:", "<font color='#750e0e'>Not Found</font>", 0)	
 		endIf
 
-		if (RN_Installed_SkyUI.GetValue())
-		
+		if (Game.GetModByName("SkyUI_SE.esp") != 255)
 			AddTextOption("SkyUI:", "<font color='#2b6320'>Installed</font>" + " [5.2SE]", 0)
-			
 		else
-		
 			AddTextOption("SkyUI:", "<font color='#750e0e'>Not Found</font>", 0)
-			
 		endIf	
 		
 		AddEmptyOption()
 		AddHeaderOption("Icon Support:")
-		
-		;;<font color='COLORHERE'>$FF_Sandbox</font>
-		
-		;;#2b6320 - Green
-		;;#750e0e - Red
 		
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
 		
@@ -891,13 +1152,13 @@ state RefreshMCM
 
 	function OnSelectST()
 	
-			ShowMessage("Please exit MCM and re-enter again to see changes", false, "Ok")
+			ShowMessage("Please exit the MCM and re-enter again to see changes", false, "Ok")
 			bool bRefresh = True
 			SetTitleText("===PLEASE WAIT===")
 			While bRefresh
 				If !IsInMenuMode()
-					RN_Mod.CheckSupportedMods()
 					Build_Arrays()
+					BuildPatchArray(false, true)
 					AddDynamicPagesList()		
 					RN_Tracker_Array._Build_Quest_Toggles()
 					RN_Tracker_Array._Build_Quest_Arrays()
@@ -945,7 +1206,7 @@ endState
 
 String function GetConfigSaveString()
 	
-		if (RN_Installed_Fiss.GetValue())
+		if (Game.GetModByName("Fiss.esp") != 255)
 			Status_Return = "Save Preset"
 		else
 			Status_Return = "FISS Not Found"
@@ -955,7 +1216,7 @@ endFunction
 
 String function GetConfigLoadString()
 
-		if (RN_Installed_Fiss.GetValue())
+		if (Game.GetModByName("Fiss.esp") != 255)
 			Status_Return = "Load Preset"
 		else
 			Status_Return = "FISS Not Found"
@@ -994,8 +1255,7 @@ FISSInterface fiss = FISSFactory.getFISS()
 	fiss.saveInt("_ScanInterval", _ScanInterval)
 	
 	;;Relic Storage Page
-	fiss.saveBool("Safe Storage Spell", StorageSpellVal)
-	fiss.saveBool("Summon Type", SummonSpellVal)
+	fiss.saveBool("Storage Restriction", Restricted)
 	fiss.saveBool("Relic Transfer", AutoTransferRelics)
 	fiss.saveBool("TokenCrafting", Token_Vis)
 	fiss.saveBool("AllowWeapon", AllowWeapon)
@@ -1005,11 +1265,16 @@ FISSInterface fiss = FISSFactory.getFISS()
 	fiss.saveBool("AllowGems", AllowGems)	
 	fiss.saveBool("AllowMisc", AllowMisc)	
 	fiss.saveBool("AllowPotion", AllowPotion)
-	fiss.saveBool("AllowProtectedItems", AllowProtectedItems)
+	
+	;;Achievements Page
+	fiss.saveBool("Achievement Notifications", Ach_Notify)
+	fiss.saveBool("Achievement Visuals", Ach_Visual)
+	fiss.saveInt("Achievement Sounds", IndexSounds)
+	fiss.saveBool("Achievement Perks", Ach_Perks)
+	fiss.saveInt("Achievement Attribute", IndexAttribute)	
 	
 	;;Quest Tracker
 	fiss.saveBool("Show Spoilers", RN_Tracker._bSpoilers)
-	fiss.saveBool("Hide Incomplete", RN_Tracker._HideIncomplete)
 	fiss.saveInt("Helgen Option", RN_Tracker._Helgen_Index)
 	fiss.saveInt("Legacy Option", RN_Tracker._Legacy_Index)
 	
@@ -1133,83 +1398,41 @@ FISSInterface fiss = FISSFactory.getFISS()
 	endIf
 	
 	;;Relic Storage Page
-	
-	
-	if DBM_ArcSkill.GetValue() >= 5
-		StorageSpellVal = fiss.loadBool("Safe Storage Spell")	
-		if !StorageSpellVal
-			if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
-				(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-			
-			elseif(Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
-				(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
-			endIf
-		
-			AutoTransferRelics = False
-			RN_Transfer.GoToState("Disabled")
-			
-			AllowWeapon = False
-			AllowArmor = False
-			AllowBook = False
-			AllowKey = False
-			AllowGems = False
-			AllowMisc = False
-			AllowPotion = False
-			AllowProtectedItems = False
 
-		elseif StorageSpellVal
-			if (!Game.GetPlayer().HasSpell(RN_Storage_Spell)) && SummonSpellVal
-				(Game.GetPlayer().AddSpell(RN_Storage_Spell))
-				
-			elseif (!Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)) && !SummonSpellVal
-				(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
-			endif
-		
-			AllowWeapon = fiss.loadBool("AllowWeapon")
-			AllowArmor = fiss.loadBool("AllowArmor")
-			AllowBook = fiss.loadBool("AllowBook")
-			AllowKey = fiss.loadBool("AllowKey")
-			AllowGems = fiss.loadBool("AllowGems")
-			AllowMisc = fiss.loadBool("AllowMisc")
-			AllowPotion = fiss.loadBool("AllowPotion")	
-			AllowProtectedItems= fiss.loadBool("AllowProtectedItems")
-			
-			AutoTransferRelics = fiss.loadBool("Relic Transfer")
-			if AutoTransferRelics && DBM_ArcSkill.GetValue() >= 5
-				RN_Transfer.GoToState("")
-			else
-				RN_Transfer.GoToState("Disabled")
-			endIf
-		endIf
+	Restricted = fiss.loadBool("Storage Restriction")
 	
+	AutoTransferRelics = fiss.loadBool("Relic Transfer")
+	if AutoTransferRelics
+		RN_Transfer.GoToState("")
 	else
-		StorageSpellVal = false
-		(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-		(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
-		AutoTransferRelics = False
 		RN_Transfer.GoToState("Disabled")
-		AllowWeapon = False
-		AllowArmor = False
-		AllowBook = False
-		AllowKey = False
-		AllowGems = False
-		AllowMisc = False
-		AllowPotion = False	
-		AllowProtectedItems = False
 	endIf
-				
-	SummonSpellVal = fiss.loadBool("Summon Type")	
+	
+	AllowWeapon = fiss.loadBool("AllowWeapon")
+	AllowArmor = fiss.loadBool("AllowArmor")
+	AllowBook = fiss.loadBool("AllowBook")
+	AllowKey = fiss.loadBool("AllowKey")
+	AllowGems = fiss.loadBool("AllowGems")
+	AllowMisc = fiss.loadBool("AllowMisc")
+	AllowPotion = fiss.loadBool("AllowPotion")	
+	
 	Token_Vis = fiss.loadBool("TokenCrafting")
 	if 	Token_Vis
 		RN_Token_Visibility.SetValue(1)
 	else
 		RN_Token_Visibility.SetValue(0)
 	endIf
-			
-	;;Quest Tracker
-	RN_Tracker._bSpoilers = fiss.loadBool("Show Spoilers")
-	RN_Tracker._HideIncomplete = fiss.loadBool("Hide Incomplete")
+
+	;; Achievements Page
 	
+	Ach_Notify = fiss.loadBool("Achievement Notifications")
+	Ach_Visual = fiss.loadBool("Achievement Visuals")
+	IndexSounds = fiss.loadInt("Achievement Sounds")
+	Ach_Perks = fiss.loadBool("Achievement Perks")
+	IndexAttribute = fiss.loadInt("Achievement Attribute")
+
+	;;Quest Tracker
+	RN_Tracker._bSpoilers = fiss.loadBool("Show Spoilers")	
 	RN_Tracker._Helgen_Index = fiss.loadInt("Helgen Option")
 	RN_Tracker._Legacy_Index = fiss.loadInt("Legacy Option")
 	
@@ -1286,31 +1509,24 @@ Function Begin_Config_Default()
 	ShowListenerVal = True
 	ShowStartup = True
 	PrepTransfer = 1
-	SummonSpellVal = False
-	StorageSpellVal = False	
-	if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
-		(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-	elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
-		(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
-	endIf
+	Restricted = True
 	
 	IndexmoreHUD = 0
 	
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-			AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-			AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-			AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-		endIf
-		
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017	
-			AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-			AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-		endIf
+	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
+		AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
+		AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
+		AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
+	endIf
+	
+	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017	
+		AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
+		AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
+		AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
+	endIf
 	
 	AutoTransferRelics = False
 	RN_Transfer.GoToState("Disabled")
-	
 	AllowWeapon = False
 	AllowArmor = False
 	AllowBook = False
@@ -1318,21 +1534,28 @@ Function Begin_Config_Default()
 	AllowGems = False
 	AllowMisc = False
 	AllowPotion = False
-	AllowProtectedItems = False
 	
 	ScanNotificationsval = True
-	_ScanInterval = 10
+	_ScanInterval = 30
 	AutoScanVal = True
 	RN_AutoScan.UpdateInt(_ScanInterval)
 	
 	RN_Tracker._bSpoilers = false
-	RN_Tracker._HideIncomplete = false
 	
 	RN_Tracker._Helgen_Index = 0
 	RN_Tracker._Legacy_Index = 0
 	
 	Token_Vis = True
 	RN_Token_Visibility.SetValue(1)
+
+	if Achievements_Enabled
+		Ach_Notify = True
+		Ach_Visual = True
+		IndexSounds = 0
+		Ach_Highlight = False
+		Ach_Perks = False
+		IndexAttribute = 0
+	endIf
 
 	if IsInMenuMode()
 		ForcePageReset()
@@ -1351,7 +1574,6 @@ Function Begin_Config_Author()
 	ShowListenerVal = True
 	ShowStartup = True
 	PrepTransfer = 1
-	SummonSpellVal = False
 	Token_Vis = True
 	RN_Token_Visibility.SetValue(1)
 
@@ -1369,53 +1591,34 @@ Function Begin_Config_Author()
 		AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
 		AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
 	endIf
-	
-	if DBM_ArcSkill.GetValue() >= 5
-		AutoTransferRelics = True
-		RN_Transfer.GoToState("")
-		AllowWeapon = True
-		AllowArmor = True
-		AllowBook = True
-		AllowKey = True
-		AllowGems = True
-		AllowMisc = True
-		AllowPotion = True
-		AllowProtectedItems = False
-		
-		StorageSpellVal = True
-		if (!Game.GetPlayer().HasSpell(RN_Storage_Spell)) && SummonSpellVal
-			(Game.GetPlayer().AddSpell(RN_Storage_Spell))
-			
-		elseif (!Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)) && !SummonSpellVal
-			(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
-		endIf
-	else
-		AutoTransferRelics = False
-		RN_Transfer.GoToState("Disabled")
-		AllowWeapon = False
-		AllowArmor = False
-		AllowBook = False
-		AllowKey = False
-		AllowGems = False
-		AllowMisc = False
-		AllowPotion = False
-		AllowProtectedItems = False
-		StorageSpellVal = False
-		if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
-			(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-		elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
-			(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
-		endIf
-	endIf
 
+	AutoTransferRelics = False
+	RN_Transfer.GoToState("Disabled")
+	AllowWeapon = False
+	AllowArmor = False
+	AllowBook = False
+	AllowKey = False
+	AllowGems = False
+	AllowMisc = False
+	AllowPotion = False
+	
+	Restricted = False
 	ScanNotificationsval = True
 	_ScanInterval = 5
 	AutoScanVal = True
 	RN_AutoScan.UpdateInt(_ScanInterval)
 	
 	RN_Tracker._bSpoilers = True
-	RN_Tracker._HideIncomplete = false
-	
+
+	if Achievements_Enabled
+		Ach_Notify = True
+		Ach_Visual = True
+		IndexSounds = 1
+		Ach_Highlight = True
+		Ach_Perks = True
+		IndexAttribute = 4
+	endIf
+		
 	if IsInMenuMode()
 		ForcePageReset()
 	endIf
@@ -1473,7 +1676,7 @@ state ScanMuseum
 	function OnSelectST()
 		
 		if ShowMessage("This will start the process of Scanning the Museum for completed sets... do you want to scan now?", true, "Scan", "Cancel")
-			ShowMessage("Please exit MCM and wait for the scan to complete", false, "Ok")
+			ShowMessage("Please exit the MCM and wait for the scan to complete", false, "Ok")
 			RN_Utility.ScanMuseum()
 		endIf
 	endFunction
@@ -1581,6 +1784,20 @@ state Dev_Alerts ;;Debug Options
 	EndEvent
 endState
 
+state RUI_Handler ;;Debug Options
+	Event OnSelectST()
+		RUI = !RUI
+		SetToggleOptionValueST(RUI)	
+	EndEvent
+endState
+
+state TOV_Handler ;;Debug Options
+	Event OnSelectST()
+		TOV = !TOV
+		SetToggleOptionValueST(TOV)	
+	EndEvent
+endState
+
 ;;-------------------------------
 
 state Scan_Debug
@@ -1608,6 +1825,24 @@ endState
 
 ;;-------------------------------
 
+State Update_Patches
+
+	function OnSelectST()
+	
+		if self.ShowMessage("This will send an update event to all installed patches, do you want to update now?", true, "Update", "Cancel")
+			self.ShowMessage("Please exit the MCM and follow the on-screen instructions", false, "Ok")
+			RN_Utility.UpdatePatches()
+		endIF			
+	EndFunction
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Use this to add support for new items / displays from installed patches that have been updated mid-game")
+	EndEvent
+endState
+
+;;-------------------------------
+
 state RebuildLists
 
 	Event OnSelectST()
@@ -1623,7 +1858,7 @@ state RebuildLists
 
 	Event OnHighlightST()
 
-		SetInfoText("This option will rebuild the moreHUD lists -- NOT FOR PLAYER USE")
+		SetInfoText("This option will rebuild the moreHUD lists -- Only to be used if prompted or advised by Developer.")
 	EndEvent
 endState
 
@@ -1755,135 +1990,49 @@ endFunction
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------------- Storage Options -----------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-				
-state iRelicStorageOptions ;;Storage Spell
-	
+;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+;;-------------------------------
+
+state iRelicRestrictionOptions
+
 	Event OnSelectST()
-		StorageSpellVal = !StorageSpellVal 
+		Restricted = !Restricted 
 			
-		self.SetTextOptionValueST(Self.SetStorageOptions(), false, "")
+		self.SetTextOptionValueST(Self.SetRestrictionOptions(), false, "")
 		ForcePagereset()
 	EndEvent
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Adds the spell for the Relic Storage Container to the player.\n The container is inaccessible until the player has reached an overall Archaeology level of 5")
-	EndEvent
-endState		
-
-;;-------------------------------
-	
-String function SetStorageOptions()	
-
-		if !StorageSpellVal
-			if (Game.GetPlayer().HasSpell(RN_Storage_Spell))
-				(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-					if AutoTransferRelics
-						AutoTransferRelics = FALSE
-						RN_Transfer.GoToState("Disabled")
-						AllowWeapon = FALSE
-						AllowArmor = FALSE
-						AllowBook = FALSE
-						AllowGems = FALSE
-						AllowKey = FALSE
-						AllowMisc= FALSE
-						AllowPotion = FALSE
-						AllowProtectedItems = False
-					endIf
-				Status_Return = "Add Spell"
-			
-			elseif (Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell))
-				(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
-					if AutoTransferRelics
-						AutoTransferRelics = FALSE
-						RN_Transfer.GoToState("Disabled")
-						AllowWeapon = FALSE
-						AllowArmor = FALSE
-						AllowBook = FALSE
-						AllowGems = FALSE
-						AllowKey = FALSE
-						AllowMisc= FALSE
-						AllowPotion = FALSE
-						AllowProtectedItems = False
-					endIf
-				Status_Return = "Add Spell"
-			endIf
-		
-		elseif StorageSpellVal
-			if (!Game.GetPlayer().HasSpell(RN_Storage_Spell)) && SummonSpellVal
-				(Game.GetPlayer().AddSpell(RN_Storage_Spell))
-				
-			elseif (!Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)) && !SummonSpellVal
-				(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
-				Status_Return = "Remove Spell"
-			endif	
-		endIf	
-	return Status_Return 
-endFunction
-
-;;-------------------------------
-	
-String function GetStorageOptions()
-	
-	if DBM_ArcSkill.GetValue() < 5
-		Status_Return = "Locked"
-		StorageSpellVal = FALSE
-	elseif !StorageSpellVal
-		Status_Return = "Add Spell"		
-	elseif StorageSpellVal
-		Status_Return = "Remove Spell"
-	endIf
-		return Status_Return
-endFunction	
-
-;;-------------------------------
-
-state iRelicStorageSummon ;;Storage Spell
-	
-	Event OnSelectST()
-		SummonSpellVal = !SummonSpellVal 
-			
-		self.SetTextOptionValueST(Self.SetSummonOptions(), false, "")
-		ForcePagereset()
-	EndEvent
-
-	Event OnHighlightST()
-
-		self.SetInfoText("Toggle to choose how you want to access the Relic Storage Container")
+		self.SetInfoText("Toggles storage restriction on/off.\n Off - The storage container will have no restrictions and will allow any items to be stored.\n On - The storage container will only allow items that are displayable and not already on display.")
 	EndEvent
 endState
 
 ;;-------------------------------
 	
-String function SetSummonOptions()	
-
-		if !SummonSpellVal
-			(Game.GetPlayer().RemoveSpell(RN_Storage_Spell))
-			(Game.GetPlayer().AddSpell(RN_Storage_Summon_Spell))
-			Status_Return = "Summon Chest"
+String function SetRestrictionOptions()
+	
+	if !Restricted
+		Status_Return = "Off"	
 		
-		elseif SummonSpellVal
-			(Game.GetPlayer().RemoveSpell(RN_Storage_Summon_Spell))
-			(Game.GetPlayer().AddSpell(RN_Storage_Spell))
-			Status_Return = "Cloud Access"		
-		endIf
-
-	return Status_Return 
-endFunction
+	elseif Restricted
+		Status_Return = "On"
+	endIf
+	return Status_Return
+endFunction	
 
 ;;-------------------------------
 	
-String function GetSummonOptions()
+String function GetRestrictionOptions()
 	
-	if DBM_ArcSkill.GetValue() < 5
-		Status_Return = "Locked"
-	elseif !SummonSpellVal
-		Status_Return = "Summon Chest"
-	elseif SummonSpellVal
-		Status_Return = "Cloud Access"
+	if !Restricted
+		Status_Return = "Off"
+		
+	elseif Restricted
+		Status_Return = "On"
 	endIf
-		return Status_Return
+	return Status_Return
 endFunction	
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1980,8 +2129,10 @@ endFunction
 	
 String function SetTransferOptions()	
 
-	if !AutoTransferRelics
-		Status_Return = "Disabled"
+	if !Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)
+		Status_Return = "Spell Required"
+	elseif !AutoTransferRelics
+		Status_Return = "Disabled"			
 	elseif AutoTransferRelics
 		Status_Return = "Enabled"				
 	endIf	
@@ -1992,9 +2143,8 @@ endFunction
 	
 String function GetTransferOptions()
 	
-	if !StorageSpellVal
-		Status_Return = "Locked"
-		AutoTransferRelics = FALSE
+	if !Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)
+		Status_Return = "Spell Required"
 	elseif !AutoTransferRelics
 		Status_Return = "Disabled"			
 	elseif AutoTransferRelics
@@ -2019,7 +2169,7 @@ state Token_Visibility ;;Token Visibility
 
 	Event OnSelectST()
 		Token_Vis = !Token_Vis
-		SetToggleOptionValueST(Self.SetTokenVisibility(), false, "")
+		SetTextOptionValueST(Self.SetTokenVisibility(), false, "")
 		ForcePageReset()
 	EndEvent
 
@@ -2036,11 +2186,11 @@ String function SetTokenVisibility()
 
 	if !Token_Vis
 		RN_Token_Visibility.SetValue(0)
-		Status_Return = "Hidden"
+		Status_Return = "Off"
 		
 	elseif Token_Vis
 		RN_Token_Visibility.SetValue(1)
-		Status_Return = "Visible"
+		Status_Return = "On"
 	endIf
 	
 	return Status_Return 
@@ -2051,10 +2201,10 @@ endFunction
 String function GetTokenVisibility()
 	
 	if !Token_Vis
-		Status_Return = "Hidden"
+		Status_Return = "Off"
 		
 	elseif Token_Vis
-		Status_Return = "Visible"
+		Status_Return = "On"
 	endIf
 	
 	return Status_Return 
@@ -2200,26 +2350,6 @@ state Transfer_Potion
 	EndEvent
 endState
 
-;;-------------------------------
-
-state Transfer_Protected
-
-	Event OnSelectST()
-		AllowProtectedItems = !AllowProtectedItems
-			SetToggleOptionValueST(AllowProtectedItems)
-	EndEvent
-	
-	Event OnDefaultST()
-		AllowProtectedItems = false
-		SetToggleOptionValueST(AllowProtectedItems)
-	EndEvent
-
-	Event OnHighlightST()
-
-		self.SetInfoText("Enabling this option will allow displayable Quest / Protected items to be Automatically transfered to the Relic Storage Container when picked up.\n Default: Disabled")
-	EndEvent
-endState
-
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Section Toggles------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2354,7 +2484,7 @@ state iRelicListenerNotifications
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Enable to show notifications for quest, skills and exploration displays in the Museum.\n Default: Enabled")
+		self.SetInfoText("Enable to show notifications for quest displays, skills displays, exploration displays and unlocked achievements in the Museum.\n Default: Enabled")
 	EndEvent
 endState
 
@@ -2489,7 +2619,7 @@ state Safehouse_Disp
 			if self.ShowMessage("This will Enable moreHUD icons and functionality for all standard Safehouse displays, do you want to enable now?", true, "Enable", "Cancel")
 				self.SetTextOptionValueST(self.SetSafehouseOptions(), false, "")
 				RN_Utility.SetUpSafehouse()
-				RN_Installed_SafehouseGeneral.SetValue(1)
+				RN_SafeouseContent_Installed.SetValue(1)
 			endIf
 		endIF			
 	EndFunction
@@ -2524,6 +2654,413 @@ String function GetSafehouseOptions()
 		return Status_Return
 endFunction	
 
+;;-------------------------------
+
+state iAchievement_Enabled
+	
+	function OnSelectST()
+	
+		Achievements_Enabled = !Achievements_Enabled 
+		
+		if Achievements_Enabled
+			if self.ShowMessage("This will enable the TCC Achievements system which can grant perks, gold, increases to attributes and Unique items for reaching certain milestones within Legacy of the Dragonborn, do you want to enable now?", true, "Enable", "Cancel")
+				ShowMessage("Please exit the MCM and wait for the setup complete notification", false, "Ok")
+				RN_Utility.SetUpAchievements()
+			endIf
+		endIF			
+	EndFunction
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Enable this to turn on the achievements system.\n Default: Disabled \n (THIS FEATURE CAN NOT BE DISABLED ONCE TURNED ON)")
+	EndEvent
+endState
+
+;;-------------------------------
+
+State Disable_AchievementPerks
+
+	function OnSelectST()
+	
+		Ach_Perks = !Ach_Perks 
+		SetToggleOptionValueST(Ach_Perks)
+	EndFunction
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Some achievements will grant perk points as part of the reward, use this option to enable/disable perk point rewards.\n Default: Disabled")
+	EndEvent
+endState
+
+State Enable_Highlights
+
+	function OnSelectST()
+	
+		Ach_Highlight = !Ach_Highlight 
+		SetToggleOptionValueST(Ach_Highlight)
+	EndFunction
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Use to show/hide the specific requirements for obtaining an achievement when hovering over them in the MCM.\n Default: Disabled")
+	EndEvent
+endState	
+;;-------------------------------
+		
+state SoundListOptions
+
+	event OnMenuOpenST()
+		SetMenuDialogStartIndex(IndexSounds)
+		SetMenuDialogDefaultIndex(0)
+		SetMenuDialogOptions(AchievementSoundList)
+	endEvent
+
+	event OnMenuAcceptST(int index)
+		IndexSounds = Index
+		SetMenuOptionValueST(SoundListOptions, AchievementSoundList[IndexSounds])
+		ForcePageReset()
+	endEvent
+
+	event OnDefaultST()
+		IndexSounds = 0
+		SetMenuOptionValueST(AchievementSoundList[IndexSounds])
+		ForcePageReset()
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("Use this menu to customize which sound plays when an achievement is awarded.")
+	endEvent
+endState
+
+;;-------------------------------
+		
+state AttributeListOptions
+
+	event OnMenuOpenST()
+		SetMenuDialogStartIndex(IndexAttribute)
+		SetMenuDialogDefaultIndex(0)
+		SetMenuDialogOptions(AttributeList)
+	endEvent
+
+	event OnMenuAcceptST(int index)
+		IndexAttribute = Index
+		SetMenuOptionValueST(AttributeListOptions, AttributeList[IndexAttribute])
+		ForcePageReset()
+	endEvent
+
+	event OnDefaultST()
+		IndexAttribute = 0
+		SetMenuOptionValueST(AttributeList[IndexAttribute])
+		ForcePageReset()
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("Use this menu to customize which attribute is increased when an achievement is awarded.")
+	endEvent
+endState
+
+;;-------------------------------
+
+state AchievementSet01
+
+	function OnSelectST()
+		Ach_Notify = !Ach_Notify
+		SetToggleOptionValueST(Ach_Notify)
+	EndFunction
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Enable this to turn on the achievements notification system.\n Default: Enabled")
+	EndEvent
+endState
+
+;;-------------------------------
+
+state AchievementSet02
+
+	function OnSelectST()
+		Ach_Visual = !Ach_Visual 
+		SetToggleOptionValueST(Ach_Visual)		
+	EndFunction
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Enable this to turn on the visual effect when an achievement is awarded.\n Default: Enabled")
+	EndEvent
+endState
+
+state iAchievement01
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Reach a total of 750 displays in the Museum")
+		endif
+	EndEvent
+endState
+
+state iAchievement02
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Reach a total of 1000 displays in the Museum")
+		endif
+	EndEvent
+endState
+
+state iAchievement03
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Reach a total of 100 book displays in the Museum")
+		endif
+	EndEvent
+endState
+
+state iAchievement04
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Reach a total of 250 book displays in the Museum")
+		endif
+	EndEvent
+endState
+
+state iAchievement05
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display all the Explorer Relics in the Guildhouse")
+		endif
+	EndEvent
+endState
+
+state iAchievement06
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display all the Gems in the Gallery of Natural Science")
+		endif
+	EndEvent
+endState
+
+state iAchievement07
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display all the Shells for the Tide Pool in the Gallery of Natural Science")
+		endif
+	EndEvent
+endState
+
+state iAchievement08
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display all 10 Decks of Cards in the Hall of Oddities")
+		endif
+	EndEvent
+endState
+
+state iAchievement09
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display the complete Coin Collection in the Hall of Oddities")
+		endif
+	EndEvent
+endState
+
+state iAchievement10
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Complete all side quests from Auryen's Notes")
+		endif
+	EndEvent
+endState
+
+state iAchievement11
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Locate and interact with all Standing Stones around Skyrim")
+		endif
+	EndEvent
+endState
+
+state iAchievement12
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Locate and interact with all Word Walls around Skyrim")
+		endif
+	EndEvent
+endState
+
+state iAchievement13
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display all Dragon Priest Masks and Dragon Claws in the Hall of Heroes")
+		endif
+	EndEvent
+endState
+
+state iAchievement14
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Help the people of Skyrim and become the Thane of every Hold")
+		endif
+	EndEvent
+endState
+
+state iAchievement15
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display all the pieces from the Arms of the Crusader set in the Hall of Heroes")
+		endif
+	EndEvent
+endState
+
+state iAchievement16
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Visit Solitude and complete the Legacy starting quest to open the Museum")
+		endif
+	EndEvent
+endState
+
+state iAchievement17
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display all the Black Books in the Daedric Gallery")
+		endif
+	EndEvent
+endState
+
+state iAchievement18
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Fill the Armory and reach a Smithing level of 100, this achievement does not count items from supported mods")
+		endif
+	EndEvent
+endState
+
+state iAchievement19
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Build all creature displays in the Gallery of Natural Science")
+		endif
+	EndEvent
+endState
+
+state iAchievement20
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Locate and interact with the 9 Shrines of the Divines around Skyrim")
+		endif
+	EndEvent
+endState
+
+state iAchievement21
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Locate or craft all Dwemer artifacts in the Reception Hall")
+		endif
+	EndEvent
+endState
+
+state iAchievement22
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Locate or craft all Falmer artifacts in the Reception Hall")
+		endif
+	EndEvent
+endState
+
+state iAchievement23
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Locate or craft all Nordic artifacts in the Reception Hall")
+		endif
+	EndEvent
+endState
+
+state iAchievement24
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Agree to help Brother Ikard and don't skip the Haunted Museum quest")
+		endif
+	EndEvent
+endState
+
+state iAchievement25
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Display all Museum Paintings")
+		endif
+	EndEvent
+endState
+
+state iAchievement26
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Complete all Excavations and roll the credits")
+		endif
+	EndEvent
+endState
+
+state iAchievement27
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Build all the Explorer Outposts")
+		endif
+	EndEvent
+endState
+
+state iAchievement28
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Forgive Avram after Shadows of One's Past")
+		endif
+	EndEvent
+endState
+
+state iAchievement29
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Become a Master of each spell school")
+		endif
+	EndEvent
+endState
+
+state iAchievement30
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Find and display Ice's Stalhrim Spoon of Assassination")
+		endif
+	EndEvent
+endState
+
+state iAchievement31
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Renovate Deepholme")
+		endif
+	EndEvent
+endState
+
+state iAchievement32
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Display all Guild Displays in the Dragonborn Hall")
+		endif
+	EndEvent
+endState
+
+state iAchievement33
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Complete all Daedric Quests")
+		endif
+	EndEvent
+endState
+
+state iAchievement34
+	Event OnHighlightST()
+		if Ach_Highlight
+			self.SetInfoText("Take all that gold and fill the Treasury!")
+		endif
+	EndEvent
+endState
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Return Strings -------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------
@@ -2539,14 +3076,16 @@ endFunction
 
 ;;-------------------------------
 
-Event BuildTotals(globalvariable akvariable, globalvariable[] array)
+Event BuildTotalsArray(globalvariable akvariable, Globalvariable[] _array)
 
 	akvariable.setvalue(0)
-	Int _Index = array.length
+	Int _Index = _array.length
 	while _Index
 		_Index -= 1
-		If array[_Index].GetValue()
-			akvariable.Mod(1)
+		if _array[_Index] != None
+			if _array[_Index].GetValue()
+				akvariable.Mod(1)
+			endIF
 		endIF
 	endWhile
 endEvent
@@ -2558,15 +3097,23 @@ string function GetCurrentMuseumCount(GlobalVariable akVariable)
 	Int Current_Count = (akVariable.GetValue()) as Int	
 	Int Total_Room = 11
 		
-		if RN_SupportedCreationCount.GetValue()
+		if RN_CreationClubContent_Installed.GetValue()
 			Total_Room += 1
 		endIf
 
-		if RN_Installed_SafehouseGeneral.GetValue()
+		if RN_SafeouseContent_Installed.GetValue()
 			Total_Room += 1
 		endIf
 		
 		Status_Return = (Current_Count + "/" + Total_Room + " Sections")
+	return Status_Return
+endFunction
+
+;;-------------------------------
+
+string function GetCurrentAchievementCount(GlobalVariable akVariable, Formlist akTotal)
+
+		Status_Return = (akVariable.GetValue() as Int + "/" + akTotal.GetSize() as Int)
 	return Status_Return
 endFunction
 
@@ -2658,174 +3205,224 @@ endFunction
 Event Build_Arrays()	
 	
 	Int _Index
-	
-	RN_Patches_Count_Array = new globalvariable[56]
+
+	RN_Armory_Global_Count = new globalvariable[20]
 	_Index = 0
-	While _Index < RN_Patches_Count.GetSize()
-		globalvariable akvariable = RN_Patches_Count.GetAt(_Index) as globalvariable
-		RN_Patches_Count_Array[_Index] = akvariable
+	While _Index < _Armory_Global_Count.GetSize()
+		globalvariable akvariable = _Armory_Global_Count.GetAt(_Index) as globalvariable
+		RN_Armory_Global_Count[_Index] = akvariable
 		_Index += 1
 	endWhile
 
-	RN_Patches_Total_Array = new globalvariable[56]
+	RN_Armory_Global_Complete = new globalvariable[20]
 	_Index = 0
-	While _Index < RN_Patches_Total.GetSize()
-		globalvariable akvariable = RN_Patches_Total.GetAt(_Index) as globalvariable
-		RN_Patches_Total_Array[_Index] = akvariable
+	While _Index < _Armory_Global_Complete.GetSize()
+		globalvariable akvariable = _Armory_Global_Complete.GetAt(_Index) as globalvariable
+		RN_Armory_Global_Complete[_Index] = akvariable
 		_Index += 1
 	endWhile
 
-	RN_Patches_Complete_Array = new globalvariable[56]
+	RN_Armory_Global_Total = new globalvariable[20]
 	_Index = 0
-	While _Index < RN_Patches_Complete.GetSize()
-		globalvariable akvariable = RN_Patches_Complete.GetAt(_Index) as globalvariable
-		RN_Patches_Complete_Array[_Index] = akvariable
-		_Index += 1
-	endWhile
-
-	RN_Patches_Installed_Array = new globalvariable[56]
-	_Index = 0
-	While _Index < RN_Patches_Installed.GetSize()
-		globalvariable akvariable = RN_Patches_Installed.GetAt(_Index) as globalvariable
-		RN_Patches_Installed_Array[_Index] = akvariable
+	While _Index < _Armory_Global_Total.GetSize()
+		globalvariable akvariable = _Armory_Global_Total.GetAt(_Index) as globalvariable
+		RN_Armory_Global_Total[_Index] = akvariable
 		_Index += 1
 	endWhile
 
 ;;-------------------------------
 
-	RN_Creations_Count_Array = new globalvariable[40]
+	RN_Museum_Global_Complete = new globalvariable[13]
 	_Index = 0
-	While _Index < RN_Creations_Count.GetSize()
-		globalvariable akvariable = RN_Creations_Count.GetAt(_Index) as globalvariable
-		RN_Creations_Count_Array[_Index] = akvariable
+	While _Index < _Museum_Global_Complete.GetSize()
+		globalvariable akvariable = _Museum_Global_Complete.GetAt(_Index) as globalvariable
+		RN_Museum_Global_Complete[_Index] = akvariable
 		_Index += 1
 	endWhile
 
-	RN_Creations_Total_Array = new globalvariable[40]
+	RN_Museum_Global_Count = new globalvariable[13]
 	_Index = 0
-	While _Index < RN_Creations_Total.GetSize()
-		globalvariable akvariable = RN_Creations_Total.GetAt(_Index) as globalvariable
-		RN_Creations_Total_Array[_Index] = akvariable
+	While _Index < _Museum_Global_Count.GetSize()
+		globalvariable akvariable = _Museum_Global_Count.GetAt(_Index) as globalvariable
+		RN_Museum_Global_Count[_Index] = akvariable
 		_Index += 1
 	endWhile
 
-	RN_Creations_Complete_Array = new globalvariable[40]
+	RN_Museum_Global_Total = new globalvariable[13]
 	_Index = 0
-	While _Index < RN_Creations_Complete.GetSize()
-		globalvariable akvariable = RN_Creations_Complete.GetAt(_Index) as globalvariable
-		RN_Creations_Complete_Array[_Index] = akvariable
-		_Index += 1
-	endWhile
-
-	RN_Creations_Installed_Array = new globalvariable[40]
-	_Index = 0
-	While _Index < RN_Creations_Installed.GetSize()
-		globalvariable akvariable = RN_Creations_Installed.GetAt(_Index) as globalvariable
-		RN_Creations_Installed_Array[_Index] = akvariable
+	While _Index < _Museum_Global_Total.GetSize()
+		globalvariable akvariable = _Museum_Global_Total.GetAt(_Index) as globalvariable
+		RN_Museum_Global_Total[_Index] = akvariable
 		_Index += 1
 	endWhile
 	
-	RN_Patches_Name = new string[56]
-	RN_Patches_Name[0] = "Aetherium Armor and Weapons"
-	RN_Patches_Name[1] = "Amulets of Skyrim"
-	RN_Patches_Name[2] = "Animated Armory"
-	RN_Patches_Name[3] = "Artifacts of Boethiah"
-	RN_Patches_Name[4] = "Artifacts of Skyrim"
-	RN_Patches_Name[5] = "Bad Gremlins Collectables"
-	RN_Patches_Name[6] = "Beyond Skyrim: Bruma"
-	RN_Patches_Name[7] = "Cloaks of Skyrim"
-	RN_Patches_Name[8] = "Clockwork"
-	RN_Patches_Name[9] = "Dawnguard Arsenal"
-	RN_Patches_Name[10] = "Dwemer Spectres"
-	RN_Patches_Name[11] = "Falskaar"
-	RN_Patches_Name[12] = "Follower: Auri"
-	RN_Patches_Name[13] = "Follower: Inigo"
-	RN_Patches_Name[14] = "Follower: Kaidan"
-	RN_Patches_Name[15] = "Follower: M'rissi"
-	RN_Patches_Name[16] = "Fossil Mining"
-	RN_Patches_Name[17] = "The Gray Cowl Of Nocturnal"
-	RN_Patches_Name[18] = "Guard Armor Replacer"
-	RN_Patches_Name[19] = "Heavy Armory"
-	RN_Patches_Name[20] = "Helgen Reborn"
-	RN_Patches_Name[21] = "Ice Blade of the Monarch"
-	RN_Patches_Name[22] = "Identity Crisis"
-	RN_Patches_Name[23] = "Immersive College Of Winterhold"
-	RN_Patches_Name[24] = "Immersive Armors"
-	RN_Patches_Name[25] = "Immersive Weapons"
-	RN_Patches_Name[26] = "Inn Soaps"
-	RN_Patches_Name[27] = "Interesting NPC's"
-	RN_Patches_Name[28] = "Jaysus Swords"
-	RN_Patches_Name[29] = "konahrik's accoutrements"
-	RN_Patches_Name[30] = "Kthonia's Weapon Pack"
-	RN_Patches_Name[31] = "Moonpath To Elsweyr"
-	RN_Patches_Name[32] = "Moon And Star"
-	RN_Patches_Name[33] = "New Treasure Hunt"
-	RN_Patches_Name[34] = "Oblivion Artifacts"
-	RN_Patches_Name[35] = "Path of the Revanant"
-	RN_Patches_Name[36] = "Project AHO"
-	RN_Patches_Name[37] = "Reliquary of Myth"
-	RN_Patches_Name[38] = "Royal Armory"
-	RN_Patches_Name[39] = "Ruins Edge"
-	RN_Patches_Name[40] = "Skyrim Sewers"
-	RN_Patches_Name[41] = "Skyrim Underground"
-	RN_Patches_Name[42] = "Skyrim Unique Treasures"
-	RN_Patches_Name[43] = "Staff of Sheogorath"
-	RN_Patches_Name[44] = "Teldryn Serious"
-	RN_Patches_Name[45] = "The Brotherhood of Old"
-	RN_Patches_Name[46] = "The Forgotten City"
-	RN_Patches_Name[47] = "The Wheels Of Lull"
-	RN_Patches_Name[48] = "Tools of Kagrenac"
-	RN_Patches_Name[49] = "Treasure Hunter"
-	RN_Patches_Name[50] = "Undeath"
-	RN_Patches_Name[51] = "Vigilant."
-	RN_Patches_Name[52] = "Volkihar Knight"
-	RN_Patches_Name[53] = "Wintersun"
-	RN_Patches_Name[54] = "Wyrmstooth"
-	RN_Patches_Name[55] = "Zim's Thane Weapons"	
-	
-	RN_Creations_Name = new string[40]
-	RN_Creations_Name[0] = "Adventurer's Backpack"
-	RN_Creations_Name[1] = "Alternate Armors - Daedric Mail"
-	RN_Creations_Name[2] = "Alternate Armors - Dragonscale"
-	RN_Creations_Name[3] = "Alternate Armors - Dwarven Mail"
-	RN_Creations_Name[4] = "Alternate Armors - Ebony Plate"
-	RN_Creations_Name[5] = "Alternate Armors - Elven Hunter"
-	RN_Creations_Name[6] = "Alternate Armors - Stalhrim Fur"
-	RN_Creations_Name[7] = "Alternate Armors - Steel Soldier"
-	RN_Creations_Name[8] = "Arcane Accessories"
-	RN_Creations_Name[9] = "Arcane Archer Pack"
-	RN_Creations_Name[10] = "Arms of Chaos"
-	RN_Creations_Name[11] = "Bone Wolf"
-	RN_Creations_Name[12] = "Camping"
-	RN_Creations_Name[13] = "Civil War Champions"
-	RN_Creations_Name[14] = "Dawnfang & Duskfang"
-	RN_Creations_Name[15] = "Dead Man's Dread"
-	RN_Creations_Name[16] = "Divine Crusader"
-	RN_Creations_Name[17] = "Dwarven Armored Mudcrab"
-	RN_Creations_Name[18] = "Elite Crossbows"
-	RN_Creations_Name[19] = "Expanded Crossbow Pack"
-	RN_Creations_Name[20] = "Forgotten Seasons"
-	RN_Creations_Name[21] = "Goblins"
-	RN_Creations_Name[22] = "Netch Leather Armor"
-	RN_Creations_Name[23] = "Nix-Hound"
-	RN_Creations_Name[24] = "Nordic Jewelry"
-	RN_Creations_Name[25] = "Pets of Skyrim"
-	RN_Creations_Name[26] = "Plague of the Dead"
-	RN_Creations_Name[27] = "Rare Curios"
-	RN_Creations_Name[28] = "Ruin's Edge"
-	RN_Creations_Name[29] = "Saints & Seducers"
-	RN_Creations_Name[30] = "Saturalia Holiday Pack"
-	RN_Creations_Name[31] = "Shadowrend"
-	RN_Creations_Name[32] = "Spell Knight Armor"
-	RN_Creations_Name[33] = "Staff of Hasedoki"
-	RN_Creations_Name[34] = "Staff of Sheogorath"
-	RN_Creations_Name[35] = "Stendarr's Hammer"
-	RN_Creations_Name[36] = "The Gray Cowl Returns!"
-	RN_Creations_Name[37] = "Umbra"
-	RN_Creations_Name[38] = "Vigil Enforcer Armor Set"
-	RN_Creations_Name[39] = "Wild Horses"
+;;-------------------------------
+
+	_Armory_Section_names = new string[20]
+	_Armory_Section_names[0] = "Ancient Nord Set:"
+	_Armory_Section_names[1] = "Blades Set:"
+	_Armory_Section_names[2] = "Daedric Set:"
+	_Armory_Section_names[3] = "Dawnguard Set:"
+	_Armory_Section_names[4] = "Dragon Set:"
+	_Armory_Section_names[5] = "Dwarven Set:"
+	_Armory_Section_names[6] = "Ebony Set:"
+	_Armory_Section_names[7] = "Elven Set:"
+	_Armory_Section_names[8] = "Falmer Set:"
+	_Armory_Section_names[9] = "Forsworn Set:"
+	_Armory_Section_names[10] = "Glass Set:"
+	_Armory_Section_names[11] = "Guard Armor Set:"
+	_Armory_Section_names[12] = "Iron Set:"
+	_Armory_Section_names[13] = "Misc Set:"
+	_Armory_Section_names[14] = "Nordic Set:"
+	_Armory_Section_names[15] = "Orcish Set:"
+	_Armory_Section_names[16] = "Snow Elf Set:"
+	_Armory_Section_names[17] = "Stalhrim Set:"
+	_Armory_Section_names[18] = "Steel Set:"
+	_Armory_Section_names[19] = "Thane Weapons Set:"
+
+	_Museum_Section_names = new string[13]
+	_Museum_Section_names[0] = "Armory:"
+	_Museum_Section_names[1] = "Daedric Gallery:"
+	_Museum_Section_names[2] = "Dragonborn Hall:"
+	_Museum_Section_names[3] = "Guildhouse:"
+	_Museum_Section_names[4] = "Hall of Heroes:"
+	_Museum_Section_names[5] = "Hall of Lost Empires:"
+	_Museum_Section_names[6] = "Hall of Oddities:"
+	_Museum_Section_names[7] = "Hall of Secrets:"
+	_Museum_Section_names[8] = "Hall of Wonders:"
+	_Museum_Section_names[9] = "Library:"
+	_Museum_Section_names[10] = "Natural Science:"
+	_Museum_Section_names[11] = "Safehouse:"
+	_Museum_Section_names[12] = "Storeroom:"
 endEvent
 
+;;-------------------------------
+	
+Function AddModSupport(Int _WaitTime, Int _ArrayIndex = -1, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
+	
+	Utility.Wait(_WaitTime)
+	
+	Int Index = RN_Patches_Name.Find(_ModName)
+	if Index == -1
+		if _ArrayIndex != -1
+			Index = _ArrayIndex
+		else
+			Index = RN_Patches_Name.Find("")
+		endIf
+		RN_Patches_Name[Index] = _ModName
+		RN_Patches_Complete_Array[Index] = _GVComplete
+		RN_Patches_Count_Array[Index] = _GVCount
+		RN_Patches_Total_Array[Index] = _GVTotal
+	else
+		RN_Patches_Name[Index] = _ModName
+		RN_Patches_Complete_Array[Index] = _GVComplete
+		RN_Patches_Count_Array[Index] = _GVCount
+		RN_Patches_Total_Array[Index] = _GVTotal		
+	endif
+	
+	Debug.Trace("TCC Registered " + _ModName + " at position " + Index)
+
+	If DevDebugVal
+		DBMDebug.Log(self, "TCC Registered " + _ModName + " at position " + Index)
+	endIf
+endFunction
+
+;;-------------------------------
+	
+Function AddCustomModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
+	
+	Utility.Wait(_WaitTime)
+	
+	Int Index = RN_Custom_Name.Find(_ModName)
+	if Index == -1
+		Index = RN_Custom_Name.Find("")
+		RN_Custom_Name[Index] = _ModName
+		RN_Custom_Complete_Array[Index] = _GVComplete
+		RN_Custom_Count_Array[Index] = _GVCount
+		RN_Custom_Total_Array[Index] = _GVTotal
+	else
+		RN_Custom_Name[Index] = _ModName
+		RN_Custom_Complete_Array[Index] = _GVComplete
+		RN_Custom_Count_Array[Index] = _GVCount
+		RN_Custom_Total_Array[Index] = _GVTotal		
+	endif
+	
+	;Debug.Trace("TCC Registered Custom Patch " + _ModName + " at position " + Index)
+
+	If DevDebugVal
+		DBMDebug.Log(self, "TCC Registered Custom Patch " + _ModName + " at position " + Index)
+	endIf
+endFunction
+
+;;-------------------------------
+	
+Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, String _ModName, String[] _SectionName)
+	
+	Int Index
+	
+	if _ModName == "Heavy Armory"
+		
+		Index = Complete.GetSize()
+		Index_Section = Index
+		While  Index
+			Index -= 1
+			RN_Section_Name[Index] = _SectionName[Index]
+			RN_Section_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
+			RN_Section_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
+			RN_Section_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
+			If DevDebugVal
+				DBMDebug.Log(self, "TCC Registered Section " + _SectionName[Index] + " at position " + Index)
+			endIf
+		endWhile
+	
+	elseif _ModName == "Immersive Weapons"
+
+		Index = Complete.GetSize()
+		Index_Section2 = Index
+		While  Index
+			Index -= 1
+			RN_Section2_Name[Index] = _SectionName[Index]
+			RN_Section2_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
+			RN_Section2_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
+			RN_Section2_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
+			If DevDebugVal
+				DBMDebug.Log(self, "TCC Registered Section " + _SectionName[Index] + " at position " + Index)
+			endIf
+		endWhile	
+	endIf
+endFunction
+
+;;-------------------------------
+
+Function BuildPatchArray(bool _create, bool _Rebuild)
+	
+	if _create
+		RN_Patches_Complete_Array = new globalvariable[128]
+		RN_Patches_Count_Array = new globalvariable[128]
+		RN_Patches_Total_Array = new globalvariable[128]
+		RN_Patches_Name = new string[128]
+		
+		RN_Custom_Complete_Array = new globalvariable[128]
+		RN_Custom_Count_Array = new globalvariable[128]
+		RN_Custom_Total_Array = new globalvariable[128]
+		RN_Custom_Name = new string[128]
+
+		RN_Section_Complete_Array = new globalvariable[128]
+		RN_Section_Count_Array = new globalvariable[128]
+		RN_Section_Total_Array = new globalvariable[128]
+		RN_Section_Name = new string[128]
+		
+		RN_Section2_Complete_Array = new globalvariable[128]
+		RN_Section2_Count_Array = new globalvariable[128]
+		RN_Section2_Total_Array = new globalvariable[128]
+		RN_Section2_Name = new string[128]	
+	endIf
+	
+	if _Rebuild
+		SendModEvent("TCCUpdate_Arrays")
+	endIf
+endFunction
+			
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script End ------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

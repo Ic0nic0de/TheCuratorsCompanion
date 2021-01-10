@@ -9,11 +9,11 @@ formlist property dbmMaster auto
 
 formlist property _ChestSpecificItems auto
 
-formlist property RN_TokenFormlist auto
+formlist property TCC_TokenList auto
 
 int[] property _DisplayCounts auto
 
-globalvariable property RN_Installed_SafehouseGeneral auto
+globalvariable property RN_SafeouseContent_Installed auto
 
 ;-- Events --------------------------------
 
@@ -43,7 +43,7 @@ endEvent
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 	
-	if RN_Installed_SafehouseGeneral.GetValue() == 1	
+	if RN_SafeouseContent_Installed.GetValue() == 1	
 		if dbmNew.HasForm(akBaseItem) && _ChestSpecificItems.HasForm(akBaseItem) || dbmFound.HasForm(akBaseItem) && _ChestSpecificItems.HasForm(akBaseItem)
 		
 			Int _ItemPosition = _ChestSpecificItems.Find(akBaseItem)
@@ -66,14 +66,14 @@ endEvent
 
 Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
 
-	if RN_Installed_SafehouseGeneral.GetValue() == 1
+	if RN_SafeouseContent_Installed.GetValue() == 1
 	
 		Int _ItemPosition = _ChestSpecificItems.Find(akBaseItem)
 
 		if self.GetItemCount(akBaseItem) == 0 || Self.GetItemCount(akBaseItem) < _DisplayCounts[_ItemPosition]
 			if dbmDisp.HasForm(akBaseItem)
 				dbmDisp.RemoveAddedForm(akBaseItem)
-				if !RN_TokenFormlist.HasForm(akDestContainer)
+				if !TCC_TokenList.HasForm(akDestContainer)
 					dbmNew.AddForm(akBaseItem)
 				else
 					dbmFound.AddForm(akBaseItem)
@@ -86,6 +86,10 @@ endEvent
 ;-- Events --------------------------------
 
 Event onSH_Update(string eventName, string strArg, float numArg, Form sender)
+	
+	if RN_MCM.DevDebugVal
+		Debug.Notification("Updating Safehouse Container Lists")
+	endif
 	
 	Int _Index = self.GetNumItems()
 	While _Index 

@@ -6,13 +6,21 @@ Import RN_Utility_Global
 
 RN_Utility_MCM property MCM auto
 
-RN_Utility_ArrayHolder property RN_Array auto
-
 string property _RoomName Auto
 
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 
+ObjectReference[] property _Armory_Helms_Displays auto
+
+Formlist property _Armory_Formlist_Displays auto
+Formlist property _Armory_Formlist_Enabled auto
+Formlist property _Armory_Global_Complete auto
+Formlist property _Armory_Global_Count auto
+Formlist property _Armory_Global_Total auto
+Formlist property _Armory_Message_Notification auto
+Formlist property _Armory_Message_Default auto
+		
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,31 +50,41 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 ;;----------
 
 	Int _Index = 0
-	Int _Length = RN_Array._Armory_Section_names.length
+	Int _Length = _Armory_Global_Complete.GetSize()	
+	
 	While _Index < _Length 
-		if RN_Array._Armory_Global_Complete[_Index].GetValue() == 0
-			_onDisplayCheck(RN_Array._Armory_Formlist_Displays[_Index], RN_Array._Armory_Formlist_Enabled[_Index], RN_Array._Armory_Global_Count[_Index])
+	
+		Formlist _DisplayList = _Armory_Formlist_Displays.GetAt(_Index) as Formlist
+		Formlist _EnabledList = _Armory_Formlist_Enabled.GetAt(_Index) as Formlist
+		GlobalVariable _Complete = _Armory_Global_Complete.GetAt(_Index) as GlobalVariable
+		GlobalVariable _Count = _Armory_Global_Count.GetAt(_Index) as GlobalVariable
+		GlobalVariable _Total = _Armory_Global_Total.GetAt(_Index) as GlobalVariable	
+		Message _Notification = _Armory_Message_Notification.GetAt(_Index) as Message
+		Message _Message = _Armory_Message_Default.GetAt(_Index) as Message
+		if !_Complete.GetValue()
+
+			_onDisplayCheck(_DisplayList, _EnabledList, _Count)
+			
 			if _Index == 11
 				Int _Index2 = 0
-				Int _Length2 = RN_Array._Armory_Helms_Displays.length
+				Int _Length2 = _Armory_Helms_Displays.length
 				While _Index2 < _Length2
-				ObjectReference formToProcess = RN_Array._Armory_Helms_Displays[_Index2] As ObjectReference
-					if !RN_Array._Armory_Formlist_Enabled[_Index].HasForm(formToProcess) && !formToProcess.IsDisabled()
-						RN_Array._Armory_Formlist_Enabled[_Index].AddForm(formToProcess)
-						
-					elseif RN_Array._Armory_Formlist_Enabled[_Index].HasForm(formToProcess) && formToProcess.IsDisabled()
-						RN_Array._Armory_Formlist_Enabled[_Index].RemoveAddedForm(formToProcess)	
+					ObjectReference formToProcess = _Armory_Helms_Displays[_Index2] As ObjectReference
+					if !_EnabledList.HasForm(formToProcess) && !formToProcess.IsDisabled()
+						_EnabledList.AddForm(formToProcess)
+					elseif _EnabledList.HasForm(formToProcess) && formToProcess.IsDisabled()
+						_EnabledList.RemoveAddedForm(formToProcess)	
 					endIf
 					_Index2 += 1
 				endWhile
-				
-				RN_Array._Armory_Global_Count[_Index].setvalue(RN_Array._Armory_Formlist_Enabled[_Index].GetSize()) 	
+				_Count.setvalue(_EnabledList.GetSize()) 	
 			endIf
-			if (CheckValueCount1(RN_Array._Armory_Global_Count[_Index], RN_Array._Armory_Global_Total[_Index], RN_Array._Armory_Global_Complete[_Index]) && (MCM.ShowSetCompleteVal)) 
+			
+			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
 				if (MCM.ShowSimpleNotificationVal)
-					RN_Array._Armory_Message_Notification[_Index].Show()
+					_Notification.Show()
 				else
-					RN_Array._Armory_Message_Default[_Index].Show()
+					_Message.Show()
 				endif
 			endif
 		endIf

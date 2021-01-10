@@ -1,15 +1,14 @@
 scriptName RN_Utility_Setup_C2 extends Quest
 
+Import Debug
+
 Import RN_Utility_Global
 
 RN_Utility_MCM property MCM auto
 
-Import Debug
-
-RN_Utility_ArrayHolder property RN_Array auto
-
 ;Display Ref List - Armory
-formlist property DBM_SectionArmory_Displays_Merged auto
+formlist property _Armory_Formlist_Displays auto
+formlist property TCC_DisplayList_Armory auto
 
 ;; Global for ModEvent Return.
 GlobalVariable Property RN_Setup_Done Auto
@@ -45,11 +44,11 @@ function _RunSetup(bool forced)
 		endIf
 	
 		;;Merge Armory Display Lists
-		Int _Index = 0 	
-		Int _Length = RN_Array._Armory_Formlist_Displays.length
-		While _Index < _Length
-			_onConsolidateDisplays(RN_Array._Armory_Formlist_Displays[_Index], DBM_SectionArmory_Displays_Merged)
-			_Index += 1
+		Int _Index = _Armory_Formlist_Displays.GetSize()
+		While _Index
+			_Index -= 1
+			Formlist _List = _Armory_Formlist_Displays.GetAt(_Index) as Formlist
+			_onConsolidateDisplays(_List, TCC_DisplayList_Armory)
 		endWhile
 		
 		RN_Setup_Done.Mod(1)

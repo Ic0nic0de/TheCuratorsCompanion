@@ -5,8 +5,6 @@ scriptName RN_Utility_QuestTracker_MCM extends SKI_ConfigBase
 RN_Utility_QuestTracker_Quests property _QuestHolder auto
 RN_Utility_QuestTracker_Arrays property _ArrayHolder auto
 
-RN_Utility_Mods Property RN_Mod Auto
-
 RN_Utility_MCM Property RN_MCM auto
 
 String property _MCM_Page auto hidden
@@ -30,28 +28,11 @@ Int Property _Helgen_Index = 0 Auto Hidden
 Int Property _Legacy_Index = 0 Auto Hidden
 
 Bool Property _bSpoilers Auto Hidden
-Bool Property _HideIncomplete Auto Hidden
-
-GlobalVariable Property RN_Installed_Clockwork Auto
-GlobalVariable Property RN_Installed_Falskaar Auto
-GlobalVariable Property RN_Installed_Helgen Auto
-GlobalVariable Property RN_Installed_MAS Auto
-GlobalVariable Property RN_Installed_Moonpath Auto
-GlobalVariable Property RN_Installed_3DNPC Auto
-GlobalVariable Property RN_Installed_GrayCowl Auto
-GlobalVariable Property RN_Installed_ProjectAHO Auto
-GlobalVariable Property RN_Installed_Undeath Auto
-GlobalVariable Property RN_Installed_Underground Auto
-GlobalVariable Property RN_Installed_Vigilant Auto
-GlobalVariable Property RN_Installed_WheelsOfLull Auto
-GlobalVariable Property RN_Installed_Wyrmstooth Auto
-GlobalVariable Property RN_Installed_ASLAL Auto
 
 ;-- Events --------------------------------------
 
 Event OnConfigInit()
-   
-	RN_Mod.CheckSupportedMods()
+ 
 	_Build_Pages()
 	_Build_Pages_Dynamic()
 endEvent
@@ -106,73 +87,73 @@ Event _Build_Pages_Dynamic()
 	Int _Index = 0
 	Int _Page = 10
 
-	if RN_Installed_Clockwork.GetValue()
+	if Game.GetModByName("LOTD_TCC_Clockwork.esp") != 255
 		_Index = _Array_Page_Static.Find("")	
 			_Array_Page_Static[_Index] = "Clockwork"
 		_Page += 1
 	endif
 
-	if RN_Installed_Falskaar.GetValue()
+	if Game.GetModByName("LOTD_TCC_Falskaar.esp") != 255
 		_Index = _Array_Page_Static.Find("") 	
 			_Array_Page_Static[_Index] = "Falskaar"
 		_Page += 1
 	endif
 
-	if RN_Installed_Helgen.GetValue()
+	if Game.GetModByName("LOTD_TCC_Helgen.esp") != 255
 		_Index = _Array_Page_Static.Find("")  
 			_Array_Page_Static[_Index] = "Helgen Reborn"
 		_Page += 1
 	endif
 
-	if RN_Installed_MAS.GetValue()
+	if Game.GetModByName("LOTD_TCC_MAS.esp") != 255
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Moon And Star"
 		_Page += 1
 	endif
 	
-	if RN_Installed_Moonpath.GetValue()
+	if Game.GetModByName("LOTD_TCC_Moonpath.esp") != 255
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Moonpath To Elsweyr"
 		_Page += 1
 	endIf
  
- 	if RN_Installed_ProjectAHO.GetValue()  
+ 	if Game.GetModByName("LOTD_TCC_ProjectAHO.esp") != 255
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Project AHO"
 		_Page += 1
 	endif
 
-	if RN_Installed_Underground.GetValue()
+	if Game.GetModByName("LOTD_TCC_Underground.esp") != 255
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Skyrim Underground"
 		_Page += 1
 	endif
 
-	if RN_Installed_GrayCowl.GetValue()
+	if Game.GetModByName("LOTD_TCC_GrayCowl.esp") != 255
 		_Index = _Array_Page_Static.Find("")	
 			_Array_Page_Static[_Index] = "The Gray Cowl Of Nocturnal"
 		_Page += 1
 	endif 
 
-	if RN_Installed_WheelsOfLull.GetValue()
+	if Game.GetModByName("LOTD_TCC_WheelsOfLull.esp") != 255
 		_Index = _Array_Page_Static.Find("")  
 			_Array_Page_Static[_Index] = "The Wheels Of Lull"
 		_Page += 1
 	endif
 
-	if RN_Installed_Undeath.GetValue()
+	if Game.GetModByName("LOTD_TCC_Undeath.esp") != 255
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = "Undeath"
 		_Page += 1
 	endif
 	
-	if RN_Installed_Wyrmstooth.GetValue()
+	if Game.GetModByName("LOTD_TCC_Wyrmstooth.esp") != 255
 		_Index = _Array_Page_Static.Find("")	
 			_Array_Page_Static[_Index] = "Wyrmstooth"
 		_Page += 1
 	endif
 	
-	if RN_Installed_3DNPC.GetValue()
+	if Game.GetModByName("LOTD_TCC_3DNPC.esp") != 255
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = " "
 		_Page += 1
@@ -198,7 +179,7 @@ Event _Build_Pages_Dynamic()
 		_Page += 1	
 	endIf
 	
-	if RN_Installed_Vigilant.GetValue()
+	if Game.GetModByName("LOTD_TCC_Vigilant.esp") != 255
 		_Index = _Array_Page_Static.Find("")
 			_Array_Page_Static[_Index] = " "
 		_Page += 1
@@ -271,13 +252,19 @@ endEvent
 ;-- Menu Events ---------------------------------
 
 Event _Build_Menu_Legacy()
-
-	_Legacy_Menu_Option = new string[4]
-	_Legacy_Menu_Option[0] = "Make Selection"
-	_Legacy_Menu_Option[1] = "Any Other Start"
-	_Legacy_Menu_Option[2] = "Solitude Docks Start"
-	_Legacy_Menu_Option[3] = "GuildMaster Start"
-
+	
+	if Game.GetModByName("DBM_RelicHunter.esp") != 255
+		_Legacy_Menu_Option = new string[4]
+		_Legacy_Menu_Option[0] = "Make Selection"
+		_Legacy_Menu_Option[1] = "Any Other Start"
+		_Legacy_Menu_Option[2] = "Solitude Docks Start"
+		_Legacy_Menu_Option[3] = "GuildMaster Start"
+	else
+		_Legacy_Menu_Option = new string[3]
+		_Legacy_Menu_Option[0] = "Make Selection"
+		_Legacy_Menu_Option[1] = "Any Other Start"
+		_Legacy_Menu_Option[2] = "Solitude Docks Start"
+	endif
 endEvent
 
 ;-- Events --------------------------------------
@@ -299,15 +286,12 @@ Event _Build_Page_Settings()
 		SetCursorPosition(0)
 		AddHeaderOption("Mod Settings:")
 		
-		if RN_Installed_ASLAL.GetValue()
+		if Game.GetModByName("Alternate Start - Live Another Life.esp") != 255
 			AddMenuOptionST("_State_Menu_Legacy", "Live Another Life Config:", _Legacy_Menu_Option[_Legacy_Index])
-			
 		else
-		
-			AddTextOption("Live Another Life Config:", _MCM_Strings[0], 1)			
-
+			AddTextOption("Live Another Life Config:", _MCM_Strings[0], 1)
 		endIf
-		
+	
 		AddEmptyOption()
 		AddTextOption("Users with the 'Alternate Start: Live Another Life'", "", 0)
 		AddTextOption("mod should use the menu above to display the mods", "", 0)
@@ -316,15 +300,12 @@ Event _Build_Page_Settings()
 		AddEmptyOption()
 		AddHeaderOption("General Settings:")
 		AddTextOptionST("_State_Spoilers", "Show Hidden Quests (Spoilers)", self.GetSpoilersString())
-		AddTextOptionST("_State_HideIncomplete", "Hide Available Quests", self.GetHideIncompleteString())
 		SetCursorPosition(1)
 		AddHeaderOption("")	
 	
-		if RN_Installed_Helgen.GetValue()
+		if Game.GetModByName("LOTD_TCC_Helgen.esp") != 255
 			AddMenuOptionST("_State_Menu_Helgen", "Helgen Reborn Config:", _Helgen_Menu_Option[_Helgen_Index])			
-			
 		else
-		
 			AddTextOption("Helgen Reborn Config:", _MCM_Strings[0], 1)
 		endIf	
 
@@ -343,7 +324,7 @@ State _State_Spoilers
 
 	Event OnSelectST()
 		_bSpoilers = !_bSpoilers
-		SetToggleOptionValueST(Self.SetSpoilersString(), false, "")
+		SetTextOptionValueST(Self.SetSpoilersString(), false, "")
 		ForcePageReset()
 	endEvent
 
@@ -370,49 +351,6 @@ endFunction
 String Function GetSpoilersString()
 
 	if _bSpoilers
-		_Status_Return = _MCM_Strings[2]
-	
-	else
-		_Status_Return = _MCM_Strings[1]
-		
-	endif
-	
-	return _Status_Return
-endFunction
-
-;-- Hide Incomplete Toggle State -----------------------------------------
-
-State _State_HideIncomplete
-
-	Event OnSelectST()
-		_HideIncomplete = !_HideIncomplete
-		SetToggleOptionValueST(Self.SetHideIncompleteString(), false, "")
-		ForcePageReset()
-	endEvent
-
-	Event OnHighlightST()
-
-		SetInfoText("Enable this to hide the available quests and only show completed & in progress quests.\n Default: OFF")
-	endEvent
-	
-endState
-
-String Function SetHideIncompleteString()
-
-	if _HideIncomplete
-		_Status_Return = _MCM_Strings[2]
-	
-	else
-		_Status_Return = _MCM_Strings[1]
-		
-	endif
-	
-	return _Status_Return
-endFunction
-
-String Function GetHideIncompleteString()
-
-	if _HideIncomplete
 		_Status_Return = _MCM_Strings[2]
 	
 	else
@@ -584,33 +522,31 @@ Event _Build_Section(bool Page_Side, String TitleOfSectionHeader, Int HeaderSect
 		SetCursorPosition(_Position_Left)
 		AddHeaderOption(TitleOfSectionHeader, 0)
 		_Position_Left += 2
-			if !_HideIncomplete
-				while _Index < _Array_Length && CurrentQuestNames[_Index] != ""
-					SetCursorPosition(_Position_Left)
-					_ArrayHolder._Array_Quest_Option_ID[_ArrayHolder._Array_Quest_Index] = self.AddToggleOption(CurrentQuestNames[_Index], CurrentQuestState, 0)
-					_ArrayHolder._Array_Quest_Option_Name[_ArrayHolder._Array_Quest_Index] = CurrentQuestNames[_Index]
-					_ArrayHolder._Array_Quest_ToggleState[_ArrayHolder._Array_Quest_Index] = CurrentQuestState
-					_ArrayHolder._Array_Quest_Index += 1
-					_Position_Left += 2
-					_Index += 1
-				endWhile
-			endIf
+		while _Index < _Array_Length && CurrentQuestNames[_Index] != ""
+			SetCursorPosition(_Position_Left)
+			_ArrayHolder._Array_Quest_Option_ID[_ArrayHolder._Array_Quest_Index] = self.AddToggleOption(CurrentQuestNames[_Index], CurrentQuestState, 0)
+			_ArrayHolder._Array_Quest_Option_Name[_ArrayHolder._Array_Quest_Index] = CurrentQuestNames[_Index]
+			_ArrayHolder._Array_Quest_ToggleState[_ArrayHolder._Array_Quest_Index] = CurrentQuestState
+			_ArrayHolder._Array_Quest_Index += 1
+			_Position_Left += 2
+			_Index += 1
+		endWhile
+		
 	else
 
 		_Position_Right += HeaderSectionLayoutOnPage * 2
 		SetCursorPosition(_Position_Right)
 		AddHeaderOption(TitleOfSectionHeader, 0)
 		_Position_Right += 2
-		
-			while _Index < _Array_Length && CurrentQuestNames[_Index] != ""
-				SetCursorPosition(_Position_Right)
-				_ArrayHolder._Array_Quest_Option_ID[_ArrayHolder._Array_Quest_Index] = self.AddToggleOption(CurrentQuestNames[_Index], CurrentQuestState, 0)
-				_ArrayHolder._Array_Quest_Option_Name[_ArrayHolder._Array_Quest_Index] = CurrentQuestNames[_Index]
-				_ArrayHolder._Array_Quest_ToggleState[_ArrayHolder._Array_Quest_Index] = CurrentQuestState
-				_ArrayHolder._Array_Quest_Index += 1
-				_Position_Right += 2
-			_Index += 1
-			endWhile	
+		while _Index < _Array_Length && CurrentQuestNames[_Index] != ""
+			SetCursorPosition(_Position_Right)
+			_ArrayHolder._Array_Quest_Option_ID[_ArrayHolder._Array_Quest_Index] = self.AddToggleOption(CurrentQuestNames[_Index], CurrentQuestState, 0)
+			_ArrayHolder._Array_Quest_Option_Name[_ArrayHolder._Array_Quest_Index] = CurrentQuestNames[_Index]
+			_ArrayHolder._Array_Quest_ToggleState[_ArrayHolder._Array_Quest_Index] = CurrentQuestState
+			_ArrayHolder._Array_Quest_Index += 1
+			_Position_Right += 2
+		_Index += 1
+		endWhile	
 	endIf	
 endEvent
 

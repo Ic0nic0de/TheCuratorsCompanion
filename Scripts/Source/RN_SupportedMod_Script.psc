@@ -9,109 +9,126 @@ RN_Utility_MCM property MCM auto
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-;;bool to control if the setup has been completed for the mod.
+																					;;AutoFill Properties
 bool _setupDone = false
 
-;;Formlists to control merged and found lists
-formlist property Supported_Items_Merged auto
+formlist property TCC_ItemList_Patches auto
 
-;;Formlists to control item lists - MoreHUD
 formlist property dbmNew auto
 formlist property dbmMaster auto
 
-;;Formlist to control quest displays.
 formlist property DBM_RN_QuestDisplays auto
 Formlist property DBM_RN_ExplorationDisplays auto
 
-;; Global for ModEvent Return.
 globalvariable property RN_Setup_Done auto
 globalvariable property RN_Setup_Registered auto
 
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 
-;;Global for mod completion.
-globalvariable property iModComplete auto
-globalvariable property iCreationComplete auto
-
 globalvariable property RN_SupportedModCount auto
-globalvariable property RN_SupportedCreationCount auto
 
-formlist property RN_TokenFormlistExcluded auto
+formlist property TCC_TokenList_ExcludedItems auto
+
+globalvariable property RN_CreationClubContent_Installed auto
+globalvariable property RN_SafeouseContent_Installed auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-;;Patch Type - false - Creaton / true - Patch
-bool property _bPatchType auto 
+;;Name of the patch to appear in the MCM
+String Property _ModName Auto
 
-;;Formlists to control item lists.
+;;Set this to True if this patch is located in the Hall of Wonders (Creation Club).
+bool property bCreationClub auto
+
+;;Set this to True if this patch is located in the Safehouse.
+bool property bSafeHouseMod auto
+
+;;Formlists that contain the displayable items.
 formlist[] property _itemsArray auto
 
-;;Formlists to control Display lists.
+;;Formlists that contain the display References.
 formlist[] property _displaysArray auto
+
+;;Formlist for the room that the displays are housed in.
 formlist[] property _displayRooms auto
 
+;;Formlist needed if you are adding displays to 2 or more rooms / sections.
 formlist property _displayList_Merged auto
+
+;;Formlist to keep track of enabled displays.
 formlist property _displayList_Enabled auto
 
-;;Collection Complete Notifications.
+;;Message to show when all items have been collected.
 Message property _modCompleteMessage auto
+
+;;Notification to show when all items have been collected.
 Message property _modCompleteNotification auto
 
-;;Globals for set completion
+;;Global for mod completion
 globalvariable property _Global_Mod_Complete auto
 
-;;Globals for current Count
+;;Global for current display Count
 globalvariable property _Global_Display_Count auto
 
-;;Globals for Total Count
+;;Global for Total display Count
 globalvariable property _Global_Display_Total auto
 
-;;AddForm to quest display listener. 
-Formlist Property _questDisplays auto
+;;AddForm to quest display listener. (Requires Another script on the display itself) 
+Formlist Property _questDisplays auto ;Optional
 
-;;Shrine Display Properties
-Formlist property _wintersunShrine auto
+;;Addform to exploration listener. (Requires Another script on the display itself) 
+Formlist property _wintersunShrine auto ;Optional
 
 ;;Prisoner belongigns chest for mods that add one.
-ObjectReference[] property _PrisonerChest auto
+ObjectReference[] property _PrisonerChest auto ;Optional
+
+;; Set to 0 for custom made / unofficial patches
+Int Property _ArrayIndex Auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;;-- Events ---------------------------------------			
-	
+
 Event onInit()
-		
-	RegisterForModEvent("TCCScan", "_onScan")
-	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
+
+	Register()	
+endEvent
+
+;;-- Events ---------------------------------------			
+	
+Event onPlayerLoadGame()
+
+	Register()
 endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event onPlayerLoadGame()
-	
+Function Register()
+
 	RegisterForModEvent("TCCScan", "_onScan")
 	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
-		
-	if _displayList_Merged
-		_Global_Display_Total.SetValue(_displayList_Merged.GetSize())
-	else
-		_Global_Display_Total.SetValue(_displaysArray[0].GetSize())
-	endIf
-	
-	_Global_Display_Count.SetValue(_displayList_Enabled.GetSize())	
-endEvent
+	RegisterForModEvent("TCCUpdate_Patches", "_onPatchUpdate")
+	RegisterForModEvent("TCCUpdate_Counts", "_onCountUpdate")
+	RegisterForModEvent("TCCUpdate_Arrays", "_onArrayUpdate")
+endFunction
 
 ;;-- Events ---------------------------------------	
 
 Event _onSetup(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+		
+	_RunSetup()			
+endEvent
 
-	_RunSetup()
+;;-- Events ---------------------------------------	
+
+Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+		
+	MCM.AddModSupport(Utility.Randomint(1,5), _ArrayIndex, _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)			
 endEvent
 
 ;;-- Events ---------------------------------------		
@@ -123,13 +140,28 @@ Event _RunSetup()
 	if !_setupDone
 
 		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Received for: " +_Global_Mod_Complete)
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Received for: " + GetOwningQuest().GetName())
+		endIf
+		
+		MCM.AddModSupport(Utility.Randomint(1,5), _ArrayIndex, _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
+		
+		if bCreationClub
+			if !RN_CreationClubContent_Installed.GetValue()
+				RN_CreationClubContent_Installed.setvalue(1)
+			endIf
 		endIf
 
+		if bSafeHouseMod
+			if !RN_SafeouseContent_Installed.GetValue()
+				RN_SafeouseContent_Installed.setvalue(1)
+			endIf
+		endIf	
+		
+		
 		Int Index = _itemsArray.length		
 		While Index
 			Index -= 1
-			_onConsolidateItems(_itemsArray[Index], Supported_Items_Merged, dbmNew, dbmMaster)			
+			_onConsolidateItems(_itemsArray[Index], TCC_ItemList_Patches, dbmNew, dbmMaster)			
 		endWhile
 		
 ;;------------
@@ -141,12 +173,6 @@ Event _RunSetup()
 				_onConsolidateDisplays(_displaysArray[Index], _displayList_Merged)
 			endIf
 		endWhile
-				
-		if _displayList_Merged
-			_Global_Display_Total.SetValue(_displayList_Merged.GetSize())
-		else
-			_Global_Display_Total.SetValue(_displaysArray[0].GetSize())
-		endIf
 		
 ;;------------
 		
@@ -186,42 +212,59 @@ Event _RunSetup()
 			Index = _PrisonerChest.length
 			while Index > 0
 				Index -= 1		
-				RN_TokenFormlistExcluded.AddForm(_PrisonerChest[Index])
+				TCC_TokenList_ExcludedItems.AddForm(_PrisonerChest[Index])
 			EndWhile
 		endIf
 		
 ;;------------
-
-		if _bPatchType	
-			RN_SupportedModCount.Mod(1)
-		else
-			RN_SupportedCreationCount.Mod(1)	
-		endIf
+		
+		RN_SupportedModCount.Mod(1)
 		
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
 		
 		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Completed for: " +_Global_Mod_Complete)
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Completed for: " + GetOwningQuest().GetName())
 		endIf
 	else
 		
 		RN_Setup_Done.Mod(1)
 		
 		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Already Completed for: " +_Global_Mod_Complete)
+			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Already Completed for: " + GetOwningQuest().GetName())
 		endIf
 	endIf
+endEvent
+
+;;-- Events ---------------------------------------	
+
+Event _onPatchUpdate(string eventName, string strArg, float numArg, Form sender)
+	
+	_setupDone = false
+	_RunSetup()
 endEvent	
 
 ;;-- Events ---------------------------------------		
+
+Event _onCountUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+
+	if _displayList_Merged
+		_Global_Display_Total.SetValue(_displayList_Merged.GetSize())
+	else
+		_Global_Display_Total.SetValue(_displaysArray[0].GetSize())
+	endIf
+
+	_Global_Display_Count.SetValue(_displayList_Enabled.GetSize())
+endEvent
+
+;;-- Events ---------------------------------------
 
 Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 	
 	RN_Scan_Registered.Mod(1)
 	
 	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " +_Global_Mod_Complete)
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " + GetOwningQuest().GetName())
 	endIf
 	
 	if !_Global_Mod_Complete.GetValue()
@@ -243,7 +286,6 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	RN_Scan_Done.Mod(1)
 	
 	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " +_Global_Mod_Complete)
+		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " + GetOwningQuest().GetName())
 	endIf
-	
-EndEvent	
+endEvent	

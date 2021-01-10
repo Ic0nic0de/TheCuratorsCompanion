@@ -14,7 +14,7 @@ formlist property dbmMaster auto
 formlist[] property _itemsArray auto
 
 ;;Formlists to control item lists - Merged Formlist 2. (DAE, HOLE, HOO, NS, GH, HOS)
-formlist property DBM_Section_DG_HOLE_HOO_NS_GH_HOS_Merged auto ;;Merged Item List.
+formlist property TCC_ItemList_Museum_2 auto ;;Merged Item List.
 
 Globalvariable Property RN_Setup_Done auto
 globalvariable property RN_Setup_Registered auto
@@ -52,7 +52,7 @@ function _RunSetup(bool forced)
 		While _index
 			_index -= 1
 			Formlist _List = _itemsArray[_index]
-			_onConsolidateItems(_List, DBM_Section_DG_HOLE_HOO_NS_GH_HOS_Merged, dbmNew, dbmMaster)			
+			_onConsolidateItems(_List, TCC_ItemList_Museum_2, dbmNew, dbmMaster)			
 		endWhile
 		
 		RN_Setup_Done.Mod(1)
