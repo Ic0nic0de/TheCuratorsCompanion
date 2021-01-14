@@ -1,4 +1,4 @@
-ScriptName RN_Utility_PlayerInventoryMonitor extends ReferenceAlias
+ScriptName RN_Utility_InventoryMonitor1 extends ReferenceAlias
 
 RN_Utility_MCM property RN_MCM auto
 
@@ -8,7 +8,7 @@ formlist property dbmDisp auto
 
 formlist property TCC_TokenList auto
 
-formlist property TCC_ItemList_Safehouse auto
+formlist property TCC_ItemList_Museum_1 auto
 
 ;;Museum storage containers to check within several events.
 formlist property _MuseumContainerList_WP auto
@@ -18,6 +18,7 @@ objectreference[] TokenList
 ;-- Events --------------------------------
 
 Event onInit()
+	
 	RegisterForModEvent("Update_TokenArray", "_Update")
 	GoToState("DISABLED")
 endEvent
@@ -28,9 +29,7 @@ Event OnPlayerLoadGame()
 	
 	RegisterForModEvent("Update_TokenArray", "_Update")
 	RemoveAllInventoryEventFilters()
-	AddInventoryEventFilter(dbmNew)
-	AddInventoryEventFilter(dbmFound)
-	AddInventoryEventFilter(dbmDisp)
+	AddInventoryEventFilter(TCC_ItemList_Museum_1)
 	GoToState("")
 endEvent
 
@@ -53,11 +52,9 @@ endEvent
 
 Event onItemAdded(Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 	
-	if !TCC_ItemList_Safehouse.HasForm(akBaseItem)
-		if !_MuseumContainerList_WP.HasForm(akSourceContainer) && !dbmDisp.HasForm(akBaseItem)
-			dbmNew.RemoveAddedForm(akBaseItem)
-			dbmFound.AddForm(akBaseItem)
-		endIf
+	if !_MuseumContainerList_WP.HasForm(akSourceContainer) && !dbmDisp.HasForm(akBaseItem)
+		dbmNew.RemoveAddedForm(akBaseItem)
+		dbmFound.AddForm(akBaseItem)
 	endIf
 endEvent
 
@@ -65,27 +62,24 @@ endEvent
 		
 Event onItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
 
-	if !TCC_ItemList_Safehouse.HasForm(akBaseItem) && dbmFound.HasForm(akBaseItem)	
+	if dbmFound.HasForm(akBaseItem)	
 		if !akDestContainer || (!_MuseumContainerList_WP.HasForm(akDestContainer) && !TCC_TokenList.HasForm(akDestContainer))
 
 			Bool bDuplicate
-			Int Index = 0
-			Int Total = TCC_TokenList.GetSize()
-			while Index && !bDuplicate
+			Int Index = TCC_TokenList.GetSize()
+			while Index > 0 && !bDuplicate
+				Index -=1
 				bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
-				Index +=1
 			endWhile
 			
-			if !bDuplicate
-				if !dbmDisp.HasForm(akBaseItem)
-					dbmNew.AddForm(akBaseItem)
-					dbmFound.RemoveAddedForm(akBaseItem)
-				endIF
+			if !bDuplicate && !dbmDisp.HasForm(akBaseItem)
+				dbmNew.AddForm(akBaseItem)
+				dbmFound.RemoveAddedForm(akBaseItem)
 			endIf
 		endIf
 	endIf
-endEvent
-
+endEvent		
+	
 ;-- Events --------------------------------
 
 state DISABLED

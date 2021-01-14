@@ -32,7 +32,7 @@ endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event onPlayerLoadGame()
+Event Register()
 	
 	RegisterForModEvent("TCCScan", "_onScan")
 endEvent

@@ -1,4 +1,4 @@
-scriptname RN_Utility_autoScan extends referencealias
+scriptname RN_Utility_autoScan extends quest
 
 RN_Utility_MCM property RN_MCM auto
 
@@ -8,7 +8,7 @@ globalvariable property DBM_SortWait auto
 
 Int _ScanInt
 
-Event OnPlayerLoadGame()
+Event Register()
 
 	UpdateInt(RN_MCM._ScanInterval)	
 endEvent
@@ -31,7 +31,7 @@ Event OnUpdate()
 	
 	if DBM_SortWait.getvalue() || !RN_MCM.autoScanVal || Game.GetPlayer().IsInCombat()
 		If RN_MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Autoscan unable to start " + "Wait = " + DBM_SortWait.Getvalue() +  _ScanInt + RN_MCM.autoScanVal)
+			DBMDebug.Log(self, "TCC: Autoscan unable to start " + "Wait = " + DBM_SortWait.Getvalue() +  _ScanInt + RN_MCM.autoScanVal)
 		endIf
 		
 		UpdateInt(RN_MCM._ScanInterval)	

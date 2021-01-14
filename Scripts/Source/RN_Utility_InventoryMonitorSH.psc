@@ -1,4 +1,4 @@
-ScriptName RN_Utility_PlayerInventoryMonitor_SH extends ReferenceAlias
+ScriptName RN_Utility_InventoryMonitorSH extends ReferenceAlias
 
 RN_Utility_MCM property RN_MCM auto
 
@@ -27,9 +27,7 @@ Event OnPlayerLoadGame()
 	
 	RegisterForModEvent("Update_TokenArray", "_Update")
 	RemoveAllInventoryEventFilters()
-	AddInventoryEventFilter(dbmNew)
-	AddInventoryEventFilter(dbmFound)
-	AddInventoryEventFilter(dbmDisp)
+	AddInventoryEventFilter(TCC_ItemList_Safehouse)
 	GoToState("")
 endEvent
 
@@ -52,12 +50,9 @@ endEvent
 
 Event onItemAdded(Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 
-	if TCC_ItemList_Safehouse.HasForm(akBaseItem)	
-		Debug.Notification("Script 2")
-		if !_SafehouseContainerList_WP.HasForm(akSourceContainer) && !dbmDisp.HasForm(akBaseItem)
-			dbmNew.RemoveAddedForm(akBaseItem)
-			dbmFound.AddForm(akBaseItem)
-		endIf
+	if !_SafehouseContainerList_WP.HasForm(akSourceContainer) && !dbmDisp.HasForm(akBaseItem)
+		dbmNew.RemoveAddedForm(akBaseItem)
+		dbmFound.AddForm(akBaseItem)
 	endIf
 endEvent
 
@@ -65,22 +60,19 @@ endEvent
 		
 Event onItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
 
-	if TCC_ItemList_Safehouse.HasForm(akBaseItem) && dbmFound.HasForm(akBaseItem)	
+	if dbmFound.HasForm(akBaseItem)	
 		if !akDestContainer || (!_SafehouseContainerList_WP.HasForm(akDestContainer) && !TCC_TokenList.HasForm(akDestContainer))
 
 			Bool bDuplicate
-			Int Index = 0
-			Int Total = TCC_TokenList.GetSize()
-			while Index && !bDuplicate
+			Int Index = TCC_TokenList.GetSize()
+			while Index > 0 && !bDuplicate
+				Index -= 1
 				bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
-				Index +=1
 			endWhile
 			
-			if !bDuplicate
-				if !dbmDisp.HasForm(akBaseItem)
-					dbmNew.AddForm(akBaseItem)
-					dbmFound.RemoveAddedForm(akBaseItem)
-				endIF
+			if !bDuplicate && !dbmDisp.HasForm(akBaseItem)
+				dbmNew.AddForm(akBaseItem)
+				dbmFound.RemoveAddedForm(akBaseItem)
 			endIf
 		endIf	
 	endIF

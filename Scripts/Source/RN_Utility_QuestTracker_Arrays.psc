@@ -2905,7 +2905,7 @@ Event _Build_Quest_Arrays()
 ;;------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------------------------------------------------------------------------	
 
-	VigilantSide_ID = new string[18]
+	VigilantSide_ID = new string[26]
 	VigilantSide_ID[0] = ""
 	VigilantSide_ID[1] = ""
 	VigilantSide_ID[2] = ""
@@ -2923,9 +2923,18 @@ Event _Build_Quest_Arrays()
 	VigilantSide_ID[14] = "zzzCHSubQuest05"
 	VigilantSide_ID[15] = "zzzCHSubQuest06"
 	VigilantSide_ID[16] = "zzzCHSubQuest11"
-	VigilantSide_ID[17] = "zzzCHGreymarchQuest"
+	VigilantSide_ID[17] = "zzzCHGreymarchQuest"	
+	VigilantSide_ID[18] = ""
+	VigilantSide_ID[19] = ""
+	VigilantSide_ID[20] = ""
+	VigilantSide_ID[21] = ""
+	VigilantSide_ID[22] = ""
+	VigilantSide_ID[23] = ""
+	VigilantSide_ID[24] = ""
+	VigilantSide_ID[25] = ""
+	
 
-	VigilantSide_Name = new string[18]
+	VigilantSide_Name = new string[26]
 	VigilantSide_Name[0] = "Knight of Akatosh"
 	VigilantSide_Name[1] = "Knight of Talos"
 	VigilantSide_Name[2] = "Knight of Mara"
@@ -2944,8 +2953,16 @@ Event _Build_Quest_Arrays()
 	VigilantSide_Name[15] = "The Avenger"
 	VigilantSide_Name[16] = "Kyne's Dragon"
 	VigilantSide_Name[17] = "Greymarch"
-
-	VigilantSide_Giver = new string[18]
+	VigilantSide_Name[18] = "Bounty: Book"
+	VigilantSide_Name[19] = "Bounty: Chick Trader"
+	VigilantSide_Name[20] = "Bounty: Piper"
+	VigilantSide_Name[21] = "Bounty: Daedric Relic"
+	VigilantSide_Name[22] = "Bounty: Horn"
+	VigilantSide_Name[23] = "Bounty: Summoner"
+	VigilantSide_Name[24] = "Bounty: Vampire"
+	VigilantSide_Name[25] = "Bounty: Witch"
+	
+	VigilantSide_Giver = new string[26]
 	VigilantSide_Giver[0] = "Sir Amiel (Barrier Tower of Anyammis)"
 	VigilantSide_Giver[1] = "Sir Berich (Old Temple of the Eight Divines)"
 	VigilantSide_Giver[2] = "Sir Casimir (Old Temple of the Eight Divines)"
@@ -2964,8 +2981,16 @@ Event _Build_Quest_Arrays()
 	VigilantSide_Giver[15] = "Aredhel (St. Dulsa's Charnel)"
 	VigilantSide_Giver[16] = "Kahkaankrein (Second Inquisition Court)"
 	VigilantSide_Giver[17] = "Automatic Start"
-
-	VigilantSide_Reqs = new string[18]
+	VigilantSide_Giver[18] = "Read the notice on the Notice Board in front of the Temple of Stendarr"
+	VigilantSide_Giver[19] = "Read the notice on the Notice Board in front of the Temple of Stendarr"
+	VigilantSide_Giver[20] = "Read the notice on the Notice Board in front of the Temple of Stendarr"
+	VigilantSide_Giver[21] = "Read the notice on the Notice Board in front of the Temple of Stendarr"
+	VigilantSide_Giver[22] = "Read the notice on the Notice Board in front of the Temple of Stendarr"
+	VigilantSide_Giver[23] = "Read the notice on the Notice Board in front of the Temple of Stendarr"
+	VigilantSide_Giver[24] = "Read the notice on the Notice Board in front of the Temple of Stendarr"
+	VigilantSide_Giver[25] = "Read the notice on the Notice Board in front of the Temple of Stendarr"
+	
+	VigilantSide_Reqs = new string[26]
 	VigilantSide_Reqs[0] = "No Requirements"
 	VigilantSide_Reqs[1] = "No Requirements"
 	VigilantSide_Reqs[2] = "No Requirements"
@@ -2984,8 +3009,16 @@ Event _Build_Quest_Arrays()
 	VigilantSide_Reqs[15] = "No Requirements"
 	VigilantSide_Reqs[16] = "Kyne's Feather & White Flowers(Funeral Quest)"
 	VigilantSide_Reqs[17] = "No Requirements"
-
-	VigilantSide_Notes = new string[18]
+	VigilantSide_Reqs[18] = "No Requirements"
+	VigilantSide_Reqs[19] = "No Requirements"
+	VigilantSide_Reqs[20] = "No Requirements"
+	VigilantSide_Reqs[21] = "No Requirements"
+	VigilantSide_Reqs[22] = "No Requirements"
+	VigilantSide_Reqs[23] = "No Requirements"
+	VigilantSide_Reqs[24] = "No Requirements"
+	VigilantSide_Reqs[25] = "No Requirements"
+	
+	VigilantSide_Notes = new string[26]
 	VigilantSide_Notes[0] = "NOTE: Speak to sir Amiel, Becomes a follower if you have more than 0 karma"
 	VigilantSide_Notes[1] = "NOTE: Speak to Sir Berich, Becomes a follower if you have more than 20 karma"
 	VigilantSide_Notes[2] = "NOTE: Find and battle Sir Casimir in the 'Old Temple of the Eight Divines'"
@@ -3004,8 +3037,16 @@ Event _Build_Quest_Arrays()
 	VigilantSide_Notes[15] = "NOTE: Defeat Aredhel in St. Dulsa's Charnel"
 	VigilantSide_Notes[16] = "NOTE: If you have Kyne's Feather in your inventory, he'll ask you for it and giving it to him will set him free"
 	VigilantSide_Notes[17] = "NOTE: This quest starts when you kill Marukh in Malada"
-
-	VigilantSide_First = new int[18]	
+	VigilantSide_Notes[18] = ""
+	VigilantSide_Notes[19] = ""
+	VigilantSide_Notes[20] = ""
+	VigilantSide_Notes[21] = ""
+	VigilantSide_Notes[22] = ""
+	VigilantSide_Notes[23] = ""
+	VigilantSide_Notes[24] = ""
+	VigilantSide_Notes[25] = ""
+	
+	VigilantSide_First = new int[26]	
 	VigilantSide_First[0] = -999
 	VigilantSide_First[1] = -999	
 	VigilantSide_First[2] = -999	
@@ -3024,8 +3065,16 @@ Event _Build_Quest_Arrays()
 	VigilantSide_First[15] = 5
 	VigilantSide_First[16] = 10
 	VigilantSide_First[17] = 10
+	VigilantSide_First[18] = -999
+	VigilantSide_First[19] = -999
+	VigilantSide_First[20] = -999
+	VigilantSide_First[21] = -999
+	VigilantSide_First[22] = -999
+	VigilantSide_First[23] = -999
+	VigilantSide_First[24] = -999
+	VigilantSide_First[25] = -999
 	
-	VigilantSide_Final = new int[18]	
+	VigilantSide_Final = new int[26]	
 	VigilantSide_Final[0] = 0
 	VigilantSide_Final[1] = 0
 	VigilantSide_Final[2] = 0
@@ -3044,8 +3093,16 @@ Event _Build_Quest_Arrays()
 	VigilantSide_Final[15] = 30
 	VigilantSide_Final[16] = 999
 	VigilantSide_Final[17] = 20	
+	VigilantSide_Final[18] = 999
+	VigilantSide_Final[19] = 999
+	VigilantSide_Final[20] = 999
+	VigilantSide_Final[21] = 999
+	VigilantSide_Final[22] = 999
+	VigilantSide_Final[23] = 999
+	VigilantSide_Final[24] = 999
+	VigilantSide_Final[25] = 999
 	
-	VigilantSide_Radiant = new bool[18]
+	VigilantSide_Radiant = new bool[26]
 	VigilantSide_Radiant[0] = true
 	VigilantSide_Radiant[1] = true
 	VigilantSide_Radiant[2] = true
@@ -3064,8 +3121,16 @@ Event _Build_Quest_Arrays()
 	VigilantSide_Radiant[15] = false
 	VigilantSide_Radiant[16] = false
 	VigilantSide_Radiant[17] = false
+	VigilantSide_Radiant[18] = true
+	VigilantSide_Radiant[19] = true
+	VigilantSide_Radiant[20] = true
+	VigilantSide_Radiant[21] = true
+	VigilantSide_Radiant[22] = true
+	VigilantSide_Radiant[23] = true
+	VigilantSide_Radiant[24] = true
+	VigilantSide_Radiant[25] = true
 	
-	VigilantSide_Spoiler = new bool[18]
+	VigilantSide_Spoiler = new bool[26]
 	VigilantSide_Spoiler[0] = false
 	VigilantSide_Spoiler[1] = false
 	VigilantSide_Spoiler[2] = false
@@ -3084,7 +3149,15 @@ Event _Build_Quest_Arrays()
 	VigilantSide_Spoiler[15] = false
 	VigilantSide_Spoiler[16] = false
 	VigilantSide_Spoiler[17] = false
-
+	VigilantSide_Spoiler[18] = false
+	VigilantSide_Spoiler[19] = false
+	VigilantSide_Spoiler[20] = false
+	VigilantSide_Spoiler[21] = false
+	VigilantSide_Spoiler[22] = false
+	VigilantSide_Spoiler[23] = false
+	VigilantSide_Spoiler[24] = false
+	VigilantSide_Spoiler[25] = false
+	
 ;;------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------------------------------------------------------------------------

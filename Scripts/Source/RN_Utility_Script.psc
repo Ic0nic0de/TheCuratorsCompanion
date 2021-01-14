@@ -11,8 +11,11 @@ import utility
 
 RN_Utility_MCM property RN_MCM auto
 RN_Storage_Transfer property RN_Transfer auto
-RN_Utility_PlayerInventoryMonitor property RN_Inventory auto
-RN_Utility_PlayerInventoryMonitor_SH property RN_InventorySH auto
+RN_Utility_InventoryMonitor1 property RN_Inv1 auto
+RN_Utility_InventoryMonitor2 property RN_Inv2 Auto
+RN_Utility_InventoryMonitorSH property RN_InvSH auto
+RN_Utility_InventoryMonitorARM property RN_InvArm auto
+RN_Utility_InventoryMonitor_Patches property RN_InvPatch auto
 RN_Listener_Explore property RN_Explore auto
 RN_Listener_Skills property RN_Skills auto
 RN_Listener_Quest property RN_Quest auto
@@ -29,7 +32,6 @@ message property DBM_ScanMuseum_Message auto
 message property DBM_ScanMuseum_Finished_Message auto
 
 message property ModConfigStartup auto
-Message property ModConfigProgress Auto
 Message property ModConfigFinished auto
 message property ModConfigFinishedNoPatches auto
 
@@ -45,6 +47,8 @@ message property UserSettingsLoaded auto
 message property UserSettingsNone auto
 message property TCC_UniquesSetupFinished auto
 message property moreHUDListRebuilt auto
+
+message property TCC_SafehouseSetupFinished auto
 
 bool bSettingup
 bool bScanning
@@ -192,8 +196,11 @@ Event RunSetup()
 				RN_Thane.OnPlayerLoadGame()			;; Fire off Thane Listener.
 				RN_Skills.OnPlayerLoadGame()		;; Fire off Skills Listener.		
 				RN_Transfer.OnPlayerLoadGame()		;; Fire off Auto Transfer.
-				RN_Inventory.OnPlayerLoadGame()		;; Fire off Inventory Manager.
-				RN_InventorySH.OnPlayerLoadGame()   ;; Fire off Inventory Manager. (Safehouse)
+				RN_Inv1.OnPlayerLoadGame()			;; Fire off Inventory Manager.
+				RN_Inv2.OnPlayerLoadGame()			;; Fire off Inventory Manager.
+				RN_InvSH.OnPlayerLoadGame()   		;; Fire off Inventory Manager. (Safehouse)
+				RN_InvArm.OnPlayerLoadGame() 		;; Fire off Inventory Manager. (Armory)
+				RN_InvPatch.OnPlayerLoadGame()		;; Fire off Inventory Manager. (Patches)
 				
 				UpdateCurrentInstanceGlobal(RN_SupportedModCount)
 				UpdateCurrentInstanceGlobal(RN_CustomModCount)
@@ -207,13 +214,7 @@ Event RunSetup()
 				
 				Wait(5)
 				
-				Int _Menu = ModConfigProgress.Show() 
-				if _Menu == 0
-					UpdateAllFound()
-					ScanMuseum()	
-				elseif _Menu == 1
-					UpdateAllFound()	
-				endIf
+				UpdateAllFound()	
 
 				RN_MCM.Begin_Config_Load()
 				
@@ -691,7 +692,7 @@ Function SetUpSafehouse()
 			DBM_SortWait.setvalue(0)
 			RN_Safehouse_Done.setvalue(0)
 			RN_Safehouse_Registered.setvalue(0)
-			Debug.Notification("The Curators Companion: Safehouse Integration Done")
+			TCC_SafehouseSetupFinished.Show()
 		endIf		
 	endWhile
 endFunction
@@ -703,9 +704,10 @@ Event SetUpAchievements()
 	DBM_SortWait.setvalue(1)
 	RN_Setup_Start.setvalue(1)
 	bSetupStarted = True
+	Debug.Notification("The Curators Companion: Enabling Achievements System...")
 	SendModEvent("TCCSetup_Uniques")
 	Wait(5)
-
+	
 	while bSetupStarted	
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
 			CreateMoreHudLists()

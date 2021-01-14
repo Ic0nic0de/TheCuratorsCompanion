@@ -55,8 +55,6 @@ formlist property TCC_ItemList_Safehouse auto
 formlist property TCC_TokenList_NoShipmentCrates auto
 globalvariable property RN_moreHUD_Option auto
 
-formlist property RN_Achievement_Globals auto
-
 string[] moreHUDChoiceList 
 int IndexmoreHUD = 0
 int moreHUDOptions
@@ -212,6 +210,11 @@ GlobalVariable[] RN_Armory_Global_Count
 GlobalVariable[] RN_Armory_Global_Total
 String[] _Armory_Section_names
 
+formlist property RN_Achievement_Globals auto
+globalvariable[] RN_Ach_Globals
+string[] RN_Ach_StateName
+string[] RN_Ach_AchName
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Patches -----------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -364,9 +367,9 @@ Event AddSettingsPage()
 		AddTextOptionST("iRelicArmoryNotifications", "Armory Items:", self.GetArmoryNotificationsString(), 0)	
 		
 		if RN_SupportedModCount.GetValue() > 0 || RN_CustomModCount.GetValue() > 0
-			AddTextOptionST("iRelicModsNotifications", "Creations & Mods Items:", self.GetModsNotificationsString(), 0)
+			AddTextOptionST("iRelicModsNotifications", "Patch(es) Items:", self.GetModsNotificationsString(), 0)
 		else
-			AddTextOptionST("iRelicModsNotifications", "Creations & Mods Items:", "No Patches Found", 1)
+			AddTextOptionST("iRelicModsNotifications", "Patch(es) Items:", "No Patches Found", 1)
 		endIF
 		
 		AddTextOptionST("iRelicListenerNotifications", "Listeners:", self.GetListenerString(), 0)
@@ -454,7 +457,7 @@ Event AddRelicStoragePage()
 		AddTextOptionST("Token_Visibility", "Storage Token Recipe:", self.GetTokenVisibility(), 0)
 		AddHeaderOption("Auto Storage Options:")
 		
-		if GetTransferOptions() == "Spell Required"
+		if GetTransferOptions() == "Purchase Spell To Use"
 			AddTextOptionST("iRelicStorageTransfer", "Automatic Relic Storage:", self.GetTransferOptions(), 1)
 		else
 			AddTextOptionST("iRelicStorageTransfer", "Automatic Relic Storage:", self.GetTransferOptions(), 0)
@@ -521,111 +524,8 @@ Event AddAchievementsPage()
 			AddToggleOptionST("AchievementSet01", "Notifications:", Ach_Notify, 0)
 			AddToggleOptionST("AchievementSet02", "Visual effect:", Ach_Visual, 0)
 			AddMenuOptionST("SoundListOptions", "Sound effect:", AchievementSoundList[IndexSounds])
-			
 			AddHeaderOption("Achievements:")	
-			
-			if RN_Ach01Complete.GetValue()
-				AddTextOptionST("iAchievement01", "Collector", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement01", "Collector", "Locked", 1)
-			endIf
 
-			if RN_Ach02Complete.GetValue()
-				AddTextOptionST("iAchievement02", "Hoarder", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement02", "Hoarder", "Locked", 1)
-			endIf
-
-			if RN_Ach03Complete.GetValue()
-				AddTextOptionST("iAchievement03", "Junior Librarian", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement03", "Junior Librarian", "Locked", 1)
-			endIf
-
-			if RN_Ach04Complete.GetValue()
-				AddTextOptionST("iAchievement04", "Bibliophile", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement04", "Bibliophile", "Locked", 1)
-			endIf
-
-			if RN_Ach05Complete.GetValue()
-				AddTextOptionST("iAchievement05", "Spelunker", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement05", "Spelunker", "Locked", 1)
-			endIf
-
-			if RN_Ach06Complete.GetValue()
-				AddTextOptionST("iAchievement06", "Lapidarist", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement06", "Lapidarist", "Locked", 1)
-			endIf
-
-			if RN_Ach07Complete.GetValue()
-				AddTextOptionST("iAchievement07", "Conchologist", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement07", "Conchologist", "Locked", 1)
-			endIf
-
-			if RN_Ach08Complete.GetValue()
-				AddTextOptionST("iAchievement08", "Fusilatelist", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement08", "Fusilatelist", "Locked", 1)
-			endIf
-
-			if RN_Ach09Complete.GetValue()
-				AddTextOptionST("iAchievement09", "Numismatist", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement09", "Numismatist", "Locked", 1)
-			endIf
-			
-			if RN_Ach10Complete.GetValue()
-				AddTextOptionST("iAchievement10", "Expert Sleuth", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement10", "Expert Sleuth", "Locked", 1)
-			endIf
-
-			if RN_Ach11Complete.GetValue()
-				AddTextOptionST("iAchievement11", "Pillar of Nirn", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement11", "Pillar of Nirn", "Locked", 1)
-			endIf
-
-			if RN_Ach12Complete.GetValue()
-				AddTextOptionST("iAchievement12", "Noise Complaint", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement12", "Noise Complaint", "Locked", 1)
-			endIf
-
-			if RN_Ach13Complete.GetValue()
-				AddTextOptionST("iAchievement13", "Masquerader", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement13", "Masquerader", "Locked", 1)
-			endIf
-
-			if RN_Ach14Complete.GetValue()
-				AddTextOptionST("iAchievement14", "That's Sir Thane to You", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement14", "That's Sir Thane to You", "Locked", 1)
-			endIf
-
-			if RN_Ach15Complete.GetValue()
-				AddTextOptionST("iAchievement15", "Guardian of the Divine", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement15", "Guardian of the Divine", "Locked", 1)
-			endIf
-
-			if RN_Ach16Complete.GetValue()
-				AddTextOptionST("iAchievement16", "Cut the Ribbon", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement16", "Cut the Ribbon", "Locked", 1)
-			endIf
-			
-			if RN_Ach17Complete.GetValue()
-				AddTextOptionST("iAchievement17", "Tentacle Afficianado", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement17", "Tentacle Afficianado", "Locked", 1)
-			endIf
-			
 			SetCursorPosition(1)			
 			AddHeaderOption("")	
 			
@@ -634,110 +534,32 @@ Event AddAchievementsPage()
 			AddMenuOptionST("AttributeListOptions", "Reward Attribute:", AttributeList[IndexAttribute])
 			
 			AddHeaderOption("Awarded: " + self.GetCurrentAchievementCount(RN_Achievements_Listener_Count, RN_Achievement_Globals) + " Achievements")
-
-			if RN_Ach18Complete.GetValue()
-				AddTextOptionST("iAchievement18", "Temper Tantrum", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement18", "Temper Tantrum", "Locked", 1)
-			endIf
 			
-			if RN_Ach19Complete.GetValue()
-				AddTextOptionST("iAchievement19", "Taxidermist", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement19", "Taxidermist", "Locked", 1)
-			endIf
-
-			if RN_Ach20Complete.GetValue()
-				AddTextOptionST("iAchievement20", "By All of the Gods!", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement20", "By All of the Gods!", "Locked", 1)
-			endIf
-
-			if RN_Ach21Complete.GetValue()
-				AddTextOptionST("iAchievement21", "Gearhead", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement21", "Gearhead", "Locked", 1)
-			endIf
-
-			if RN_Ach22Complete.GetValue()
-				AddTextOptionST("iAchievement22", "Blind Construction", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement22", "Blind Construction", "Locked", 1)
-			endIf
-			
-			if RN_Ach23Complete.GetValue()
-				AddTextOptionST("iAchievement23", "Children of the Sky", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement23", "Children of the Sky", "Locked", 1)
-			endIf
-
-			if RN_Ach24Complete.GetValue()
-				AddTextOptionST("iAchievement24", "Ghostbuster", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement24", "Ghostbuster", "Locked", 1)
-			endIf
-
-			if RN_Ach25Complete.GetValue()
-				AddTextOptionST("iAchievement25", "Canvas Collector", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement25", "Canvas Collector", "Locked", 1)
-			endIf
-	
-			if RN_Ach26Complete.GetValue()
-				AddTextOptionST("iAchievement26", "That's all Folks", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement26", "That's all Folks", "Locked", 1)
-			endIf
-			
-			if RN_Ach27Complete.GetValue()
-				AddTextOptionST("iAchievement27", "Expansionist", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement27", "Expansionist", "Locked", 1)
-			endIf
-			
-			if RN_Ach28Complete.GetValue()
-				AddTextOptionST("iAchievement28", "Forgive and Forget", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement28", "Forgive and Forget", "Locked", 1)
-			endIf
-			
-			if RN_Ach29Complete.GetValue()
-				AddTextOptionST("iAchievement29", "Yer a Wizard " + PlayerRef.GetBaseObject().GetName(), "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement29", "Yer a Wizard " + PlayerRef.GetBaseObject().GetName(), "Locked", 1)
-			endIf
-			
-			if RN_Ach30Complete.GetValue()
-				AddTextOptionST("iAchievement30", "Master of Secrets", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement30", "Master of Secrets", "Locked", 1)
-			endIf
-			
-			if RN_Ach31Complete.GetValue()
-				AddTextOptionST("iAchievement31", "Deep Pockets", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement31", "Deep Pockets", "Locked", 1)
-			endIf
-			
-			if RN_Ach32Complete.GetValue()
-				AddTextOptionST("iAchievement32", "Guild Master Master", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement32", "Guild Master Master", "Locked", 1)
-			endIf
-			
-			if RN_Ach33Complete.GetValue()
-				AddTextOptionST("iAchievement33", "Champion of All", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement33", "Champion of All", "Locked", 1)
-			endIf
-			
-			if RN_Ach34Complete.GetValue()
-				AddTextOptionST("iAchievement34", "Midas Touch", "Awarded", 0)
-			else
-				AddTextOptionST("iAchievement34", "Midas Touch", "Locked", 1)
-			endIf
-		endif		
-	endif
+			Int PageIdx = 9			
+			Int _Index = 0
+			While _Index < RN_Ach_AchName.length
+				SetCursorPosition(PageIdx + 1)
+				if RN_Ach_Globals[_Index].GetValue()
+					if _Index == 28
+						AddTextOptionST(RN_Ach_StateName[_Index], RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Awarded", 0)
+						PageIdx += 1
+					else
+						AddTextOptionST(RN_Ach_StateName[_Index], RN_Ach_AchName[_Index], "Awarded", 0)
+						PageIdx += 1
+					endIf
+				else
+					if _Index == 28
+						AddTextOptionST(RN_Ach_StateName[_Index], RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Locked", 1)
+						PageIdx += 1
+					else
+						AddTextOptionST(RN_Ach_StateName[_Index], RN_Ach_AchName[_Index], "Locked", 1)
+						PageIdx += 1
+					endIf					
+				endIf
+				_Index +=1		
+			endWhile	
+		endIf
+	endIf
 endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -971,47 +793,52 @@ Event AddCompletedModsPage()
 		BuildTotalsArray(iModComplete, RN_Patches_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)				
-
-		if Safehouse_Enabled
-			AddHeaderOption("Untracked Mods:", 0)
-			if (Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255)
-				AddTextOption("Safehouse Plus", "Installed", 1)
-			endIf
-				
-			if (Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255)
-				AddTextOption("Cheesemod for Everyone", "Installed", 1)
-			endIf
-		endIf		
 		
-		AddHeaderOption(self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Official Patches Completed", 0)
+		AddHeaderOption("Untracked Patch(es):", 0)
+		if (Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255)
+			AddTextOption("Safehouse Plus", "Installed", 1)
+		else
+			AddTextOption("Safehouse Plus", "Not Installed", 1)
+		endIf
 		
-		if RN_SupportedModCount.GetValue() > 0	
-			Int _IndexOpt = 0
+		SetCursorPosition(1)
+		AddHeaderOption("", 0)
+		
+		if (Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255)
+			AddTextOption("Cheesemod for Everyone", "Installed", 1)
+		else
+			AddTextOption("Cheesemod for Everyone", "Not Installed", 1)
+		endIf	
+		
+		SetCursorPosition(4)
+		AddHeaderOption(self.GetCurrentCount(iModComplete, RN_SupportedModCount) + " Official Patch(es) Completed", 0)
+		
+		SetCursorPosition(5)
+		AddHeaderOption("", 0)
+		
+		if RN_SupportedModCount.GetValue() > 0
+			Int PageIdx = 5			
 			Int _Index = 0
-			While _Index < RN_Patches_Name.length
+			While _Index < RN_Patches_Name.length	
+				SetCursorPosition(PageIdx + 1)
 				if RN_Patches_Name[_Index] != ""
 					if RN_Patches_Complete_Array[_Index].GetValue()
 						AddTextOption(RN_Patches_Name[_Index], "Complete", 1)
-						_IndexOpt += 1
+						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
 						AddTextOption(RN_Patches_Name[_Index], "Updating...", 1)
-						_IndexOpt += 1
+						PageIdx += 1
 					else
 						AddTextOption(RN_Patches_Name[_Index], self.GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]), 0)
-						_IndexOpt += 1
+						PageIdx += 1
 					endIf
 				endIf
-				_Index +=1
-				
-				if _IndexOpt == (RN_SupportedModCount.GetValue() as Int / 2)
-					SetCursorPosition(1)
-					AddHeaderOption("", 0)
-				endIf
+				_Index +=1			
 			endWhile	
 		else
-			SetCursorPosition(0)
-			AddHeaderOption("Official Patches", 0)
-			AddTextOption("No Trackable Patches Installed", "", 1)
+			SetCursorPosition(4)
+			AddHeaderOption("Official Patch(es)", 0)
+			AddTextOption("No Trackable Patch(es) Installed", "", 1)
 		endIf
 	endIf
 endEvent
@@ -1025,39 +852,31 @@ Event AddCustomModsPage()
 	if CurrentPage == "Custom Patches"
 		BuildTotalsArray(iCustomComplete, RN_Custom_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetCursorPosition(0)					
+		SetCursorPosition(0)									
+		AddHeaderOption(self.GetCurrentCount(iCustomComplete, RN_CustomModCount) + " Custom Patch(es) Completed", 0)
+		SetCursorPosition(1)
+		AddHeaderOption("", 0)
 		
-		AddHeaderOption(self.GetCurrentCount(iCustomComplete, RN_CustomModCount) + " Custom Patches Completed", 0)
-		
-		if RN_CustomModCount.GetValue() > 0	
+		if RN_CustomModCount.GetValue() > 0
+			Int PageIdx = 1
 			Int _IndexOpt = 0
 			Int _Index = 0
 			While _Index < RN_Custom_Name.length
-				
+				SetCursorPosition(PageIdx + 1)
 				if RN_Custom_Name[_Index] != ""
 					if RN_Custom_Complete_Array[_Index].GetValue()
 						AddTextOption(RN_Custom_Name[_Index], "Complete", 1)
-						_IndexOpt += 1
-				
+						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
 						AddTextOption(RN_Custom_Name[_Index], "Updating...", 1)
-						_IndexOpt += 1
-						
+						PageIdx += 1
 					else
 						AddTextOption(RN_Custom_Name[_Index], self.GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]), 0)
-						_IndexOpt += 1
+						PageIdx += 1
 					endIf
 				endIf
-				_Index +=1
-				if _IndexOpt == (RN_CustomModCount.GetValue() as Int / 2)
-					SetCursorPosition(1)
-					AddHeaderOption("", 0)
-				endIf
+				_Index +=1			
 			endWhile	
-		else
-			SetCursorPosition(0)
-			AddHeaderOption("", 0)
-			AddTextOption("No Trackable Patches Installed", "", 1)
 		endIf
 	endIf
 endEvent
@@ -1501,10 +1320,10 @@ endFunction
 
 Function Begin_Config_Default()
 
-	ShowMuseumVal = True
-	ShowArmoryVal = True
-	ShowModsVal = True
-	ShowSetCompleteVal = True
+	ShowMuseumVal = False
+	ShowArmoryVal = False
+	ShowModsVal = False
+	ShowSetCompleteVal = False
 	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
 	ShowStartup = True
@@ -1548,14 +1367,12 @@ Function Begin_Config_Default()
 	Token_Vis = True
 	RN_Token_Visibility.SetValue(1)
 
-	if Achievements_Enabled
-		Ach_Notify = True
-		Ach_Visual = True
-		IndexSounds = 0
-		Ach_Highlight = False
-		Ach_Perks = False
-		IndexAttribute = 0
-	endIf
+	Ach_Notify = True
+	Ach_Visual = True
+	IndexSounds = 0
+	Ach_Highlight = False
+	Ach_Perks = False
+	IndexAttribute = 0
 
 	if IsInMenuMode()
 		ForcePageReset()
@@ -1569,7 +1386,7 @@ Function Begin_Config_Author()
 	ShowMuseumVal = False
 	ShowArmoryVal = False
 	ShowModsVal = False
-	ShowSetCompleteVal = True
+	ShowSetCompleteVal = False
 	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
 	ShowStartup = True
@@ -1604,20 +1421,18 @@ Function Begin_Config_Author()
 	
 	Restricted = False
 	ScanNotificationsval = True
-	_ScanInterval = 5
+	_ScanInterval = 30
 	AutoScanVal = True
 	RN_AutoScan.UpdateInt(_ScanInterval)
 	
 	RN_Tracker._bSpoilers = True
-
-	if Achievements_Enabled
-		Ach_Notify = True
-		Ach_Visual = True
-		IndexSounds = 1
-		Ach_Highlight = True
-		Ach_Perks = True
-		IndexAttribute = 4
-	endIf
+	
+	Ach_Notify = True
+	Ach_Visual = True
+	IndexSounds = 1
+	Ach_Highlight = True
+	Ach_Perks = True
+	IndexAttribute = 4
 		
 	if IsInMenuMode()
 		ForcePageReset()
@@ -1693,8 +1508,8 @@ state autoScanInterval ; Museum scan slider.
 
 	event OnSliderOpenST()
 		SetSliderDialogStartValue(_ScanInterval)
-		SetSliderDialogRange(0, 60)
-		SetSliderDialogInterval(1)
+		SetSliderDialogRange(0, 120)
+		SetSliderDialogInterval(10)
 	endEvent
 
 	event OnSliderAcceptST(float a_value)
@@ -1704,7 +1519,7 @@ state autoScanInterval ; Museum scan slider.
 	endEvent
 
 	event OnDefaultST()
-		_ScanInterval = 10
+		_ScanInterval = 30
 		SetSliderOptionValueST(_ScanInterval)
 		RN_AutoScan.UpdateInt(_ScanInterval)
 	endEvent
@@ -1808,7 +1623,7 @@ state Scan_Debug
 			RN_Scan_Done.SetValue(RN_Scan_Registered.GetValue())
 			
 			autoScanVal = True
-			_ScanInterval = 10
+			_ScanInterval = 30
 			RN_AutoScan.UpdateInt(_ScanInterval)
 			
 			DBM_SortWait.setvalue(0)
@@ -1876,7 +1691,7 @@ state iRelicSetCompleteNotifications
 
 	Event OnHighlightST()
 
-		self.SetInfoText("This option will display notifications when the player collects all displayable items from a given Set, collection or Museum Section.\n Default: Enabled")
+		self.SetInfoText("This option will display notifications when the player collects all displayable items from a given Set, collection or Museum Section.\n Default: On")
 	EndEvent
 endState
 
@@ -1885,9 +1700,9 @@ endState
 String function SetCompleteNotificationsString()
 
 		if !ShowSetCompleteVal		
-			Status_Return = "Disabled"
+			Status_Return = "Off"
 		elseif ShowSetCompleteVal	
-			Status_Return = "Enabled"
+			Status_Return = "On"
 		endIf
 		return Status_Return
 endfunction
@@ -1897,9 +1712,9 @@ endfunction
 String function GetCompleteNotificationsString()
 
 	if !ShowSetCompleteVal
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowSetCompleteVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 	return Status_Return
 endFunction	
@@ -2085,7 +1900,7 @@ state PrepStationTransfer ;;Prep Station Storage Transfer
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Choose which container(s) to check for displayable items when using the 'Transfer Relics' option at the Prep station.\n Default: All Storage")
+		self.SetInfoText("Choose which container(s) to check for displayable items when using the 'Transfer Relics' option at the Prep station.\n All Storage: Player Inventory, Relic Storage Container, All custom storage containers added via token.\n Relic Storage: Relic Storage Container Only.\n Custom Storage: Only containers added via token.")
 	EndEvent
 endState
 
@@ -2104,7 +1919,7 @@ String function SetPrepStationOptions()
 		
 	endIf	
 	
-return Status_Return 
+	return Status_Return 
 endFunction
 	
 ;;-------------------------------
@@ -2122,7 +1937,7 @@ String function GetPrepStationOptions()
 		
 	endIf	
 	
-return Status_Return 
+	return Status_Return 
 endFunction	
 
 ;;-------------------------------
@@ -2130,13 +1945,14 @@ endFunction
 String function SetTransferOptions()	
 
 	if !Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)
-		Status_Return = "Spell Required"
+		Status_Return = "Purchase Spell To Use"
 	elseif !AutoTransferRelics
 		Status_Return = "Disabled"			
 	elseif AutoTransferRelics
 		Status_Return = "Enabled"				
 	endIf	
-return Status_Return 
+	
+	return Status_Return 
 endFunction
 	
 ;;-------------------------------
@@ -2144,13 +1960,14 @@ endFunction
 String function GetTransferOptions()
 	
 	if !Game.GetPlayer().HasSpell(RN_Storage_Summon_Spell)
-		Status_Return = "Spell Required"
+		Status_Return = "Purchase Spell To Use"
 	elseif !AutoTransferRelics
 		Status_Return = "Disabled"			
 	elseif AutoTransferRelics
 		Status_Return = "Enabled"				
 	endIf	
-return Status_Return 
+	
+	return Status_Return 
 endFunction	
 
 ;;-------------------------------
@@ -2364,7 +2181,7 @@ state iRelicMuseumNotifications
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Show Notifications when picking up a displayable item for the Museum.\n Default: Enabled")
+		self.SetInfoText("Show Notifications when picking up a displayable item for the Museum.\n Default: On")
 	EndEvent
 endState
 
@@ -2373,9 +2190,9 @@ endState
 String function SetMuseumNotificationsString()
 
 	if !ShowMuseumVal		
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowMuseumVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 	return Status_Return
 endfunction
@@ -2385,9 +2202,9 @@ endfunction
 String function GetMuseumNotificationsString()
 
 	if !ShowMuseumVal
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowMuseumVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 	return Status_Return
 endFunction	
@@ -2404,7 +2221,7 @@ state iRelicArmoryNotifications
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Show Notifications when picking up a displayable item for the Armory.\n Default: Enabled")
+		self.SetInfoText("Show Notifications when picking up a displayable item for the Armory.\n Default: On")
 	EndEvent
 endState
 
@@ -2413,9 +2230,9 @@ endState
 String function SetArmoryNotificationsString()
 
 	if !ShowArmoryVal		
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowArmoryVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 		return Status_Return
 endfunction
@@ -2425,9 +2242,9 @@ endfunction
 String function GetArmoryNotificationsString()
 
 	if !ShowArmoryVal		
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowArmoryVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 		return Status_Return
 endFunction	
@@ -2444,7 +2261,7 @@ state iRelicModsNotifications
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Show Notifications when picking up a displayable item from any installed & Supported Mods.\n Default: Enabled")
+		self.SetInfoText("Show Notifications when picking up a displayable item from any installed patch(es).\n Default: On")
 	EndEvent
 endState
 
@@ -2453,9 +2270,9 @@ endState
 String function SetModsNotificationsString()
 
 	if !ShowModsVal		
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowModsVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 		return Status_Return
 endfunction
@@ -2465,9 +2282,9 @@ endfunction
 String function GetModsNotificationsString()
 
 	if !ShowModsVal
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowModsVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 		return Status_Return
 endFunction	
@@ -2484,7 +2301,7 @@ state iRelicListenerNotifications
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Enable to show notifications for quest displays, skills displays, exploration displays and unlocked achievements in the Museum.\n Default: Enabled")
+		self.SetInfoText("Enable to show notifications for quest displays, skills displays, exploration displays and unlocked achievements in the Museum.\n Default: On")
 	EndEvent
 endState
 
@@ -2493,9 +2310,9 @@ endState
 String function SetListenerString()
 
 	if !ShowListenerVal		
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowListenerVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 		return Status_Return
 endfunction
@@ -2505,9 +2322,9 @@ endfunction
 String function GetListenerString()
 
 	if !ShowListenerVal
-		Status_Return = "Disabled"
+		Status_Return = "Off"
 	elseif ShowListenerVal	
-		Status_Return = "Enabled"
+		Status_Return = "On"
 	endIf
 		return Status_Return
 endFunction	
@@ -2618,6 +2435,10 @@ state Safehouse_Disp
 		if Safehouse_Enabled
 			if self.ShowMessage("This will Enable moreHUD icons and functionality for all standard Safehouse displays, do you want to enable now?", true, "Enable", "Cancel")
 				self.SetTextOptionValueST(self.SetSafehouseOptions(), false, "")
+				ShowMessage("Please exit the MCM and wait for the setup complete notification", false, "Ok")
+				While IsInMenuMode()
+					Wait(0.5)
+				endWhile
 				RN_Utility.SetUpSafehouse()
 				RN_SafeouseContent_Installed.SetValue(1)
 			endIf
@@ -2664,7 +2485,11 @@ state iAchievement_Enabled
 		
 		if Achievements_Enabled
 			if self.ShowMessage("This will enable the TCC Achievements system which can grant perks, gold, increases to attributes and Unique items for reaching certain milestones within Legacy of the Dragonborn, do you want to enable now?", true, "Enable", "Cancel")
+				SetToggleOptionValueST(Achievements_Enabled)
 				ShowMessage("Please exit the MCM and wait for the setup complete notification", false, "Ok")
+				While IsInMenuMode()
+					Wait(0.5)
+				endWhile
 				RN_Utility.SetUpAchievements()
 			endIf
 		endIF			
@@ -3255,6 +3080,14 @@ Event Build_Arrays()
 		RN_Museum_Global_Total[_Index] = akvariable
 		_Index += 1
 	endWhile
+
+	RN_Ach_Globals = new globalvariable[34]
+	_Index = 0
+	While _Index < RN_Achievement_Globals.GetSize()
+		globalvariable akvariable = RN_Achievement_Globals.GetAt(_Index) as globalvariable
+		RN_Ach_Globals[_Index] = akvariable
+		_Index += 1
+	endWhile
 	
 ;;-------------------------------
 
@@ -3294,8 +3127,80 @@ Event Build_Arrays()
 	_Museum_Section_names[10] = "Natural Science:"
 	_Museum_Section_names[11] = "Safehouse:"
 	_Museum_Section_names[12] = "Storeroom:"
-endEvent
+	
+	RN_Ach_StateName = new string[34]
+	RN_Ach_StateName[0] = "iAchievement01"
+	RN_Ach_StateName[1] = "iAchievement02"
+	RN_Ach_StateName[2] = "iAchievement03"
+	RN_Ach_StateName[3] = "iAchievement04"
+	RN_Ach_StateName[4] = "iAchievement05"
+	RN_Ach_StateName[5] = "iAchievement06"
+	RN_Ach_StateName[6] = "iAchievement07"
+	RN_Ach_StateName[7] = "iAchievement08"
+	RN_Ach_StateName[8] = "iAchievement09"
+	RN_Ach_StateName[9] = "iAchievement10"
+	RN_Ach_StateName[10] = "iAchievement11"
+	RN_Ach_StateName[11] = "iAchievement12"
+	RN_Ach_StateName[12] = "iAchievement13"	
+	RN_Ach_StateName[13] = "iAchievement14"
+	RN_Ach_StateName[14] = "iAchievement15"
+	RN_Ach_StateName[15] = "iAchievement16"
+	RN_Ach_StateName[16] = "iAchievement17"
+	RN_Ach_StateName[17] = "iAchievement18"
+	RN_Ach_StateName[18] = "iAchievement19"
+	RN_Ach_StateName[19] = "iAchievement20"
+	RN_Ach_StateName[20] = "iAchievement21"
+	RN_Ach_StateName[21] = "iAchievement22"
+	RN_Ach_StateName[22] = "iAchievement23"
+	RN_Ach_StateName[23] = "iAchievement24"
+	RN_Ach_StateName[24] = "iAchievement25"
+	RN_Ach_StateName[25] = "iAchievement26"
+	RN_Ach_StateName[26] = "iAchievement27"
+	RN_Ach_StateName[27] = "iAchievement28"
+	RN_Ach_StateName[28] = "iAchievement29"
+	RN_Ach_StateName[29] = "iAchievement30"
+	RN_Ach_StateName[30] = "iAchievement31"
+	RN_Ach_StateName[31] = "iAchievement32"
+	RN_Ach_StateName[32] = "iAchievement33"
+	RN_Ach_StateName[33] = "iAchievement34"
 
+	RN_Ach_AchName = new string[34]
+	RN_Ach_AchName[0] = "Collector"
+	RN_Ach_AchName[1] = "Hoarder"
+	RN_Ach_AchName[2] = "Junior Librarian"
+	RN_Ach_AchName[3] = "Bibliophile"
+	RN_Ach_AchName[4] = "Spelunker"
+	RN_Ach_AchName[5] = "Lapidarist"
+	RN_Ach_AchName[6] = "Conchologist"
+	RN_Ach_AchName[7] = "Fusilatelist"
+	RN_Ach_AchName[8] = "Fusilatelist"
+	RN_Ach_AchName[9] = "Expert Sleuth"
+	RN_Ach_AchName[10] = "Pillar of Nirn"
+	RN_Ach_AchName[11] = "Noise Complaint"
+	RN_Ach_AchName[12] = "Masquerader"	
+	RN_Ach_AchName[13] = "That's Sir Thane to You"
+	RN_Ach_AchName[14] = "Guardian of the Divine"
+	RN_Ach_AchName[15] = "Cut the Ribbon"
+	RN_Ach_AchName[16] = "Tentacle Afficianado"
+	RN_Ach_AchName[17] = "Temper Tantrum"
+	RN_Ach_AchName[18] = "Taxidermist"
+	RN_Ach_AchName[19] = "By All of the Gods!"
+	RN_Ach_AchName[20] = "Gearhead"
+	RN_Ach_AchName[21] = "Blind Construction"
+	RN_Ach_AchName[22] = "Children of the Sky"
+	RN_Ach_AchName[23] = "Ghostbuster"
+	RN_Ach_AchName[24] = "Canvas Collector"
+	RN_Ach_AchName[25] = "That's all Folks"
+	RN_Ach_AchName[26] = "Expansionist"
+	RN_Ach_AchName[27] = "Forgive and Forget"
+	RN_Ach_AchName[28] = "Yer a Wizard "
+	RN_Ach_AchName[29] = "Master of Secrets"
+	RN_Ach_AchName[30] = "Deep Pockets"
+	RN_Ach_AchName[31] = "Guild Master Master"
+	RN_Ach_AchName[32] = "Champion of All"
+	RN_Ach_AchName[33] = "Midas Touch"	
+endEvent
+				
 ;;-------------------------------
 	
 Function AddModSupport(Int _WaitTime, Int _ArrayIndex = -1, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
