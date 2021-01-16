@@ -19,6 +19,7 @@ formlist property dbmMaster auto
 
 formlist property DBM_RN_QuestDisplays auto
 Formlist property DBM_RN_ExplorationDisplays auto
+formlist property RN_ExcludedItems_Generic auto
 
 globalvariable property RN_Setup_Done auto
 globalvariable property RN_Setup_Registered auto
@@ -45,6 +46,9 @@ bool property bCreationClub auto
 
 ;;Set this to True if this patch is located in the Safehouse.
 bool property bSafeHouseMod auto
+
+;;Formlist to exclude items from being transferred.
+Formlist property _ExcludedTransferItems auto
 
 ;;Formlists that contain the displayable items.
 formlist[] property _itemsArray auto
@@ -215,7 +219,15 @@ Event _RunSetup()
 				TCC_TokenList_ExcludedItems.AddForm(_PrisonerChest[Index])
 			EndWhile
 		endIf
-		
+
+		if _ExcludedTransferItems
+			Index = _ExcludedTransferItems.GetSize()
+			while Index > 0
+				Index -= 1	
+				Form _Item = _ExcludedTransferItems.GetAt(Index) as Form
+				RN_ExcludedItems_Generic.AddForm(_Item)
+			EndWhile
+		endIf			
 ;;------------
 		
 		RN_SupportedModCount.Mod(1)
