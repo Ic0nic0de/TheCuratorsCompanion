@@ -51,7 +51,7 @@ formlist[] property _itemsArray auto
 formlist[] property _displaysArray auto
 
 ;;Formlist for the room that the displays are housed in.
-formlist[] property _displayRooms auto
+formlist[] property _displayRoomflist auto
 
 ;;Formlist needed if you are adding displays to 2 or more rooms / sections.
 formlist property _displayList_Merged auto
@@ -160,20 +160,9 @@ Event _RunSetup()
 		Index = _displaysArray.length		
 		While Index
 			Index -= 1
-			if _displayList_Merged
-				_onConsolidateDisplays(_displaysArray[Index], _displayList_Merged)
-			endIf
+			_onConsolidateDisplays(_displaysArray[Index], _displayList_Merged)
+			_onConsolidateDisplays(_displaysArray[Index], _displayRoomflist[Index])
 		endWhile
-		
-;;------------
-		
-		if _displayRooms
-			Index = _displaysArray.length
-			While Index 
-				Index -= 1
-				_onConsolidateDisplays(_displaysArray[Index], _displayRooms[Index])
-			endWhile
-		endIf
 		
 ;;------------
 		
@@ -229,12 +218,7 @@ endEvent
 
 Event _onCountUpdate(string eventName, string strArg, float numArg, Form sender)
 
-	if _displayList_Merged
-		_Global_Display_Total.SetValue(_displayList_Merged.GetSize())		
-	else
-		_Global_Display_Total.SetValue(_displaysArray[0].GetSize())	
-	endIf
-
+	_Global_Display_Total.SetValue(_displayList_Merged.GetSize())	
 	_Global_Display_Count.SetValue(_displayList_Enabled.GetSize())
 endEvent
 

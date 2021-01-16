@@ -85,6 +85,7 @@ Event onInit()
 	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
 	RegisterForModEvent("TCCUpdate_Patches", "_onPatchUpdate")
 	RegisterForModEvent("TCCUpdate_Counts", "_onCountUpdate")
+	RegisterForModEvent("TCCUpdate_Arrays", "_onArrayUpdate")
 endEvent
 
 ;;-- Events ---------------------------------------		
@@ -94,7 +95,8 @@ Event onPlayerLoadGame()
 	RegisterForModEvent("TCCScan", "_onScan")
 	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
 	RegisterForModEvent("TCCUpdate_Patches", "_onPatchUpdate")
-	RegisterForModEvent("TCCUpdate_Counts", "_onCountUpdate")	
+	RegisterForModEvent("TCCUpdate_Counts", "_onCountUpdate")
+	RegisterForModEvent("TCCUpdate_Arrays", "_onArrayUpdate")	
 endEvent	
 
 ;;-- Events ---------------------------------------	
@@ -102,6 +104,15 @@ endEvent
 Event _onSetup(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 
 	_RunSetup()
+endEvent
+
+;;-- Events ---------------------------------------	
+
+Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
+		
+	_CreateArray()
+	MCM.AddModSupport(Utility.Randomint(1,5), _ArrayIndex, _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
+	MCM.AddSectionSupport(_IW_Global_Count, _IW_Global_Total, _IW_Global_Complete, _ModName, _ImmersiveWeapons_Section_names)		
 endEvent
 
 ;;-- Events ---------------------------------------	

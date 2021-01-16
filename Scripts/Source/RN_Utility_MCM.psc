@@ -687,7 +687,6 @@ endEvent
 ;;------------------------------------------------------------------------------ Armory Page -------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 Event AddArmorySetsPage()
 
 	if CurrentPage == "Armory Sections"
@@ -695,89 +694,83 @@ Event AddArmorySetsPage()
 		BuildTotalsArray(iHeavyArmSets, RN_Section_Complete_Array)
 		BuildTotalsArray(iImmWeapSets, RN_Section2_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetCursorPosition(0)						
+		SetCursorPosition(0)
+		
 		AddHeaderOption("Armory Sets:")
+		SetCursorPosition(1)
+		AddHeaderOption("Completed: " + self.GetCurrentArmoryCount(iArmorySets) + " Sets")
+		Int PageIdx = 1	
 		Int _Index = 0
 		Int _Length = RN_Armory_Global_Complete.length
 		While _Index < _Length 
-			
+			SetCursorPosition(PageIdx + 1)
 			if RN_Armory_Global_Complete[_Index].GetValue() == 1
 				AddTextOption(_Armory_Section_names[_Index], "Complete", 1)
+				PageIdx += 1
 			elseif RN_Scan_Registered.GetValue()
 				AddTextOption(_Armory_Section_names[_Index], "Updating...", 1)
+				PageIdx += 1
 			else
 				AddTextOption(_Armory_Section_names[_Index], self.GetCurrentCount(RN_Armory_Global_Count[_Index], RN_Armory_Global_Total[_Index]), 0)
+				PageIdx += 1
 			endIf
 			_Index +=1
-			
-			if _Index == _Length / 2
-				AddEmptyOption()
-				SetCursorPosition(1)
-				AddHeaderOption("Completed: " + self.GetCurrentArmoryCount(iArmorySets) + " Sets")
-			endIf
 		endWhile
 		
-		SetCursorPosition(24)
-		
-		if (Game.GetModByName("LOTD_TCC_HeavyArm.esp") != 255)
-			AddHeaderOption("Heavy Armory Sets:")
-			
-			_Index = 0
-			_Length = Index_Section
-			While _Index < _Length 
-				
-				if RN_Section_Name[_Index] != ""
-					if RN_Section_Complete_Array[_Index].GetValue() == 1
-						AddTextOption(RN_Section_Name[_Index], "Complete", 1)
-					elseif RN_Scan_Registered.GetValue()
-						AddTextOption(RN_Section_Name[_Index], "Updating...", 1)
-					else
-						AddTextOption(RN_Section_Name[_Index], self.GetCurrentCount(RN_Section_Count_Array[_Index], RN_Section_Total_Array[_Index]), 0)
-					endIf
-				endIf
-				_Index +=1
-				
-				if _Index == _Length / 2 + 1
-					SetCursorPosition(25)
-					AddHeaderOption("Completed: " + self.GetCurrentHACount(iHeavyArmSets) + " Sets")
-				endIf
-			endWhile
-		endIf
-		
-		if (Game.GetModByName("LOTD_TCC_HeavyArm.esp") != 255)
-			SetCursorPosition(48)
-		else
-			SetCursorPosition(24)
-		endIf
-		
+		PageIdx += 2
+		SetCursorPosition(PageIdx + 1)
+
 		if (Game.GetModByName("LOTD_TCC_ImmWeap.esp") != 255)
 			AddHeaderOption("Immersive Weapons Sets:")
-			
+			PageIdx += 1
+			SetCursorPosition(PageIdx + 1)
+			AddHeaderOption("Completed: " + self.GetCurrentIWCount(iImmWeapSets) + " Sets")
+			PageIdx	+= 1
 			_Index = 0
 			_Length = Index_Section2
 			While _Index < _Length 
-				
+				SetCursorPosition(PageIdx + 1)
 				if RN_Section2_Name[_Index] != ""				
 					if RN_Section2_Complete_Array[_Index].GetValue() == 1
 						AddTextOption(RN_Section2_Name[_Index], "Complete", 1)
-						
+						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
 						AddTextOption(RN_Section2_Name[_Index], "Updating...", 1)
-						
+						PageIdx += 1
 					else
 						AddTextOption(RN_Section2_Name[_Index], self.GetCurrentCount(RN_Section2_Count_Array[_Index], RN_Section2_Total_Array[_Index]), 0)
+						PageIdx += 1
 					endIf
 				endIf
 				_Index +=1
-				
-				if _Index == _Length / 2
-					if (Game.GetModByName("LOTD_TCC_HeavyArm.esp") != 255) 
-						SetCursorPosition(49)
+			endWhile
+			PageIdx += 2
+			SetCursorPosition(PageIdx + 1)
+		endIf
+		
+		if (Game.GetModByName("LOTD_TCC_HeavyArm.esp") != 255)
+			AddHeaderOption("Heavy Armory Sets:")
+			PageIdx += 1
+			SetCursorPosition(PageIdx + 1)
+			AddHeaderOption("Completed: " + self.GetCurrentHACount(iHeavyArmSets) + " Sets")
+			PageIdx	+= 1		
+			_Index = 0
+			_Length = Index_Section
+			While _Index < _Length 
+				SetCursorPosition(PageIdx + 1)
+				if RN_Section_Name[_Index] != ""
+					if RN_Section_Complete_Array[_Index].GetValue() == 1
+						AddTextOption(RN_Section_Name[_Index], "Complete", 1)
+						PageIdx += 1
+					elseif RN_Scan_Registered.GetValue()
+						AddTextOption(RN_Section_Name[_Index], "Updating...", 1)
+						PageIdx += 1
 					else
-						SetCursorPosition(25)
+						AddTextOption(RN_Section_Name[_Index], self.GetCurrentCount(RN_Section_Count_Array[_Index], RN_Section_Total_Array[_Index]), 0)
+						PageIdx += 1
 					endIf
-					AddHeaderOption("Completed: " + self.GetCurrentIWCount(iImmWeapSets) + " Sets")
 				endIf
+				_Index +=1
 			endWhile
 		endIf
 	endIf
@@ -3265,9 +3258,9 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 	
 	Int Index
 	
-	if _ModName == "Heavy Armory"
+	if _ModName == "Heavy Armory:"
 		
-		Index = Complete.GetSize()
+		Index = _SectionName.length
 		Index_Section = Index
 		While  Index
 			Index -= 1
@@ -3276,11 +3269,12 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
 			If DevDebugVal
+				Debug.Trace("TCC Registered Section " + _SectionName[Index] + " at position " + Index)
 				DBMDebug.Log(self, "TCC Registered Section " + _SectionName[Index] + " at position " + Index)
 			endIf
 		endWhile
 	
-	elseif _ModName == "Immersive Weapons"
+	elseif _ModName == "Immersive Weapons:"
 
 		Index = Complete.GetSize()
 		Index_Section2 = Index
