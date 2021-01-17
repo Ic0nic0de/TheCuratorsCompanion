@@ -18,6 +18,7 @@ formlist property dbmNew auto
 formlist property dbmMaster auto
 
 formlist property DBM_RN_QuestDisplays auto
+Formlist Property DBM_RN_Quest_Stage_Displays auto
 Formlist property DBM_RN_ExplorationDisplays auto
 
 globalvariable property RN_Setup_Done auto
@@ -76,6 +77,9 @@ globalvariable property _Global_Display_Total auto
 
 ;;AddForm to quest display listener. (Requires the DBM_RN_ExplorationDisplay script to be attached to the display reference) 
 Formlist Property _questDisplays auto ;Optional
+
+;;AddForm to quest stage display listener. (Requires the DBM_RN_ExplorationDisplayStage script to be attached to the display reference) 
+Formlist Property _questDisplaysStage auto ;Optional
 
 ;;Addform to exploration listener. (Requires either the DBM_RN_QuestDisplay script or DBM_RN_QuestDisplayStage script to be attached to the display reference) 
 Formlist property _ExplorationDisplays auto ;Optional
@@ -184,7 +188,18 @@ Event _RunSetup()
 				Index += 1
 			EndWhile
 		endIf
+		
+;;------------
 
+		if _questDisplaysStage
+			Index = 0
+			while Index < _questDisplaysStage.GetSize()
+				ObjectReference _Ref = _questDisplaysStage.GetAt(Index) as ObjectReference		
+				DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
+				Index += 1
+			EndWhile
+		endIf
+		
 ;;------------
 		
 		RN_CustomModCount.Mod(1)
