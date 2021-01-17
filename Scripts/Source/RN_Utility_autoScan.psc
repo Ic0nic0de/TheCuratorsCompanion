@@ -30,9 +30,7 @@ endEvent
 Event OnUpdate()
 	
 	if DBM_SortWait.getvalue() || !RN_MCM.autoScanVal || Game.GetPlayer().IsInCombat()
-		If RN_MCM.DevDebugVal
-			DBMDebug.Log(self, "TCC: Autoscan unable to start " + "Wait = " + DBM_SortWait.Getvalue() +  _ScanInt + RN_MCM.autoScanVal)
-		endIf
+		TCCDebug.Log("TCC: Autoscan unable to start " + "Wait = " + DBM_SortWait.Getvalue() +  _ScanInt + RN_MCM.autoScanVal)
 		
 		UpdateInt(RN_MCM._ScanInterval)	
 	else

@@ -29,6 +29,7 @@ Int Property _Legacy_Index = 0 Auto Hidden
 
 Bool Property _bSpoilers Auto Hidden
 
+Bool DevDebugVal
 ;-- Events --------------------------------------
 
 Event OnConfigInit()
@@ -300,6 +301,7 @@ Event _Build_Page_Settings()
 		AddEmptyOption()
 		AddHeaderOption("General Settings:")
 		AddTextOptionST("_State_Spoilers", "Show Hidden Quests (Spoilers)", self.GetSpoilersString())
+		AddToggleOptionST("Dev_Alerts", "Developer Debugging", DevDebugVal)
 		SetCursorPosition(1)
 		AddHeaderOption("")	
 	
@@ -413,6 +415,26 @@ State _State_Menu_Helgen ; MENU
 		SetInfoText("Use this menu to add the quests from the faction you chose during the Helgen Reborn main quest:\n Helgen Faction\n Stormclock Faction\n Imperial Faction")
 	endEvent
 	
+endState
+
+state Dev_Alerts ;;Debug Options
+
+	Event OnSelectST()
+	
+		DevDebugVal = !DevDebugVal
+		SetToggleOptionValueST(DevDebugVal)	
+	EndEvent
+	
+	Event OnDefaultST()
+	
+		DevDebugVal = false
+		SetToggleOptionValueST(DevDebugVal)
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Enables Developer Debugging\n Default: OFF")
+	EndEvent
 endState
 
 ;-- Events --------------------------------------
@@ -879,7 +901,7 @@ endEvent
 
 Event OnOptionSelect(Int _Value)
 
-	if RN_MCM.DevDebugVal
+	if DevDebugVal
 		String _QuestName = _Get_Quest_Name(_Value)
 		String _EditorID = _Get_Quest_ID(_Value, _QuestName)
 		Int _StageFirst = _Get_Quest_Stage_First(_Value, _QuestName)

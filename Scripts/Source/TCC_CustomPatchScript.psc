@@ -120,7 +120,8 @@ endEvent
 
 Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
 		
-	MCM.AddCustomModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _PatchName)			
+	MCM.AddCustomModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _PatchName)
+	TCCDebug.Log("Custom Patch [" + _PatchName + "] - Array Created and pushed to MCM", 0)	
 endEvent
 
 ;;-- Events ---------------------------------------		
@@ -131,9 +132,7 @@ Event _RunSetup()
 	
 	if !_setupDone
 
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Received for: " + GetOwningQuest().GetName())
-		endIf
+		TCCDebug.Log("Custom Patch [" + _PatchName + "] - Setup Event Received...", 0)
 		
 		MCM.AddCustomModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _PatchName)
 		
@@ -193,16 +192,11 @@ Event _RunSetup()
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
 		
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Completed for: " + GetOwningQuest().GetName())
-		endIf
+		TCCDebug.Log("Custom Patch [" + _PatchName + "] - Setup Event Completed", 0)
 	else
 		
 		RN_Setup_Done.Mod(1)
-		
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Already Completed for: " + GetOwningQuest().GetName())
-		endIf
+		TCCDebug.Log("Custom Patch [" + _PatchName + "] - Setup Event Already Completed", 0)
 	endIf
 endEvent
 
@@ -228,9 +222,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
 	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " + GetOwningQuest().GetName())
-	endIf
+	TCCDebug.Log("Custom Patch [" + _PatchName + "] - Scan Event Received...", 0)
 	
 	if !_Global_Mod_Complete.GetValue()
 		Int Index = _displaysArray.length
@@ -250,9 +242,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Done.Mod(1)
 	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " + GetOwningQuest().GetName())
-	endIf
+	TCCDebug.Log("Custom Patch [" + _PatchName + "] - Scan Event Completed", 0)
 endEvent	
 
 ;/

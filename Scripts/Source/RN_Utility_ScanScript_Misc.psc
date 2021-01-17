@@ -51,9 +51,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
 	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: Paintings")
-	endIf
+	TCCDebug.Log("Scan Event Received for: Misc Displays")
 
 ;;----------	
 
@@ -84,8 +82,6 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	endIf
 	
 	RN_Scan_Done.Mod(1)
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: Paintings")
-	endIf	
+	TCCDebug.Log("Scan Event Completed for: Misc Displays")
 endEvent
 

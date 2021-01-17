@@ -67,10 +67,6 @@ string[] AttributeList
 int property IndexAttribute auto hidden
 int AttributeListOptions
 
-;; DBM Debug
-globalvariable property DBM_DebuggingON auto
-quest property DBM_Debugging auto
-
 bool property _UserSettings auto hidden
 
 ;; bool Properties
@@ -89,7 +85,6 @@ bool property AllowKey auto hidden ;;auto Transfer To Storage Container
 bool property AllowGems auto hidden ;;auto Transfer To Storage Container
 bool property AllowMisc auto hidden ;;auto Transfer To Storage Container
 bool property AllowPotion auto hidden ;;auto Transfer To Storage Container
-bool property DevDebugVal auto hidden ;; Debug alerts for Dev usage.
 bool property ShowStartup = true auto hidden ;; Shows Startup Messages
 
 Int property PrepTransfer auto hidden ;; Prep Station transfer settings.
@@ -249,7 +244,7 @@ Event OnConfigInit()
 	
 	Build_Arrays()
 	AddDynamicPagesList()
-	LItemSpellTomes00AllSpells.AddForm(RN_RSC_SpellTome,1 , 1)
+	LItemSpellTomes00AllSpells.AddForm(RN_RSC_SpellTome, 1 , 1)
 EndEvent
 
 ;-- Events --------------------------------
@@ -885,9 +880,9 @@ Event AddDebugPage()
 		SetCursorPosition(0)
 		AddHeaderOption("Debug Options:")
 		
-		AddToggleOptionST("Dev_Alerts", "Developer Debugging", DevDebugVal)
 		AddTextOptionST("Update_Patches", "Update Installed Patches", "", 0)
 		AddTextOptionST("Scan_Debug", "Reset Museum Scanner", "", 0)
+		AddEmptyOption()
 		AddEmptyOption()
 		AddHeaderOption("moreHUD Debug:")
 		AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 0)
@@ -1567,30 +1562,6 @@ endFunction
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Debug Options -------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-;;-------------------------------
-
-state Dev_Alerts ;;Debug Options
-
-	Event OnSelectST()
-	
-		DevDebugVal = !DevDebugVal
-		DBM_DebuggingON.setvalue(1)
-		DBM_Debugging.Start()
-		SetToggleOptionValueST(DevDebugVal)	
-	EndEvent
-	
-	Event OnDefaultST()
-	
-		DevDebugVal = false
-		SetToggleOptionValueST(DevDebugVal)
-	EndEvent
-
-	Event OnHighlightST()
-
-		self.SetInfoText("Enables Developer Debugging Messages to the LegacyoftheDragonborn.log file\n Default: OFF")
-	EndEvent
-endState
 
 state RUI_Handler ;;Debug Options
 	Event OnSelectST()
@@ -3217,12 +3188,7 @@ Function AddModSupport(Int _WaitTime, Int _ArrayIndex = -1, GlobalVariable _GVCo
 		RN_Patches_Count_Array[Index] = _GVCount
 		RN_Patches_Total_Array[Index] = _GVTotal		
 	endif
-	
-	Debug.Trace("TCC Registered " + _ModName + " at position " + Index)
-
-	If DevDebugVal
-		DBMDebug.Log(self, "TCC Registered " + _ModName + " at position " + Index)
-	endIf
+	TCCDebug.Log("MCM Registered Official Patch [" + _ModName + "] at position " + Index, 0)
 endFunction
 
 ;;-------------------------------
@@ -3244,12 +3210,8 @@ Function AddCustomModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVa
 		RN_Custom_Count_Array[Index] = _GVCount
 		RN_Custom_Total_Array[Index] = _GVTotal		
 	endif
-	
-	;Debug.Trace("TCC Registered Custom Patch " + _ModName + " at position " + Index)
 
-	If DevDebugVal
-		DBMDebug.Log(self, "TCC Registered Custom Patch " + _ModName + " at position " + Index)
-	endIf
+	TCCDebug.Log("MCM Registered Custom Patch [" + _ModName + "] at position " + Index, 0)
 endFunction
 
 ;;-------------------------------
@@ -3268,10 +3230,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
 			RN_Section_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
-			If DevDebugVal
-				Debug.Trace("TCC Registered Section " + _SectionName[Index] + " at position " + Index)
-				DBMDebug.Log(self, "TCC Registered Section " + _SectionName[Index] + " at position " + Index)
-			endIf
+			TCCDebug.Log("MCM Registered Heavy Armory Section [" + _SectionName[Index] + "] at position " + Index, 0)
 		endWhile
 	
 	elseif _ModName == "Immersive Weapons:"
@@ -3284,9 +3243,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section2_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
 			RN_Section2_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section2_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
-			If DevDebugVal
-				DBMDebug.Log(self, "TCC Registered Section " + _SectionName[Index] + " at position " + Index)
-			endIf
+			TCCDebug.Log("MCM Registered Immersive Weapons Section [" + _SectionName[Index] + "] at position " + Index, 0)
 		endWhile	
 	endIf
 endFunction

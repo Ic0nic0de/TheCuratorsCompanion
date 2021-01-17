@@ -113,9 +113,7 @@ Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;;Au
 
 	RN_found_Registered.Mod(1)
 	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Completed for: Museum (EEH, GH, HOS, NS)")
-	endIf
+	TCCDebug.Log("Museum 2 - Update Event Received...", 0)
 	
 	Int _Index = _MuseumContainerList_WP.GetSize()
 	While _Index 
@@ -134,8 +132,5 @@ Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;;Au
 	endWhile
 	
 	RN_Found_Done.Mod(1)
-	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Completed for: Museum (EEH, GH, HOS, NS)")
-	endIf
+	TCCDebug.Log("Museum 2 - Update Event Competed", 0)
 endEvent	

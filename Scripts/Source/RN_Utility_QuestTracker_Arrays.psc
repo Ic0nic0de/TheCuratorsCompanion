@@ -1427,7 +1427,7 @@ Event _Build_Quest_Arrays()
 	Moonpath_Giver[6] = "Automatic Start - Reach the Supply Post."
 	
 	Moonpath_Reqs = new string[7]
-	Moonpath_Reqs[0] = "Level 18+ and reached a display count of 70."
+	Moonpath_Reqs[0] = "No Requirements"
 	Moonpath_Reqs[1] = "Completion of 'By the Light of the Moon'."
 	Moonpath_Reqs[2] = "'The Sweet Taste Of Elsweyr' to have been started."
 	Moonpath_Reqs[3] = "Completion of 'Incursion'."
@@ -2702,7 +2702,7 @@ Event _Build_Quest_Arrays()
 ;;------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------------------------------------------------------------------------	
 
-	VigilantMain_ID = new string[20]
+	VigilantMain_ID = new string[21]
 	VigilantMain_ID[0] = "zzzAoMMq00"
 	VigilantMain_ID[1] = "zzzAoMMq01"
 	VigilantMain_ID[2] = "zzzAoMMq02"
@@ -2712,19 +2712,20 @@ Event _Build_Quest_Arrays()
 	VigilantMain_ID[6] = "zzzAoMMq06"
 	VigilantMain_ID[7] = "zzzAoMMq07"
 	VigilantMain_ID[8] = "zzzAoMMq08"
-	VigilantMain_ID[9] = "zzzAoMMq09"
-	VigilantMain_ID[10] = "zzzAoMMq10"
-	VigilantMain_ID[11] = "zzzAoMSubQ01"
-	VigilantMain_ID[12] = "zzzBMMq01"
-	VigilantMain_ID[13] = "zzzBMMq02"
-	VigilantMain_ID[14] = "zzzBMMq03"
-	VigilantMain_ID[15] = "zzzCOMq01"
-	VigilantMain_ID[16] = "zzzCHMQ00"
-	VigilantMain_ID[17] = "zzzCHMQ01"
-	VigilantMain_ID[18] = "zzzCHMQ02"
-	VigilantMain_ID[19] = "zzzCHEpilogueQuest01"
+	VigilantMain_ID[9] = "zzzAoMMqGoodEnd"
+	VigilantMain_ID[10] = "zzzAoMMq09"
+	VigilantMain_ID[11] = "zzzAoMMq10"
+	VigilantMain_ID[12] = "zzzAoMSubQ01"
+	VigilantMain_ID[13] = "zzzBMMq01"
+	VigilantMain_ID[14] = "zzzBMMq02"
+	VigilantMain_ID[15] = "zzzBMMq03"
+	VigilantMain_ID[16] = "zzzCOMq01"
+	VigilantMain_ID[17] = "zzzCHMQ00"
+	VigilantMain_ID[18] = "zzzCHMQ01"
+	VigilantMain_ID[19] = "zzzCHMQ02"
+	VigilantMain_ID[20] = "zzzCHEpilogueQuest01"
 
-	VigilantMain_Name = new string[20]
+	VigilantMain_Name = new string[21]
 	VigilantMain_Name[0] = "(Act I) Vigilant of Stendarr"
 	VigilantMain_Name[1] = "(Act I) Bloodsucker"
 	VigilantMain_Name[2] = "(Act I) He Who Cannot Be Touched"
@@ -2734,19 +2735,20 @@ Event _Build_Quest_Arrays()
 	VigilantMain_Name[6] = "(Act I) Thus Spoke Khajiit"
 	VigilantMain_Name[7] = "(Act I) Old Guilts"
 	VigilantMain_Name[8] = "(Act I) No Mercy"
-	VigilantMain_Name[9] = "(Act I) The Endless Fall"
-	VigilantMain_Name[10] = "(Act I) The Landing"
-	VigilantMain_Name[11] = "(Act I) The witch of Ivarstead"
-	VigilantMain_Name[12] = "(Act II) Empty Cells"
-	VigilantMain_Name[13] = "(Act II) Loose Ends"
-	VigilantMain_Name[14] = "(Act II) The Blood Matron"
-	VigilantMain_Name[15] = "(Act III) Child of Oblivion"
-	VigilantMain_Name[16] = "(Act IV) Coldharbour"
-	VigilantMain_Name[17] = "(Act IV) Aetherius"
-	VigilantMain_Name[18] = "(Act IV) Exsultate Jubilate"
-	VigilantMain_Name[19] = "(Act IV) A Million Cats"
+	VigilantMain_Name[9] = "(Act I) Art of Mercy"
+	VigilantMain_Name[10] = "(Act I) The Endless Fall"
+	VigilantMain_Name[11] = "(Act I) The Landing"
+	VigilantMain_Name[12] = "(Act I) The witch of Ivarstead"
+	VigilantMain_Name[13] = "(Act II) Empty Cells"
+	VigilantMain_Name[14] = "(Act II) Loose Ends"
+	VigilantMain_Name[15] = "(Act II) The Blood Matron"
+	VigilantMain_Name[16] = "(Act III) Child of Oblivion"
+	VigilantMain_Name[17] = "(Act IV) Coldharbour"
+	VigilantMain_Name[18] = "(Act IV) Aetherius"
+	VigilantMain_Name[19] = "(Act IV) Exsultate Jubilate"
+	VigilantMain_Name[20] = "(Act IV) A Million Cats"
 
-	VigilantMain_Giver = new string[20]
+	VigilantMain_Giver = new string[21]
 	VigilantMain_Giver[0] = "Altano (Windpeak Inn)"
 	VigilantMain_Giver[1] = "Automatic Start"
 	VigilantMain_Giver[2] = "Automatic Start"
@@ -2767,8 +2769,9 @@ Event _Build_Quest_Arrays()
 	VigilantMain_Giver[17] = "Automatic Start"
 	VigilantMain_Giver[18] = "Automatic Start"
 	VigilantMain_Giver[19] = "Automatic Start"
+	VigilantMain_Giver[20] = "Automatic Start"
 
-	VigilantMain_Reqs = new string[20]
+	VigilantMain_Reqs = new string[21]
 	VigilantMain_Reqs[0] = "No Requirements"
 	VigilantMain_Reqs[1] = "Completion of 'Vigilant of Stendarr'"
 	VigilantMain_Reqs[2] = "Completion of 'Bloodsucker'"
@@ -2779,18 +2782,19 @@ Event _Build_Quest_Arrays()
 	VigilantMain_Reqs[7] = "Completion of 'Thus Spoke Khajiit'"
 	VigilantMain_Reqs[8] = "Completion of 'Old Guilts'"
 	VigilantMain_Reqs[9] = "Completion of 'No Mercy'"
-	VigilantMain_Reqs[10] = "Completion of 'The Endless Fall'"
-	VigilantMain_Reqs[11] = "Completion of 'The Landing'"
+	VigilantMain_Reqs[10] = "Completion of 'No Mercy'"
+	VigilantMain_Reqs[11] = "Completion of 'The Endless Fall'"
 	VigilantMain_Reqs[12] = "Completion of 'The Landing'"
-	VigilantMain_Reqs[13] = "Must have started 'Empty Cells'"
+	VigilantMain_Reqs[13] = "Completion of 'The Landing' or 'Art of Mercy'"
 	VigilantMain_Reqs[14] = "Must have started 'Empty Cells'"
-	VigilantMain_Reqs[15] = "Completion of 'Empty Cells'"
-	VigilantMain_Reqs[16] = "Completion of 'Child Of Oblivion'"
-	VigilantMain_Reqs[17] = "Completion of 'Coldharbour'"
-	VigilantMain_Reqs[18] = "Completion of 'Exsultate Jubilate'"
+	VigilantMain_Reqs[15] = "Must have started 'Empty Cells'"
+	VigilantMain_Reqs[16] = "Completion of 'Empty Cells'"
+	VigilantMain_Reqs[17] = "Completion of 'Child Of Oblivion'"
+	VigilantMain_Reqs[18] = "Completion of 'Coldharbour'"
 	VigilantMain_Reqs[19] = "Completion of 'Exsultate Jubilate'"
+	VigilantMain_Reqs[20] = "Completion of 'Exsultate Jubilate'"
 
-	VigilantMain_Notes = new string[20]
+	VigilantMain_Notes = new string[21]
 	VigilantMain_Notes[0] = ""
 	VigilantMain_Notes[1] = ""
 	VigilantMain_Notes[2] = ""
@@ -2800,19 +2804,20 @@ Event _Build_Quest_Arrays()
 	VigilantMain_Notes[6] = ""
 	VigilantMain_Notes[7] = ""
 	VigilantMain_Notes[8] = "NOTE: Karma Neutral path - Start conversation with 'What are you doing here?'"
-	VigilantMain_Notes[9] = "NOTE: Karma Gain path - Defy Molag Bal with 'Begone...' and 'I said, begone...' dialogue options"
-	VigilantMain_Notes[10] = ""
-	VigilantMain_Notes[11] = "NOTE: This quest will register as 'Ongoing' when the quest 'The Landing' is started, once 'The Landing' has been completed, travel back to the Witch's Pond and speak with Reyda.\n Karma Gain path - Ignore her lies and tell her that her fate is sealed"
-	VigilantMain_Notes[12] = "NOTE: Start this quest by speaking to the Windhelm guard outside the Temple of Stendarr, this quest will complete after speaking to Jorleif, 'Loose Ends' and 'The Blood Matron'"
-	VigilantMain_Notes[13] = "Note: This quest is contained within 'Empty Cells',\n Karma Gain path - Kill the giant Vampire Brute.\n Karma Neutral Path - Answer Lamae with 'Begone, monster', or attack her if you already agreed to her offer"
-	VigilantMain_Notes[14] = "Note: This quest is contained within 'Empty Cells'.\n Karma Gain path - automatic on completion"
-	VigilantMain_Notes[15] = "NOTE: Start this quest by returning to the Temple of Stendarr after leaving Windhelm, Choosing the death option will result in missing the Museum quest display for act III, it is highly recommended to complete this quest accepting the help of Molag Bal"
-	VigilantMain_Notes[16] = "NOTE: This quest does not appear in your journal"
-	VigilantMain_Notes[17] = "NOTE: This quest does not appear in your journal, Must have a Karma Level of 50+ for a chance to trigger the good ending"
-	VigilantMain_Notes[18] = "NOTE: This quest does not appear in your journal"
+	VigilantMain_Notes[9] = "NOTE: To start this quest you must not kill the witches and you must kill Altano after selecting the 'I won't do it' dialogue options - This is the good ending to Act 1."
+	VigilantMain_Notes[10] = "NOTE: Karma Gain path - Defy Molag Bal with 'Begone...' and 'I said, begone...' dialogue options.\n This Quest is not availabe if you take the good ending and complete the quest 'Art of Mercy'"
+	VigilantMain_Notes[11] = "NOTE: This Quest is not availabe if you take the good ending and complete the quest 'Art of Mercy'"
+	VigilantMain_Notes[12] = "NOTE: This quest will register as 'Ongoing' when the quest 'The Landing' is started, once 'The Landing' has been completed, travel back to the Witch's Pond and speak with Reyda.\n Karma Gain path - Ignore her lies and tell her that her fate is sealed"
+	VigilantMain_Notes[13] = "NOTE: Start this quest by speaking to the Windhelm guard outside the Temple of Stendarr, this quest will complete after speaking to Jorleif, 'Loose Ends' and 'The Blood Matron'"
+	VigilantMain_Notes[14] = "Note: This quest is contained within 'Empty Cells',\n Karma Gain path - Kill the giant Vampire Brute.\n Karma Neutral Path - Answer Lamae with 'Begone, monster', or attack her if you already agreed to her offer"
+	VigilantMain_Notes[15] = "Note: This quest is contained within 'Empty Cells'.\n Karma Gain path - automatic on completion"
+	VigilantMain_Notes[16] = "NOTE: Start this quest by returning to the Temple of Stendarr after leaving Windhelm, Choosing the death option will result in missing the Museum quest display for act III, it is highly recommended to complete this quest accepting the help of Molag Bal"
+	VigilantMain_Notes[17] = "NOTE: This quest does not appear in your journal"
+	VigilantMain_Notes[18] = "NOTE: This quest does not appear in your journal, Must have a Karma Level of 50+ for a chance to trigger the good ending"
 	VigilantMain_Notes[19] = "NOTE: This quest does not appear in your journal"
+	VigilantMain_Notes[20] = "NOTE: This quest does not appear in your journal"
 
-	VigilantMain_First = new int[20]	
+	VigilantMain_First = new int[21]	
 	VigilantMain_First[0] = 0
 	VigilantMain_First[1] = 0	
 	VigilantMain_First[2] = 0	
@@ -2822,10 +2827,10 @@ Event _Build_Quest_Arrays()
 	VigilantMain_First[6] = 0	
 	VigilantMain_First[7] = 0	
 	VigilantMain_First[8] = 0	
-	VigilantMain_First[9] = 0
+	VigilantMain_First[9] = 0	
 	VigilantMain_First[10] = 0
-	VigilantMain_First[11] = 10
-	VigilantMain_First[12] = 0
+	VigilantMain_First[11] = 0
+	VigilantMain_First[12] = 10
 	VigilantMain_First[13] = 0
 	VigilantMain_First[14] = 0
 	VigilantMain_First[15] = 0
@@ -2833,8 +2838,9 @@ Event _Build_Quest_Arrays()
 	VigilantMain_First[17] = 0
 	VigilantMain_First[18] = 0
 	VigilantMain_First[19] = 0
+	VigilantMain_First[20] = 0
 	
-	VigilantMain_Final = new int[20]	
+	VigilantMain_Final = new int[21]	
 	VigilantMain_Final[0] = 999
 	VigilantMain_Final[1] = 999
 	VigilantMain_Final[2] = 999
@@ -2846,17 +2852,18 @@ Event _Build_Quest_Arrays()
 	VigilantMain_Final[8] = 999
 	VigilantMain_Final[9] = 999
 	VigilantMain_Final[10] = 999
-	VigilantMain_Final[11] = 300	
-	VigilantMain_Final[12] = 999
+	VigilantMain_Final[11] = 999
+	VigilantMain_Final[12] = 300	
 	VigilantMain_Final[13] = 999
 	VigilantMain_Final[14] = 999
 	VigilantMain_Final[15] = 999
 	VigilantMain_Final[16] = 999
-	VigilantMain_Final[17] = 255	
-	VigilantMain_Final[18] = 50
-	VigilantMain_Final[19] = 20	
+	VigilantMain_Final[17] = 999
+	VigilantMain_Final[18] = 255	
+	VigilantMain_Final[19] = 50
+	VigilantMain_Final[20] = 20	
 	
-	VigilantMain_Radiant = new bool[20]
+	VigilantMain_Radiant = new bool[21]
 	VigilantMain_Radiant[0] = false
 	VigilantMain_Radiant[1] = false
 	VigilantMain_Radiant[2] = false
@@ -2877,8 +2884,9 @@ Event _Build_Quest_Arrays()
 	VigilantMain_Radiant[17] = false
 	VigilantMain_Radiant[18] = false
 	VigilantMain_Radiant[19] = false
+	VigilantMain_Radiant[20] = false
 	
-	VigilantMain_Spoiler = new bool[20]
+	VigilantMain_Spoiler = new bool[21]
 	VigilantMain_Spoiler[0] = false
 	VigilantMain_Spoiler[1] = false
 	VigilantMain_Spoiler[2] = false
@@ -2890,8 +2898,8 @@ Event _Build_Quest_Arrays()
 	VigilantMain_Spoiler[8] = false
 	VigilantMain_Spoiler[9] = false
 	VigilantMain_Spoiler[10] = false
-	VigilantMain_Spoiler[11] = true
-	VigilantMain_Spoiler[12] = false
+	VigilantMain_Spoiler[11] = false
+	VigilantMain_Spoiler[12] = true
 	VigilantMain_Spoiler[13] = false
 	VigilantMain_Spoiler[14] = false
 	VigilantMain_Spoiler[15] = false
@@ -2899,6 +2907,7 @@ Event _Build_Quest_Arrays()
 	VigilantMain_Spoiler[17] = false
 	VigilantMain_Spoiler[18] = false
 	VigilantMain_Spoiler[19] = false
+	VigilantMain_Spoiler[20] = false
 
 ;;------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------------------------------------------------------------------------

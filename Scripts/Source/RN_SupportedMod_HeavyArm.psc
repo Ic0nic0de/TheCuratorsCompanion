@@ -110,7 +110,8 @@ Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
 		
 	_CreateArray()
 	MCM.AddModSupport(Utility.Randomint(1,5), _ArrayIndex, _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
-	MCM.AddSectionSupport(_HA_Global_Count, _HA_Global_Total, _HA_Global_Complete, _ModName, _HeavyArmory_Section_names)		
+	MCM.AddSectionSupport(_HA_Global_Count, _HA_Global_Total, _HA_Global_Complete, _ModName, _HeavyArmory_Section_names)
+	TCCDebug.Log("Official Patch [" + _ModName + "] - Array Created and pushed to MCM", 0)
 endEvent
 
 ;;-- Events ---------------------------------------	
@@ -120,10 +121,8 @@ Event _RunSetup()
 	RN_Setup_Registered.Mod(1)
 	
 	if !_setupDone
-	
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Received for: " + GetOwningQuest().GetName())
-		endIf
+		
+		TCCDebug.Log("Official Patch [" + _ModName + "] - Setup Event Received...", 0)
 		
 		_CreateArray()
 		MCM.AddModSupport(Utility.Randomint(1,5), _ArrayIndex, _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
@@ -151,16 +150,12 @@ Event _RunSetup()
 		RN_SupportedModCount.Mod(1)
 		_setupDone = True
 		
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Completed for: " + GetOwningQuest().GetName())
-		endIf
+		TCCDebug.Log("Official Patch [" + _ModName + "] - Setup Event Completed", 0)
 		
 	else
 		
 		RN_Setup_Done.Mod(1)
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Already Completed for: " + GetOwningQuest().GetName())
-		endIf
+		TCCDebug.Log("Official Patch [" + _ModName + "] - Setup Event Already Completed", 0)
 	endIf
 endEvent	
 
@@ -194,9 +189,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	
 	RN_Scan_Registered.Mod(1)
 	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " + GetOwningQuest().GetName())
-	endIf
+	TCCDebug.Log("Official Patch [" + _ModName + "] - Scan Event Received...", 0)
 
 	if !_Global_Mod_Complete.GetValue()
 		Int Index = _HA_Formlist_Displays.GetSize()
@@ -232,9 +225,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 
 	RN_Scan_Done.Mod(1)	
 
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " + GetOwningQuest().GetName())
-	endIf
+	TCCDebug.Log("Official Patch [" + _ModName + "] - Scan Event Completed", 0)
 EndEvent
 
 Function _CreateArray()

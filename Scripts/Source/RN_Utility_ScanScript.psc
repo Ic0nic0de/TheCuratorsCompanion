@@ -46,18 +46,14 @@ endEvent
 Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
-	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " + _RoomName)
-	endIf
+
+	TCCDebug.Log("Scan Event Received for: " + _RoomName)
 
 ;;----------	
 	If _SectionToScan == 8 && !RN_SupportedCreationCount.Getvalue() || _SectionToScan == 11 && !RN_SafeouseContent_Installed.GetValue()
 		
 		RN_Scan_Done.Mod(1)
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Not Run for: " + _RoomName)
-		endIf
+		TCCDebug.Log("Scan Event Not Run For: " + _RoomName)
 		
 	else
 
@@ -100,9 +96,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 		endIf
 		
 		RN_Scan_Done.Mod(1)
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " + _RoomName)
-		endIf	
+		TCCDebug.Log("Scan Event Compelted for: " + _RoomName)
 	endIf
 endEvent
 

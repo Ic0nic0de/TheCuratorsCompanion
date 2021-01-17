@@ -87,11 +87,8 @@ endEvent
 Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;; automatic Call from (RN_Utility_Script)
 
 	RN_found_Registered.Mod(1)
+	TCCDebug.Log("Patch(es) - Update Event Received...", 0)
 	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Received for: Supported Mods")
-	endIf
-
 	Int _Index = _MuseumContainerList_WP.GetSize()
 	While _Index 
 		_Index -= 1
@@ -107,9 +104,5 @@ Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;; a
 	endWhile
 	
 	RN_Found_Done.Mod(1)
-	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Completed for: Supported Mods")
-	endIf
-	
+	TCCDebug.Log("Patch(es) - Update Event Completed", 0)
 endEvent

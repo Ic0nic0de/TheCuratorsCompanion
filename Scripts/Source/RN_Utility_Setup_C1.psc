@@ -74,9 +74,7 @@ function _RunSetup(bool forced)
 	
 	if !_setupDone
 
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Received for: Setup C1")
-		endIf
+		TCCDebug.Log("Setup Event Received for: Setup C1")
 	
 		;;Merge Hall Of Heroes Display Lists
 		_onConsolidateDisplays(DBM_SectionHOHGroundFloorLeft, TCC_DisplayList_HallofHeroes)
@@ -101,15 +99,11 @@ function _RunSetup(bool forced)
 		
 		RN_Setup_Done.Mod(1)
 		_setupDone = true
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Completed for: Setup C1")
-		endIf
+		TCCDebug.Log("Setup Event Completed for: Setup C1")
 	
 	else
 		
 		RN_Setup_Done.Mod(1)
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Already Completed for: Setup C1")
-		endIf
+		TCCDebug.Log("Setup Event Already Completed for: Setup C1")
 	endIf
 endFunction

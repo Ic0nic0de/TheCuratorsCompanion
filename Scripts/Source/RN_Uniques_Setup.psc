@@ -95,9 +95,7 @@ Event _RunSetup()
 	
 	if !_setupDone
 
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Received for: " + GetOwningQuest().GetName())
-		endIf
+		TCCDebug.Log("Official Patch [TCC Unique Items] - Setup Event Received...", 0)
 
 		Int Index = _itemsArray.length		
 		While Index
@@ -128,16 +126,11 @@ Event _RunSetup()
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
 		
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Completed for: " + GetOwningQuest().GetName())
-		endIf
+		TCCDebug.Log("Official Patch [TCC Unique Items] - Setup Event Completed", 0)
 	else
 		
-		RN_Setup_Done.Mod(1)
-		
-		If MCM.DevDebugVal
-			DBMDebug.Log(GetOwningQuest(), "TCC: Setup Event Already Completed for: " + GetOwningQuest().GetName())
-		endIf
+		RN_Setup_Done.Mod(1)	
+		TCCDebug.Log("Official Patch [TCC Unique Items] - Setup Event Already Completed", 0)
 	endIf
 endEvent
 
@@ -145,45 +138,8 @@ endEvent
 
 Event _onPatchUpdate(string eventName, string strArg, float numArg, Form sender)
 	
-	RN_Setup_Registered.Mod(1)
-
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Received for: " + GetOwningQuest().GetName())
-	endIf
-
-	Int Index = _itemsArray.length		
-	While Index
-		Index -= 1
-		_onConsolidateItems(_itemsArray[Index], TCC_ItemList_Patches, dbmNew, dbmMaster)			
-	endWhile
-	
-;;------------
-	
-	Index = _displaysArray.length		
-	While Index
-		Index -= 1
-		if _displayList_Merged
-			_onConsolidateDisplays(_displaysArray[Index], _displayList_Merged)
-		endIf
-	endWhile
-	
-;;------------
-	
-	if _displayRooms
-		Index = _displaysArray.length
-		While Index 
-			Index -= 1
-			_onConsolidateDisplays(_displaysArray[Index], _displayRooms[Index])
-		endWhile
-	endIf
-	
-;;------------
-	
-	RN_Setup_Done.Mod(1)
-	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Update Event Completed for: " + GetOwningQuest().GetName())
-	endIf
+	_setupDone = false
+	_RunSetup()
 endEvent	
 
 ;;-- Events ---------------------------------------		
@@ -205,9 +161,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	
 	RN_Scan_Registered.Mod(1)
 	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " + GetOwningQuest().GetName())
-	endIf
+	TCCDebug.Log("Official Patch [TCC Unique Items] - Scan Event Received...", 0)
 	
 	if !_Global_Mod_Complete.GetValue()
 		Int Index = _displaysArray.length
@@ -226,8 +180,5 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	endIf
 	
 	RN_Scan_Done.Mod(1)
-	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " + GetOwningQuest().GetName())
-	endIf
+	TCCDebug.Log("Official Patch [TCC Unique Items] - Scan Event Completed", 0)
 endEvent	

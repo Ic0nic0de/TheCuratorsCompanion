@@ -43,10 +43,8 @@ function _RunSetup(bool forced)
 	endIf
 	
 	if !_setupDone
-
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Received for: Setup B")
-		endIf
+	
+		TCCDebug.Log("Setup Event Received for: Setup B")
 	
 		Int _index = _itemsArray.length		
 		While _index
@@ -57,15 +55,11 @@ function _RunSetup(bool forced)
 		
 		RN_Setup_Done.Mod(1)
 		_setupDone = true
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Completed for: Setup B")
-		endIf
+		TCCDebug.Log("Setup Event Completed for: Setup B")
 	
 	else
 		
 		RN_Setup_Done.Mod(1)
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Already Completed for: Setup B")
-		endIf
+		TCCDebug.Log("Setup Event Already Completed for: Setup B")
 	endIf
 endFunction

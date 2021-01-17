@@ -42,10 +42,7 @@ endEvent
 Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
-	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Received for: " + _RoomName)
-	endIf
+	TCCDebug.Log("Scan Event Received for: " + _RoomName)
 	
 ;;----------
 
@@ -94,9 +91,6 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 ;;----------
 	
 	RN_Scan_Done.Mod(1)
-	
-	If MCM.DevDebugVal
-		DBMDebug.Log(GetOwningQuest(), "TCC: Scan Event Completed for: " + _RoomName)
-	endIf
+	TCCDebug.Log("Scan Event Compelted for: " + _RoomName)
 endEvent
 

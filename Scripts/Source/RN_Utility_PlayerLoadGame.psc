@@ -20,7 +20,8 @@ RN_Utility_ScanScript_Misc property ScanScript_15 auto
 RN_Utility_autoScan property AutoScan auto
   	
 Event OnPlayerLoadGame()
-
+	
+	TCCDebug.EnableLogging()
 	AutoScan.Register()
 	ScanScript_1.Register()
 	ScanScript_2.Register()

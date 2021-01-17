@@ -87,10 +87,6 @@ endEvent
 
 Event onSH_Update(string eventName, string strArg, float numArg, Form sender)
 	
-	if RN_MCM.DevDebugVal
-		Debug.Notification("Updating Safehouse Container Lists")
-	endif
-	
 	Int _Index = self.GetNumItems()
 	While _Index 
 		_Index -= 1

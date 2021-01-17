@@ -35,7 +35,8 @@ Event onCellAttach()
 	
 	if MCM.Achievements_Enabled && !RN_Achievements_Listener_Complete.GetValue()
 		if RN_Achievements_Listener_Count.GetValue() == RN_Achievement_Globals.GetSize()
-			Notification("The Curators Companion: All " + RN_Achievement_Globals.GetSize() AS Int + " Achievements Unlocked")			
+			Notification("The Curators Companion: All " + RN_Achievement_Globals.GetSize() AS Int + " Achievements Unlocked")
+			TCCDebug.Log("Achievements Master - All Available Achievements Completed", 0)
 			RN_Achievements_Listener_Complete.SetValue(1)
 		else
 			RN_Achievements_Listener_Complete.SetValue(0)
@@ -53,6 +54,7 @@ Event Notify(String _Message)
 	
 	if (MCM.Ach_Notify)
 		Notification("Achievement Unlocked! (" + _Message + ")")
+		TCCDebug.Log("Achievements Master - Achievement complete: " + _Message, 0)
 	endIf
 	
 	PlayFX(MCM.IndexSounds)

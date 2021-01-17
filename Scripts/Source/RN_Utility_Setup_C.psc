@@ -49,9 +49,7 @@ function _RunSetup(bool forced)
 	
 	if !_setupDone
 
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Received for: Setup C")
-		endIf
+		TCCDebug.Log("Setup Event Received for: Setup C")
 	
 		;;Merge Library Display Lists
 		_onConsolidateDisplays(DBM_SectionLibraryLowerFloorLeft, TCC_DisplayList_Library)
@@ -67,15 +65,11 @@ function _RunSetup(bool forced)
 		
 		RN_Setup_Done.Mod(1)
 		_setupDone = true
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Completed for: Setup C")
-		endIf
+		TCCDebug.Log("Setup Event Completed for: Setup C")
 	
 	else
 		
 		RN_Setup_Done.Mod(1)
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Already Completed for: Setup C")
-		endIf
+		TCCDebug.Log("Setup Event Already Completed for: Setup C")
 	endIf
 endFunction

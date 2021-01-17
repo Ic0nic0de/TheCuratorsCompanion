@@ -154,7 +154,6 @@ globalvariable property GV_SectionHOLE auto
 		
 Event OnInit()
 
-	Wait(5)
 	RunSetup()	
 endEvent
 	
@@ -162,16 +161,17 @@ endEvent
 
 Event RunSetup()
 
-	if RN_Setup_Finish.GetValue()		
-		SetupComplete.Show()		
+	if RN_Setup_Finish.GetValue()
+		TCCDebug.Log("Utility - Setup already completed with " + RN_Setup_Finish.GetValue(), 0)	
+		SetupComplete.Show()	
 	else
 		
+		TCCDebug.Log("Utility - Setup Started", 0)
 		DBM_SortWait.setvalue(1)
 		RN_Setup_Start.setvalue(1)
 		bSetupStarted = True
 		RN_MCM.BuildPatchArray(true, false)
 		RN_MCM.Build_Arrays()
-		
 		
 		SendModEvent("TCCSetup_Patches")
 		
@@ -242,6 +242,7 @@ Event RunSetup()
 			endIf
 		endWhile	
 	endIf
+	TCCDebug.Log("Utility - Initial Mod Setup Finished", 0)
 endEvent
 
 ;;-- Functions ---------------------------------------
@@ -250,17 +251,25 @@ Event AddPlayerToFormlists()
 	TCC_TokenList.AddForm(PlayerRef)
 	_MuseumContainerList_WP.AddForm(PlayerRef)
 	_SafehouseContainerList_WP.AddForm(PlayerRef)
+	
+	if !TCC_TokenList.HasForm(PlayerRef) || !_MuseumContainerList_WP.HasForm(PlayerRef) || !_SafehouseContainerList_WP.HasForm(PlayerRef)
+		TCCDebug.Log("Utility - Unable to find PlayerRef in Formlist", 2)
+	endIf
+		
 	SendModEvent("Update_TokenArray", "Updating Token Array")
 endEvent
 				
 ;;-- Functions ---------------------------------------
 
 function CreateMoreHudLists()		
-		
+	
+	TCCDebug.Log("Utility - Updating moreHUD Lists...", 0)
+	
 	Int _Index = _MuseumContainerList.GetSize()	;;Check museum containers for displayed items.	
 	While _Index 
 		_Index -= 1
 		ObjectReference _Container = _MuseumContainerList.GetAt(_Index) as ObjectReference
+		TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
 		Int _Index2 = _Container.GetNumItems()
 		while _Index2
 			_Index2 -= 1		
@@ -277,6 +286,7 @@ function CreateMoreHudLists()
 	While _Index
 		_Index -= 1
 		ObjectReference _Container = TCC_TokenList.GetAt(_Index) as ObjectReference		
+		TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
 		Int _Index2 = _Container.GetNumItems()
 		While _Index2
 			_Index2 -= 1
@@ -308,6 +318,7 @@ function CreateMoreHudLists()
 	
 	bMoreHUDListsCreated = true
 	
+	TCCDebug.Log("Utility - moreHUD Lists Updated", 0)
 endFunction
 
 ;;-- Events ---------------------------------------
@@ -361,6 +372,7 @@ Event InitGlobals()
 	
 	if (Game.GetModByName("LOTD_TCC_Cloaks.esp") != 255)
 		DBM_CloaksStorage = Game.GetFormFromFile(2122, "DBM_CloaksofSkyrim_Patch.esp") as objectreference
+		TCCDebug.Log("Utility - Found Cloaks Storage - " + DBM_CloaksStorage.GetBaseObject().GetName(), 0)
 	endIf
 endEvent
 	
@@ -423,6 +435,8 @@ Event onUpdate()
 			UpdateCurrentInstanceGlobal(RN_SupportedSafehouseCount)			
 			
 			if RN_SupportedModCount.GetValue() > _OldPatchCount || RN_SupportedSafehouseCount.GetValue() > _OldSafehouseCount || RN_CustomModCount.GetValue() > _OldCustomCount
+				Int PatchesFound = (RN_SupportedModCount.GetValue() as Int - _OldPatchCount) + (RN_SupportedSafehouseCount.GetValue() as Int - _OldSafehouseCount) + (RN_CustomModCount.GetValue() as Int - _OldCustomCount)
+				TCCDebug.Log("Utility - Found " + PatchesFound + " patch(es) installed mid-game.", 0)
 				ModStartup_UpdatingLists.Show()
 				CreateMoreHudLists()
 				UpdateAllFound()
@@ -527,6 +541,8 @@ endEvent
 
 function ScanMuseum()
 	
+	TCCDebug.Log("Utility - Scanning Museum...", 0)
+	
 	if RN_MCM.ScanNotificationsval
 		DBM_ScanMuseum_Message.Show()
 	endIf
@@ -538,6 +554,7 @@ function ScanMuseum()
 	
 	if RN_MCM.Achievements_Enabled
 		SendModEvent("TCCScan_Uniques")
+		TCCDebug.Log("Utility - Scanning Uniques...", 0)
 	endIf
 	
 	FinishScan(5)
@@ -561,6 +578,8 @@ function FinishScan(Int _Wait)
 			endIf
 		endIf		
 	endWhile
+	
+	TCCDebug.Log("Utility - Museum Scan Finished", 0)
 endFunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -570,7 +589,9 @@ endFunction
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function UpdateAllFound()
-		
+	
+	TCCDebug.Log("Utility - Updating all found items...", 0)
+	
 	bUpdating = True
 	DBM_SortWait.setvalue(1)
 	
@@ -593,11 +614,15 @@ function FinishUpdate(Int _Wait)
 			bUpdating = False
 		endIf		
 	endWhile
+	
+	TCCDebug.Log("Utility - Completed update", 0)
 endFunction		
 
 ;;-- Functions ---------------------------------------
 
 Function RebuildLists()
+	
+	TCCDebug.Log("Utility - Rebuild moreHUD Lists Request Received...", 0)
 	
 	Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists...")
 	Debug.Notification("The Curators Companion: Do not add / remove any items from inventory")
@@ -621,16 +646,23 @@ Function RebuildLists()
 	endWhile
 		
 	CreateMoreHudLists()
+
+	DBM_SortWait.SetValue(0)
 	
 	Debug.Notification("The Curators Companion: moreHUD Lists Rebuilt & Ready")
-	
-	DBM_SortWait.SetValue(0)
+	TCCDebug.Log("Utility - Rebuild moreHUD Lists Request Completed", 0)
+	TCCDebug.Log("Utility - dbmNew = " + dbmNew.GetSize() as Int, 0)
+	TCCDebug.Log("Utility - dbmFound = " + dbmFound.GetSize() as Int, 0)
+	TCCDebug.Log("Utility - dbmDisp = " + dbmDisp.GetSize() as Int, 0)
+	TCCDebug.Log("Utility - dbmMaster = " + dbmMaster.GetSize() as Int, 0)
 endFunction
 
 ;;-- Functions ---------------------------------------
 
 Function SetUpSafehouse()
-
+	
+	TCCDebug.Log("Utility - Enable Safehouse Request Received...", 0)
+	
 	DBM_SortWait.setvalue(1)
 	bSettingup = true
 	
@@ -639,6 +671,7 @@ Function SetUpSafehouse()
 		_Index -= 1
 		ObjectReference _Container = _SafehouseContainerList.GetAT(_Index) as ObjectReference
 		TCC_TokenList.AddForm(_Container)
+		TCCDebug.Log("Utility - Added Safehouse Container " +  _Container.GetBaseObject().GetName() + " to TCC_TokenList", 0)
 	endWhile
 	SendModEvent("Update_TokenArray", "Updating Token Array")
 	SendModEvent("TCCSetup_SH")
@@ -654,6 +687,7 @@ Function SetUpSafehouse()
 			Int ListSize = _SafehouseContainerList_WP.GetSize() ;;Check safehouse items found
 			While Index < ListSize
 				ObjectReference _Container = _SafehouseContainerList_WP.GetAt(Index) as ObjectReference
+				TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
 				Int Index2 = 0
 				Int ContainerList = _Container.GetNumItems()
 				while Index2 < ContainerList	
@@ -671,7 +705,8 @@ Function SetUpSafehouse()
 			Index = TCC_TokenList.GetSize() ;; Check player and custom storage for found items.
 			While Index
 				Index -= 1
-				ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference		
+				ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference	
+				TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)				
 				Int _Index2 = _Container.GetNumItems()
 				While _Index2
 					_Index2 -= 1
@@ -695,12 +730,16 @@ Function SetUpSafehouse()
 			TCC_SafehouseSetupFinished.Show()
 		endIf		
 	endWhile
+	
+	TCCDebug.Log("Utility - Enable Safehouse Request Completed", 0)
 endFunction
 
 ;;-- Functions ---------------------------------------
 
 Event SetUpAchievements()
-
+	
+	TCCDebug.Log("Utility - Enable Achievements Request Received...", 0)	
+	
 	DBM_SortWait.setvalue(1)
 	RN_Setup_Start.setvalue(1)
 	bSetupStarted = True
@@ -723,13 +762,16 @@ Event SetUpAchievements()
 			bSetupStarted = False
 			TCC_UniquesSetupFinished.Show()
 		endIf
-	endWhile	
+	endWhile
+
+	TCCDebug.Log("Utility - Enable Achievements Request Completed", 0)	
 endEvent
 
 ;;-- Functions ---------------------------------------
 
 Event UpdatePatches()
-		
+	
+	TCCDebug.Log("Utility - Update Patch(es) request received...", 0)	
 	DBM_SortWait.setvalue(1)
 	RN_Setup_Start.setvalue(1)
 	bSetupStarted = True
@@ -747,7 +789,7 @@ Event UpdatePatches()
 	
 	while bSetupStarted	
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
-			CreateMoreHudLists()
+			CreateMoreHudLists()	
 			InitGlobals()
 			
 			SendModEvent("TCCUpdate_Counts")
@@ -764,7 +806,8 @@ Event UpdatePatches()
 			DBM_SortWait.setvalue(0)				
 			bSetupStarted = False	
 		endIf
-	endWhile	
+	endWhile
+	TCCDebug.Log("Utility - Update Patch(es) request Completed", 0)
 endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

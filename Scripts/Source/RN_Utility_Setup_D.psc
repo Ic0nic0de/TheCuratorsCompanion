@@ -46,9 +46,7 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 	
 	if !_setupDone
 
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Received for: Setup D")
-		endIf
+		TCCDebug.Log("Setup Event Received for: Setup D")
 	
 		Int _index = _itemsArray.length		
 		While _index
@@ -62,15 +60,11 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 		RN_Safehouse_Done.Mod(1)
 		_setupDone = True
 		
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Completed for: Setup D")
-		endIf
+		TCCDebug.Log("Setup Event Completed for: Setup D")
 	else
 		
 		RN_Safehouse_Done.Mod(1)
 		
-		If MCM.DevDebugVal
-			DBMDebug.Log(Self, "TCC: Setup Event Already Completed for: Setup D")
-		endIf
+		TCCDebug.Log("Setup Event Already Completed for: Setup D")
 	endIf
 endEvent			

@@ -108,7 +108,8 @@ Function RunRelicTransfer()
 endFunction
 
 Function DisplayFunc()
-
+	
+	TCCDebug.Log("Display - Started Displaying Tranfered Items...")
 	UpdateCurrentInstanceGlobal(RN_Transfer_Count)
 	
 	Int Index = TransferComplete.Show()
@@ -143,5 +144,7 @@ Function DisplayFunc()
 	else
 		Return
 	endIf
+	
+	TCCDebug.Log("Display - Finished Displaying Tranfered Items")
 endFunction
 

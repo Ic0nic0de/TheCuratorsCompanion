@@ -86,6 +86,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 			
 				TCC_TokenList.AddForm(akNewContainer)
 				TCC_TokenList_NoShipmentCrates.AddForm(akNewContainer)
+				TCCDebug.Log("Token - Added [" + akNewContainer.GetBaseObject().GetName() + "] " + akNewContainer + " to TCC_TokenList and TCC_TokenList_NoShipmentCrates")
 				Handle = ModEvent.Create("Update_TokenArray")
 				if (Handle)
 					ModEvent.PushString(Handle, "")
@@ -130,6 +131,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 				
 				TCC_TokenList.RemoveAddedForm(akNewContainer)
 				TCC_TokenList_NoShipmentCrates.RemoveAddedForm(akNewContainer)
+				TCCDebug.Log("Token - Removed [" + akNewContainer.GetBaseObject().GetName() + "] " + akNewContainer + " from TCC_TokenList and TCC_TokenList_NoShipmentCrates")
 				Handle = ModEvent.Create("Update_TokenArray")
 				if (Handle)
 					ModEvent.PushString(Handle, "")

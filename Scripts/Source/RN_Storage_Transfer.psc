@@ -83,6 +83,7 @@ endFunction
 Function ProcessForm(Form akBaseItem)
 
 	PlayerRef.RemoveItem(akBaseItem, 1, TRUE, RN_Storage_Container)
+	TCCDebug.Log("Automatic Transfer - Moved [" +  akBaseItem.GetName() + "] " + akBaseItem + " to RN_Storage_Container", 0)
 endFunction
 
 ;;------------------------------------------------------------------------------------------
