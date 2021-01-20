@@ -6,6 +6,8 @@ Import RN_Utility_Global
 
 RN_Utility_MCM property MCM auto
 
+DBMSupportedModScript property DBM auto
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -28,61 +30,37 @@ globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 
 globalvariable property RN_CustomModCount auto
-
 globalvariable property RN_CreationClubContent_Installed auto
 globalvariable property RN_SafeouseContent_Installed auto
 
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-																					;;Manually Filled Properties
-;;Name of this patch (This is how the patch will appear in the MCM)
-String Property _PatchName Auto
+formlist property TCC_DisplayList_None auto
+formlist property TCC_DisplayList_Armory auto
+formlist property TCC_DisplayList_DaedricGallery auto
+formlist property TCC_DisplayList_DragonbornHall auto
+formlist property TCC_DisplayList_Guildhouse auto
+formlist property TCC_DisplayList_HallofHeroes auto
+formlist property TCC_DisplayList_HallofLostEmpires auto
+formlist property TCC_DisplayList_HallofOddities auto
+formlist property TCC_DisplayList_HallofSecrets auto
+formlist property TCC_DisplayList_HallofWonders auto
+formlist property TCC_DisplayList_Library auto
+formlist property TCC_DisplayList_NaturalScience auto
+formlist property TCC_DisplayList_Safehouse auto
+formlist property TCC_DisplayList_Storeroom auto
 
-;;Set this to True if this patch adds displays to the Hall of Wonders (Creation Club).
-bool property bCreationClubPatch auto
+formlist property _DisplayList auto
+formlist property _EnabledList auto
 
-;;Set this to True if this patch adds displays to the Safehouse.
-bool property bSafeHousePatch auto
+Message property _CompleteMessage auto
+Message property _CompleteNotification auto
 
-;;Add all Displayable Item Formlists to this Array.
-formlist[] property _itemsArray auto
+globalvariable property _GlobalComplete auto
+globalvariable property _GlobalCount auto
+globalvariable property _GlobalTotal auto
 
-;;Add all Display Formlists to this Array.
-formlist[] property _displaysArray auto
-
-;;Formlist for the room that the displays are housed in.
-formlist[] property _displayRoomflist auto
-
-;;Formlist needed if you are adding displays to 2 or more rooms / sections.
-formlist property _displayList_Merged auto
-
-;;Formlist to keep track of enabled displays.
-formlist property _displayList_Enabled auto
-
-;;Message to show when all items have been collected.
-Message property _modCompleteMessage auto
-
-;;Notification to show when all items have been collected.
-Message property _modCompleteNotification auto
-
-;;Global for mod completion
-globalvariable property _Global_Mod_Complete auto
-
-;;Global for current display Count
-globalvariable property _Global_Display_Count auto
-
-;;Global for Total display Count
-globalvariable property _Global_Display_Total auto
-
-;;AddForm to quest display listener. (Requires the DBM_RN_ExplorationDisplay script to be attached to the display reference) 
-Formlist Property _questDisplays auto ;Optional
-
-;;AddForm to quest stage display listener. (Requires the DBM_RN_ExplorationDisplayStage script to be attached to the display reference) 
-Formlist Property _questDisplaysStage auto ;Optional
-
-;;Addform to exploration listener. (Requires either the DBM_RN_QuestDisplay script or DBM_RN_QuestDisplayStage script to be attached to the display reference) 
-Formlist property _ExplorationDisplays auto ;Optional
+Formlist Property _questDisplays auto
+Formlist Property _questDisplaysStage auto
+Formlist property _ExplorationDisplays auto
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -116,16 +94,21 @@ endFunction
 ;;-- Events ---------------------------------------	
 
 Event _onSetup(string eventName, string strArg, float numArg, Form sender)
-		
+	
 	_RunSetup()			
 endEvent
 
 ;;-- Events ---------------------------------------	
 
 Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
-		
-	MCM.AddCustomModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _PatchName)
-	TCCDebug.Log("Custom Patch [" + _PatchName + "] - Array Created and pushed to MCM", 0)	
+
+	if !DBM
+		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
+		return
+	endIf
+	
+	MCM.AddCustomModSupport(Utility.Randomint(1,20), _GlobalComplete, _GlobalCount, _GlobalTotal, DBM.sSupportedModName + ":")
+	TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Array Created and pushed to MCM", 0)	
 endEvent
 
 ;;-- Events ---------------------------------------		
@@ -134,90 +117,82 @@ Event _RunSetup()
 	
 	RN_Setup_Registered.Mod(1)
 	
-	if !_setupDone
-
-		TCCDebug.Log("Custom Patch [" + _PatchName + "] - Setup Event Received...", 0)
-		
-		MCM.AddCustomModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _PatchName)
-		
-		if bCreationClubPatch
-			if !RN_CreationClubContent_Installed.GetValue()
-				RN_CreationClubContent_Installed.setvalue(1)
-			endIf
-		endIf
-
-		if bSafeHousePatch
-			if !RN_SafeouseContent_Installed.GetValue()
-				RN_SafeouseContent_Installed.setvalue(1)
-			endIf
-		endIf	
-			
-		Int Index = _itemsArray.length		
-		While Index
-			Index -= 1
-			_onConsolidateItems(_itemsArray[Index], TCC_ItemList_Patches, dbmNew, dbmMaster)			
-		endWhile
-		
-;;------------
-		
-		Index = _displaysArray.length		
-		While Index
-			Index -= 1
-			_onConsolidateDisplays(_displaysArray[Index], _displayList_Merged)
-			_onConsolidateDisplays(_displaysArray[Index], _displayRoomflist[Index])
-		endWhile
-		
-;;------------
-		
-		if _ExplorationDisplays
-			Index = 0
-			while Index < _ExplorationDisplays.GetSize()
-				ObjectReference _Ref = _ExplorationDisplays.GetAt(Index) as ObjectReference		
-				DBM_RN_ExplorationDisplays.AddForm(_Ref)
-				Index += 1
-			EndWhile
-		endIf
+	if !DBM
+		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
+		RN_Setup_Done.Mod(1)
+		return
+	endIf
 	
-;;------------
-
-		if _questDisplays
-			Index = 0
-			while Index < _questDisplays.GetSize()
-				ObjectReference _Ref = _questDisplays.GetAt(Index) as ObjectReference		
-				DBM_RN_QuestDisplays.AddForm(_Ref)
-				Index += 1
-			EndWhile
-		endIf
+	if !_setupDone
+		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Setup Event Received...", 0)
+		MCM.AddCustomModSupport(Utility.Randomint(1,20), _GlobalComplete, _GlobalCount, _GlobalTotal, DBM.sSupportedModName + ":")
 		
-;;------------
+		Int _Index
+		
+;;------------ ;; Item Lists
+			
+		_Index = DBM.NewSectionItemLists.length		
+		While _Index
+			_Index -= 1
+			_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)			
+		endWhile
 
-		if _questDisplaysStage
-			Index = 0
-			while Index < _questDisplaysStage.GetSize()
-				ObjectReference _Ref = _questDisplaysStage.GetAt(Index) as ObjectReference		
-				DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
-				Index += 1
-			EndWhile
-		endIf
+		_Index = DBM.NewSectionItemAltLists.length		
+		While _Index
+			_Index -= 1
+			_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)			
+		endWhile
+		
+		_Index = DBM.NewSectionDisplayRefLists.length		
+		While _Index
+			_Index -= 1
+			_onConsolidateDisplays(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
+			_onConsolidateDisplays(DBM.NewSectionDisplayRefLists[_Index], _getDisplayRoom(DBM.NewSectionRoomNames[_Index]))
+		endWhile
+		
+;;------------ Quest / Exploration Displays
+		
+		_Index = 0
+		while _Index < _explorationDisplays.GetSize()
+			ObjectReference _Ref = _ExplorationDisplays.GetAt(_Index) as ObjectReference		
+			DBM_RN_ExplorationDisplays.AddForm(_Ref)
+			_Index += 1
+		EndWhile
+
+		_Index = 0
+		while _Index < _questDisplays.GetSize()
+			ObjectReference _Ref = _questDisplays.GetAt(_Index) as ObjectReference		
+			DBM_RN_QuestDisplays.AddForm(_Ref)
+			_Index += 1
+		EndWhile
+
+		_Index = 0
+		while _Index < _questDisplaysStage.GetSize()
+			ObjectReference _Ref = _questDisplaysStage.GetAt(_Index) as ObjectReference		
+			DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
+			_Index += 1
+		EndWhile			
 		
 ;;------------
 		
 		RN_CustomModCount.Mod(1)
-		
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
-		
-		TCCDebug.Log("Custom Patch [" + _PatchName + "] - Setup Event Completed", 0)
+		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Setup Event Completed", 0)
 	else
-		
 		RN_Setup_Done.Mod(1)
-		TCCDebug.Log("Custom Patch [" + _PatchName + "] - Setup Event Already Completed", 0)
+		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Setup Event Already Completed", 0)
 	endIf
 endEvent
 
 ;;-- Events ---------------------------------------	
 
 Event _onPatchUpdate(string eventName, string strArg, float numArg, Form sender)
+
+	if !DBM
+		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
+		return
+	endIf
 	
 	_setupDone = false
 	_RunSetup()
@@ -227,38 +202,95 @@ endEvent
 
 Event _onCountUpdate(string eventName, string strArg, float numArg, Form sender)
 
-	_Global_Display_Total.SetValue(_displayList_Merged.GetSize())	
-	_Global_Display_Count.SetValue(_displayList_Enabled.GetSize())
+	if !DBM
+		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
+		return
+	endIf
+	
+	_GlobalTotal.SetValue(_DisplayList.GetSize())	
+	_GlobalCount.SetValue(_EnabledList.GetSize())
 endEvent
 
 ;;-- Events ---------------------------------------
 
 Event _onScan(string eventName, string strArg, float numArg, Form sender)
+
+	if !DBM
+		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
+		RN_Scan_Done.Mod(1)
+		return
+	endIf
 	
 	RN_Scan_Registered.Mod(1)
 	
-	TCCDebug.Log("Custom Patch [" + _PatchName + "] - Scan Event Received...", 0)
+	TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Scan Event Received...", 0)
 	
-	if !_Global_Mod_Complete.GetValue()
-		Int Index = _displaysArray.length
+	if !_GlobalComplete.GetValue()
+		Int Index = DBM.NewSectionDisplayRefLists.length
 		While Index
 			Index -= 1
-			_onDisplayCheck(_displaysArray[Index], _displayList_Enabled, _Global_Display_Count)
+			_onDisplayCheck(DBM.NewSectionDisplayRefLists[Index], _EnabledList, _GlobalCount)
 		endWhile
 		
-		if (CheckValueCount1(_Global_Display_Count, _Global_Display_Total, _Global_Mod_Complete) && (MCM.ShowSetCompleteVal))
+		if (CheckValueCount1(_GlobalCount, _GlobalTotal, _GlobalComplete) && (MCM.ShowSetCompleteVal))
 			if (MCM.ShowSimpleNotificationVal)
-				_modCompleteNotification.Show()
+				_CompleteNotification.Show()
 			else
-				_modCompleteMessage.Show()
+				_CompleteMessage.Show()
 			endIf
 		endIf	
 	endIf
 	
 	RN_Scan_Done.Mod(1)
 	
-	TCCDebug.Log("Custom Patch [" + _PatchName + "] - Scan Event Completed", 0)
+	TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Scan Event Completed", 0)
 endEvent	
 
-;/
-/;
+;;-- Events ---------------------------------------
+
+Formlist Function _getDisplayRoom(String _RoomName)
+	
+	if (_RoomName == "Armory")
+		return TCC_DisplayList_Armory
+	
+	elseif (_RoomName == "Daedric Gallery")
+		return TCC_DisplayList_DaedricGallery
+		
+	elseif (_RoomName == "Dragonborn Hall")
+		return TCC_DisplayList_DragonbornHall
+
+	elseif (_RoomName == "Guildhouse")
+		return TCC_DisplayList_Guildhouse
+
+	elseif (_RoomName == "Hall of Heroes")
+		return TCC_DisplayList_HallofHeroes
+
+	elseif (_RoomName == "Hall of Lost Empires")
+		return TCC_DisplayList_HallofLostEmpires
+
+	elseif (_RoomName == "Hall of Oddities")
+		return TCC_DisplayList_HallofOddities
+
+	elseif (_RoomName == "Hall of Secrets")
+		return TCC_DisplayList_HallofSecrets
+
+	elseif (_RoomName == "Hall of Wonders")
+		RN_CreationClubContent_Installed.setvalue(1)
+		return TCC_DisplayList_HallofWonders
+
+	elseif (_RoomName == "Gallery Library")
+		return TCC_DisplayList_Library
+
+	elseif (_RoomName == "Natural Science")
+		return TCC_DisplayList_NaturalScience
+
+	elseif (_RoomName == "Safehouse")
+		RN_SafeouseContent_Installed.setvalue(1)
+		return TCC_DisplayList_Safehouse
+
+	elseif (_RoomName == "Museum Storeroom")
+		return TCC_DisplayList_Storeroom
+	endif
+	
+	Return TCC_DisplayList_None
+endFunction
