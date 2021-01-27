@@ -6,9 +6,6 @@ Import RN_Utility_Global
 
 RN_Utility_MCM Property MCM Auto
 
-;; Set to 0 for custom made / unofficial patches.
-Int Property _ArrayIndex Auto
-
 ;;Name of the patch to appear in the MCM.
 String Property _ModName Auto
 
@@ -111,7 +108,7 @@ endEvent
 Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
 		
 	_CreateArray()
-	MCM.AddModSupport(Utility.Randomint(1,5), _ArrayIndex, _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
+	MCM.AddModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
 	MCM.AddSectionSupport(_IW_Global_Count, _IW_Global_Total, _IW_Global_Complete, _ModName, _ImmersiveWeapons_Section_names)
 	TCCDebug.Log("Official Patch [" + _ModName + "] - Array Created and pushed to MCM", 0)
 endEvent
@@ -127,7 +124,7 @@ Event _RunSetup()
 		TCCDebug.Log("Official Patch [" + _ModName + "] - Setup Event Received...", 0)
 		
 		_CreateArray()
-		MCM.AddModSupport(Utility.Randomint(1,5), _ArrayIndex, _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
+		MCM.AddModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
 		MCM.AddSectionSupport(_IW_Global_Count, _IW_Global_Total, _IW_Global_Complete, _ModName, _ImmersiveWeapons_Section_names)
 		
 		Int Index = 0

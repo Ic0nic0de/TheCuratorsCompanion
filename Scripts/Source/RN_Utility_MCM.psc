@@ -6,6 +6,7 @@ import AhzmoreHUD
 import AhzmoreHUDIE
 
 import utility
+import RN_Utility_Global
 
 RN_Utility_autoScan property RN_AutoScan auto
 
@@ -116,7 +117,9 @@ globalvariable property RN_SafeouseContent_Installed auto
 
 ;; General Globals
 globalvariable property DBM_SortWait auto
+globalvariable property RN_Setup_Done auto
 globalvariable property RN_Setup_Start auto
+globalvariable property RN_Setup_Registered auto
 globalvariable property RN_Token_Visibility auto
 
 ;; Treasury Globals
@@ -383,7 +386,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", "Version 5.0.0", 0)		
+		AddTextOption("", "Version 5.0.2", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -882,7 +885,7 @@ Event AddDebugPage()
 		
 		AddTextOptionST("Update_Patches", "Update Installed Patches", "", 0)
 		AddTextOptionST("Scan_Debug", "Reset Museum Scanner", "", 0)
-		AddEmptyOption()
+		AddtextOptionST("Startup_Debug", "Reset Startup Tasks", "", 0)
 		AddEmptyOption()
 		AddHeaderOption("moreHUD Debug:")
 		AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 0)
@@ -1599,6 +1602,27 @@ state Scan_Debug
 	Event OnHighlightST()
 
 		self.SetInfoText("Resets the Museum Scanner")
+	EndEvent
+endState
+
+;;-------------------------------
+
+state Startup_Debug
+
+	Event OnSelectST()
+	
+		if self.ShowMessage("This will reset the startup tasks, do you want to reset now?", true, "Reset", "Cancel")
+			ShowMessage("Please wait a few minutes then save / load the game", false, "Ok")
+			RN_Setup_Done.SetValue(RN_Setup_Registered.GetValue())
+			ShowMessage("Please exit the MCM", false, "Ok")
+			ForcePageReset()
+		endIf
+		
+	EndEvent
+
+	Event OnHighlightST()
+
+		self.SetInfoText("Resets the TCC Startup tasks")
 	EndEvent
 endState
 
@@ -3167,17 +3191,14 @@ endEvent
 				
 ;;-------------------------------
 	
-Function AddModSupport(Int _WaitTime, Int _ArrayIndex = -1, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
+Function AddModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
 	
 	Utility.Wait(_WaitTime)
 	
-	Int Index = RN_Patches_Name.Find(_ModName)
-	if Index == -1
-		if _ArrayIndex != -1
-			Index = _ArrayIndex
-		else
-			Index = RN_Patches_Name.Find("")
-		endIf
+	Int Index = GetArrayPos(_ModName)
+	
+	if Index == 999
+		Index = RN_Patches_Complete_Array.Find(none)
 		RN_Patches_Name[Index] = _ModName
 		RN_Patches_Complete_Array[Index] = _GVComplete
 		RN_Patches_Count_Array[Index] = _GVCount

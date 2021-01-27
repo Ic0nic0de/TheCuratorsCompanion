@@ -415,6 +415,9 @@ Event onUpdate()
 	bSetupStarted = True
 	DBM_SortWait.setvalue(1)
 	
+	RN_SupportedModCount.setvalue(0)
+	RN_CustomModCount.setvalue(0)
+	
 	SendModEvent("TCCSetup_Patches")
 	
 	if RN_MCM.Achievements_Enabled
@@ -789,7 +792,7 @@ Event UpdatePatches()
 	
 	while bSetupStarted	
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
-			CreateMoreHudLists()	
+			RebuildLists()	
 			InitGlobals()
 			
 			SendModEvent("TCCUpdate_Counts")

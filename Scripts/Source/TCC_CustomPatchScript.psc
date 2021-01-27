@@ -95,7 +95,8 @@ endFunction
 
 Event _onSetup(string eventName, string strArg, float numArg, Form sender)
 	
-	_RunSetup()			
+	_RunSetup()
+	RN_CustomModCount.Mod(1)	
 endEvent
 
 ;;-- Events ---------------------------------------	
@@ -123,31 +124,40 @@ Event _RunSetup()
 		return
 	endIf
 	
+	TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName  + "] Hooked [" + DBM.GetName()  + "] Support Handler", 0)
+	Utility.Wait(2)
+	
 	if !_setupDone
 		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Setup Event Received...", 0)
 		MCM.AddCustomModSupport(Utility.Randomint(1,20), _GlobalComplete, _GlobalCount, _GlobalTotal, DBM.sSupportedModName + ":")
 		
 		Int _Index
 		
-;;------------ ;; Item Lists
+;;------------ Item Lists
 			
 		_Index = DBM.NewSectionItemLists.length		
 		While _Index
 			_Index -= 1
-			_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)			
+			if DBM.NewSectionItemLists[_Index] != none
+				_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)	
+			endIf		
 		endWhile
 
 		_Index = DBM.NewSectionItemAltLists.length		
 		While _Index
 			_Index -= 1
-			_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)			
+			if DBM.NewSectionItemAltLists[_Index] != none
+				_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)
+			endIf			
 		endWhile
 		
 		_Index = DBM.NewSectionDisplayRefLists.length		
 		While _Index
 			_Index -= 1
-			_onConsolidateDisplays(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
-			_onConsolidateDisplays(DBM.NewSectionDisplayRefLists[_Index], _getDisplayRoom(DBM.NewSectionRoomNames[_Index]))
+			if DBM.NewSectionDisplayRefLists[_Index] != none 
+				_onConsolidateDisplays(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
+				_onConsolidateDisplays(DBM.NewSectionDisplayRefLists[_Index], _getDisplayRoom(DBM.NewSectionRoomNames[_Index]))
+			endIf
 		endWhile
 		
 ;;------------ Quest / Exploration Displays
@@ -174,8 +184,7 @@ Event _RunSetup()
 		EndWhile			
 		
 ;;------------
-		
-		RN_CustomModCount.Mod(1)
+
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
 		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Setup Event Completed", 0)
@@ -195,6 +204,7 @@ Event _onPatchUpdate(string eventName, string strArg, float numArg, Form sender)
 	endIf
 	
 	_setupDone = false
+	_DisplayList.Revert()
 	_RunSetup()
 endEvent	
 
@@ -214,14 +224,14 @@ endEvent
 ;;-- Events ---------------------------------------
 
 Event _onScan(string eventName, string strArg, float numArg, Form sender)
+	
+	RN_Scan_Registered.Mod(1)
 
 	if !DBM
 		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
 		RN_Scan_Done.Mod(1)
 		return
 	endIf
-	
-	RN_Scan_Registered.Mod(1)
 	
 	TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Scan Event Received...", 0)
 	
