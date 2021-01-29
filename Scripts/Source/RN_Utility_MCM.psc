@@ -26,6 +26,8 @@ RN_Utility_QuestTracker_Arrays property RN_Tracker_Array auto
 string[] PagesList
 string Status_Return
 
+bool property UpdateReq Auto
+
 bool Token_Vis
 bool Safehouse_Enabled 
 bool Ach_Highlight
@@ -968,7 +970,7 @@ state RefreshMCM
 			While bRefresh
 				If !IsInMenuMode()
 					Build_Arrays()
-					BuildPatchArray(false, true)
+					BuildPatchArray(true, true)
 					AddDynamicPagesList()		
 					RN_Tracker_Array._Build_Quest_Toggles()
 					RN_Tracker_Array._Build_Quest_Arrays()
@@ -3193,7 +3195,7 @@ endEvent
 	
 Function AddModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
 	
-	Utility.Wait(_WaitTime)
+	;Utility.Wait(_WaitTime)
 	
 	Int Index = GetArrayPos(_ModName)
 	
@@ -3216,7 +3218,7 @@ endFunction
 	
 Function AddCustomModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
 	
-	Utility.Wait(_WaitTime)
+	;Utility.Wait(_WaitTime)
 	
 	Int Index = RN_Custom_Name.Find(_ModName)
 	if Index == -1
@@ -3274,6 +3276,9 @@ endFunction
 Function BuildPatchArray(bool _create, bool _Rebuild)
 	
 	if _create
+	
+		TCCDebug.Log("MCM - Building Patch Array", 0)	
+		
 		RN_Patches_Complete_Array = new globalvariable[128]
 		RN_Patches_Count_Array = new globalvariable[128]
 		RN_Patches_Total_Array = new globalvariable[128]
@@ -3296,6 +3301,8 @@ Function BuildPatchArray(bool _create, bool _Rebuild)
 	endIf
 	
 	if _Rebuild
+		
+		TCCDebug.Log("MCM - Sending Patch Array Event", 0)
 		SendModEvent("TCCUpdate_Arrays")
 	endIf
 endFunction

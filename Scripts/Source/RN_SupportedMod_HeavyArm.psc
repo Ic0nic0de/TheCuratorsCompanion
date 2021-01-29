@@ -108,7 +108,6 @@ Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
 	_CreateArray()
 	MCM.AddModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
 	MCM.AddSectionSupport(_HA_Global_Count, _HA_Global_Total, _HA_Global_Complete, _ModName, _HeavyArmory_Section_names)
-	TCCDebug.Log("Official Patch [" + _ModName + "] - Array Created and pushed to MCM", 0)
 endEvent
 
 ;;-- Events ---------------------------------------	
@@ -116,15 +115,12 @@ endEvent
 Event _RunSetup()
 	
 	RN_Setup_Registered.Mod(1)
+	RN_SupportedModCount.Mod(1)
 	
 	if !_setupDone
 		
 		TCCDebug.Log("Official Patch [" + _ModName + "] - Setup Event Received...", 0)
-		
-		_CreateArray()
-		MCM.AddModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
-		MCM.AddSectionSupport(_HA_Global_Count, _HA_Global_Total, _HA_Global_Complete, _ModName, _HeavyArmory_Section_names)
-		
+
 		Int Index = 0
 		Int _List = TCC_ItemList_HA.GetSize()		
 		While Index < _List
@@ -144,9 +140,9 @@ Event _RunSetup()
 		_onConsolidateDisplays(TCC_DisplayList_HA, TCC_DisplayList_Armory)
 				
 		RN_Setup_Done.Mod(1)
-		RN_SupportedModCount.Mod(1)
 		_setupDone = True
 		
+		MCM.UpdateReq = True
 		TCCDebug.Log("Official Patch [" + _ModName + "] - Setup Event Completed", 0)
 		
 	else

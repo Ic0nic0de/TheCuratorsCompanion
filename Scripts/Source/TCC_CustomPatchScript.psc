@@ -95,8 +95,7 @@ endFunction
 
 Event _onSetup(string eventName, string strArg, float numArg, Form sender)
 	
-	_RunSetup()
-	RN_CustomModCount.Mod(1)	
+	_RunSetup()	
 endEvent
 
 ;;-- Events ---------------------------------------	
@@ -109,7 +108,6 @@ Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
 	endIf
 	
 	MCM.AddCustomModSupport(Utility.Randomint(1,20), _GlobalComplete, _GlobalCount, _GlobalTotal, DBM.sSupportedModName + ":")
-	TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Array Created and pushed to MCM", 0)	
 endEvent
 
 ;;-- Events ---------------------------------------		
@@ -117,6 +115,7 @@ endEvent
 Event _RunSetup()
 	
 	RN_Setup_Registered.Mod(1)
+	RN_CustomModCount.Mod(1)
 	
 	if !DBM
 		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
@@ -128,12 +127,10 @@ Event _RunSetup()
 	Utility.Wait(2)
 	
 	if !_setupDone
+	
 		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Setup Event Received...", 0)
-		MCM.AddCustomModSupport(Utility.Randomint(1,20), _GlobalComplete, _GlobalCount, _GlobalTotal, DBM.sSupportedModName + ":")
 		
 		Int _Index
-		
-;;------------ Item Lists
 			
 		_Index = DBM.NewSectionItemLists.length		
 		While _Index
@@ -187,6 +184,8 @@ Event _RunSetup()
 
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
+		
+		MCM.UpdateReq = True
 		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Setup Event Completed", 0)
 	else
 		RN_Setup_Done.Mod(1)

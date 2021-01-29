@@ -85,7 +85,8 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 		
 		RN_Safehouse_Done.Mod(1)
 		_setupDone = True
-
+		
+		MCM.UpdateReq = True
 		TCCDebug.Log("Setup Event Completed for: CheeseMod")
 	else
 		

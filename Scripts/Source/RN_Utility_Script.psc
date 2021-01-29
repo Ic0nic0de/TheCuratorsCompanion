@@ -64,9 +64,6 @@ objectreference property DBM_CloaksStorage auto
 ;;Player Ref 
 objectreference property PlayerRef auto
 
-int _OldPatchCount
-int _OldSafehouseCount
-int _OldCustomCount
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Formlist Properties ------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -169,8 +166,8 @@ Event RunSetup()
 		TCCDebug.Log("Utility - Setup Started", 0)
 		DBM_SortWait.setvalue(1)
 		RN_Setup_Start.setvalue(1)
-		bSetupStarted = True
-		RN_MCM.BuildPatchArray(true, false)
+		bSetupStarted = True	
+		
 		RN_MCM.Build_Arrays()
 		
 		SendModEvent("TCCSetup_Patches")
@@ -224,6 +221,8 @@ Event RunSetup()
 					UserSettingsNone.Show()
 				endIf
 				
+				RN_MCM.BuildPatchArray(true, true)
+				
 				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedSafehouseCount.GetValue() > 0 || RN_CustomModCount.GetValue() > 0
 					RN_SupportedPatchTotal.SetValue(RN_SupportedModCount.GetValue() as Int + RN_CustomModCount.GetValue() as Int) 
 					UpdateCurrentInstanceGlobal(RN_SupportedPatchTotal)
@@ -238,7 +237,7 @@ Event RunSetup()
 				RN_Setup_Registered.setvalue(0)
 				DBM_SortWait.setvalue(0)				
 				bSetupStarted = False
-						
+				RN_MCM.UpdateReq = False		
 			endIf
 		endWhile	
 	endIf
@@ -396,24 +395,17 @@ endFunction
 Event onUpdate()
 	
 	bMaintenance = true
-
-	_OldPatchCount = RN_SupportedModCount.GetValue() as Int
-	_OldCustomCount = RN_CustomModCount.GetValue() as Int
-	_OldSafehouseCount = RN_SupportedSafehouseCount.GetValue() as Int
-	
 	if RN_MCM.ShowStartup
 		ModStartup.Show()
 	endIf
 	
 	AddPlayerToFormlists()
-
-;;--------------
-
+	
 	RN_Setup_Finish.setvalue(0)
 	RN_Setup_Start.setvalue(1)	
 
-	bSetupStarted = True
 	DBM_SortWait.setvalue(1)
+	bSetupStarted = True
 	
 	RN_SupportedModCount.setvalue(0)
 	RN_CustomModCount.setvalue(0)
@@ -431,19 +423,15 @@ Event onUpdate()
 	Wait(5)
 	
 	while bSetupStarted		
-		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() &&  RN_Safehouse_Done.GetValue() == RN_Safehouse_Registered.GetValue()
-		
-			UpdateCurrentInstanceGlobal(RN_SupportedModCount)
-			UpdateCurrentInstanceGlobal(RN_CustomModCount)
-			UpdateCurrentInstanceGlobal(RN_SupportedSafehouseCount)			
+		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() && RN_Safehouse_Done.GetValue() == RN_Safehouse_Registered.GetValue()
 			
-			if RN_SupportedModCount.GetValue() > _OldPatchCount || RN_SupportedSafehouseCount.GetValue() > _OldSafehouseCount || RN_CustomModCount.GetValue() > _OldCustomCount
-				Int PatchesFound = (RN_SupportedModCount.GetValue() as Int - _OldPatchCount) + (RN_SupportedSafehouseCount.GetValue() as Int - _OldSafehouseCount) + (RN_CustomModCount.GetValue() as Int - _OldCustomCount)
-				TCCDebug.Log("Utility - Found " + PatchesFound + " patch(es) installed mid-game.", 0)
+			if RN_MCM.UpdateReq
+				TCCDebug.Log("Utility - Installing new patch(es)", 0)
 				ModStartup_UpdatingLists.Show()
 				CreateMoreHudLists()
 				UpdateAllFound()
-				RN_MCM.Build_Arrays()
+				RN_MCM.BuildPatchArray(true, true)
+				RN_MCM.UpdateReq = False
 			endIf
 			bSetupStarted = False
 		endIf
@@ -778,6 +766,7 @@ Event UpdatePatches()
 	DBM_SortWait.setvalue(1)
 	RN_Setup_Start.setvalue(1)
 	bSetupStarted = True
+	
 	RN_SupportedModCount.setvalue(0)
 	RN_CustomModCount.setvalue(0)
 	
@@ -799,7 +788,9 @@ Event UpdatePatches()
 			
 			if RN_MCM.Achievements_Enabled
 				SendModEvent("TCCUpdate_Counts_Uniques")
-			endIf				
+			endIf	
+			
+			RN_MCM.BuildPatchArray(true, true)
 			
 			ModUpdateFinished.Show()
 			
