@@ -69,12 +69,17 @@ endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-		
-	if TCC_ItemList_Safehouse.HasForm(akBaseItem) && !TCC_FoundList_Safehouse.HasForm(akBaseItem) && RN_SafeouseContent_Installed.GetValue()
-		TCC_FoundList_Safehouse.AddForm(akBaseItem)
-							
-		if (MCM.ShowMuseumVal)
+Auto State Silent
+	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+		TCC_FoundList_Safehouse.AddForm(akBaseItem)		
+	EndEvent
+endState	
+
+State Notify
+	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+			
+		if RN_SafeouseContent_Installed.GetValue()
+			TCC_FoundList_Safehouse.AddForm(akBaseItem)
 			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
 			FoundAlias.ForceRefTo(FoundRelic)
 			if (!MCM.ShowSimpleNotificationVal)
@@ -84,9 +89,9 @@ Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemRefer
 			endIf
 			FoundAlias.Clear()
 			FoundRelic.Delete()
-		endIf	
-	endIf		
-EndEvent		
+		endIf		
+	EndEvent
+endState	
 	
 ;;-- Events ---------------------------------------	
 

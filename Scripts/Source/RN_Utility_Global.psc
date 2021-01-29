@@ -363,52 +363,52 @@ Int Function GetArrayPos(String _ModName) global
 		Return 76
 	
 	elseif (_ModName == "Teldryn Serious:")
-		Return 75
-	
-	elseif (_ModName == "The Forgotten City:")
-		Return 76
-	
-	elseif (_ModName == "The Gray Cowl Of Nocturnal:")
 		Return 77
 	
-	elseif (_ModName == "The Gray Cowl Returns!:")
+	elseif (_ModName == "The Forgotten City:")
 		Return 78
-
-	elseif (_ModName == "The Wheels Of Lull:")
+	
+	elseif (_ModName == "The Gray Cowl Of Nocturnal:")
 		Return 79
 	
-	elseif (_ModName == "Tools of Kagrenac:")
+	elseif (_ModName == "The Gray Cowl Returns!:")
 		Return 80
-	
-	elseif (_ModName == "Treasure Hunter:")
+
+	elseif (_ModName == "The Wheels Of Lull:")
 		Return 81
 	
-	elseif (_ModName == "Umbra:")
+	elseif (_ModName == "Tools of Kagrenac:")
 		Return 82
 	
-	elseif (_ModName == "Undeath:")
+	elseif (_ModName == "Treasure Hunter:")
 		Return 83
 	
-	elseif (_ModName == "Vigil Enforcer Armor Set:")
+	elseif (_ModName == "Umbra:")
 		Return 84
 	
-	elseif (_ModName == "Vigilant:")
+	elseif (_ModName == "Undeath:")
 		Return 85
-
-	elseif (_ModName == "Volkihar Knight:")
+	
+	elseif (_ModName == "Vigil Enforcer Armor Set:")
 		Return 86
 	
-	elseif (_ModName == "Wild Horses:")
+	elseif (_ModName == "Vigilant:")
 		Return 87
-	
-	elseif (_ModName == "Wintersun:")
+
+	elseif (_ModName == "Volkihar Knight:")
 		Return 88
 	
-	elseif (_ModName == "Wyrmstooth:")
+	elseif (_ModName == "Wild Horses:")
 		Return 89
 	
-	elseif (_ModName == "Zim's Thane Weapons:")
+	elseif (_ModName == "Wintersun:")
 		Return 90
+	
+	elseif (_ModName == "Wyrmstooth:")
+		Return 91
+	
+	elseif (_ModName == "Zim's Thane Weapons:")
+		Return 92
 	endIf
 		
 	return 999

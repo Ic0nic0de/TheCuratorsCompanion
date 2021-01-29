@@ -18,6 +18,12 @@ RN_Utility_QuestTracker_MCM property RN_Tracker auto
 
 RN_Utility_QuestTracker_Arrays property RN_Tracker_Array auto
 
+RN_Main_Armory property _AddItemArmory auto
+RN_Main_Safehouse property _AddItemSafehoue auto
+RN_Main_Museum_HOHLIB property _AddItemMain_1 auto
+RN_Main_Museum_EEHMISC property _AddItemMain_2 auto
+RN_Main_SupportedMods property _AddItemPatches auto
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties -------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -388,7 +394,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", "Version 5.0.2", 0)		
+		AddTextOption("", "Version 5.0.3", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -1114,8 +1120,30 @@ FISSInterface fiss = FISSFactory.getFISS()
 	
 	;;General Settings
 	ShowMuseumVal = fiss.loadBool("Museum Notifications")
+	if ShowMuseumVal
+		_AddItemMain_1.GoToState("Notify")
+		_AddItemMain_2.GoToState("Notify")
+		_AddItemSafehoue.GoToState("Notify")
+	else
+		_AddItemMain_1.GoToState("Silent")
+		_AddItemMain_2.GoToState("Silent")
+		_AddItemSafehoue.GoToState("Silent")
+	endIf
+		
 	ShowArmoryVal = fiss.loadBool("Armory Notifications")
+	if ShowArmoryVal
+		_AddItemArmory.GoToState("Notify")
+	else
+		_AddItemArmory.GoToState("Silent")
+	endIf
+		
 	ShowModsVal = fiss.loadBool("Supported Mods Notifications")
+	if ShowModsVal
+		_AddItemPatches.GoToState("Notify")
+	else
+		_AddItemPatches.GoToState("Silent")
+	endIf	
+	
 	ShowSetCompleteVal = fiss.loadBool("Show Section/Set Complete Notifications")
 	ShowSimpleNotificationVal = fiss.loadBool("Show Basic Notifications")
 	ShowListenerVal = fiss.loadBool("Museum Display Listener")
@@ -1314,8 +1342,16 @@ endFunction
 Function Begin_Config_Default()
 
 	ShowMuseumVal = False
+	_AddItemMain_1.GoToState("Silent")
+	_AddItemMain_2.GoToState("Silent")
+	_AddItemSafehoue.GoToState("Silent")
+	
 	ShowArmoryVal = False
+	_AddItemArmory.GoToState("Silent")
+		
 	ShowModsVal = False
+	_AddItemPatches.GoToState("Silent")
+	
 	ShowSetCompleteVal = False
 	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
@@ -1377,8 +1413,16 @@ endFunction
 Function Begin_Config_Author()
 
 	ShowMuseumVal = False
+	_AddItemMain_1.GoToState("Silent")
+	_AddItemMain_2.GoToState("Silent")
+	_AddItemSafehoue.GoToState("Silent")
+	
 	ShowArmoryVal = False
+	_AddItemArmory.GoToState("Silent")
+		
 	ShowModsVal = False
+	_AddItemPatches.GoToState("Silent")
+	
 	ShowSetCompleteVal = False
 	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
@@ -2166,6 +2210,16 @@ state iRelicMuseumNotifications
 	Event OnSelectST()
 		ShowMuseumVal = !ShowMuseumVal 
 		
+		if ShowMuseumVal
+			_AddItemMain_1.GoToState("Notify")
+			_AddItemMain_2.GoToState("Notify")
+			_AddItemSafehoue.GoToState("Notify")
+		else
+			_AddItemMain_1.GoToState("Silent")
+			_AddItemMain_2.GoToState("Silent")
+			_AddItemSafehoue.GoToState("Silent")
+		endIf
+		
 		self.SetTextOptionValueST(Self.SetMuseumNotificationsString(), false, "")
 	EndEvent
 
@@ -2205,6 +2259,12 @@ state iRelicArmoryNotifications
 
 	Event OnSelectST()
 		ShowArmoryVal = !ShowArmoryVal 
+
+		if ShowArmoryVal
+			_AddItemArmory.GoToState("Notify")
+		else
+			_AddItemArmory.GoToState("Silent")
+		endIf
 		
 		self.SetTextOptionValueST(Self.SetArmoryNotificationsString(), false, "")
 	EndEvent
@@ -2245,7 +2305,13 @@ state iRelicModsNotifications
 
 	Event OnSelectST()
 		ShowModsVal = !ShowModsVal 
-		
+
+		if ShowModsVal
+			_AddItemPatches.GoToState("Notify")
+		else
+			_AddItemPatches.GoToState("Silent")
+		endIf
+	
 		self.SetTextOptionValueST(self.SetModsNotificationsString(), false, "")
 	EndEvent
 
@@ -3193,9 +3259,7 @@ endEvent
 				
 ;;-------------------------------
 	
-Function AddModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
-	
-	;Utility.Wait(_WaitTime)
+Function AddModSupport(GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName, GlobalVariable akTotal)
 	
 	Int Index = GetArrayPos(_ModName)
 	
@@ -3211,14 +3275,14 @@ Function AddModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVariable
 		RN_Patches_Count_Array[Index] = _GVCount
 		RN_Patches_Total_Array[Index] = _GVTotal		
 	endif
+	
+	akTotal.Mod(1)
 	TCCDebug.Log("MCM Registered Official Patch [" + _ModName + "] at position " + Index, 0)
 endFunction
 
 ;;-------------------------------
 	
-Function AddCustomModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName)
-	
-	;Utility.Wait(_WaitTime)
+Function AddCustomModSupport(GlobalVariable _GVComplete, GlobalVariable _GVCount, GlobalVariable _GVTotal, String _ModName, GlobalVariable akTotal)
 	
 	Int Index = RN_Custom_Name.Find(_ModName)
 	if Index == -1
@@ -3233,7 +3297,8 @@ Function AddCustomModSupport(Int _WaitTime, GlobalVariable _GVComplete, GlobalVa
 		RN_Custom_Count_Array[Index] = _GVCount
 		RN_Custom_Total_Array[Index] = _GVTotal		
 	endif
-
+	
+	akTotal.Mod(1)
 	TCCDebug.Log("MCM Registered Custom Patch [" + _ModName + "] at position " + Index, 0)
 endFunction
 
@@ -3303,6 +3368,9 @@ Function BuildPatchArray(bool _create, bool _Rebuild)
 	if _Rebuild
 		
 		TCCDebug.Log("MCM - Sending Patch Array Event", 0)
+		
+		RN_SupportedModCount.SetValue(0)
+		RN_CustomModCount.SetValue(0)
 		SendModEvent("TCCUpdate_Arrays")
 	endIf
 endFunction

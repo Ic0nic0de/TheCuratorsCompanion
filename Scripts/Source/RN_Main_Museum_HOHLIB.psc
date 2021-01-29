@@ -72,28 +72,31 @@ endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-	
-	if TCC_ItemList_Museum_1.HasForm(akBaseItem) && !TCC_FoundList_Museum_1.HasForm(akBaseItem) 
-		TCC_FoundList_Museum_1.AddForm(akBaseItem)
-						
-		if (MCM.ShowMuseumVal)		
-			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
-			FoundAlias.ForceRefTo(FoundRelic)
-			if (!MCM.ShowSimpleNotificationVal)
-				if (DBM_MuseumIntro.IsCompleted())
-					DBM_FoundRelicMessageComplete.Show()
-				else
-					DBM_FoundRelicMessage.Show()
-				endIf						
+Auto State Silent
+	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+		TCC_FoundList_Museum_1.AddForm(akBaseItem)		
+	EndEvent
+endState	
+
+State Notify
+	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+		
+		TCC_FoundList_Museum_1.AddForm(akBaseItem)	
+		ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
+		FoundAlias.ForceRefTo(FoundRelic)
+		if (!MCM.ShowSimpleNotificationVal)
+			if (DBM_MuseumIntro.IsCompleted())
+				DBM_FoundRelicMessageComplete.Show()
 			else
-				DBM_FoundRelicNotification.Show()
-			endIf
-			FoundAlias.Clear()
-			FoundRelic.Delete()
-		endIf	
-	endIf		
-EndEvent		
+				DBM_FoundRelicMessage.Show()
+			endIf						
+		else
+			DBM_FoundRelicNotification.Show()
+		endIf
+		FoundAlias.Clear()
+		FoundRelic.Delete()	
+	EndEvent
+endState
 	
 ;;-- Events ---------------------------------------	
 

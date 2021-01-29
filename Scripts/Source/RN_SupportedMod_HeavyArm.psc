@@ -106,7 +106,7 @@ endEvent
 Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
 		
 	_CreateArray()
-	MCM.AddModSupport(Utility.Randomint(1,5), _Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName)
+	MCM.AddModSupport(_Global_Mod_Complete, _Global_Display_Count, _Global_Display_Total, _ModName, RN_SupportedModCount)
 	MCM.AddSectionSupport(_HA_Global_Count, _HA_Global_Total, _HA_Global_Complete, _ModName, _HeavyArmory_Section_names)
 endEvent
 
@@ -115,7 +115,6 @@ endEvent
 Event _RunSetup()
 	
 	RN_Setup_Registered.Mod(1)
-	RN_SupportedModCount.Mod(1)
 	
 	if !_setupDone
 		

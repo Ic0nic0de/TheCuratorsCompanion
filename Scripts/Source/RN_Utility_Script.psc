@@ -176,6 +176,10 @@ Event RunSetup()
 			SendModEvent("TCCSetup_Uniques")
 		endIf
 		
+		While Utility.IsInMenuMode()
+			Wait(2)
+		endWhile
+		
 		ModConfigStartup.Show() 
 		
 		AddPlayerToFormlists()
@@ -199,6 +203,8 @@ Event RunSetup()
 				RN_InvArm.OnPlayerLoadGame() 		;; Fire off Inventory Manager. (Armory)
 				RN_InvPatch.OnPlayerLoadGame()		;; Fire off Inventory Manager. (Patches)
 				
+				RN_MCM.BuildPatchArray(true, true)
+				
 				UpdateCurrentInstanceGlobal(RN_SupportedModCount)
 				UpdateCurrentInstanceGlobal(RN_CustomModCount)
 				UpdateCurrentInstanceGlobal(RN_SupportedSafehouseCount)
@@ -220,8 +226,6 @@ Event RunSetup()
 				else
 					UserSettingsNone.Show()
 				endIf
-				
-				RN_MCM.BuildPatchArray(true, true)
 				
 				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedSafehouseCount.GetValue() > 0 || RN_CustomModCount.GetValue() > 0
 					RN_SupportedPatchTotal.SetValue(RN_SupportedModCount.GetValue() as Int + RN_CustomModCount.GetValue() as Int) 
@@ -406,9 +410,6 @@ Event onUpdate()
 
 	DBM_SortWait.setvalue(1)
 	bSetupStarted = True
-	
-	RN_SupportedModCount.setvalue(0)
-	RN_CustomModCount.setvalue(0)
 	
 	SendModEvent("TCCSetup_Patches")
 	
@@ -781,6 +782,7 @@ Event UpdatePatches()
 	
 	while bSetupStarted	
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
+			RN_MCM.BuildPatchArray(true, true)
 			RebuildLists()	
 			InitGlobals()
 			
@@ -789,8 +791,6 @@ Event UpdatePatches()
 			if RN_MCM.Achievements_Enabled
 				SendModEvent("TCCUpdate_Counts_Uniques")
 			endIf	
-			
-			RN_MCM.BuildPatchArray(true, true)
 			
 			ModUpdateFinished.Show()
 			

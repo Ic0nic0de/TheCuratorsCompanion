@@ -114,7 +114,7 @@ Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
 		return
 	endIf
 	
-	MCM.AddModSupport(Utility.Randomint(1,20), _GlobalComplete, _GlobalCount, _GlobalTotal, _ModName)
+	MCM.AddModSupport(_GlobalComplete, _GlobalCount, _GlobalTotal, _ModName, RN_SupportedModCount)
 endEvent
 
 ;;-- Events ---------------------------------------		
@@ -122,8 +122,7 @@ endEvent
 Event _RunSetup()
 	
 	RN_Setup_Registered.Mod(1)
-	RN_SupportedModCount.Mod(1)
-	
+		
 	if !DBM
 		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
 		RN_Setup_Done.Mod(1)
