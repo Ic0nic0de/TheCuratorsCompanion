@@ -200,6 +200,8 @@ GlobalVariable Property RN_Ach32Complete Auto
 GlobalVariable Property RN_Ach33Complete Auto
 GlobalVariable Property RN_Ach34Complete Auto
 
+ObjectReference Property TCC_Achievements_Xmarker Auto
+
 Formlist property _Museum_Global_Complete auto
 Formlist property _Museum_Global_Count auto
 Formlist property _Museum_Global_Total auto
@@ -394,7 +396,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", "Version 5.0.3", 0)		
+		AddTextOption("", "Version 5.0.4", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -517,7 +519,7 @@ Event AddAchievementsPage()
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
 
-		if !Achievements_Enabled
+		if TCC_Achievements_Xmarker.IsDisabled()
 			if RN_Setup_Start.GetValue()
 				AddTextOptionST("iAchievement_Enabled", "Enable Achievements System", "Wait For Setup...", 1)
 			else
@@ -2547,6 +2549,8 @@ state iAchievement_Enabled
 					Wait(0.5)
 				endWhile
 				RN_Utility.SetUpAchievements()
+			else
+				Achievements_Enabled = False
 			endIf
 		endIF			
 	EndFunction
