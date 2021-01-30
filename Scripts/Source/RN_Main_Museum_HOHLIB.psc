@@ -81,20 +81,22 @@ endState
 State Notify
 	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 		
-		TCC_FoundList_Museum_1.AddForm(akBaseItem)	
-		ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
-		FoundAlias.ForceRefTo(FoundRelic)
-		if (!MCM.ShowSimpleNotificationVal)
-			if (DBM_MuseumIntro.IsCompleted())
-				DBM_FoundRelicMessageComplete.Show()
+		if !TCC_FoundList_Museum_1.HasForm(akBaseItem)
+			TCC_FoundList_Museum_1.AddForm(akBaseItem)	
+			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
+			FoundAlias.ForceRefTo(FoundRelic)
+			if (!MCM.ShowSimpleNotificationVal)
+				if (DBM_MuseumIntro.IsCompleted())
+					DBM_FoundRelicMessageComplete.Show()
+				else
+					DBM_FoundRelicMessage.Show()
+				endIf						
 			else
-				DBM_FoundRelicMessage.Show()
-			endIf						
-		else
-			DBM_FoundRelicNotification.Show()
+				DBM_FoundRelicNotification.Show()
+			endIf
+			FoundAlias.Clear()
+			FoundRelic.Delete()
 		endIf
-		FoundAlias.Clear()
-		FoundRelic.Delete()	
 	EndEvent
 endState
 	

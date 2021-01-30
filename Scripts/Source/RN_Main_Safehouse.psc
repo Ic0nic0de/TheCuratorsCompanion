@@ -78,7 +78,7 @@ endState
 State Notify
 	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 			
-		if RN_SafeouseContent_Installed.GetValue()
+		if RN_SafeouseContent_Installed.GetValue() && !TCC_FoundList_Safehouse.HasForm(akBaseItem)
 			TCC_FoundList_Safehouse.AddForm(akBaseItem)
 			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
 			FoundAlias.ForceRefTo(FoundRelic)

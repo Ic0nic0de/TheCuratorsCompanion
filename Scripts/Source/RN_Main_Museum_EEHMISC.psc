@@ -94,21 +94,23 @@ State Notify
 			FoundRelic.Delete()
 			
 		else
-			TCC_FoundList_Museum_2.AddForm(akBaseItem)	
-			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
-			FoundAlias.ForceRefTo(FoundRelic)
-			if (!MCM.ShowSimpleNotificationVal)
-				if (DBM_MuseumIntro.IsCompleted())
-					DBM_FoundRelicMessageComplete.Show()
+			if !TCC_FoundList_Museum_2.HasForm(akBaseItem)
+				TCC_FoundList_Museum_2.AddForm(akBaseItem)	
+				ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
+				FoundAlias.ForceRefTo(FoundRelic)
+				if (!MCM.ShowSimpleNotificationVal)
+					if (DBM_MuseumIntro.IsCompleted())
+						DBM_FoundRelicMessageComplete.Show()
+					else
+						DBM_FoundRelicMessage.Show()
+					endIf						
 				else
-					DBM_FoundRelicMessage.Show()
-				endIf						
-			else
-				DBM_FoundRelicNotification.Show()
+					DBM_FoundRelicNotification.Show()
+				endIf
+				FoundAlias.Clear()
+				FoundRelic.Delete()
 			endIf
-			FoundAlias.Clear()
-			FoundRelic.Delete()
-		endIf		
+		endIf
 	EndEvent
 endState
 	
