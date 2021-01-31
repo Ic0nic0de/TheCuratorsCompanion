@@ -9,7 +9,6 @@ ReferenceAlias property FoundAlias auto
 
 ;;Formlists to control merged and found lists
 formlist property TCC_ItemList_Patches auto
-formlist property TCC_FoundList_Patches auto
 
 ;;Player Ref for Game.GetPlayer().
 ObjectReference property PlayerRef auto
@@ -24,44 +23,29 @@ Message property DBM_FoundRelicMessageComplete auto
 ;;Item Notifications.
 Message property DBM_FoundRelicNotification auto
 
-;; Global for ModEvent Return.
-GlobalVariable property RN_Found_Done auto
-GlobalVariable Property RN_found_Registered Auto
-
-;;Museum storage containers to check within several events.
-formlist property _MuseumContainerList_WP auto
-
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-																			;; Script Start
-;;-- Events ---------------------------------------		
-
-Event onInit()
-
-	RegisterForModEvent("TCCUpdate", "_onUpdate")	
-endEvent
-
-;;-- Events ---------------------------------------		
-
-Event onPlayerLoadGame()
-
-	RegisterForModEvent("TCCUpdate", "_onUpdate")	
-endEvent
-
-;;-- Events ---------------------------------------	
+;;MoreHud
+formlist property dbmNew auto
+formlist property dbmDisp auto
+formlist property dbmFound auto
 
 Auto State Silent
-	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-		TCC_FoundList_Patches.AddForm(akBaseItem)		
+	Event OnBeginState()
+		RemoveAllInventoryEventFilters()
+		AddInventoryEventFilter(TCC_ItemList_Patches as Form)
+	EndEvent
+	
+	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)	
 	EndEvent
 endState	
 
 State Notify
-	Event onItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)	
-		
-		if !TCC_FoundList_Patches.HasForm(akBaseItem)		
-			TCC_FoundList_Patches.AddForm(akBaseItem)
+	Event OnBeginState()
+		RemoveAllInventoryEventFilters()
+		AddInventoryEventFilter(TCC_ItemList_Patches as Form)
+	EndEvent
+
+	Event onItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)			
+		if DBMNew.HasForm(akBaseItem) && !DBMFound.HasForm(akBaseItem) && !DBMDisp.HasForm(akBaseItem)		
 			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
 			FoundAlias.ForceRefTo(FoundRelic)
 			if (!MCM.ShowSimpleNotificationVal)
@@ -78,28 +62,3 @@ State Notify
 		endIf
 	endEvent
 endState	
-
-;;-- Events ---------------------------------------		
-
-Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;; automatic Call from (RN_Utility_Script)
-
-	RN_found_Registered.Mod(1)
-	TCCDebug.Log("Patch(es) - Update Event Received...", 0)
-	
-	Int _Index = _MuseumContainerList_WP.GetSize()
-	While _Index 
-		_Index -= 1
-		ObjectReference _Container = _MuseumContainerList_WP.GetAt(_Index) as ObjectReference
-		Int Index2 = _Container.GetNumItems()
-		while Index2
-			Index2 -=1		
-			Form ItemRelic = _Container.GetNthForm(Index2)			
-			if TCC_ItemList_Patches.HasForm(ItemRelic) && !TCC_FoundList_Patches.HasForm(ItemRelic)
-				TCC_FoundList_Patches.AddForm(ItemRelic)
-			endIf	
-		endWhile
-	endWhile
-	
-	RN_Found_Done.Mod(1)
-	TCCDebug.Log("Patch(es) - Update Event Completed", 0)
-endEvent

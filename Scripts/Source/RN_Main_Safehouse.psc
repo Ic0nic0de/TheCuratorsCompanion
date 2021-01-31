@@ -12,7 +12,6 @@ RN_Utility_MCM Property MCM Auto
 
 ;;Formlists to control item lists - Merged Formlist 1. (HOH, Lib)
 formlist property TCC_ItemList_Safehouse auto ;;Merged Item List.
-formlist property TCC_FoundList_Safehouse auto ;;Found Item List.
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties --------------------------------------------------------------------------------------------------------
@@ -30,56 +29,29 @@ ReferenceAlias Property FoundAlias auto
 ;;Player Ref for Game.GetPlayer()
 Objectreference Property PlayerRef Auto
 
-;; Global for ModEvent Return.
-GlobalVariable Property RN_Found_Done Auto
-GlobalVariable Property RN_found_Registered Auto
-
-GlobalVariable Property RN_SafeouseContent_Installed Auto
-
-;;Museum / Safehouse storage containers to check within several events.
-Formlist property _SafehouseContainerList_WP auto
-
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-;;-- Events ---------------------------------------
-
-Event OnInit()
-
-	RegisterForModEvent("TCCUpdate", "_onUpdate")
-	AddInventoryEventFilters()
-endEvent
-
-;;-- Events ---------------------------------------
-
-Event OnPlayerLoadGame()
-	
-	RegisterForModEvent("TCCUpdate", "_onUpdate")
-	AddInventoryEventFilters()
-endEvent
-	
-;;-- Events ---------------------------------------
-
-Event AddInventoryEventFilters()
-
-	RemoveAllInventoryEventFilters()
-	AddInventoryEventFilter(TCC_ItemList_Safehouse as Form)
-endEvent
-
-;;-- Events ---------------------------------------		
+;;MoreHud
+formlist property dbmNew auto
+formlist property dbmDisp auto
+formlist property dbmFound auto
 
 Auto State Silent
-	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-		TCC_FoundList_Safehouse.AddForm(akBaseItem)		
+	Event OnBeginState()
+		RemoveAllInventoryEventFilters()
+		AddInventoryEventFilter(TCC_ItemList_Safehouse as Form)
+	EndEvent
+	
+	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)	
 	EndEvent
 endState	
 
 State Notify
-	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-			
-		if RN_SafeouseContent_Installed.GetValue() && !TCC_FoundList_Safehouse.HasForm(akBaseItem)
-			TCC_FoundList_Safehouse.AddForm(akBaseItem)
+	Event OnBeginState()
+		RemoveAllInventoryEventFilters()
+		AddInventoryEventFilter(TCC_ItemList_Safehouse as Form)
+	EndEvent
+	
+	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)			
+		if DBMNew.HasForm(akBaseItem) && !DBMFound.HasForm(akBaseItem) && !DBMDisp.HasForm(akBaseItem)
 			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
 			FoundAlias.ForceRefTo(FoundRelic)
 			if (!MCM.ShowSimpleNotificationVal)
@@ -93,32 +65,3 @@ State Notify
 	EndEvent
 endState	
 	
-;;-- Events ---------------------------------------	
-
-Event _onUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
-
-	RN_found_Registered.Mod(1)
-	
-	TCCDebug.Log("Safehouse - Update Event Received...", 0)
-	
-	Int _Index = 0
-	Int ListSize = _SafehouseContainerList_WP.GetSize()
-	While _Index < ListSize
-		ObjectReference _Container = _SafehouseContainerList_WP.GetAt(_Index) as ObjectReference
-		Int Index2 = 0
-		Int ContainerList = _Container.GetNumItems()
-		while Index2 < ContainerList	
-			Form ItemRelic = _Container.GetNthForm(Index2)			
-			if TCC_ItemList_Safehouse.HasForm(ItemRelic)
-				if !TCC_FoundList_Safehouse.HasForm(ItemRelic)
-					TCC_FoundList_Safehouse.AddForm(ItemRelic)
-				endIf
-			endIf
-			Index2 += 1
-		endWhile
-		_Index += 1
-	endWhile
-	
-	RN_Found_Done.Mod(1)
-	TCCDebug.Log("Safehouse - Update Event Completed", 0)
-endEvent	

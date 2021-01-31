@@ -236,6 +236,7 @@ Event OnPageReset(String page)
 	_ArrayHolder._Reset_Arrays()
 	_QuestHolder._Build_Quests()
 	_Build_Quests_Pages()
+	
 endEvent
 
 ;-- Menu Events ---------------------------------

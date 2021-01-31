@@ -53,7 +53,6 @@ message property TCC_SafehouseSetupFinished auto
 bool bSettingup
 bool bScanning
 bool bScanAll
-bool bUpdating
 bool bMoreHUDListsCreated
 bool bSetupStarted
 Bool bMaintenance
@@ -68,23 +67,11 @@ objectreference property PlayerRef auto
 ;;----------------------------------------------------------------------------- Formlist Properties ------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-;;Merged & Found Item list 1
-formlist property TCC_ItemList_Museum_2 auto
-formlist property TCC_FoundList_Museum_2 auto
-
-;;Merged & Found Item list 2
-formlist property TCC_ItemList_Museum_1 auto
-formlist property TCC_FoundList_Museum_1 auto
-
 ;;MoreHud
 formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
-
-;;Safehouse formlists
-formlist property TCC_ItemList_Safehouse auto
-formlist property TCC_FoundList_Safehouse auto
 
 ;;Listeners
 formlist property DBM_RN_QuestDisplays auto
@@ -130,9 +117,6 @@ globalvariable property RN_Safehouse_Registered auto
 
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
-
-globalvariable property RN_Found_Done auto
-globalvariable property RN_found_Registered auto
 
 globalvariable property RN_Quest_Listener_Total auto
 globalvariable property RN_Exploration_Listener_Total auto
@@ -216,8 +200,6 @@ Event RunSetup()
 				endIf
 				
 				Wait(5)
-				
-				UpdateAllFound()	
 
 				RN_MCM.Begin_Config_Load()
 				
@@ -430,7 +412,6 @@ Event onUpdate()
 				TCCDebug.Log("Utility - Installing new patch(es)", 0)
 				ModStartup_UpdatingLists.Show()
 				CreateMoreHudLists()
-				UpdateAllFound()
 				RN_MCM.BuildPatchArray(true, true)
 				RN_MCM.UpdateReq = False
 			endIf
@@ -578,37 +559,7 @@ endFunction
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------- Update Functions ----------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-function UpdateAllFound()
-	
-	TCCDebug.Log("Utility - Updating all found items...", 0)
-	
-	bUpdating = True
-	DBM_SortWait.setvalue(1)
-	
-	SendModEvent("TCCUpdate")	
-	FinishUpdate(5)
-endFunction
-
-;;-- Functions ---------------------------------------
-
-function FinishUpdate(Int _Wait)
-	
-	Wait(_Wait)
-	
-	while bUpdating	
-		if RN_Found_Done.GetValue() == RN_Found_Registered.GetValue()	
-			
-			RN_Found_Done.setvalue(0)
-			DBM_SortWait.setvalue(0)
-			RN_Found_Registered.setvalue(0)
-			bUpdating = False
-		endIf		
-	endWhile
-	
-	TCCDebug.Log("Utility - Completed update", 0)
-endFunction		
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
 
 ;;-- Functions ---------------------------------------
 
@@ -674,27 +625,8 @@ Function SetUpSafehouse()
 	
 	while bSettingup	
 		if RN_Safehouse_Done.GetValue() == RN_Safehouse_Registered.GetValue()	
-
-			Int Index = 0
-			Int ListSize = _SafehouseContainerList_WP.GetSize() ;;Check safehouse items found
-			While Index < ListSize
-				ObjectReference _Container = _SafehouseContainerList_WP.GetAt(Index) as ObjectReference
-				TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
-				Int Index2 = 0
-				Int ContainerList = _Container.GetNumItems()
-				while Index2 < ContainerList	
-					Form _ItemRelic = _Container.GetNthForm(Index2)			
-					if TCC_ItemList_Safehouse.HasForm(_ItemRelic)
-						if !TCC_FoundList_Safehouse.HasForm(_ItemRelic)
-							TCC_FoundList_Safehouse.AddForm(_ItemRelic)
-						endIf
-					endIf
-					Index2 += 1
-				endWhile
-				Index += 1
-			endWhile
 			
-			Index = TCC_TokenList.GetSize() ;; Check player and custom storage for found items.
+		Int	Index = TCC_TokenList.GetSize() ;; Check player and custom storage for found items.
 			While Index
 				Index -= 1
 				ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference	
