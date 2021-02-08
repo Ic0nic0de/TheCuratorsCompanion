@@ -8,8 +8,6 @@ import AhzmoreHUDIE
 import utility
 import RN_Utility_Global
 
-RN_Utility_autoScan property RN_AutoScan auto
-
 RN_Utility_Script property RN_Utility auto
 
 RN_Storage_Transfer property RN_Transfer auto
@@ -97,11 +95,7 @@ bool property AllowPotion auto hidden ;;auto Transfer To Storage Container
 bool property ShowStartup = true auto hidden ;; Shows Startup Messages
 
 Int property PrepTransfer auto hidden ;; Prep Station transfer settings.
-
 bool property ScanNotificationsval auto hidden ;; Museum Scan Notifications
-bool property autoScanVal auto hidden ;; Auto Museum Scan
-int property _ScanInterval auto ;; museum scan interval
-
 bool property Ach_Notify = true auto hidden
 bool property Ach_Visual = true auto hidden
 
@@ -131,7 +125,7 @@ globalvariable property RN_Setup_Registered auto
 globalvariable property RN_Token_Visibility auto
 
 ;; Treasury Globals
-globalvariable property RN_Total_Value auto
+globalvariable property RN_MuseumValue auto
 globalvariable property RN_Treasury_Count auto
 globalvariable property RN_Treasury_Count2 auto
 globalvariable property RN_Treasury_Count3 auto
@@ -359,7 +353,7 @@ Event InitAttributeList()
 	AttributeList[3] = "Increase Stamina"
 	AttributeList[4] = "Random Attribute"
 EndEvent
-	
+		
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Settings Page ------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -396,7 +390,7 @@ Event AddSettingsPage()
 		AddTextOption("featured add-on for Legacy of the Dragonborn.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By (Ic0n)Ic0de", 0)
-		AddTextOption("", "Version 5.0.4", 0)		
+		AddTextOption("", "Version 5.1.0", 0)		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
 		AddTextOptionST("Config_Save", "FISS - User Profile", self.GetConfigSaveString(), 0)
@@ -438,13 +432,8 @@ Event AddAdvancedPage()
 		SetCursorPosition(1)
 
 		AddHeaderOption("Museum Scan:")
-		AddTextOptionST("ScanType", "Museum Scan Type", self.GetScanType(), 0)
 		AddTextOptionST("ScanNotifications", "Museum Scan Notifications", self.GetScanNotification(), 0)
-		if autoScanVal
-			AddSliderOptionST("autoScanInterval", "Museum Scan Interval (Minutes)", _ScanInterval)	
-		elseif !autoScanVal
-			AddTextOptionST("ScanMuseum", "Museum Scan (Manual)", "Scan Now", 0)
-		endIf	
+		AddTextOptionST("ScanMuseum", "Museum Scan (Manual)", "Scan Now", 0)	
 	endif
 endEvent
 
@@ -651,22 +640,24 @@ Event AddMuseumSetsPage()
 		endIf
 
 		AddEmptyOption()
+
 		AddHeaderOption("Player Wealth:")
+		AddTextOption("Museum Displays Value:", RN_MuseumValue.GetValue() as Int, 0)
 		AddTextOption("Safehouse Treasury Value:", RN_Treasury_Count.GetValue() as Int, 0)
 		AddTextOption("Deepholme Treasury Value:", Self.GetTreasuryCountString2(), 0)
 		AddTextOption("Karagas' Tower Treasury Value:", Self.GetTreasuryCountString3(), 0)
-		
+	
 		SetCursorPosition(1)
 		AddHeaderOption("Page Information:")
 		AddTextOption("This page lists all completable Museum sections.", "", 0)
 		AddEmptyOption()
 		AddTextOption("As items are collected and displayed, this page will", "", 0)
-		AddTextOption("keep track of your progess.", "", 0)
+		AddTextOption("keep track of your progess and display counts.", "", 0)
 		AddEmptyOption()
-		AddTextOption("Running the Museum Scan from the MCM or Prep Station", "", 0)
-		AddTextOption("will scan the Museum and Armory for items on display", "", 0)
-		AddTextOption("then update the figures in the MCM, it is recommended", "", 0)
-		AddTextOption("to use the autoscanner which can be enabled in the MCM", "", 0)
+		AddTextOption("The figures on this page will update automatically", "", 0)
+		AddTextOption("when displaying items in the Museum, of course it", "", 0)
+		AddTextOption("may take a moment to update those numbers so run", "", 0)
+		AddTextOption("the Museum scan if you feel the numbers seem off ;)", "", 0)
 		if RN_CreationClubContent_Installed.GetValue()
 			AddEmptyOption()
 		endIf
@@ -685,9 +676,10 @@ Event AddMuseumSetsPage()
 		AddTextOption("Completed:", self.GetDisplaySectionCount(iDisplaySectionComplete), 0)
 		AddEmptyOption()
 		AddHeaderOption("Wealth Information:")
-		AddTextOption("This section tracks the amount of Gold within the treasury", "", 0)
-		AddTextOption("rooms, the figures update after adding / removing Gold.", "", 0)
-		AddTextOption("Total value:", self.GetTotalTreasuryValue(RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3), 0)
+		AddTextOption("This section tracks the Museum value as well as the Gold", "", 0)
+		AddTextOption("value of the Treasury rooms, the figures update after", "", 0)
+		AddTextOption("displaying items or adding / removing Gold.", "", 0)
+		AddTextOptionST("GetMuseumValue", "Total Museum value:", self.GetTotalTreasuryValue(RN_MuseumValue, RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3), 0)
 	endIf
 endEvent
 
@@ -1071,8 +1063,6 @@ FISSInterface fiss = FISSFactory.getFISS()
 	fiss.saveBool("Show startup notifications", ShowStartup)
 	fiss.saveInt("Prep Station Transfer", PrepTransfer)
 	fiss.saveBool("ScanNotificationsval", ScanNotificationsval)
-	fiss.saveBool("AutoScanVal", AutoScanVal)
-	fiss.saveInt("_ScanInterval", _ScanInterval)
 	
 	;;Relic Storage Page
 	fiss.saveBool("Storage Restriction", Restricted)
@@ -1231,13 +1221,6 @@ FISSInterface fiss = FISSFactory.getFISS()
 	PrepTransfer = fiss.loadInt("Prep Station Transfer")
 
 	ScanNotificationsval = fiss.loadBool("ScanNotificationsval")
-	_ScanInterval = fiss.loadInt("_ScanInterval")
-	AutoScanVal = fiss.loadBool("AutoScanVal")
-	If AutoScanVal
-		RN_AutoScan.UpdateInt(_ScanInterval)
-	else
-		RN_AutoScan.UpdateInt(0)
-	endIf
 	
 	;;Relic Storage Page
 
@@ -1354,7 +1337,7 @@ Function Begin_Config_Default()
 	ShowModsVal = False
 	_AddItemPatches.GoToState("Silent")
 	
-	ShowSetCompleteVal = False
+	ShowSetCompleteVal = True
 	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
 	ShowStartup = True
@@ -1386,9 +1369,6 @@ Function Begin_Config_Default()
 	AllowPotion = False
 	
 	ScanNotificationsval = True
-	_ScanInterval = 30
-	AutoScanVal = True
-	RN_AutoScan.UpdateInt(_ScanInterval)
 	
 	RN_Tracker._bSpoilers = false
 	
@@ -1425,7 +1405,7 @@ Function Begin_Config_Author()
 	ShowModsVal = False
 	_AddItemPatches.GoToState("Silent")
 	
-	ShowSetCompleteVal = False
+	ShowSetCompleteVal = True
 	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
 	ShowStartup = True
@@ -1460,9 +1440,6 @@ Function Begin_Config_Author()
 	
 	Restricted = False
 	ScanNotificationsval = True
-	_ScanInterval = 30
-	AutoScanVal = True
-	RN_AutoScan.UpdateInt(_ScanInterval)
 	
 	RN_Tracker._bSpoilers = True
 	
@@ -1482,49 +1459,6 @@ endFunction
 ;;----------------------------------------------------------------------------- Museum Scan Options--------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-state ScanType
-
-	Event OnSelectST()
-	
-		autoScanVal = !autoScanVal
-		SetTextOptionValueST(SetScanType(), false, "")
-		ForcePageReset()		
-	EndEvent
-
-	function OnHighlightST()
-
-		SetInfoText("Toggle to select between Manual / Automatic Scanning")
-	endFunction
-endState
-
-;;-------------------------------
-
-String function SetScanType()
-
-		if !autoScanVal	
-			RN_AutoScan.UpdateInt(0)
-			Status_Return = "Manual"
-		elseif autoScanVal
-			RN_AutoScan.UpdateInt(_ScanInterval)
-			Status_Return = "Automatic"
-		endIf
-		return Status_Return
-endfunction
-
-;;-------------------------------
-			
-String function GetScanType()
-
-	if !autoScanVal
-		Status_Return = "Manual"
-	elseif autoScanVal	
-		Status_Return = "Automatic"
-	endIf
-	return Status_Return
-endFunction	
-	
-;;------------------------------
-
 state ScanMuseum
 
 	function OnSelectST()
@@ -1539,34 +1473,6 @@ state ScanMuseum
 
 		SetInfoText("Selecting this option will scan the Museum & Armory for all displayed items and update the listings within this mod.")
 	endFunction
-endState
-
-;;------------------------------
-
-state autoScanInterval ; Museum scan slider.
-
-	event OnSliderOpenST()
-		SetSliderDialogStartValue(_ScanInterval)
-		SetSliderDialogRange(0, 120)
-		SetSliderDialogInterval(10)
-	endEvent
-
-	event OnSliderAcceptST(float a_value)
-		_ScanInterval = a_value as int
-		SetSliderOptionValueST(_ScanInterval)
-		RN_AutoScan.UpdateInt(_ScanInterval)
-	endEvent
-
-	event OnDefaultST()
-		_ScanInterval = 30
-		SetSliderOptionValueST(_ScanInterval)
-		RN_AutoScan.UpdateInt(_ScanInterval)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("Use this slider to set the interval between automatic museum scans - Set to 0 to turn off.\n Default: 10 Minutes")
-	endEvent
-	
 endState
 
 ;;------------------------------
@@ -1636,11 +1542,6 @@ state Scan_Debug
 	
 		if self.ShowMessage("This will reset the current Museum scan and reset the scanner, do you want to reset now?", true, "Reset", "Cancel")
 			RN_Scan_Done.SetValue(RN_Scan_Registered.GetValue())
-			
-			autoScanVal = True
-			_ScanInterval = 30
-			RN_AutoScan.UpdateInt(_ScanInterval)
-			
 			DBM_SortWait.setvalue(0)
 			ForcePageReset()
 		endIf
@@ -3070,19 +2971,28 @@ endFunction
 
 ;;-------------------------------
 
-String function GetTotalTreasuryValue(GlobalVariable akvariable1, GlobalVariable akvariable2, GlobalVariable akvariable3)
+State GetMuseumValue
+	Event OnHighlightST()
+		self.SetInfoText("This is an approximate total value for the Museum including Safehouse Displays and all 3 Treasury Rooms.\n The value will update after using the Prep Station, Display Drop off chest or manually displaying an item.")
+	EndEvent
+endState
+		
+;;-------------------------------
 
-	RN_Total_Value.SetValue(0)
-	RN_Total_Value.Mod(akvariable1.GetValue() As Int)
+Int function GetTotalTreasuryValue(GlobalVariable akMuseumVal, GlobalVariable akvariable1, GlobalVariable akvariable2, GlobalVariable akvariable3)
+
+	Int Value = 0
+	Value += (akMuseumVal.GetValue() as Int)
+	Value += (akvariable1.GetValue() As Int)
 		if DBM_DHQuest.IsCompleted()
-			RN_Total_Value.Mod(akvariable2.GetValue() As Int)
+			Value += (akvariable2.GetValue() As Int)
 		endIf
 		
 		if DBM_Excavation02.IsCompleted()
-			RN_Total_Value.Mod(akvariable3.GetValue() As Int)	
+			Value += (akvariable3.GetValue() As Int)	
 		endIf
-			Status_Return = RN_Total_Value.GetValue() As Int
-		return Status_Return
+		
+	return Value
 endFunction
 
 ;;-------------------------------

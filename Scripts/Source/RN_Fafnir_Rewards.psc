@@ -10,7 +10,6 @@ MiscObject Property TCCFafnirTeddy Auto
 Formlist Property GemList Auto
 Formlist Property ShellList Auto
 Formlist Property CardList Auto
-GlobalVariable Property RN_Fafnir_Gold Auto
 
 Message Property DBM_FoundGoldMessage Auto
 Message Property DBM_FoundGemMessage Auto
@@ -72,10 +71,8 @@ Event OnUpdateGameTime()
 			
 		else
 			Int _Reward = RandomInt(1,9)
-			RN_Fafnir_Gold.Setvalue(_Reward)
-			GetOwningQuest().UpdateCurrentInstanceGlobal(RN_Fafnir_Gold)
 			PlayerRef.Additem(Gold001, _Reward, true)
-			DBM_FoundGoldMessage.Show()
+			DBM_FoundGoldMessage.Show(_Reward)
 		endIf
 		RegisterForSingleUpdateGameTime(RandomInt(12,36))
 	else

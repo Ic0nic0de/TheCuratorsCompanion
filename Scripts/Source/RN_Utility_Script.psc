@@ -31,14 +31,11 @@ ObjectReference Property TCC_Achievements_Xmarker auto
 message property DBM_ScanMuseum_Message auto
 message property DBM_ScanMuseum_Finished_Message auto
 
-message property ModConfigStartup auto
 Message property ModConfigFinished auto
-message property ModConfigFinishedNoPatches auto
 
 message property ModUpdateStartup auto
 Message property ModUpdateFinished auto
 
-message property SetupComplete auto
 message property ModStartup auto
 message property ModStartupDone auto
 message property ModStartup_UpdatingLists auto
@@ -54,7 +51,6 @@ bool bSettingup
 bool bScanning
 bool bScanAll
 bool bMoreHUDListsCreated
-bool bSetupStarted
 Bool bMaintenance
 
 ;;Do Not Fill this property.
@@ -141,16 +137,14 @@ endEvent
 ;;-- Events ---------------------------------------
 
 Event RunSetup()
-
+	
 	if RN_Setup_Finish.GetValue()
 		TCCDebug.Log("Utility - Setup already completed with " + RN_Setup_Finish.GetValue(), 0)	
-		SetupComplete.Show()	
 	else
 		
 		TCCDebug.Log("Utility - Setup Started", 0)
 		DBM_SortWait.setvalue(1)
 		RN_Setup_Start.setvalue(1)
-		bSetupStarted = True	
 		
 		RN_MCM.Build_Arrays()
 		
@@ -164,14 +158,9 @@ Event RunSetup()
 			Wait(2)
 		endWhile
 		
-		ModConfigStartup.Show() 
-		
 		AddPlayerToFormlists()
-		Wait(5)
-		
-;;------------------------------------	
 
-		while bSetupStarted	
+		while RN_Setup_Start.GetValue()	
 			if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
 				CreateMoreHudLists()
 				InitGlobals()
@@ -189,40 +178,21 @@ Event RunSetup()
 				
 				RN_MCM.BuildPatchArray(true, true)
 				
-				UpdateCurrentInstanceGlobal(RN_SupportedModCount)
-				UpdateCurrentInstanceGlobal(RN_CustomModCount)
-				UpdateCurrentInstanceGlobal(RN_SupportedSafehouseCount)
-				
 				SendModEvent("TCCUpdate_Counts")
 				
 				if RN_MCM.Achievements_Enabled
 					SendModEvent("TCCUpdate_Counts_Uniques")
 				endIf
-				
-				Wait(5)
 
 				RN_MCM.Begin_Config_Load()
 				
-				if RN_MCM._UserSettings
-					UserSettingsLoaded.Show()
-				else
-					UserSettingsNone.Show()
-				endIf
-				
-				if RN_SupportedModCount.GetValue() > 0 || RN_SupportedSafehouseCount.GetValue() > 0 || RN_CustomModCount.GetValue() > 0
-					RN_SupportedPatchTotal.SetValue(RN_SupportedModCount.GetValue() as Int + RN_CustomModCount.GetValue() as Int) 
-					UpdateCurrentInstanceGlobal(RN_SupportedPatchTotal)
-					ModConfigFinished.Show()
-				else
-					ModConfigFinishedNoPatches.Show()
-				endIf
+				ModConfigFinished.Show(RN_SupportedModCount.GetValue() as Int + RN_CustomModCount.GetValue() as Int + RN_SupportedSafehouseCount.GetValue() as Int)
 				
 				RN_Setup_Start.setvalue(0)
 				RN_Setup_Finish.setvalue(1)		
 				RN_Setup_Done.setvalue(0)
 				RN_Setup_Registered.setvalue(0)
 				DBM_SortWait.setvalue(0)				
-				bSetupStarted = False
 				RN_MCM.UpdateReq = False		
 			endIf
 		endWhile	
@@ -391,7 +361,6 @@ Event onUpdate()
 	RN_Setup_Start.setvalue(1)	
 
 	DBM_SortWait.setvalue(1)
-	bSetupStarted = True
 	
 	SendModEvent("TCCSetup_Patches")
 	
@@ -405,7 +374,7 @@ Event onUpdate()
 	
 	Wait(5)
 	
-	while bSetupStarted		
+	while RN_Setup_Start.GetValue()		
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() && RN_Safehouse_Done.GetValue() == RN_Safehouse_Registered.GetValue()
 			
 			if RN_MCM.UpdateReq
@@ -415,7 +384,7 @@ Event onUpdate()
 				RN_MCM.BuildPatchArray(true, true)
 				RN_MCM.UpdateReq = False
 			endIf
-			bSetupStarted = False
+			RN_Setup_Start.setvalue(0)
 		endIf
 	endWhile	
 
@@ -493,7 +462,6 @@ Event onUpdate()
 
 	InitGlobals()
 	
-	RN_Setup_Start.setvalue(0)
 	RN_Setup_Finish.setvalue(1)		
 	RN_Setup_Done.setvalue(0)
 	RN_Setup_Registered.setvalue(0)	
@@ -666,12 +634,11 @@ Event SetUpAchievements()
 	
 	DBM_SortWait.setvalue(1)
 	RN_Setup_Start.setvalue(1)
-	bSetupStarted = True
 	Debug.Notification("The Curators Companion: Enabling Achievements System...")
 	SendModEvent("TCCSetup_Uniques")
 	Wait(5)
 	
-	while bSetupStarted	
+	while RN_Setup_Start.GetValue()	
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
 			CreateMoreHudLists()
 			InitGlobals()
@@ -683,7 +650,6 @@ Event SetUpAchievements()
 			RN_Setup_Done.setvalue(0)
 			RN_Setup_Registered.setvalue(0)
 			DBM_SortWait.setvalue(0)				
-			bSetupStarted = False
 			TCC_UniquesSetupFinished.Show()
 		endIf
 	endWhile
@@ -698,7 +664,6 @@ Event UpdatePatches()
 	TCCDebug.Log("Utility - Update Patch(es) request received...", 0)	
 	DBM_SortWait.setvalue(1)
 	RN_Setup_Start.setvalue(1)
-	bSetupStarted = True
 	
 	RN_SupportedModCount.setvalue(0)
 	RN_CustomModCount.setvalue(0)
@@ -712,7 +677,7 @@ Event UpdatePatches()
 	ModUpdateStartup.Show()
 	Wait(5)
 	
-	while bSetupStarted	
+	while RN_Setup_Start.GetValue()	
 		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() 
 			RN_MCM.BuildPatchArray(true, true)
 			RebuildLists()	
@@ -730,7 +695,6 @@ Event UpdatePatches()
 			RN_Setup_Done.setvalue(0)
 			RN_Setup_Registered.setvalue(0)
 			DBM_SortWait.setvalue(0)				
-			bSetupStarted = False	
 		endIf
 	endWhile
 	TCCDebug.Log("Utility - Update Patch(es) request Completed", 0)

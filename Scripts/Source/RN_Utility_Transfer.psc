@@ -18,15 +18,14 @@ formlist property TCC_ItemList_Safehouse auto
 formlist property DBM_ProtectedItems auto
 
 globalvariable property DBM_SortWait auto
-globalvariable Property RN_Transfer_Count auto
 globalvariable property DBM_DisplayCount auto
-globalvariable property TCC_TransferDisplay auto
 
+int _Transfered
 int _OldDisplayCount
 
 Function RunCustomTransfer()
 	
-	RN_Transfer_Count.setvalue(0)
+	_Transfered = 0
 	
 	Int Index = TCC_TokenList.GetSize()
 	Bool Transferable
@@ -48,7 +47,7 @@ Function RunCustomTransfer()
 					
 					if Transferable
 						_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
-						RN_Transfer_Count.Mod(1)
+						_Transfered += 1
 					endIf
 				endIf
 			endWhile
@@ -59,7 +58,7 @@ endFunction
 
 Function RunAllTransfer()
 
-	RN_Transfer_Count.setvalue(0)
+	_Transfered = 0
 
 	Int Index = TCC_TokenList.GetSize()
 	Bool Transferable
@@ -80,7 +79,7 @@ Function RunAllTransfer()
 				
 				if Transferable
 					_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
-					RN_Transfer_Count.Mod(1)
+					_Transfered += 1
 				endIf
 			endIf
 		endWhile
@@ -90,7 +89,7 @@ endFunction
 
 Function RunRelicTransfer()
 
-	RN_Transfer_Count.setvalue(0)
+	_Transfered = 0
 	
 	Int Index = RN_Storage_Container.GetNumItems()
 	While Index
@@ -100,7 +99,7 @@ Function RunRelicTransfer()
 			Bool Transferable = !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
 			if Transferable
 				RN_Storage_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
-				RN_Transfer_Count.Mod(1)
+				_Transfered += 1
 			endIf
 		endIf
 	endWhile
@@ -110,9 +109,8 @@ endFunction
 Function DisplayFunc()
 	
 	TCCDebug.Log("Display - Started Displaying Tranfered Items...")
-	UpdateCurrentInstanceGlobal(RN_Transfer_Count)
 	
-	Int Index = TransferComplete.Show()
+	Int Index = TransferComplete.Show(_Transfered as Int)
 	
 	if Index == 0
 	
@@ -136,11 +134,9 @@ Function DisplayFunc()
 			endIF
 		endWhile
 		
-		TCC_TransferDisplay.SetValue(DBM_DisplayCount.GetValue() as Int - _OldDisplayCount)
+		_Transfered = (DBM_DisplayCount.GetValue() as Int - _OldDisplayCount)
 		
-		UpdateCurrentInstanceGlobal(TCC_TransferDisplay)
-		
-		TransferDisplayDone.Show()
+		TransferDisplayDone.Show(_Transfered as Int)
 	else
 		Return
 	endIf

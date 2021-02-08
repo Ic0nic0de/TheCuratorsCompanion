@@ -63,6 +63,8 @@ globalvariable property _Global_Display_Total auto
 globalvariable property RN_SafeouseContent_Installed auto
 globalvariable property RN_CreationClubContent_Installed auto
 
+objectreference property TCC_Achievements_Xmarker auto
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -89,6 +91,7 @@ Function Register()
 	RegisterForModEvent("TCCSetup_Uniques", "_onSetup")
 	RegisterForModEvent("TCCUpdate_Uniques", "_onPatchUpdate")
 	RegisterForModEvent("TCCUpdate_Counts_Uniques", "_onCountUpdate")
+	RegisterForModEvent("DBM DisplayEvent", "_OnDisplayEventReceived")
 endFunction
 
 ;;-- Events ---------------------------------------	
@@ -217,6 +220,34 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	RN_Scan_Done.Mod(1)	
 	TCCDebug.Log("Official Patch [TCC Unique Items] - Scan Event Completed", 0)
 endEvent	
+
+;;-- Events ---------------------------------------	
+
+Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
+	
+	if !_Global_Mod_Complete.GetValue() && !TCC_Achievements_Xmarker.IsDisabled()
+		ObjectReference Disp = DisplayRef as ObjectReference
+		if _displayList_Merged.HasForm(Disp)
+			if EnableState
+				_displayList_Enabled.AddForm(Disp)
+				_Global_Display_Count.Mod(1)
+			elseif !EnableState
+				if _displayList_Enabled.HasForm(Disp)
+					_displayList_Enabled.RemoveAddedForm(Disp)
+					_Global_Display_Count.Mod(-1)
+				endIf
+			endIf
+		endif
+		
+		if (CheckValueCount1(_Global_Display_Count, _Global_Display_Total, _Global_Mod_Complete) && (MCM.ShowSetCompleteVal)) 
+			if (MCM.ShowSimpleNotificationVal)
+				_modCompleteNotification.Show()
+			else
+				_modCompleteMessage.Show()
+			endif
+		endif
+	endIf
+endEvent
 
 ;;-- Events ---------------------------------------
 

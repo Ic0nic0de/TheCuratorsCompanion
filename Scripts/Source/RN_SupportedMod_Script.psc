@@ -69,6 +69,12 @@ globalvariable property _GlobalTotal auto
 
 String Property _ModName auto
 
+formlist property _NewSectionGlobalComplete auto
+formlist property _NewSectionGlobalCount auto
+formlist property _NewSectionGlobalTotal auto
+formlist property _NewSectionDisplayList auto
+string[] _NewSectionArrayName
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,6 +102,7 @@ Function Register()
 	RegisterForModEvent("TCCUpdate_Patches", "_onPatchUpdate")
 	RegisterForModEvent("TCCUpdate_Counts", "_onCountUpdate")
 	RegisterForModEvent("TCCUpdate_Arrays", "_onArrayUpdate")
+	RegisterForModEvent("DBM DisplayEvent", "_OnDisplayEventReceived")
 endFunction
 
 ;;-- Events ---------------------------------------	
@@ -109,12 +116,17 @@ endEvent
 
 Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 
-	if !DBM
+	if (!DBM)
 		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
 		return
 	endIf
 	
 	MCM.AddModSupport(_GlobalComplete, _GlobalCount, _GlobalTotal, _ModName, RN_SupportedModCount)
+	
+	if (_ModName == "Heavy Armory:") || (_ModName == "Immersive Weapons:")
+		_CreateArray()
+		MCM.AddSectionSupport(_NewSectionGlobalCount, _NewSectionGlobalTotal, _NewSectionGlobalComplete, _ModName, _NewSectionArrayName)
+	endIf
 endEvent
 
 ;;-- Events ---------------------------------------		
@@ -123,7 +135,7 @@ Event _RunSetup()
 	
 	RN_Setup_Registered.Mod(1)
 		
-	if !DBM
+	if (!DBM)
 		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
 		RN_Setup_Done.Mod(1)
 		return
@@ -132,7 +144,7 @@ Event _RunSetup()
 	TCCDebug.Log("Official Patch [" + _ModName  + "] Hooked [" + DBM.GetName()  + "] Support Handler", 0)
 	Utility.Wait(2)
 	
-	if !_setupDone
+	if (!_setupDone)
 
 		TCCDebug.Log("Official Patch [" + _ModName  + "] - Setup Event Received...", 0)
 		
@@ -220,7 +232,7 @@ endEvent
 
 Event _onPatchUpdate(string eventName, string strArg, float numArg, Form sender)
 
-	if !DBM
+	if (!DBM)
 		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
 		return
 	endIf
@@ -234,13 +246,24 @@ endEvent
 
 Event _onCountUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 
-	if !DBM
+	if (!DBM)
 		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
 		return
 	endIf
 	
 	_GlobalTotal.SetValue(_DisplayList.GetSize())	
 	_GlobalCount.SetValue(_EnabledList.GetSize())
+	
+	if (_ModName == "Heavy Armory:") || (_ModName == "Immersive Weapons:") 
+		Int Index = 0
+		Int _List = _NewSectionDisplayList.GetSize()		
+		While Index < _List
+			FormList List = _NewSectionDisplayList.GetAt(Index) as Formlist
+			GlobalVariable Variable = _NewSectionGlobalTotal.GetAt(Index) as GlobalVariable
+			Variable.SetValue(List.GetSize())
+			Index += 1
+		endWhile
+	endif
 endEvent
 
 ;;-- Events ---------------------------------------
@@ -249,7 +272,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	
 	RN_Scan_Registered.Mod(1)
 
-	if !DBM
+	if (!DBM)
 		TCCDebug.Log("Fatal Error, DBM PATCH NOT SET ON QUEST " + GetOwningQuest().GetName() + " ABORTING SETUP...", 0)
 		RN_Scan_Done.Mod(1)
 		return
@@ -257,7 +280,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	
 	TCCDebug.Log("Official Patch [" + _ModName  + "] - Scan Event Received...", 0)
 	
-	if !_GlobalComplete.GetValue()
+	if (!_GlobalComplete.GetValue())
 		Int Index = DBM.NewSectionDisplayRefLists.length
 		While Index
 			Index -= 1
@@ -277,6 +300,34 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	
 	TCCDebug.Log("Official Patch [" + _ModName  + "] - Scan Event Completed", 0)
 endEvent	
+
+;;-- Events ---------------------------------------	
+
+Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
+	
+	if (!_GlobalComplete.GetValue())
+		ObjectReference Disp = DisplayRef as ObjectReference
+		if (_DisplayList.HasForm(Disp))
+			if (EnableState)
+				_EnabledList.AddForm(Disp)
+				_GlobalCount.Mod(1)
+			elseif (!EnableState)
+				if (_EnabledList.HasForm(Disp))
+					_EnabledList.RemoveAddedForm(Disp)
+					_GlobalCount.Mod(-1)
+				endIf
+			endIf
+		endif
+		
+		if (CheckValueCount1(_GlobalCount, _GlobalTotal, _GlobalComplete) && (MCM.ShowSetCompleteVal)) 
+			if (MCM.ShowSimpleNotificationVal)
+				_CompleteNotification.Show()
+			else
+				_CompleteMessage.Show()
+			endif
+		endif
+	endIf
+endEvent
 
 ;;-- Events ---------------------------------------
 
@@ -325,4 +376,53 @@ Formlist Function _getDisplayRoom(String _RoomName)
 	endif
 	
 	Return TCC_DisplayList_None
+endFunction
+
+;;-- Events ---------------------------------------	
+
+Function _CreateArray()
+
+	if (_ModName == "Heavy Armory:")
+	
+		_NewSectionArrayName = new string[19]
+		_NewSectionArrayName[0] = "Ancient Nord Set:"
+		_NewSectionArrayName[1] = "Blades Set:"
+		_NewSectionArrayName[2] = "Daedric Set:"
+		_NewSectionArrayName[3] = "Dawnguard Set:"
+		_NewSectionArrayName[4] = "Dragon Set:"
+		_NewSectionArrayName[5] = "Dwarven Set:"
+		_NewSectionArrayName[6] = "Ebony Set:"
+		_NewSectionArrayName[7] = "Elven Set:"
+		_NewSectionArrayName[8] = "Falmer Set:"
+		_NewSectionArrayName[9] = "Forsworn Set:"
+		_NewSectionArrayName[10] = "Glass Set:"
+		_NewSectionArrayName[11] = "Imperial Set:"
+		_NewSectionArrayName[12] = "Iron Set:"
+		_NewSectionArrayName[13] = "Nord Hero Set:"
+		_NewSectionArrayName[14] = "Nordic Set:"
+		_NewSectionArrayName[15] = "Orcish Set:"
+		_NewSectionArrayName[16] = "Silver Set:"
+		_NewSectionArrayName[17] = "Stalhrim Set:"
+		_NewSectionArrayName[18] = "Steel Set:"
+		
+	elseif (_ModName == "Immersive Weapons:")
+	
+		_NewSectionArrayName = new string[16]
+		_NewSectionArrayName[0] = "Ancient Nord Set:"
+		_NewSectionArrayName[1] = "Blades Set:"
+		_NewSectionArrayName[2] = "Daedric Set:"
+		_NewSectionArrayName[3] = "Dawnguard Set:"
+		_NewSectionArrayName[4] = "Dragon Set:"
+		_NewSectionArrayName[5] = "Dwarven Set:"
+		_NewSectionArrayName[6] = "Ebony Set:"
+		_NewSectionArrayName[7] = "Elven Set:"
+		_NewSectionArrayName[8] = "Falmer Set:"
+		_NewSectionArrayName[9] = "Glass Set:"
+		_NewSectionArrayName[10] = "Iron Set:"
+		_NewSectionArrayName[11] = "Orcish Set:"
+		_NewSectionArrayName[12] = "Steel Set:"
+		_NewSectionArrayName[13] = "Wolf Set:"
+		_NewSectionArrayName[14] = "Daedric Gallery Set:"
+		_NewSectionArrayName[15] = "Hall Of Heroes Set:"
+	endIf
 endFunction

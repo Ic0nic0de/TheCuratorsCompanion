@@ -254,6 +254,34 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + ":" + "] - Scan Event Completed", 0)
 endEvent	
 
+;;-- Events ---------------------------------------	
+
+Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
+	
+	if !_GlobalComplete.GetValue()
+		ObjectReference Disp = DisplayRef as ObjectReference
+		if _DisplayList.HasForm(Disp)
+			if EnableState
+				_EnabledList.AddForm(Disp)
+				_GlobalCount.Mod(1)
+			elseif !EnableState
+				if _EnabledList.HasForm(Disp)
+					_EnabledList.RemoveAddedForm(Disp)
+					_GlobalCount.Mod(-1)
+				endIf
+			endIf
+		endif
+		
+		if (CheckValueCount1(_GlobalCount, _GlobalTotal, _GlobalComplete) && (MCM.ShowSetCompleteVal)) 
+			if (MCM.ShowSimpleNotificationVal)
+				_CompleteNotification.Show()
+			else
+				_CompleteMessage.Show()
+			endif
+		endif
+	endIf
+endEvent
+
 ;;-- Events ---------------------------------------
 
 Formlist Function _getDisplayRoom(String _RoomName)

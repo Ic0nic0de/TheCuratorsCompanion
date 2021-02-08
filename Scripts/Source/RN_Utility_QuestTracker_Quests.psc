@@ -178,7 +178,7 @@ Event _Build_Quests()
 	elseIf MCM._MCM_Page == Array.page[6] ;---------------COMPLETE (25) - Helgen Reborn
 
 		Int _Index = 0
-		Int _length = 6
+		Int _length = 7
 		While _Index < _length
 		
 			if !Array.Helgen_Radiant[_Index]	
