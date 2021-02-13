@@ -9,7 +9,6 @@ Quest Property FCQuest02 Auto
 Actor Property FCMetellus Auto
 
 GlobalVariable Property RN_Quest_Listener_Count Auto
-
 Bool FirstRun = True
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

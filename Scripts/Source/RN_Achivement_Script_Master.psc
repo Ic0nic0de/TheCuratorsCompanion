@@ -79,7 +79,7 @@ endEvent
 
 Event Attribute(Int _Value)
 
-	if _Value == 0
+	if _Value == 4
 		Int _RandomAtt = Utility.RandomInt(1,3)
 		PushAttr(_RandomAtt)
 	else

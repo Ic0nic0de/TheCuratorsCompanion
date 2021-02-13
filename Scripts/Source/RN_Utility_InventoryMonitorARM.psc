@@ -63,13 +63,15 @@ endEvent
 Event onItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
 
 	if dbmFound.HasForm(akBaseItem)	
-		if !akDestContainer || (!_MuseumContainerList_WP.HasForm(akDestContainer) && !TCC_TokenList.HasForm(akDestContainer))
+		if !akDestContainer || (!_MuseumContainerList_WP.HasForm(akDestContainer) && TokenList.find(akDestContainer) == -1)
 
 			Bool bDuplicate
-			Int Index = TCC_TokenList.GetSize()
+			Int Index = TokenList.length
 			while Index > 0 && !bDuplicate
 				Index -=1
-				bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
+				if TokenList[Index] != none
+					bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
+				endif
 			endWhile
 			
 			if !bDuplicate && !dbmDisp.HasForm(akBaseItem)
@@ -78,7 +80,7 @@ Event onItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
 			endIf
 		endIf
 	endIf
-endEvent		
+endEvent	
 	
 ;-- Events --------------------------------
 

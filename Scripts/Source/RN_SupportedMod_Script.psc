@@ -36,6 +36,8 @@ globalvariable property RN_SupportedModCount auto
 globalvariable property RN_CreationClubContent_Installed auto
 globalvariable property RN_SafeouseContent_Installed auto
 
+ObjectReference property FCEndingDestroyed auto
+
 formlist property TCC_DisplayList_None auto
 formlist property TCC_DisplayList_Armory auto
 formlist property TCC_DisplayList_DaedricGallery auto
@@ -307,7 +309,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 	
 	if (!_GlobalComplete.GetValue())
 		ObjectReference Disp = DisplayRef as ObjectReference
-		if (_DisplayList.HasForm(Disp))
+		if (_DisplayList.HasForm(Disp)) || FCEndingDestroyed && Disp == FCEndingDestroyed
 			if (EnableState)
 				_EnabledList.AddForm(Disp)
 				_GlobalCount.Mod(1)

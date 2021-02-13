@@ -35,8 +35,6 @@ bool property UpdateReq Auto
 bool Token_Vis
 bool Safehouse_Enabled 
 bool Ach_Highlight
-bool property RUI auto hidden
-bool property TOV auto hidden
 bool Property Achievements_Enabled auto hidden
 bool Property Ach_Perks auto hidden
 
@@ -101,6 +99,7 @@ bool property Ach_Visual = true auto hidden
 
 ;Relic Storage
 Book Property RN_RSC_SpellTome auto
+Book Property RN_TransferContainer_SpellTome auto
 Spell Property RN_Storage_Summon_Spell auto
 Leveleditem Property LItemSpellTomes00AllSpells auto
 
@@ -252,6 +251,7 @@ Event OnConfigInit()
 	Build_Arrays()
 	AddDynamicPagesList()
 	LItemSpellTomes00AllSpells.AddForm(RN_RSC_SpellTome, 1 , 1)
+	LItemSpellTomes00AllSpells.AddForm(RN_TransferContainer_SpellTome, 1 , 1)
 EndEvent
 
 ;-- Events --------------------------------
@@ -895,11 +895,6 @@ Event AddDebugPage()
 		AddTextOption("moreHUD Displayed count:", dbmDisp.GetSize() As Int, 0)
 		AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 0)
 		AddEmptyOption()
-		
-		AddHeaderOption("Dev Handlers:")
-		AddTextOption("These options can and will break your game.", "", 1)
-		AddToggleOptionST("RUI_Handler", "RUI = (" + Utility.RandomInt(0,249) + "/" + Utility.RandomInt(250,500) + ")" , RUI)
-		AddToggleOptionST("TOV_Handler", "TOV = (" + Utility.RandomInt(0,249) + "/" + Utility.RandomInt(250,500) + ")" , TOV)
 		SetCursorPosition(1)
 		
 		AddHeaderOption("Mod Requirements:")
@@ -1520,20 +1515,6 @@ endFunction
 ;;----------------------------------------------------------------------------- Debug Options -------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-state RUI_Handler ;;Debug Options
-	Event OnSelectST()
-		RUI = !RUI
-		SetToggleOptionValueST(RUI)	
-	EndEvent
-endState
-
-state TOV_Handler ;;Debug Options
-	Event OnSelectST()
-		TOV = !TOV
-		SetToggleOptionValueST(TOV)	
-	EndEvent
-endState
-
 ;;-------------------------------
 
 state Scan_Debug
@@ -1980,7 +1961,7 @@ state Transfer_Weapon
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Automatically transfer displayable weapons to the Relic Storage Container when picked up.\n Default: Disabled")
+		self.SetInfoText("Automatically store displayable weapons in the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2000,7 +1981,7 @@ state Transfer_Armor
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Automatically transfer displayable armor to the Relic Storage Container when picked up.\n Default: Disabled")
+		self.SetInfoText("Automatically store displayable armor in the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2020,7 +2001,7 @@ state Transfer_Book
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Automatically transfer displayable books to the Relic Storage Container when picked up.\n Default: Disabled")
+		self.SetInfoText("Automatically store displayable books in the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2040,7 +2021,7 @@ state Transfer_Key
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Automatically transfer displayable keys to the Relic Storage Container when picked up.\n Default: Disabled")
+		self.SetInfoText("Automatically store displayable keys in the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2060,7 +2041,7 @@ state Transfer_Gems
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Automatically transfer displayable gems and soul gems to the Relic Storage Container when picked up.\n Default: Disabled")
+		self.SetInfoText("Automatically store displayable gems and soul gems in the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2080,7 +2061,7 @@ state Transfer_Misc
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Automatically transfer displayable Misc Items to the Relic Storage Container when picked up.\n Default: Disabled")
+		self.SetInfoText("Automatically store displayable Misc Items in the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2100,7 +2081,7 @@ state Transfer_Potion
 
 	Event OnHighlightST()
 
-		self.SetInfoText("Automatically transfer displayable Potions & Poisons to the Relic Storage Container when picked up.\n Default: Disabled")
+		self.SetInfoText("Automatically store displayable Potions & Poisons in the Relic Storage Container when picked up.\n Default: Disabled")
 	EndEvent
 endState
 

@@ -57,25 +57,27 @@ Event onItemAdded(Form akBaseItem, Int aiItemCount, ObjectReference akItemRefere
 endEvent
 
 ;-- Events --------------------------------
-		
+
 Event onItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
 
 	if dbmFound.HasForm(akBaseItem)	
-		if !akDestContainer || (!_SafehouseContainerList_WP.HasForm(akDestContainer) && !TCC_TokenList.HasForm(akDestContainer))
+		if !akDestContainer || (!_SafehouseContainerList_WP.HasForm(akDestContainer) && TokenList.find(akDestContainer) == -1)
 
 			Bool bDuplicate
-			Int Index = TCC_TokenList.GetSize()
+			Int Index = TokenList.length
 			while Index > 0 && !bDuplicate
-				Index -= 1
-				bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
+				Index -=1
+				if TokenList[Index] != none
+					bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
+				endif
 			endWhile
 			
 			if !bDuplicate && !dbmDisp.HasForm(akBaseItem)
 				dbmNew.AddForm(akBaseItem)
 				dbmFound.RemoveAddedForm(akBaseItem)
 			endIf
-		endIf	
-	endIF
+		endIf
+	endIf
 endEvent
 
 ;-- Events --------------------------------

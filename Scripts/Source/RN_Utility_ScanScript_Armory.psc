@@ -44,7 +44,7 @@ endEvent
 
 ;;-- Events ---------------------------------------		
 
-Event Register()
+Event onPlayerLoadGame()
 	
 	RegisterForModEvent("TCCScan", "_onScan")
 	RegisterForModEvent("DBM DisplayEvent", "_OnDisplayEventReceived")

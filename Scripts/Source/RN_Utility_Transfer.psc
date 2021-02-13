@@ -1,8 +1,15 @@
 Scriptname RN_Utility_Transfer extends Quest  
 
+;;Alias to force the base item into.
+referencealias property FoundAlias auto
+message property TCC_TransferContainer auto
+message property TCC_TransferComplete auto
+message property TCC_RetrievalComplete auto
+
 message property TransferComplete auto
 message property TransferDisplayWait auto
 message property TransferDisplayDone auto
+message property DBM_SortError auto
 
 objectreference property RN_Storage_Container auto
 objectreference property RN_Excluded_Act auto
@@ -21,6 +28,7 @@ globalvariable property DBM_SortWait auto
 globalvariable property DBM_DisplayCount auto
 
 int _Transfered
+int _PlayerTransfered
 int _OldDisplayCount
 
 Function RunCustomTransfer()
@@ -142,5 +150,59 @@ Function DisplayFunc()
 	endIf
 	
 	TCCDebug.Log("Display - Finished Displaying Tranfered Items")
+endFunction
+
+Function TransferRelics(ObjectReference ref)
+	
+	_PlayerTransfered = 0
+	
+	if (ref) && (ref.GetBaseObject().GetType() == 28)
+		if !DBM_SortWait.GetValue()
+			FoundAlias.ForceRefTo(ref)
+			Int _MenuButton = TCC_TransferContainer.Show()
+			if _MenuButton == 0	
+				DBM_SortWait.SetValue(1)
+				SendModEvent("_StartTimer", "Transfering Items")
+				Int _Index = PlayerRef.GetNumItems()
+				while _Index
+					_Index -= 1		
+					Form _ItemRelic = PlayerRef.GetNthForm(_Index)
+					if dbmMaster.HasForm(_ItemRelic) && !TCC_ItemList_Safehouse.HasForm(_ItemRelic)
+						Bool Transferable = !Game.GetPlayer().IsEquipped(_ItemRelic) && !Game.IsObjectFavorited(_ItemRelic) && !RN_ExcludedItems_Generic.HasForm(_ItemRelic) && !DBM_ProtectedItems.HasForm(_ItemRelic)
+						if Transferable
+							PlayerRef.RemoveItem(_ItemRelic, PlayerRef.GetItemCount(_ItemRelic), true, ref)
+							_PlayerTransfered += 1
+						endIf
+					endIf
+				endWhile
+				DBM_SortWait.SetValue(0)
+				TCC_TransferComplete.show(_PlayerTransfered)
+				
+			elseif _MenuButton == 1
+				DBM_SortWait.SetValue(1)
+				SendModEvent("_StartTimer", "Retrieving Items")
+				Int _Index = ref.GetNumItems()
+				while _Index
+					_Index -= 1		
+					Form _ItemRelic = ref.GetNthForm(_Index)
+					if dbmMaster.HasForm(_ItemRelic) && !TCC_ItemList_Safehouse.HasForm(_ItemRelic)
+						ref.RemoveItem(_ItemRelic, ref.GetItemCount(_ItemRelic), true, PlayerRef)
+						_PlayerTransfered += 1
+					endIf
+				endWhile
+				DBM_SortWait.SetValue(0)
+				TCC_RetrievalComplete.show(_PlayerTransfered)
+			elseif _MenuButton == 2
+				FoundAlias.Clear()
+				return
+			endif
+			
+			FoundAlias.Clear()
+		else
+			DBM_SortError.Show()
+		endIf
+	else
+		Debug.Notification("This spell can only be used on containers")
+	endif
 endFunction
 

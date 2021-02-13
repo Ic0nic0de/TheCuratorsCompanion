@@ -31,11 +31,7 @@ endFunction
 function OptionsMenu()
 	OPButton = DBM_RN_SetCheck_Message.show()
 	if OPButton == 0
-		if RN_MCM.autoScanVal
-			Debug.MessageBox("Please disable automatic scanning in the MCM")
-		else
-			RN_Utility.ScanMuseum()
-		endIf	
+		RN_Utility.ScanMuseum()
 	elseif OPButton == 1
 		Transfer()
 	elseif OPButton == 2
@@ -48,33 +44,19 @@ endFunction
 function Transfer()
 	
 	TRButton = DBM_RN_TransferRelics_Message.Show()
-	
 	if TRButton == 0
-
 		if RN_MCM.PrepTransfer == 0
-		
 			DBM_CuratorsCompanion_TransferUtil.SetStage(10)
-		
 		elseif RN_MCM.PrepTransfer == 1
-			
 			DBM_CuratorsCompanion_TransferUtil.SetStage(20)
-		
 		elseif RN_MCM.PrepTransfer == 2
-	
 			DBM_CuratorsCompanion_TransferUtil.SetStage(30)
-		
 		endIf
-		
 	elseif TRButton == 1
-		
 		RN_Excluded_Act.Activate(Game.GetPlayer())
-
 	elseif TRButton == 2
-	
 		OptionsMenu()
-		
 	endIf
-	
 endFunction
 
 

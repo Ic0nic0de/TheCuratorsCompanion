@@ -1,7 +1,5 @@
 ScriptName RN_Utility_Token extends ObjectReference
 
-RN_Utility_MCM property RN_MCM auto
-
 message property TCC_TokenRemoval auto
 message property TCC_TokenAdded auto
 message property TCC_TokenUpdated auto
@@ -51,7 +49,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 			
 				Actor _o = akNewContainer as Actor
 				
-				if _o.IsInFaction(JobMerchantFaction) && !RN_MCM.TOV
+				if _o.IsInFaction(JobMerchantFaction)
 				
 					FoundAlias.ForceRefTo(_o)
 					
