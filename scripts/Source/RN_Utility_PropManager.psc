@@ -1,5 +1,7 @@
 scriptname RN_Utility_PropManager extends quest 
 
+bool property UpdateReq auto hidden
+
 globalvariable property TCC_RoomEditCount_None auto
 globalvariable property TCC_RoomEditCount_Armory auto
 globalvariable property TCC_RoomEditCount_DaedricGallery auto

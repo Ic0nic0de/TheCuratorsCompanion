@@ -1,6 +1,7 @@
 ScriptName RN_Utility_Setup_SHP extends Quest
 
 RN_Utility_MCM property MCM auto
+RN_Utility_PropManager property Util auto
 
 Import RN_Utility_Global
 
@@ -58,7 +59,10 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 	RN_Safehouse_Registered.Mod(1)
 	
 	if !_setupDone
-		if !MCM.advdebug
+	
+		Util.UpdateReq = True
+		
+		if MCM.advdebug
 			TCCDebug.Log("Setup Event Received for: Safehouse Plus")
 		endif
 
@@ -88,7 +92,6 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 		RN_Safehouse_Done.Mod(1)
 		_setupDone = True
 		
-		MCM.UpdateReq = True
 		if MCM.advdebug
 			TCCDebug.Log("Setup Event Completed for: Safehouse Plus")
 		endif

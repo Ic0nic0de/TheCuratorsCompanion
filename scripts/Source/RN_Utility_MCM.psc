@@ -23,8 +23,7 @@ RN_Main_SupportedMods property _AddItemPatches auto
 string[] PagesList
 string Status_Return
 
-bool property advdebug auto
-bool property UpdateReq auto
+bool property advdebug auto hidden
 bool Token_Vis conditional
 
 bool property Safehouse_Enabled auto hidden
@@ -48,13 +47,8 @@ globalvariable property RN_Safehouse_Registered auto
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 
-
 ;; Player Ref for Game.GetPlayer()
 objectreference property PlayerRef auto
-
-;; Treasury Value
-quest property DBM_Excavation02 auto
-quest property DBM_DHQuest auto
 
 ;; moreHUD
 formlist property dbmNew auto
@@ -98,12 +92,7 @@ bool property Ach_Visual = true auto hidden
 globalvariable property AchHealth auto
 globalvariable property AchStamina auto
 globalvariable property AchMagicka auto
-
-;Relic Storage
-Book Property RN_RSC_SpellTome auto
-Book Property RN_TransferContainer_SpellTome auto
-Spell Property RN_Storage_Summon_Spell auto
-Leveleditem Property LItemSpellTomes00AllSpells auto
+globalvariable property AchSpeech auto
 
 ;; Globals for Complete Set Listings.
 
@@ -238,8 +227,6 @@ Event OnConfigInit()
 
 	Build_Arrays()
 	AddDynamicPagesList()
-	LItemSpellTomes00AllSpells.AddForm(RN_RSC_SpellTome, 1 , 1)
-	LItemSpellTomes00AllSpells.AddForm(RN_TransferContainer_SpellTome, 1 , 1)
 EndEvent
 
 ;-- Events --------------------------------
@@ -637,8 +624,8 @@ Function AddMuseumSetsPage()
 		AddHeaderOption("Player Wealth:")
 		AddTextOption("Museum Displays Value:", RN_MuseumValue.GetValue() as Int, 0)
 		AddTextOption("Safehouse Treasury Value:", RN_Treasury_Count.GetValue() as Int, 0)
-		AddTextOption("Deepholme Treasury Value:", GetDefaultTreasury(DBM_DHQuest, RN_Treasury_Count2), 0)
-		AddTextOption("Karagas' Tower Treasury Value:", GetDefaultTreasury(DBM_Excavation02, RN_Treasury_Count3), 0)
+		AddTextOption("Deepholme Treasury Value:", RN_Treasury_Count2.GetValue() as Int, 0)
+		AddTextOption("Karagas' Tower Treasury Value:", RN_Treasury_Count3.GetValue() as Int, 0)
 	
 		SetCursorPosition(1)
 		AddHeaderOption("Page Information:")
@@ -983,7 +970,7 @@ Function AddDebugPage()
 		AddTextOptionST("Update_Patches", "Update Installed Patches", "", 0)
 		AddTextOptionST("Scan_Debug", "Reset Museum Scanner", "", 0)
 		AddtextOptionST("Startup_Debug", "Reset Startup Tasks", "", 0)
-		AddtoggleOptionST("AdvancedDebugging", "Disable Debugging", advdebug)
+		AddtoggleOptionST("AdvancedDebugging", "Enable Debugging", advdebug)
 		AddEmptyOption()
 		AddHeaderOption("moreHUD Debug:")
 		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
@@ -1179,8 +1166,6 @@ Function Begin_Config_Save()
 	fiss.saveBool("Achievement Perks", Ach_Perks)
 	fiss.saveInt("Achievement Attribute", IndexAttribute)	
 	
-	fiss.saveBool("advdebug", advdebug)
-	
 	string saveResult = fiss.endSave()
 		if (saveResult != "")
 			ShowMessage("Fiss Save Error - Please check the log", false, "Ok")
@@ -1325,8 +1310,6 @@ FISSInterface fiss = FISSFactory.getFISS()
 	Ach_Perks = fiss.loadBool("Achievement Perks")
 	IndexAttribute = fiss.loadInt("Achievement Attribute")
 	
-	advdebug = fiss.loadBool("advdebug")
-	
 	string loadResult = fiss.endLoad()
 		if (loadResult != "")
 			if IsInMenuMode()
@@ -1423,8 +1406,6 @@ Function Begin_Config_Default()
 	Ach_Perks = False
 	IndexAttribute = 0
 	
-	advdebug = False
-	
 	if IsInMenuMode()
 		ForcePageReset()
 	endif
@@ -1474,8 +1455,6 @@ Function Begin_Config_Author()
 	Ach_Highlight = True
 	Ach_Perks = True
 	IndexAttribute = 4
-	
-	advdebug = False
 	
 	if IsInMenuMode()
 		ForcePageReset()
@@ -1566,14 +1545,26 @@ endState
 
 state AdvancedDebugging
 
-	Event OnSelectST()
+	Event OnSelectST()		
 		advdebug = !advdebug
+		
+		if advdebug
+			if ShowMessage("This will enable debugging which can be used to diagnose issues with the Mod, would you like to enable debugging now?", true, "Enable", "Cancel")
+				TCCDebug.EnableLogging()
+			else
+				advdebug = false
+			endif
+		else
+			TCCDebug.DisableLogging()
+		endIf
+		
+		
 		SetToggleOptionValueST(advdebug)
 	EndEvent
 
 	Event OnHighlightST()
 
-		SetInfoText("Disables logging of all non critical debug messages")
+		SetInfoText("Enables TCC debug logging to Documents > My Games > Skyrim Special Edition > Logs > Script > User > TheCuratorsCompanion.log")
 	EndEvent
 endState
 
@@ -2106,7 +2097,7 @@ state AttributeListOptions
 	endEvent
 
 	event OnHighlightST()
-		SetInfoText("Use this menu to customize which attribute is increased when an achievement is awarded.\n" + "\n" + "Total Increases from achievement rewards - Health: (" + AchHealth.GetValue() as Int + ")   Stamina: (" + AchStamina.GetValue() as Int + ")   Magicka: (" + AchMagicka.GetValue() as Int + ")")  
+		SetInfoText("Use this menu to customize which attribute is increased when an achievement is awarded.\n" + "\n" + "Total Increases from achievement rewards - Health: (" + AchHealth.GetValue() as Int + ")   Stamina: (" + AchStamina.GetValue() as Int + ")   Magicka: (" + AchMagicka.GetValue() as Int + ")   Speechcraft: (" + AchSpeech.GetValue() as Int +")")  
 	endEvent
 endState
 
@@ -2235,17 +2226,6 @@ endFunction
 
 ;;-------------------------------
 
-String function GetDefaultTreasury(quest akQuest, globalvariable akVariable)
-
-	if akQuest.IsCompleted()
-		return akVariable.GetValue() As Int
-	endif
-
-	return "Locked" 
-endFunction
-
-;;-------------------------------
-
 State GetMuseumValue
 
 	Event OnHighlightST()
@@ -2257,18 +2237,7 @@ endState
 
 Int function GetTotalTreasuryValue(GlobalVariable akMuseumVal, GlobalVariable akvariable1, GlobalVariable akvariable2, GlobalVariable akvariable3)
 
-	Int Value = 0
-	Value += (akMuseumVal.GetValue() as Int)
-	Value += (akvariable1.GetValue() As Int)
-		if DBM_DHQuest.IsCompleted()
-			Value += (akvariable2.GetValue() As Int)
-		endif
-		
-		if DBM_Excavation02.IsCompleted()
-			Value += (akvariable3.GetValue() As Int)	
-		endif
-		
-	return Value
+	return ((akMuseumVal.GetValue() as Int) + (akvariable1.GetValue() as Int) + (akvariable2.GetValue() as Int) + (akvariable3.GetValue() as Int))
 endFunction
 	
 ;;-------------------------------
@@ -2770,7 +2739,7 @@ Function AddModSupport(GlobalVariable _GVComplete, GlobalVariable _GVCount, Glob
 		akTotal.Mod(1)
 	endif
 	
-	if !advdebug
+	if advdebug
 		TCCDebug.Log("MCM Registered Official Patch [" + _ModName + "] at position " + Index, 0)
 	endif
 endFunction
@@ -2797,7 +2766,7 @@ Function AddCustomModSupport(GlobalVariable _GVComplete, GlobalVariable _GVCount
 		akTotal.Mod(1)
 	endif
 	
-	if !advdebug
+	if advdebug
 		TCCDebug.Log("MCM Registered Custom Patch [" + _ModName + "] at position " + Index, 0)
 	endif
 endFunction
@@ -2818,7 +2787,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
 			RN_Section_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
-			if !advdebug
+			if advdebug
 				TCCDebug.Log("MCM Registered Heavy Armory Section [" + _SectionName[Index] + "] at position " + Index, 0)
 			endif
 		endWhile
@@ -2836,7 +2805,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section2_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
 			RN_Section2_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section2_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
-			if !advdebug
+			if advdebug
 				TCCDebug.Log("MCM Registered Immersive Weapons Section [" + _SectionName[Index] + "] at position " + Index, 0)
 			endif
 		endWhile
@@ -2851,7 +2820,7 @@ endFunction
 Function BuildPatchArray(bool _create, bool _Rebuild)
 	
 	if _create
-		if !advdebug
+		if advdebug
 			TCCDebug.Log("MCM - Building Patch Array", 0)
 		endif
 		
@@ -2884,7 +2853,7 @@ Function BuildPatchArray(bool _create, bool _Rebuild)
 	
 	if _Rebuild
 		
-		if !advdebug
+		if advdebug
 			TCCDebug.Log("MCM - Sending Patch Array Event", 0)
 		endif
 		

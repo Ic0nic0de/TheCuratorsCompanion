@@ -59,7 +59,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 			
 			if EnableState
 				TCC_EnabledList_DibellaStatues.AddForm(Disp)
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Dibella Statues - Updated display " + Disp.GetName() + Disp, 0)
 				endif
 				RN_Museum_Dibella_Statues_Count.Mod(1)
@@ -67,7 +67,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 			elseif !EnableState
 				if TCC_EnabledList_DibellaStatues.HasForm(Disp)
 					TCC_EnabledList_DibellaStatues.RemoveAddedForm(Disp)
-					if !MCM.advdebug
+					if MCM.advdebug
 						TCCDebug.Log("Dibella Statues - Removed display " + Disp.GetName() + Disp, 0)
 					endif
 					RN_Museum_Dibella_Statues_Count.Mod(-1)
@@ -89,7 +89,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 			
 			if EnableState
 				TCC_EnabledList_Paintings.AddForm(Disp)
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Museum Painting - Updated display " + Disp.GetBaseObject().GetName(), 0)
 				endif
 				RN_Museum_Paintings_Count.Mod(1)
@@ -97,7 +97,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 			elseif !EnableState
 				if TCC_EnabledList_Paintings.HasForm(Disp)
 					TCC_EnabledList_Paintings.RemoveAddedForm(Disp)
-					if !MCM.advdebug
+					if MCM.advdebug
 						TCCDebug.Log("Museum Painting - Removed display " + Disp.GetBaseObject().GetName(), 0)
 					endif
 					RN_Museum_Paintings_Count.Mod(-1)
@@ -122,7 +122,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
 	
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Scan Event Received for: Misc Displays")
 	endif
 
@@ -155,7 +155,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	endIf
 	
 	RN_Scan_Done.Mod(1)
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Scan Event Completed for: Misc Displays")
 	endif
 endEvent

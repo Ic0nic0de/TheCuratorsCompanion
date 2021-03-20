@@ -98,7 +98,7 @@ Function _RunSetup()
 	
 	if !_setupDone
 		
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Official Patch [TCC Unique Items] - Setup Event Received...", 0)
 		endif
 		
@@ -134,13 +134,13 @@ Function _RunSetup()
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
 		
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Official Patch [TCC Unique Items] - Setup Event Completed", 0)
 		endif
 	else
 		
 		RN_Setup_Done.Mod(1)
-		if !MCM.advdebug		
+		if MCM.advdebug		
 			TCCDebug.Log("Official Patch [TCC Unique Items] - Setup Event Already Completed", 0)
 		endif
 	endIf
@@ -190,7 +190,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 			return
 		endIf
 		
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Scan Event Received for: TCC Unique Items", 0)
 		endif
 		
@@ -211,7 +211,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 		endIf
 		
 		RN_Scan_Done.Mod(1)	
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Scan Event Completed for: TCC Unique Items", 0)
 		endif
 	endif
@@ -226,14 +226,14 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 		if _displayList_Merged.HasForm(Disp)
 			if EnableState
 				_displayList_Enabled.AddForm(Disp)
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Official Patch [TCC Unique Items] - Updated display " + Disp.GetBaseObject().GetName(), 0)
 				endif
 				_Global_Display_Count.Mod(1)
 			elseif !EnableState
 				if _displayList_Enabled.HasForm(Disp)
 					_displayList_Enabled.RemoveAddedForm(Disp)
-					if !MCM.advdebug
+					if MCM.advdebug
 						TCCDebug.Log("Official Patch [TCC Unique Items] - Removed display " + Disp.GetBaseObject().GetName(), 0)
 					endif
 					_Global_Display_Count.Mod(-1)

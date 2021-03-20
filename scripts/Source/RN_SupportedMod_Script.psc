@@ -125,7 +125,10 @@ Function _RunSetup()
 	endIf
 	
 	if (!_setupDone)
-		if !MCM.advdebug
+	
+		Util.UpdateReq = True
+		
+		if MCM.advdebug
 			TCCDebug.Log("Official Patch [" + _ModName  + "] - Setup Event Received...", 0)
 		endif
 		
@@ -200,13 +203,13 @@ Function _RunSetup()
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
 		
-		MCM.UpdateReq = True
-		if !MCM.advdebug
+		
+		if MCM.advdebug
 			TCCDebug.Log("Official Patch [" + _ModName  + "] - Setup Event Completed", 0)
 		endif
 	else
 		RN_Setup_Done.Mod(1)
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Official Patch [" + _ModName  + "] - Setup Event Already Completed", 0)
 		endif
 	endIf
@@ -263,7 +266,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 		return
 	endIf
 	
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Official Patch [" + _ModName  + "] - Scan Event Received...", 0)
 	endif
 	
@@ -285,7 +288,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	
 	RN_Scan_Done.Mod(1)
 	
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Official Patch [" + _ModName  + "] - Scan Event Completed", 0)
 	endif
 endEvent	
@@ -299,14 +302,14 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 		if (_DisplayList.HasForm(Disp))
 			if (EnableState)
 				_EnabledList.AddForm(Disp)
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Official Patch [" + _ModName  + "] - Updated display " + Disp.GetName() + Disp, 0)
 				endif
 				_GlobalCount.Mod(1)
 			elseif (!EnableState)
 				if (_EnabledList.HasForm(Disp))
 					_EnabledList.RemoveAddedForm(Disp)
-					if !MCM.advdebug
+					if MCM.advdebug
 						TCCDebug.Log("Official Patch [" + _ModName  + "] - Removed display " + Disp.GetName() + Disp, 0)
 					endif
 					_GlobalCount.Mod(-1)

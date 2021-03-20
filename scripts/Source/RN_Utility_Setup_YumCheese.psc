@@ -1,6 +1,7 @@
 ScriptName RN_Utility_Setup_YumCheese extends Quest
 
 RN_Utility_MCM property MCM auto
+RN_Utility_PropManager property Util auto
 
 Import RN_Utility_Global
 
@@ -58,8 +59,10 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 	RN_Safehouse_Registered.Mod(1)
 	
 	if !_setupDone
+
+		Util.UpdateReq = True
 		
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Setup Event Received for: CheeseMod")
 		endIf
 		
@@ -88,17 +91,15 @@ Event OnSetup(string eventName, string strArg, float numArg, Form sender) ;;Runs
 		
 		RN_Safehouse_Done.Mod(1)
 		_setupDone = True
-		
-		MCM.UpdateReq = True
-		
-		if !MCM.advdebug
+
+		if MCM.advdebug
 			TCCDebug.Log("Setup Event Completed for: CheeseMod")
 		endif
 	else
 		
 		RN_Safehouse_Done.Mod(1)
 		
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Setup Event Already Completed for: CheeseMod")
 		endif
 	endIf

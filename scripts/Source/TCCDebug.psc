@@ -3,11 +3,7 @@ Scriptname TCCDebug extends Quest
 Import Debug
 Import Utility
 
-;;-- Functions ---------------------------------------
-
-Event OnInit()
-	 EnableLogging()
-endEvent
+RN_Utility_MCM property MCM auto
 
 ;;-- Functions ---------------------------------------
 
@@ -25,6 +21,13 @@ EndFunction
 
 ;;-- Functions ---------------------------------------
 
+Function DisableLogging() Global
+
+	CloseUserLog("TheCuratorsCompanion")
+endFunction
+
+;;-- Functions ---------------------------------------
+
 Function Log(String asMessage, Int aiLevel = 0, Bool bTrace = False) Global
 
 	TraceUser("TheCuratorsCompanion", asMessage, aiLevel)
@@ -32,5 +35,3 @@ Function Log(String asMessage, Int aiLevel = 0, Bool bTrace = False) Global
 		Trace("The Curators Companion - " + asMessage, aiLevel)
 	endif
 EndFunction
-
-

@@ -171,7 +171,7 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 					RN_Achievements_Listener_Count.Mod(1)
 					RN_Ach29Complete.SetValue(1)
 					_Complete += 1
-					Master.Reward(false, true, None, "Magicka", 50)
+					Master.Reward(false, true, None, "Magicka", 10)
 					Master.Notify("Yer a Wizard " + PlayerRef.GetBaseObject().GetName())									
 				endIf
 			endIf							

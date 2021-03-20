@@ -54,7 +54,7 @@ Event OnUpdate()
 				Act1Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 1 (Good Ending)")
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 1 (Good Ending)", 0)
 				endif
 			elseif (zzzAoMMQGoodEnd.GetStageDone(110) && zzzAoMMQGoodEnd.IsCompleted()) ;; MERCIFUL ENDING
@@ -62,7 +62,7 @@ Event OnUpdate()
 				Act1Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 1 (Merciful Ending)")
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 1 (Merciful Ending)", 0)
 				endif
 				
@@ -71,7 +71,7 @@ Event OnUpdate()
 				Act1Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 1 (Bad Ending)")
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 1 (Bad Ending)", 0)
 				endif
 			endif
@@ -83,7 +83,7 @@ Event OnUpdate()
 				Act2Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 2 (Good Ending)")
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 2 (Good Ending)", 0)
 				endif
 				
@@ -92,7 +92,7 @@ Event OnUpdate()
 				Act2Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 2 (Bad Ending)")
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 2 (Bad Ending)", 0)	
 				endif
 			endif
@@ -113,7 +113,7 @@ Event OnUpdate()
 				Act4Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 4 (Worst Ending)")		
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 4 (Worst Ending)", 0)
 				endif
 				
@@ -122,7 +122,7 @@ Event OnUpdate()
 				Act4Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 4 (True Ending)")
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 4 (True Ending)", 0)
 				endif
 
@@ -131,7 +131,7 @@ Event OnUpdate()
 				Act4Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 4 (Bitter Ending)")	
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 4 (Bitter Ending)", 0)
 				endif
 				
@@ -140,7 +140,7 @@ Event OnUpdate()
 				Act4Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 4 (Bad Ending)")
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 4 (Bad Ending)", 0)
 				endif
 				
@@ -149,7 +149,7 @@ Event OnUpdate()
 				Act4Complete = True
 				RN_Quest_Listener_Count.Mod(1)
 				Notification("Museum Display Added: Vigiant Act 4 (Madness Ending)")
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Vigilant Quest Display Listener Registered Act 4 (Madness Ending)", 0)
 				endif
 			endif

@@ -104,9 +104,11 @@ Event _RunSetup()
 		return
 	endIf
 	
-	if !_setupDone
+	if (!_setupDone)
 		
-		if !MCM.advdebug
+		Util.UpdateReq = True
+		
+		if MCM.advdebug
 			TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + "] - Setup Event Received...", 0)
 		endIf
 		
@@ -165,13 +167,12 @@ Event _RunSetup()
 		RN_Setup_Done.Mod(1)
 		_setupDone = True
 		
-		MCM.UpdateReq = True
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + "] - Setup Event Completed", 0)
 		endif
 	else
 		RN_Setup_Done.Mod(1)
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + "] - Setup Event Already Completed", 0)
 		endif
 	endIf
@@ -217,7 +218,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 		return
 	endIf
 	
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + "] - Scan Event Received...", 0)
 	endif
 	
@@ -239,7 +240,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Done.Mod(1)
 	
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + "] - Scan Event Completed", 0)
 	endif
 endEvent	
@@ -253,14 +254,14 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 		if _DisplayList.HasForm(Disp)
 			if EnableState
 				_EnabledList.AddForm(Disp)
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + "] - Updated display " + Disp.GetName() + Disp, 0)
 				endif
 				_GlobalCount.Mod(1)
 			elseif !EnableState
 				if _EnabledList.HasForm(Disp)
 					_EnabledList.RemoveAddedForm(Disp)
-					if !MCM.advdebug
+					if MCM.advdebug
 						TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName + "] - Removed display " + Disp.GetName() + Disp, 0)
 					endif
 					_GlobalCount.Mod(-1)

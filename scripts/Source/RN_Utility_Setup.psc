@@ -113,7 +113,7 @@ Event OnUpdate()
 			Done = true
 			RN_Setup_Done.Mod(1)
 			
-			if !MCM.advdebug
+			if MCM.advdebug
 				TCCDebug.Log("Main Mod Setup Event Completed")
 			endif
 			GoToState("Done")
@@ -291,7 +291,7 @@ state Safehouse
 				Done = true
 				RN_Safehouse_Done.Mod(1)
 				
-				if !MCM.advdebug
+				if MCM.advdebug
 					TCCDebug.Log("Safehouse Setup Event Completed")
 				endif
 				GoToState("Done")

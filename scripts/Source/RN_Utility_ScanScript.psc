@@ -71,14 +71,14 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 			if _DisplayList.HasForm(Disp) || _SectionToScan == 0 && _Armory_Helms_Displays.Find(Disp) != -1
 				if EnableState
 					_EnabledList.AddForm(Disp)
-					if !MCM.advdebug
+					if MCM.advdebug
 						TCCDebug.Log("Scan Script [" + _RoomName  + "] - Updated display " + Disp.GetName() + Disp, 0)
 					endif
 					_Count.Mod(1)
 				elseif !EnableState
 					if _EnabledList.HasForm(Disp)
 						_EnabledList.RemoveAddedForm(Disp)
-						if !MCM.advdebug
+						if MCM.advdebug
 							TCCDebug.Log("Scan Script [" + _RoomName  + "] - Removed display " + Disp.GetName() + Disp, 0)
 						endif
 						_Count.Mod(-1)
@@ -103,7 +103,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
 	
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Scan Event Received for: " + _RoomName)
 	endif
 
@@ -111,7 +111,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue() || _SectionToScan == 11 && !RN_SafeouseContent_Installed.GetValue()
 		
 		RN_Scan_Done.Mod(1)
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Scan Event Not Run For: " + _RoomName)
 		endif
 		
@@ -148,7 +148,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 		endIf
 		
 		RN_Scan_Done.Mod(1)
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Scan Event Completed for: " + _RoomName)
 		endif
 	endIf

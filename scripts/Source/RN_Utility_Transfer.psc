@@ -118,7 +118,7 @@ endFunction
 
 Function DisplayFunc()
 	
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Display - Started Displaying Tranfered Items...")
 	endif
 	
@@ -153,7 +153,7 @@ Function DisplayFunc()
 		Return
 	endIf
 	
-	if !MCM.advdebug
+	if MCM.advdebug
 		TCCDebug.Log("Display - Finished Displaying Tranfered Items")
 	endif
 endFunction

@@ -84,7 +84,7 @@ function BuildArray()
 	if (Game.GetModByName("LOTD_TCC_Cloaks.esp") != 255)
 		objectreference DBM_CloaksStorage = Game.GetFormFromFile(2122, "DBM_CloaksofSkyrim_Patch.esp") as objectreference
 		MuseumContainerArray[_Index] = DBM_CloaksStorage
-		if !MCM.advdebug
+		if MCM.advdebug
 			TCCDebug.Log("Scan Script Misc - Added Cloaks Storage to array", 0)
 		endif
 	endIf
