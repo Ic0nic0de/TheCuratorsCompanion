@@ -1,11 +1,10 @@
 scriptname RN_Utility_MCM extends SKI_ConfigBase Conditional
 
-import FISSFactory
-
 import AhzmoreHUD
 import AhzmoreHUDIE
 
 import utility
+import debug
 import RN_Utility_Global
 
 RN_Utility_Script property RN_Utility auto
@@ -389,9 +388,9 @@ Function AddSettingsPage()
 		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
-		AddTextOptionST("Config_Save", "FISS - User Profile", GetConfigSaveString(), 0)
-		AddTextOptionST("Config_Load", "FISS - User Profile", GetConfigLoadString(), 0)
-		AddTextOptionST("Config_Author", "Developers Preset", "Load Preset", 0)
+		AddTextOptionST("SaveConfig_JSON", "JSON - User Profile", GetConfigSaveString(), 0)
+		AddTextOptionST("LoadConfig_JSON", "JSON - User Profile", GetConfigLoadString(), 0)
+		AddTextOptionST("Config_Author", "Developers Preset", "Load Preset", 0)	
 	endif
 endFunction
 
@@ -990,10 +989,10 @@ Function AddDebugPage()
 		
 		AddHeaderOption("Mod Requirements:")
 
-		if SKSE.GetPluginVersion("fisses") > 0
-			AddTextOption("FISSES:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("fisses") + "]", 0)
+		if papyrusutil.GetVersion() > 31
+			AddTextOption("PapyrusUtil:", "<font color='#2b6320'>Installed</font>" + " [" + papyrusutil.GetVersion() + "]", 0)
 		else
-			AddTextOption("FISSES:", "<font color='#750e0e'>Not Found</font>", 0)
+			AddTextOption("PapyrusUtil:", "<font color='#750e0e'>Invalid / Missing</font>", 0)
 		endif
 
 		if SKSE.GetVersion() > 0			
@@ -1083,7 +1082,7 @@ endState
 ;;------------------------------------------------------------------------------------ Config Save / Load -------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-state Config_Save
+state SaveConfig_JSON
 
 	Event OnSelectST()
 	
@@ -1091,12 +1090,12 @@ state Config_Save
 	EndEvent
 
 	Event OnHighlightST()
-
-		SetInfoText("Save current settings to Config File (Requires FISS)")
+		
+		SetInfoText("Save current settings to Data > SKSE > Plugins > StorageUtilData > TCC_Config.json (Requires PapyrusUtil)")
 	EndEvent
 endState
 
-state Config_Load
+state LoadConfig_JSON
 
 	Event OnSelectST()
 		
@@ -1105,223 +1104,195 @@ state Config_Load
 
 	Event OnHighlightST()
 
-		SetInfoText("Load user settings from Config File (Requires FISS)")
+		SetInfoText("Load saved settings from Data > SKSE > Plugins > StorageUtilData > TCC_Config.json (Requires PapyrusUtil)")
 	EndEvent
 endState
 
 String function GetConfigSaveString()
 	
-	if (Game.GetModByName("Fiss.esp") != 255)
+	if papyrusutil.GetVersion() > 31
 		return "Save Preset"
 	endif
 	
-	return "FISS Not Found"
+	return "PapyrusUtil Not Found"
 endFunction	
 
 String function GetConfigLoadString()
 
-	if (Game.GetModByName("Fiss.esp") != 255)
+	if papyrusutil.GetVersion() > 31
 		return "Load Preset"
 	endif
 	
-	return "FISS Not Found"
+	return "PapyrusUtil Not Found"
 endFunction	
 
 ;-- Save States / Function --------------------------------
 
 Function Begin_Config_Save()
-	FISSInterface fiss = FISSFactory.getFISS()
+	if papyrusutil.GetVersion() > 31
+		jsonutil.SetPathIntValue("TCC_Config", ".!ShowMuseumVal", ShowMuseumVal as Int)	
+		jsonutil.SetPathIntValue("TCC_Config", ".!ShowArmoryVal", ShowArmoryVal as Int)	
+		jsonutil.SetPathIntValue("TCC_Config", ".!ShowModsVal", ShowModsVal as Int)	
+		jsonutil.SetPathIntValue("TCC_Config", ".!ShowSetCompleteVal", ShowSetCompleteVal as Int)	
+		jsonutil.SetPathIntValue("TCC_Config", ".!ShowSimpleNotificationVal", ShowSimpleNotificationVal as Int)	
+		jsonutil.SetPathIntValue("TCC_Config", ".!ShowListenerVal", ShowListenerVal as Int)			
+		jsonutil.SetPathIntValue("TCC_Config", ".!ShowStartup", ShowStartup as Int)	
+		jsonutil.SetPathIntValue("TCC_Config", ".!ScanNotificationsval", ScanNotificationsval as Int)	
+		jsonutil.SetPathIntValue("TCC_Config", ".!Restricted", Restricted as Int)	
+		jsonutil.SetPathIntValue("TCC_Config", ".!Token_Vis", Token_Vis as Int)
+		jsonutil.SetPathIntValue("TCC_Config", ".!Ach_Notify", Ach_Notify as Int)
+		jsonutil.SetPathIntValue("TCC_Config", ".!Ach_Visual", Ach_Visual as Int)
+		jsonutil.SetPathIntValue("TCC_Config", ".!Ach_Perks", Ach_Perks as Int)			
+		
+		jsonutil.SetPathIntValue("TCC_Config", ".!IndexSounds", IndexSounds)
+		jsonutil.SetPathIntValue("TCC_Config", ".!IndexAttribute", IndexAttribute)
+		jsonutil.SetPathIntValue("TCC_Config", ".!IndexTransfer", IndexTransfer)
 
-	if !fiss
-		ShowMessage("FISS not installed, unable to save user settings to config file", false, "Ok")
-			return
-	endif
-	
-	fiss.beginSave("TheCuratorsCompanion_Config.xml", "LOTD:The Curators Companion")
-	
-	;;General Settings
-	fiss.saveBool("Museum Notifications", ShowMuseumVal)
-	fiss.saveBool("Armory Notifications", ShowArmoryVal)
-	fiss.saveBool("Supported Mods Notifications", ShowModsVal)
-	fiss.saveBool("Show Section/Set Complete Notifications", ShowSetCompleteVal)
-	fiss.saveBool("Show Basic Notifications", ShowSimpleNotificationVal)
-	fiss.saveBool("Museum Display Listener", ShowListenerVal)
-	
-	;;Scan & Advanced Page
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017 || SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800	
-		fiss.saveInt("moreHUDOption", IndexmoreHUD)		
-	endif
-	fiss.saveBool("Show startup notifications", ShowStartup)
-	fiss.saveBool("ScanNotificationsval", ScanNotificationsval)
-	
-	;;Relic Storage Page
-	fiss.saveInt ("StorageTransfer", IndexTransfer)
-	fiss.saveBool("Storage Restriction", Restricted)
-	fiss.saveBool("TokenCrafting", Token_Vis)
-	
-	;;Achievements Page
-	fiss.saveBool("Achievement Notifications", Ach_Notify)
-	fiss.saveBool("Achievement Visuals", Ach_Visual)
-	fiss.saveInt("Achievement Sounds", IndexSounds)
-	fiss.saveBool("Achievement Perks", Ach_Perks)
-	fiss.saveInt("Achievement Attribute", IndexAttribute)	
-	
-	string saveResult = fiss.endSave()
-		if (saveResult != "")
-			ShowMessage("Fiss Save Error - Please check the log", false, "Ok")
-		else
-			ShowMessage("User settings saved successfully to Config file", false, "Ok")
-		endif
+		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017 || SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800	
+			jsonutil.SetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD)
+		endif			
+		
+		jsonutil.Save("TCC_Config", false)
+		ShowMessage("Preset Saved")
+	else
+		ShowMessage("PapyrusUtil Not Installed")
+	endIf
 EndFunction
 
 ;-- Load States / Function --------------------------------
 
 Function Begin_Config_Load()
-FISSInterface fiss = FISSFactory.getFISS()
-	
-	if !fiss && IsInMenuMode()
-		ShowMessage("FISS not installed, unable to load user settings from config file", false, "Ok")
-		return
-	endif
-	
-	fiss.beginLoad("TheCuratorsCompanion_Config.xml")	
-	
-	;;General Settings
-	ShowMuseumVal = fiss.loadBool("Museum Notifications")
-	if ShowMuseumVal
-		_AddItemMain_1.GoToState("Notify")
-		_AddItemMain_2.GoToState("Notify")
-		_AddItemSafehoue.GoToState("Notify")
-	else
-		_AddItemMain_1.GoToState("Silent")
-		_AddItemMain_2.GoToState("Silent")
-		_AddItemSafehoue.GoToState("Silent")
-	endif
+	if papyrusutil.GetVersion() > 31
+		if jsonutil.JsonExists("TCC_Config")
+			if !jsonutil.IsGood("TCC_Config")
+				if IsInMenuMode()
+					ShowMessage("The config file appears to be damaged or does not meet the requirements\n{}{" + jsonutil.GetErrors("TCC_Config") + "}", false, "Ok", "Cancel")
+					return
+				else
+					Notification("The Curators Companion: Config File Corrupt")
+					return 
+				endif
+			endIf
 		
-	ShowArmoryVal = fiss.loadBool("Armory Notifications")
-	if ShowArmoryVal
-		_AddItemArmory.GoToState("Notify")
-	else
-		_AddItemArmory.GoToState("Silent")
-	endif
-		
-	ShowModsVal = fiss.loadBool("Supported Mods Notifications")
-	if ShowModsVal
-		_AddItemPatches.GoToState("Notify")
-	else
-		_AddItemPatches.GoToState("Silent")
-	endif	
-	
-	ShowSetCompleteVal = fiss.loadBool("Show Section/Set Complete Notifications")
-	ShowSimpleNotificationVal = fiss.loadBool("Show Basic Notifications")
-	ShowListenerVal = fiss.loadBool("Museum Display Listener")
-	
-	;;Scan & Advanced Page
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
-	
-		IndexmoreHUD = fiss.loadInt("moreHUDOption")
+			ShowMuseumVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowMuseumVal", ShowMuseumVal as Int))
+			if ShowMuseumVal
+				_AddItemMain_1.GoToState("Notify")
+				_AddItemMain_2.GoToState("Notify")
+				_AddItemSafehoue.GoToState("Notify")
+			else
+				_AddItemMain_1.GoToState("Silent")
+				_AddItemMain_2.GoToState("Silent")
+				_AddItemSafehoue.GoToState("Silent")
+			endif				
 
-		if IndexmoreHUD == 0
-			RN_moreHUD_Option.SetValue(1)
-			AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-			AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-			
-		elseif IndexmoreHUD == 1
-			RN_moreHUD_Option.SetValue(2)
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-			AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-
-		elseif IndexmoreHUD == 2
-			RN_moreHUD_Option.SetValue(3)
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-			
-		elseif IndexmoreHUD == 3
-			RN_moreHUD_Option.SetValue(4)
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-			AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)	
-
-		elseif IndexmoreHUD == 4
-			RN_moreHUD_Option.SetValue(5)
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-			
-		endif	
-			
-	endif
-
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-	
-		IndexmoreHUD = fiss.loadInt("moreHUDOption")
-
-		if IndexmoreHUD == 0
-			RN_moreHUD_Option.SetValue(1)
-			AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-			AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-			AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-			
-		elseif IndexmoreHUD == 1
-			RN_moreHUD_Option.SetValue(2)
-			AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-			AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-
-		elseif IndexmoreHUD == 2
-			RN_moreHUD_Option.SetValue(3)
-			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-			
-		elseif IndexmoreHUD == 3
-			RN_moreHUD_Option.SetValue(4)
-			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-			AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-
-		elseif IndexmoreHUD == 4
-			RN_moreHUD_Option.SetValue(5)
-			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")
-			AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-			
-		endif	
-			
-	endif	
-	
-	ShowStartup = fiss.loadBool("Show startup notifications")	
-
-	ScanNotificationsval = fiss.loadBool("ScanNotificationsval")
-	
-	;;Relic Storage Page
-	IndexTransfer = fiss.loadInt("StorageTransfer")
-	Restricted = fiss.loadBool("Storage Restriction")
-	Token_Vis = fiss.loadBool("TokenCrafting")
-
-	;; Achievements Page
-	
-	Ach_Notify = fiss.loadBool("Achievement Notifications")
-	Ach_Visual = fiss.loadBool("Achievement Visuals")
-	IndexSounds = fiss.loadInt("Achievement Sounds")
-	Ach_Perks = fiss.loadBool("Achievement Perks")
-	IndexAttribute = fiss.loadInt("Achievement Attribute")
-	
-	string loadResult = fiss.endLoad()
-		if (loadResult != "")
-			if IsInMenuMode()
-				ShowMessage("Fiss Load Error - No config file found", false, "Ok")
+			ShowArmoryVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowArmoryVal", ShowArmoryVal as Int))
+			if ShowArmoryVal
+				_AddItemArmory.GoToState("Notify")
+			else
+				_AddItemArmory.GoToState("Silent")
 			endif
-			Begin_Config_Default()
+
+			ShowModsVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowModsVal", ShowModsVal as Int))
+			if ShowModsVal
+				_AddItemPatches.GoToState("Notify")
+			else
+				_AddItemPatches.GoToState("Silent")
+			endif
+			
+			ShowSetCompleteVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowSetCompleteVal", ShowSetCompleteVal as Int))
+			ShowSimpleNotificationVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowSimpleNotificationVal", ShowSimpleNotificationVal as Int))
+			ShowListenerVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowListenerVal", ShowListenerVal as Int))
+			ShowStartup = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowStartup", ShowStartup as Int))
+			ScanNotificationsval = (jsonutil.GetPathIntValue("TCC_Config", ".!ScanNotificationsval", ScanNotificationsval as Int))
+			Restricted = (jsonutil.GetPathIntValue("TCC_Config", ".!Restricted", Restricted as Int))
+			Token_Vis = (jsonutil.GetPathIntValue("TCC_Config", ".!Token_Vis", Token_Vis as Int))
+			Ach_Notify = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Notify", Ach_Notify as Int))
+			Ach_Visual = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Visual", Ach_Visual as Int))
+			Ach_Perks = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Perks", Ach_Perks as Int))				
+			
+			IndexSounds = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexSounds", IndexSounds))
+			IndexAttribute = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexAttribute", IndexAttribute))
+			IndexTransfer = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexTransfer", IndexTransfer))
+			
+			if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
+				IndexmoreHUD = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD))
+				if IndexmoreHUD == 0
+					RN_moreHUD_Option.SetValue(1)
+					AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
+					AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
+					AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)						
+				elseif IndexmoreHUD == 1
+					RN_moreHUD_Option.SetValue(2)
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
+					AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
+				elseif IndexmoreHUD == 2
+					RN_moreHUD_Option.SetValue(3)
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
+					AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)					
+				elseif IndexmoreHUD == 3
+					RN_moreHUD_Option.SetValue(4)
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
+					AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)	
+				elseif IndexmoreHUD == 4
+					RN_moreHUD_Option.SetValue(5)
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")
+					AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")	
+				endif		
+			endif
+			
+			if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
+				IndexmoreHUD = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD))
+				if IndexmoreHUD == 0
+					RN_moreHUD_Option.SetValue(1)
+					AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
+					AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
+					AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
+				elseif IndexmoreHUD == 1
+					RN_moreHUD_Option.SetValue(2)
+					AhzmoreHUD.UnRegisterIconFormList("dbmFound")
+					AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
+					AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
+				elseif IndexmoreHUD == 2
+					RN_moreHUD_Option.SetValue(3)
+					AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
+					AhzmoreHUD.UnRegisterIconFormList("dbmNew")
+					AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
+				elseif IndexmoreHUD == 3
+					RN_moreHUD_Option.SetValue(4)
+					AhzmoreHUD.UnRegisterIconFormList("dbmNew")
+					AhzmoreHUD.UnRegisterIconFormList("dbmFound")
+					AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
+				elseif IndexmoreHUD == 4
+					RN_moreHUD_Option.SetValue(5)
+					AhzmoreHUD.UnRegisterIconFormList("dbmNew")
+					AhzmoreHUD.UnRegisterIconFormList("dbmDisp")
+					AhzmoreHUD.UnRegisterIconFormList("dbmFound")	
+				endif			
+			endif					
+			
+			jsonutil.Load("TCC_Config")
+			if IsInMenuMode()
+				ShowMessage("Configuration settings successfully loaded from file")
+				ForcePageReset()
+			else
+				Notification("The Curators Companion: Configuration profile loaded")
+			endif
 		else
 			if IsInMenuMode()
-				ShowMessage("User settings loaded successfully from Config file", false, "Ok")
-				ForcePageReset()
+				ShowMessage("No Profile Found")
+			else
+				Notification("The Curators Companion: No profile found - restoring defaults")
 			endif
 		endif
+	else
+		if IsInMenuMode()
+			ShowMessage("PapyrusUtil Not Installed")
+		endif
+	endIf
 EndFunction	
 
 
