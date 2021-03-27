@@ -384,7 +384,7 @@ Function AddSettingsPage()
 		AddTextOption("the different features this mod provides.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By [Ic0n]Ic0de", 0)
-		AddTextOption("", "Version 5.1.0", 0)	
+		AddTextOption("", "Version 5.1.1", 0)	
 		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
@@ -710,7 +710,7 @@ Function AddArmorySetsPage()
 			While _Index < _Length 
 				SetCursorPosition(PageIdx + 1)
 				if RN_Section2_Name[_Index] != ""				
-					if RN_Section2_Complete_Array[_Index].GetValue() == 1
+					if RN_Section2_Complete_Array[_Index].GetValue()
 						AddTextOption(RN_Section2_Name[_Index], "Complete", 1)
 						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
@@ -738,7 +738,7 @@ Function AddArmorySetsPage()
 			While _Index < _Length 
 				SetCursorPosition(PageIdx + 1)
 				if RN_Section_Name[_Index] != ""
-					if RN_Section_Complete_Array[_Index].GetValue() == 1
+					if RN_Section_Complete_Array[_Index].GetValue()
 						AddTextOption(RN_Section_Name[_Index], "Complete", 1)
 						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
@@ -845,7 +845,7 @@ Function AddTrackingPage()
 					AddTextOption(TrackedNames[_Index], "Displayed", 1)
 					PageIdx += 1
 				else
-					AddTextOption(TrackedNames[_Index], "", 0)
+					AddToggleOption(TrackedNames[_Index], TrackedDisplays[_Index].IsEnabled())
 					PageIdx += 1
 				endif
 			endif
@@ -887,7 +887,7 @@ Function AddTrackingPage2()
 					AddToggleOption(TrackedNames2[_Index], "Displayed", 1)
 					PageIdx += 1
 				else
-					AddToggleOption(TrackedNames2[_Index], "", 0)
+					AddToggleOption(TrackedNames2[_Index], TrackedDisplays2[_Index].IsEnabled())
 					PageIdx += 1
 				endif
 			endif
