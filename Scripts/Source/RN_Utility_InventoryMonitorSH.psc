@@ -47,7 +47,7 @@ State Running
 	endEvent
 
 	Event onItemAdded(Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-
+		
 		if !_SafehouseContainerList_WP.HasForm(akSourceContainer) && !dbmDisp.HasForm(akBaseItem)
 			dbmNew.RemoveAddedForm(akBaseItem)
 			dbmFound.AddForm(akBaseItem)
@@ -70,7 +70,7 @@ State Running
 				
 				if !bDuplicate && !dbmDisp.HasForm(akBaseItem)
 					dbmNew.AddForm(akBaseItem)
-					dbmFound.RemoveAddedForm(akBaseItem)
+					dbmFound.RemoveAddedForm(akBaseItem)				
 				endIf
 			endIf
 		endIf

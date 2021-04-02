@@ -29,6 +29,7 @@ bool property Safehouse_Enabled auto hidden
 bool Ach_Highlight
 bool Property Achievements_Enabled auto hidden
 bool Property Ach_Perks auto hidden
+bool property ReplicaTag auto hidden
 
 Bool Page1
 Bool Page2
@@ -384,7 +385,7 @@ Function AddSettingsPage()
 		AddTextOption("the different features this mod provides.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By [Ic0n]Ic0de", 0)
-		AddTextOption("", "Version 5.1.1", 0)	
+		AddTextOption("", "Version 5.1.2", 0)	
 		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
@@ -418,7 +419,8 @@ Function AddAdvancedPage()
 			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", "Wait For Setup...", 1)
 		else
 			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", GetDefaultEnabled(Safehouse_Enabled), 0)
-		endif		
+		endif
+		AddToggleOptionST("ReplicaChecking", "moreHUD Replica Checking:", ReplicaTag)
 		AddEmptyOption()
 		
 		AddHeaderOption("Museum Scan:")
@@ -452,7 +454,7 @@ Function AddAdvancedPage()
 			AddTextOption(_Container.GetDisplayName(), _ContainerLocation, 0)
 		endWhile
 		
-		SetCursorPosition(17)
+		SetCursorPosition(19)
 		AddHeaderOption("Custom Storage Containers Information:")
 		AddTextOptionST("ShowCustomContainerInfo", "Click to Show Information", "", 0)		
 	endif
@@ -1286,6 +1288,7 @@ Function Begin_Config_Load()
 				ShowMessage("No Profile Found")
 			else
 				Notification("The Curators Companion: No profile found - restoring defaults")
+				Begin_Config_Default()
 			endif
 		endif
 	else
@@ -1501,6 +1504,7 @@ state Startup_Debug
 		if ShowMessage("This will reset the startup tasks, do you want to reset now?", true, "Reset", "Cancel")
 			ShowMessage("Please wait a few minutes then save / load the game", false, "Ok")
 			RN_Setup_Done.SetValue(RN_Setup_Registered.GetValue())
+			RN_Safehouse_Done.SetValue(RN_Safehouse_Registered.GetValue())
 			ShowMessage("Please exit the MCM", false, "Ok")
 		endif
 		
@@ -1760,6 +1764,44 @@ String function GetDefaultEnabled(bool val)
 	return "Enabled"
 endfunction
 
+;;-------------------------------
+
+State ReplicaChecking
+
+	Event OnSelectST()
+		
+		ReplicaTag = !ReplicaTag 
+		
+		if ReplicaTag
+			if showmessage("Would you like to turn on Replica Checking?", true, "Enable", "Cancel")
+				SetToggleOptionValueST(ReplicaTag)
+				SetTitleText("=== Please Exit The MCM ===")
+				While IsInMenuMode()
+					Wait(1)
+				endwhile
+				RN_Utility.EnableReplica()
+			else
+				ReplicaTag = False
+			endif
+		else
+			if showmessage("Would you like to turn off Replica Checking?", true, "Disable", "Cancel")
+				SetToggleOptionValueST(ReplicaTag)
+				SetTitleText("=== Please Exit The MCM ===")
+				While IsInMenuMode()
+					Wait(1)
+				endwhile
+				RN_Utility.DisableReplica()
+			else
+				ReplicaTag = True
+			endif
+		endif
+	EndEvent
+
+	Event OnHighlightST()
+
+		SetInfoText("With this option enabled, the mod will automatically attempt to update the icons on Replica's when interacting with / Displaying items.\n NOTE: This is an experimental feature and may cause some script lag when updating icons, it is absolutely mandatory that you NOT use 'Take All' on containers with this option enabled.")
+	EndEvent
+endState
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------------- Storage Options -----------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	

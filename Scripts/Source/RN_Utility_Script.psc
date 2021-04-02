@@ -12,6 +12,8 @@ import utility
 RN_Utility_MCM property RN_MCM auto
 RN_Utility_PropManager property Util auto
 
+DBM_ReplicaHandler property ReplicaHandler auto
+
 ObjectReference Property TCC_Achievements_Xmarker auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,7 +42,7 @@ bool bSettingup
 bool bScanning
 bool bScanAll
 bool bMoreHUDListsCreated
-Bool bMaintenance
+Bool Maintaining
 
 ;;Do Not Fill this property.
 objectreference property DBM_CloaksStorage auto
@@ -62,6 +64,10 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
+
+;;Replica Formlists
+formlist property DBM_ReplicaBaseItems auto
+formlist property DBM_ReplicaItems auto
 
 ;;Listeners
 formlist property DBM_RN_QuestDisplays auto
@@ -228,6 +234,9 @@ function CreateMoreHudLists()
 				dbmNew.RemoveAddedForm(_ItemRelic)
 				dbmFound.RemoveAddedForm(_ItemRelic)
 				dbmDisp.AddForm(_ItemRelic)
+				if RN_MCM.ReplicaTag 
+					ProcessReplica(_ItemRelic, true)
+				endif
 			endIf
 		endWhile
 	endWhile
@@ -246,6 +255,9 @@ function CreateMoreHudLists()
 			if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
 				dbmNew.RemoveAddedForm(_ItemRelic)
 				dbmFound.AddForm(_ItemRelic)
+				if RN_MCM.ReplicaTag 
+					ProcessReplica(_ItemRelic, false)
+				endif
 			endIf
 		endWhile
 	endWhile
@@ -273,6 +285,30 @@ function CreateMoreHudLists()
 	if RN_MCM.advdebug
 		TCCDebug.Log("Utility - moreHUD Lists Updated", 0)
 	endif
+endFunction
+
+function ProcessReplica(form _ItemRelic, bool Museum)
+
+	if DBM_ReplicaBaseItems.HasForm(_ItemRelic)
+		if Museum
+			dbmNew.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
+			dbmFound.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
+			dbmDisp.AddForm(ReplicaHandler.GetReplica(_ItemRelic))
+		else
+			dbmNew.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
+			dbmFound.AddForm(ReplicaHandler.GetReplica(_ItemRelic))		
+		endif
+			
+	elseif DBM_ReplicaItems.HasForm(_ItemRelic)	
+		if Museum
+			dbmNew.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
+			dbmFound.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
+			dbmDisp.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))
+		else
+			dbmNew.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
+			dbmFound.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))		
+		endif
+	endIf
 endFunction
 
 ;;-- Events ---------------------------------------
@@ -344,29 +380,27 @@ endfunction
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		
 Function Maintenance()
-
+	
 	if RN_Setup_Done.GetValue() > RN_Setup_Registered.GetValue() || RN_Safehouse_Done.GetValue() > RN_Safehouse_Registered.GetValue()
 		if RN_MCM.advdebug
 			TCCDebug.Log("Utility - Error Detected on load - (auto correcting)", 2)
 		endif
 		RN_Setup_Done.SetValue(RN_Setup_Registered.GetValue())
+		RN_Safehouse_Done.SetValue(RN_Safehouse_Registered.GetValue())
+		Debug.Notification("TCC Auto Correct Done")
 	endIf
 	
-	bMaintenance = false
-	
-	While !bMaintenance
-		RegisterForSingleUpdate(0)
-		Wait(1)
-	endWhile
+	if Maintaining
+		TCCDebug.Log("Utility - Maintenance function already running - (exiting)", 0)
+	else
+		RegisterForSingleUpdate(1)
+	endif
 endFunction
 
 Event onUpdate()
 	
-	bMaintenance = true
+	Maintaining = true
 	if RN_MCM.ShowStartup 
-		While IsInMenuMode()
-			Wait(1)
-		endWhile
 		ModStartup.Show()
 	endIf
 	
@@ -396,16 +430,16 @@ Event onUpdate()
 		endWhile
 		ModStartup_UpdatingLists.Show()
 		Wait(2)
+		
+		while RN_Setup_Start.GetValue()		
+			if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() && RN_Safehouse_Done.GetValue() == RN_Safehouse_Registered.GetValue()
+				CreateMoreHudLists()
+				RN_MCM.BuildPatchArray(true, true)
+				Util.UpdateReq = False
+				RN_Setup_Start.setvalue(0)
+			endIf
+		endWhile		
 	endif
-	
-	while RN_Setup_Start.GetValue()		
-		if RN_Setup_Done.GetValue() == RN_Setup_Registered.GetValue() && RN_Safehouse_Done.GetValue() == RN_Safehouse_Registered.GetValue()
-			CreateMoreHudLists()
-			RN_MCM.BuildPatchArray(true, true)
-			Util.UpdateReq = False
-			RN_Setup_Start.setvalue(0)
-		endIf
-	endWhile	
 
 	SendModEvent("TCCUpdate_Counts")
 	
@@ -477,6 +511,7 @@ Event onUpdate()
 
 	InitGlobals()
 	
+	RN_Setup_Start.setvalue(0)
 	RN_Setup_Finish.setvalue(1)		
 	RN_Setup_Done.setvalue(0)
 	RN_Setup_Registered.setvalue(0)	
@@ -487,11 +522,9 @@ Event onUpdate()
 	SendModEvent("FireScripts")
 	
 	if RN_MCM.ShowStartup 
-		While IsInMenuMode()
-			Wait(1)
-		endWhile
 		ModStartupDone.Show()
 	endIf
+	Maintaining = false
 endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -577,7 +610,6 @@ Function RebuildLists()
 
 		if (_Index % 500 == 0) 
 			Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists... (" + _Index + " / " + _Total + ")")
-			Debug.Notification("The Curators Companion: Do not add / remove any items from inventory")
 		endIf
 		_Index += 1
 	endWhile
@@ -760,6 +792,24 @@ function UpdatePatches()
 	if RN_MCM.advdebug
 		TCCDebug.Log("Utility - Update Patch(es) request Completed", 0)
 	endif
+endfunction
+
+;;-- Functions ---------------------------------------
+
+function EnableReplica()
+	Debug.Notification("The Curators Companion: Updating Replica moreHUD Icons...")
+	DBM_SortWait.setvalue(1)
+	CreateMoreHudLists()
+	DBM_SortWait.setvalue(0)
+	Debug.Notification("The Curators Companion: Replica moreHUD Icons Updated")
+endfunction
+
+function DisableReplica()
+	Debug.Notification("The Curators Companion: Updating Replica moreHUD Icons...")
+	DBM_SortWait.setvalue(1)
+	RebuildLists()
+	DBM_SortWait.setvalue(0)
+	Debug.Notification("The Curators Companion: Replica moreHUD Icons Updated")
 endfunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

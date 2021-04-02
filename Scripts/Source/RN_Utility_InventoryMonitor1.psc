@@ -2,6 +2,11 @@ ScriptName RN_Utility_InventoryMonitor1 extends ReferenceAlias
 
 RN_Utility_MCM property RN_MCM auto
 
+DBM_ReplicaHandler property ReplicaHandler auto
+
+Formlist property DBM_ReplicaBaseItems auto
+formlist property DBM_ReplicaItems auto
+
 formlist property dbmNew auto
 formlist property dbmFound auto
 formlist property dbmDisp auto
@@ -52,6 +57,17 @@ State Running
 		if !_MuseumContainerList_WP.HasForm(akSourceContainer) && !dbmDisp.HasForm(akBaseItem)
 			dbmNew.RemoveAddedForm(akBaseItem)
 			dbmFound.AddForm(akBaseItem)
+				
+			if RN_MCM.ReplicaTag
+				if DBM_ReplicaBaseItems.HasForm(akBaseitem)								;; If the item being processed is a "Base Item" ...				
+					dbmNew.RemoveAddedForm(ReplicaHandler.GetReplica(akBaseItem))
+					dbmFound.AddForm(ReplicaHandler.GetReplica(akBaseItem))
+						
+				elseif DBM_ReplicaItems.HasForm(akBaseitem)								;; If the item being processed is a "Replica" ...
+					dbmNew.RemoveAddedForm(ReplicaHandler.GetOriginal(akBaseItem))
+					dbmFound.AddForm(ReplicaHandler.GetOriginal(akBaseItem))
+				endIf
+			endIf
 		endIf
 	endEvent
 
@@ -65,13 +81,27 @@ State Running
 				while Index > 0 && !bDuplicate
 					Index -=1
 					if TokenList[Index] != none
-						bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
+						if RN_MCM.ReplicaTag
+							bDuplicate = TokenList[Index].GetitemCount(akBaseItem) || (DBM_ReplicaBaseItems.HasForm(akBaseitem) && TokenList[Index].GetitemCount(ReplicaHandler.GetReplica(akBaseItem))) || (DBM_ReplicaItems.HasForm(akBaseitem) && TokenList[Index].GetitemCount(ReplicaHandler.GetOriginal(akBaseItem)))					
+						else
+							bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
+						endif
 					endif
 				endWhile
 				
 				if !bDuplicate && !dbmDisp.HasForm(akBaseItem)
 					dbmNew.AddForm(akBaseItem)
 					dbmFound.RemoveAddedForm(akBaseItem)
+					if RN_MCM.ReplicaTag
+						if DBM_ReplicaBaseItems.HasForm(akBaseitem)								;; If the item being processed is a "Base Item" ...				
+							dbmNew.AddForm(ReplicaHandler.GetReplica(akBaseItem))
+							dbmFound.RemoveAddedForm(ReplicaHandler.GetReplica(akBaseItem))
+								
+						elseif DBM_ReplicaItems.HasForm(akBaseitem)								;; If the item being processed is a "Replica" ...
+							dbmNew.AddForm(ReplicaHandler.GetOriginal(akBaseItem))
+							dbmFound.RemoveAddedForm(ReplicaHandler.GetOriginal(akBaseItem))
+						endIf
+					endIf					
 				endIf
 			endIf
 		endIf
