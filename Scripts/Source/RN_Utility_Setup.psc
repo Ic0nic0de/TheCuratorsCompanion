@@ -75,6 +75,7 @@ globalvariable property RN_Safehouse_Done auto
 globalvariable property RN_Safehouse_Registered auto
 
 bool Done
+bool SafehouseDone
 int Tracker
 int count
 
@@ -97,10 +98,14 @@ endEvent
 
 Event SafehouseSetup(string eventName, string strArg, float numArg, Form sender)
 	
-	GoToState("Safehouse")	
-	RN_Safehouse_Registered.Mod(1)
-	Tracker = 1
-	RegisterForSingleUpdate(0)
+	if !SafehouseDone
+		TCCDebug.Log("Safehouse Setup Event Received")
+
+		RN_Safehouse_Registered.Mod(1)
+		Tracker = 1
+		GoToState("Safehouse")
+		RegisterForSingleUpdate(0)
+	endif
 endEvent
 
 ;;-- Functions ---------------------------------------
@@ -284,11 +289,12 @@ endEvent
 
 state Safehouse
 
-	Event OnUpdate()
+	Event OnUpdate()	
+		
 		if Tracker == 0
 			if Count == 2
 				Count = 0
-				Done = true
+				SafehouseDone = true
 				RN_Safehouse_Done.Mod(1)
 				
 				if MCM.advdebug
@@ -299,7 +305,7 @@ state Safehouse
 				RegisterForSingleUpdate(0)
 			endif
 		
-		elseif Tracker == 1
+		elseif Tracker == 1			
 			Tracker = 2
 			RegisterForSingleUpdate(0)
 			

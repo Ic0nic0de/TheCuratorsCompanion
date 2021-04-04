@@ -381,15 +381,6 @@ endfunction
 		
 Function Maintenance()
 	
-	if RN_Setup_Done.GetValue() > RN_Setup_Registered.GetValue() || RN_Safehouse_Done.GetValue() > RN_Safehouse_Registered.GetValue()
-		if RN_MCM.advdebug
-			TCCDebug.Log("Utility - Error Detected on load - (auto correcting)", 2)
-		endif
-		RN_Setup_Done.SetValue(RN_Setup_Registered.GetValue())
-		RN_Safehouse_Done.SetValue(RN_Safehouse_Registered.GetValue())
-		Debug.Notification("TCC Auto Correct Done")
-	endIf
-	
 	if Maintaining
 		TCCDebug.Log("Utility - Maintenance function already running - (exiting)", 0)
 	else
@@ -680,6 +671,7 @@ Function SetUpSafehouse()
 			
 			Wait(5)
 			
+			Util.UpdateReq = False
 			InitGlobals()
 			bSettingup = False
 			DBM_SortWait.setvalue(0)
