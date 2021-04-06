@@ -42,7 +42,7 @@ Bool Checking
 
 potion property TCC_CherryBakewell auto
 
-miscobject property TCCJadeMuseumLogo auto
+ObjectReference property TCCJadeLogoRef auto
 
 ;;----------------------------------------------------
 
@@ -62,7 +62,7 @@ endEvent
 
 Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 
-	if MCM.Achievements_Enabled && !Checking
+	if !Checking
 		Checking = True
 		
 		If _Complete < 6
@@ -193,7 +193,8 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 					RN_ComAchievements_Listener_Count.Mod(1)
 					RN_ComAch_06Jade.SetValue(1)
 					_Complete += 1
-					Master.Reward(false, false, TCCJadeMuseumLogo)
+					TCCJadeLogoRef.Enable()
+					Master.Reward(MCM.Ach_Perks, true, None)
 					Master.Notify("Jade Emperor")
 				endIf
 			endIf

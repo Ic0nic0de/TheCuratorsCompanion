@@ -4,6 +4,7 @@ ScriptName RN_Storage_Restrict extends objectreference
 RN_Utility_MCM Property MCM Auto
 
 formlist property dbmMaster auto 
+formlist property dbmClutter auto 
 formlist property dbmDisp auto 	;; Items that are on display
 
 ;;Mod start up global variable.
@@ -22,7 +23,7 @@ Function OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRef
 	
 	if MCM.Restricted
 	
-		if !dbmMaster.HasForm(akBaseItem)		;; If the item is not a displayable relic, return the item to the player.
+		if !dbmMaster.HasForm(akBaseItem) || !dbmClutter.HasForm(akBaseItem) 		;; If the item is not a displayable relic, return the item to the player.
 			
 			RemoveItem(akBaseItem, aiItemCount, TRUE, akSourceContainer)
 			Debug.MessageBox(akBaseItem.GetName() + " is not displayable at the Museum")

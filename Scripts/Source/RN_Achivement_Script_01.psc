@@ -35,9 +35,9 @@ Formlist Property TCC_DisplayList_Library Auto
 
 ;;Properties for reward items.
 MiscObject Property Gold001 Auto
-Armor Property ArmorShieldTCC Auto
-Weapon Property WeapSwordTCC Auto
-Book Property StorybookTCC Auto
+ObjectReference Property TCCShieldRef Auto
+ObjectReference Property TCCSwordRef Auto
+ObjectReference Property StoryBookReward Auto
 
 Bool Checking
 
@@ -59,7 +59,7 @@ endEvent
 
 Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 
-	if MCM.Achievements_Enabled && !Checking
+	if !Checking
 		Checking = True
 		
 		If _Complete < 5
@@ -80,7 +80,8 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 				RN_Achievements_Listener_Count.Mod(1)
 				RN_Ach02Complete.SetValue(1)
 				_Complete += 1
-				Master.Reward(false, false, WeapSwordTCC)
+				TCCSwordRef.Enable()
+				Master.Reward(MCM.Ach_Perks, true, None)
 				Master.Notify("Hoarder")
 			endIf			
 
@@ -122,13 +123,13 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 					endIf
 				endWhile
 				
-				if _Count >= 250
+				if _Count >= 10
 					Ach04 = True
 					RN_Achievements_Listener_Count.Mod(1)
 					RN_Ach04Complete.SetValue(1)
 					_Complete += 1
-					;Master.Reward(false, false, StorybookTCC)
 					Master.Reward(MCM.Ach_Perks, true, None)
+					StoryBookReward.Enable()
 					Master.Notify("Bibliophile")
 				endIf
 			endIf	
@@ -152,7 +153,8 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 					RN_Achievements_Listener_Count.Mod(1)
 					RN_Ach05Complete.SetValue(1)
 					_Complete += 1
-					Master.Reward(false, false, ArmorShieldTCC)
+					TCCShieldRef.Enable()
+					Master.Reward(MCM.Ach_Perks, true, None)
 					Master.Notify("Spelunker")
 				endIf
 			endIf

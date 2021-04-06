@@ -44,7 +44,7 @@ Formlist Property RN_Ach_List_27 Auto
 Formlist Property RN_Ach_List_29 Auto 
 
 ;;Properties for reward items.
-MiscObject Property TCCFafnirTeddy Auto
+ObjectReference Property MiniFafnirRef Auto
 
 Bool Checking
 
@@ -66,7 +66,7 @@ endEvent
 
 Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 
-	if MCM.Achievements_Enabled && !Checking
+	if !Checking
 		Checking = True
 		
 		If _Complete < 6
@@ -136,7 +136,8 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 					RN_Achievements_Listener_Count.Mod(1)
 					RN_Ach27Complete.SetValue(1)
 					_Complete += 1
-					Master.Reward(false, false, TCCFafnirTeddy)
+					Master.Reward(MCM.Ach_Perks, true, None)
+					MiniFafnirRef.Enable()
 					Master.Notify("Expansionist")
 				endIf
 			endIf	

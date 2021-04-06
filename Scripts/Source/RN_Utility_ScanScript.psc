@@ -15,7 +15,6 @@ ObjectReference[] property _Armory_Helms_Displays auto
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 globalvariable property RN_CreationClubContent_Installed auto
-globalvariable property RN_SafeouseContent_Installed auto
 
 Formlist property _Museum_Formlist_Merged auto
 Formlist property _Museum_Formlist_Enabled auto
@@ -59,7 +58,7 @@ endEvent
 
 Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
 
-	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue() || _SectionToScan == 11 && !RN_SafeouseContent_Installed.GetValue()
+	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue() || _SectionToScan == 12 && !MCM.Safehouse_Enabled
 		bExclude = True
 	else
 		bExclude = False
@@ -108,7 +107,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	endif
 
 ;;----------	
-	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue() || _SectionToScan == 11 && !RN_SafeouseContent_Installed.GetValue()
+	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue() || _SectionToScan == 12 && !MCM.Safehouse_Enabled
 		
 		RN_Scan_Done.Mod(1)
 		if MCM.advdebug

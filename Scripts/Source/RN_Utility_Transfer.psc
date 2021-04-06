@@ -23,7 +23,6 @@ formlist property TCC_TokenList auto
 formlist property dbmMaster auto
 formlist property dbmDisp auto
 formlist property RN_ExcludedItems_Generic auto
-formlist property TCC_ItemList_Safehouse auto
 formlist property DBM_ProtectedItems auto
 
 globalvariable property DBM_SortWait auto
@@ -47,7 +46,7 @@ Function RunCustomTransfer()
 			While Index2
 				Index2 -= 1
 				Form ItemRelic = _Container.GetNthForm(Index2)
-				if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !TCC_ItemList_Safehouse.HasForm(ItemRelic)
+				if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic)
 					if _Container as Actor
 						Actor _Actor = _Container as Actor
 						Transferable = !_Actor.IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
@@ -79,7 +78,7 @@ Function RunAllTransfer()
 		While Index2
 			Index2 -= 1
 			Form ItemRelic = _Container.GetNthForm(Index2)
-			if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !TCC_ItemList_Safehouse.HasForm(ItemRelic)
+			if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic)
 				if _Container as Actor && _Container != PlayerRef
 					Actor _Actor = _Container as Actor
 					Transferable = !_Actor.IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
@@ -105,7 +104,7 @@ Function RunRelicTransfer()
 	While Index
 		Index -= 1
 		Form ItemRelic = RN_Storage_Container.GetNthForm(Index)
-		if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic) && !TCC_ItemList_Safehouse.HasForm(ItemRelic)
+		if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic)
 			Bool Transferable = !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
 			if Transferable
 				RN_Storage_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
@@ -173,7 +172,7 @@ Function TransferRelics(ObjectReference ref)
 				while _Index
 					_Index -= 1		
 					Form _ItemRelic = PlayerRef.GetNthForm(_Index)
-					if dbmMaster.HasForm(_ItemRelic) && !TCC_ItemList_Safehouse.HasForm(_ItemRelic)
+					if dbmMaster.HasForm(_ItemRelic)
 						Bool Transferable = !Game.GetPlayer().IsEquipped(_ItemRelic) && !Game.IsObjectFavorited(_ItemRelic) && !RN_ExcludedItems_Generic.HasForm(_ItemRelic) && !DBM_ProtectedItems.HasForm(_ItemRelic)
 						if Transferable
 							PlayerRef.RemoveItem(_ItemRelic, PlayerRef.GetItemCount(_ItemRelic), true, ref)
@@ -191,7 +190,7 @@ Function TransferRelics(ObjectReference ref)
 				while _Index
 					_Index -= 1		
 					Form _ItemRelic = ref.GetNthForm(_Index)
-					if dbmMaster.HasForm(_ItemRelic) && !TCC_ItemList_Safehouse.HasForm(_ItemRelic)
+					if dbmMaster.HasForm(_ItemRelic)
 						ref.RemoveItem(_ItemRelic, ref.GetItemCount(_ItemRelic), true, PlayerRef)
 						_PlayerTransfered += 1
 					endIf

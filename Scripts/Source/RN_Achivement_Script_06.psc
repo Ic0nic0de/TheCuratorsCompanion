@@ -51,9 +51,9 @@ Formlist Property RN_Ach_List_Expedition Auto
 Formlist Property RN_Ach_List_Academia Auto
 
 ;;Properties for reward items.
-Weapon Property WeapStaffTCC Auto
-Armor Property ArmorCloakTCC Auto
-MiscObject Property TCCGoldApple Auto
+ObjectReference Property TCCStaffRef Auto
+ObjectReference Property TCCCloakRef Auto
+ObjectReference Property TCCGoldAppleRef Auto
 
 Bool Checking
 
@@ -75,7 +75,7 @@ endEvent
 
 Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 
-	if MCM.Achievements_Enabled && !Checking
+	if !Checking
 		Checking = True
 	
 		If _Complete < 8
@@ -121,7 +121,8 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 					RN_Achievements_Listener_Count.Mod(1)
 					RN_Ach32Complete.SetValue(1)
 					_Complete += 1
-					Master.Reward(false, false, ArmorCloakTCC)
+					TCCCloakRef.Enable()
+					Master.Reward(MCM.Ach_Perks, true, None)
 					Master.Notify("Guild Master Master")	
 				endIf
 			endIf	
@@ -145,7 +146,8 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 					RN_Achievements_Listener_Count.Mod(1)
 					RN_Ach33Complete.SetValue(1)
 					_Complete += 1
-					Master.Reward(false, false, WeapStaffTCC)
+					TCCStaffRef.Enable()
+					Master.Reward(MCM.Ach_Perks, true, None)
 					Master.Notify("Champion of All")		
 				endIf
 			endIf	
@@ -159,7 +161,8 @@ Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 				RN_Achievements_Listener_Count.Mod(1)
 				RN_Ach34Complete.SetValue(1)
 				_Complete += 1
-				Master.Reward(false, false, TCCGoldApple)
+				TCCGoldAppleRef.Enable()
+				Master.Reward(MCM.Ach_Perks, true, None)
 				Master.Notify("Midas Touch")
 			endIf
 

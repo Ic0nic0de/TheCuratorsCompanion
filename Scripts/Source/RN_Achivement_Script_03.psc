@@ -60,7 +60,7 @@ endEvent
 
 Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
 
-	if MCM.Achievements_Enabled && !Checking
+	if !Checking
 		Checking = True
 	
 		If _Complete < 6

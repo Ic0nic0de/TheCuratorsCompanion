@@ -10,7 +10,7 @@ formlist property TCC_TokenList auto
 
 Formlist property _SafehouseContainerList_WP auto
 
-Formlist property TCC_ItemList_Safehouse auto
+Formlist property TCC_ItemList_Clutter auto
 
 objectreference[] TokenList
 
@@ -43,7 +43,7 @@ State Running
 	
 	Event OnBeginState()
 		RemoveAllInventoryEventFilters()
-		AddInventoryEventFilter(TCC_ItemList_Safehouse)
+		AddInventoryEventFilter(TCC_ItemList_Clutter)
 	endEvent
 
 	Event onItemAdded(Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)

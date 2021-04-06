@@ -20,6 +20,7 @@ formlist property dbmNew auto 						;; Items available to be displayed
 formlist property dbmFound auto 					;; Items that are in inventory or storage
 formlist property dbmDisp auto 						;; Items that are on display
 formlist property dbmMaster auto					;; Total items list
+formlist property dbmClutter auto					;; Clutter Shite list
 
 MiscObject property TCCToken auto
 
@@ -126,7 +127,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 				While Index
 					Index -= 1
 					Form akBaseItem = akNewContainer.GetNthForm(Index)		
-					if dbmMaster.HasForm(akBaseItem)
+					if dbmMaster.HasForm(akBaseItem) || dbmClutter.HasForm(akBaseItem)
 						akNewContainer.RemoveItem(akBaseItem, akNewContainer.GetitemCount(akBaseItem), false, PlayerRef)
 					endIf
 				endWhile

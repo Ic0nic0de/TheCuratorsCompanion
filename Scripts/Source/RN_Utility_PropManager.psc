@@ -17,7 +17,6 @@ globalvariable property TCC_RoomEditCount_NaturalScience auto
 globalvariable property TCC_RoomEditCount_Safehouse auto
 globalvariable property TCC_RoomEditCount_Storeroom auto
 
-globalvariable property RN_SafeouseContent_Installed auto
 globalvariable property RN_CreationClubContent_Installed auto
 
 formlist property TCC_DisplayList_None auto
@@ -121,7 +120,6 @@ Formlist Function _getDisplayRoom(String _RoomName)
 		return TCC_DisplayList_NaturalScience
 
 	elseif (_RoomName == "Safehouse")
-		RN_SafeouseContent_Installed.setvalue(1)
 		return TCC_DisplayList_Safehouse
 
 	elseif (_RoomName == "Museum Storeroom")

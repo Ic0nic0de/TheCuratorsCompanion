@@ -14,6 +14,8 @@ RN_Main_Museum_HOHLIB property _AddItemMain_1 auto
 RN_Main_Museum_EEHMISC property _AddItemMain_2 auto
 RN_Main_SupportedMods property _AddItemPatches auto
 
+RN_PatchAPI property API auto
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties -------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -27,7 +29,6 @@ bool Token_Vis conditional
 
 bool property Safehouse_Enabled auto hidden
 bool Ach_Highlight
-bool Property Achievements_Enabled auto hidden
 bool Property Ach_Perks auto hidden
 bool property ReplicaTag auto hidden
 
@@ -36,13 +37,8 @@ Bool Page2
 
 ;; General Globals
 globalvariable property DBM_SortWait auto
-globalvariable property RN_Setup_Done auto
 globalvariable property RN_Setup_Start auto
 globalvariable property RN_Setup_Finish auto
-globalvariable property RN_Setup_Registered auto
-
-globalvariable property RN_Safehouse_Done auto
-globalvariable property RN_Safehouse_Registered auto
 
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
@@ -55,7 +51,7 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
-formlist property TCC_ItemList_Safehouse auto
+formlist property dbmClutter auto
 formlist property TCC_TokenList_NoShipmentCrates auto
 globalvariable property RN_moreHUD_Option auto
 
@@ -100,7 +96,6 @@ globalvariable property iDisplaySectionComplete auto
 globalvariable property RN_SupportedModCount auto
 globalvariable property RN_CustomModCount auto
 globalvariable property RN_CreationClubContent_Installed auto
-globalvariable property RN_SafeouseContent_Installed auto
 
 ;; Treasury Globals
 globalvariable property RN_MuseumValue auto
@@ -132,8 +127,6 @@ globalvariable property RN_Museum_Paintings_Complete auto
 globalvariable property RN_Museum_Dibella_Statues_Total auto
 globalvariable property RN_Museum_Dibella_Statues_Count auto
 globalvariable property RN_Museum_Dibella_Statues_Complete auto
-
-ObjectReference Property TCC_Achievements_Xmarker Auto
 
 Formlist property _Museum_Global_Complete auto
 Formlist property _Museum_Global_Count auto
@@ -385,7 +378,7 @@ Function AddSettingsPage()
 		AddTextOption("the different features this mod provides.", "", 0)
 		AddEmptyOption()
 		AddTextOption("", "Developed By [Ic0n]Ic0de", 0)
-		AddTextOption("", "Version 5.1.2", 0)	
+		AddTextOption("", "Version 6.0.0", 0)	
 		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
@@ -412,15 +405,19 @@ Function AddAdvancedPage()
 		else
 			AddtextOption("moreHUD Icon Settings:", "<font color='#750e0e'>moreHUD Not Found</font>")
 		endif
-		
-		if Safehouse_Enabled
-			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", GetDefaultEnabled(Safehouse_Enabled), 1)		
-		elseif RN_Setup_Start.GetValue()
+
+		if RN_Setup_Start.GetValue()
 			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", "Wait For Setup...", 1)
 		else
 			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", GetDefaultEnabled(Safehouse_Enabled), 0)
 		endif
-		AddToggleOptionST("ReplicaChecking", "moreHUD Replica Checking:", ReplicaTag)
+		
+		if RN_Setup_Start.GetValue()
+			AddTextOptionST("ReplicaChecking", "moreHUD Replica Checking:", "Wait For Setup...", 1)
+		else
+			AddTextOptionST("ReplicaChecking", "moreHUD Replica Checking:", GetDefaultEnabled(ReplicaTag), 0)
+		endif
+		
 		AddEmptyOption()
 		
 		AddHeaderOption("Museum Scan:")
@@ -469,78 +466,68 @@ Function AddAchievementsPage()
 	if CurrentPage == "Achievements"
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
+			
+		AddHeaderOption("Settings:")	
+		AddToggleOptionST("AchievementSet01", "Notifications:", Ach_Notify, 0)
+		AddToggleOptionST("AchievementSet02", "Visual effect:", Ach_Visual, 0)
+		AddMenuOptionST("SoundListOptions", "Sound effect:", AchievementSoundList[IndexSounds])
+		AddHeaderOption("Achievements:")	
 
-		if TCC_Achievements_Xmarker.IsDisabled()
-			if RN_Setup_Start.GetValue()
-				AddTextOptionST("iAchievement_Enabled", "Enable Achievements System", "Wait For Setup...", 1)
-			else
-				AddToggleOptionST("iAchievement_Enabled", "Enable Achievements System", Achievements_Enabled, 0)	
-			endif
+		SetCursorPosition(1)			
+		AddHeaderOption("")	
 		
-		else
-			
-			AddHeaderOption("Settings:")	
-			AddToggleOptionST("AchievementSet01", "Notifications:", Ach_Notify, 0)
-			AddToggleOptionST("AchievementSet02", "Visual effect:", Ach_Visual, 0)
-			AddMenuOptionST("SoundListOptions", "Sound effect:", AchievementSoundList[IndexSounds])
-			AddHeaderOption("Achievements:")	
-
-			SetCursorPosition(1)			
-			AddHeaderOption("")	
-			
-			AddToggleOptionST("Enable_Highlights", "Achievement Descriptions:", Ach_Highlight, 0)
-			AddToggleOptionST("Disable_AchievementPerks", "Reward Perk Points:", Ach_Perks, 0)			
-			AddMenuOptionST("AttributeListOptions", "Reward Attribute:", AttributeList[IndexAttribute])
-			
-			AddHeaderOption("Awarded: " + GetCurrentAchievementCount(RN_Achievements_Listener_Count, RN_Achievement_Globals) + " Achievements")
-			
-			Int PageIdx = 9			
-			Int _Index = 0
-			While _Index < RN_Ach_Globals.length
-				SetCursorPosition(PageIdx + 1)
-				if RN_Ach_Globals[_Index] != none
-					if RN_Ach_Globals[_Index].GetValue()
-						if _Index == 28
-							RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Awarded", 0)
-							PageIdx += 1
-						else
-							RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index], "Awarded", 0)
-							PageIdx += 1
-						endif
-					else
-						if _Index == 28
-							RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Locked", 1)
-							PageIdx += 1
-						else
-							RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index], "Locked", 1)
-							PageIdx += 1
-						endif					
-					endif
-				endif
-				_Index +=1		
-			endWhile
-			
-			SetCursorPosition(PageIdx + 2)
-			AddHeaderOption("Community Achievements:")
-			PageIdx += 2
-			SetCursorPosition(PageIdx + 1) 
-			AddHeaderOption("Awarded: " + GetCurrentAchievementCount(RN_ComAchievements_Listener_Count, RN_ComAchievement_Globals) + " Community Achievements")
-			PageIdx += 1
-			_Index = 0
-			While _Index < RN_ComAch_Globals.length
-				SetCursorPosition(PageIdx + 1)
-				if RN_ComAch_Globals[_Index] != none
-					if RN_ComAch_Globals[_Index].GetValue()
-						RN_ComAch_Position[_Index] = AddTextOption(RN_ComAch_AchName[_Index], "Awarded", 0)
+		AddToggleOptionST("Enable_Highlights", "Achievement Descriptions:", Ach_Highlight, 0)
+		AddToggleOptionST("Disable_AchievementPerks", "Reward Perk Points:", Ach_Perks, 0)			
+		AddMenuOptionST("AttributeListOptions", "Reward Attribute:", AttributeList[IndexAttribute])
+		
+		AddHeaderOption("Awarded: " + GetCurrentAchievementCount(RN_Achievements_Listener_Count, RN_Achievement_Globals) + " Achievements")
+		
+		Int PageIdx = 9			
+		Int _Index = 0
+		While _Index < RN_Ach_Globals.length
+			SetCursorPosition(PageIdx + 1)
+			if RN_Ach_Globals[_Index] != none
+				if RN_Ach_Globals[_Index].GetValue()
+					if _Index == 28
+						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Awarded", 0)
 						PageIdx += 1
 					else
-						RN_ComAch_Position[_Index] = AddTextOption(RN_ComAch_AchName[_Index], "Locked", 1)
-						PageIdx += 1				
+						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index], "Awarded", 0)
+						PageIdx += 1
 					endif
+				else
+					if _Index == 28
+						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Locked", 1)
+						PageIdx += 1
+					else
+						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index], "Locked", 1)
+						PageIdx += 1
+					endif					
 				endif
-				_Index +=1		
-			endWhile
-		endif
+			endif
+			_Index +=1		
+		endWhile
+		
+		SetCursorPosition(PageIdx + 2)
+		AddHeaderOption("Community Achievements:")
+		PageIdx += 2
+		SetCursorPosition(PageIdx + 1) 
+		AddHeaderOption("Awarded: " + GetCurrentAchievementCount(RN_ComAchievements_Listener_Count, RN_ComAchievement_Globals) + " Community Achievements")
+		PageIdx += 1
+		_Index = 0
+		While _Index < RN_ComAch_Globals.length
+			SetCursorPosition(PageIdx + 1)
+			if RN_ComAch_Globals[_Index] != none
+				if RN_ComAch_Globals[_Index].GetValue()
+					RN_ComAch_Position[_Index] = AddTextOption(RN_ComAch_AchName[_Index], "Awarded", 0)
+					PageIdx += 1
+				else
+					RN_ComAch_Position[_Index] = AddTextOption(RN_ComAch_AchName[_Index], "Locked", 1)
+					PageIdx += 1				
+				endif
+			endif
+			_Index +=1		
+		endWhile
 	endif
 endFunction
 
@@ -562,12 +549,14 @@ Function AddMuseumSetsPage()
 		Int _Length = RN_Museum_Global_Complete.length
 		While _Index < _Length 			
 			
-			if RN_Museum_Global_Complete[_Index].GetValue()
-				AddTextOption(_Museum_Section_names[_Index], "Complete", 1)
-			elseif RN_Scan_Registered.GetValue()
-				AddTextOption(_Museum_Section_names[_Index], "Updating...", 1)
-			else
-				AddTextOption(_Museum_Section_names[_Index], self.GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
+			if RN_Museum_Global_Complete[_Index] != none
+				if RN_Museum_Global_Complete[_Index].GetValue()
+					AddTextOption(_Museum_Section_names[_Index], "Complete", 1)
+				elseif RN_Scan_Registered.GetValue()
+					AddTextOption(_Museum_Section_names[_Index], "Updating...", 1)
+				else
+					AddTextOption(_Museum_Section_names[_Index], self.GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
+				endif
 			endif
 			_Index += 1
 			
@@ -575,10 +564,9 @@ Function AddMuseumSetsPage()
 				_Index += 1
 			endif
 			
-			if _Index == 11 && !RN_SafeouseContent_Installed.GetValue()
+			if _Index == 12 && !Safehouse_Enabled
 				_Index += 1
 			endif
-			
 		endWhile
 			
 		AddEmptyOption()
@@ -642,10 +630,11 @@ Function AddMuseumSetsPage()
 		if RN_CreationClubContent_Installed.GetValue()
 			AddEmptyOption()
 		endif
-		if RN_SafeouseContent_Installed.GetValue()
+		if Safehouse_Enabled
 			AddEmptyOption()
 		endif
-		AddEmptyOption()			
+		AddEmptyOption()
+		AddEmptyOption()		
 		AddTextOption("Completed:", GetCurrentMuseumCount(SetVal), 0)
 		AddEmptyOption()
 		AddHeaderOption("Display Information:")
@@ -760,7 +749,7 @@ endFunction
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------Mods Page -------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+			
 Function AddCompletedModsPage()
 
 	if CurrentPage == "Official Patches"
@@ -769,19 +758,19 @@ Function AddCompletedModsPage()
 		SetCursorPosition(0)				
 		
 		AddHeaderOption("Untracked Patch(es):", 0)
-		if (Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255)
-			AddTextOption("Safehouse Plus", "Installed", 1)
+		if (Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255 && Safehouse_Enabled)
+			AddTextOptionST("SHBox", "Safehouse Plus", "<font color='#2b6320'>Installed</font>", 0)
 		else
-			AddTextOption("Safehouse Plus", "Not Installed", 1)
+			AddTextOptionST("SHBox", "Safehouse Plus", "<font color='#750e0e'>Not Installed</font>", 0)
 		endif
 		
 		SetCursorPosition(1)
 		AddHeaderOption("", 0)
 		
-		if (Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255)
-			AddTextOption("Cheesemod for Everyone", "Installed", 1)
+		if (Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255 && Safehouse_Enabled)
+			AddTextOptionST("CHBox", "Cheesemod for Everyone", "<font color='#2b6320'>Installed</font>", 0)
 		else
-			AddTextOption("Cheesemod for Everyone", "Not Installed", 1)
+			AddTextOptionST("CHBox", "Cheesemod for Everyone", "<font color='#750e0e'>Not Installed</font>", 0)
 		endif	
 		
 		SetCursorPosition(4)
@@ -816,7 +805,35 @@ Function AddCompletedModsPage()
 		endif
 	endif
 endFunction
-	
+
+State CHBox
+	event OnHighlightST() 
+		if (Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255)
+			if !Safehouse_Enabled
+				SetInfoText("Cheesemod for Everyone appears to be in your load order, please enable 'Safehouse Integration' from the 'Advanced Settings' page to enable TCC features on items from this mod.")
+			else
+				SetInfoText("Cheesemod for Everyone appears to be in your load order and configured correctly, please remember items from this patch can not be tracked")
+			endif
+		else
+			SetInfoText("The Cheesemod for Everyone patch does not appear to be enabled in your load order")
+		endif
+	endevent
+endstate
+
+State SHBox
+	event OnHighlightST() 
+		if (Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255)
+			if !Safehouse_Enabled
+				SetInfoText("Safehouse Plus appears to be in your load order, please enable 'Safehouse Integration' from the 'Advanced Settings' page to enable TCC features on items from this mod.")
+			else
+				SetInfoText("Safehouse Plus appears to be in your load order and configured correctly, please remember items from this patch can not be tracked")
+			endif
+		else
+			SetInfoText("The Safehouse Plus patch does not appear to be enabled in your load order")
+		endif
+	endevent
+endstate
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Patch Tracking Page 1 --------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -938,11 +955,8 @@ endFunction
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;-------------------------------------------------------------------------------- Debug Page ------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-string function GetStatusString()
 
-	if RN_Setup_Done.GetValue() > RN_Setup_Registered.GetValue() || RN_Safehouse_Done.GetValue() > RN_Safehouse_Registered.GetValue()
-		return "Setup Error"
-	endIf
+string function GetStatusString()
 
 	if RN_Scan_Done.GetValue() > RN_Scan_Registered.GetValue()
 		return "Scan Error"
@@ -968,24 +982,23 @@ Function AddDebugPage()
 		SetCursorPosition(0)
 		AddHeaderOption("Debug Options:")
 		
-		AddTextOptionST("Update_Patches", "Update Installed Patches", "", 0)
 		AddTextOptionST("Scan_Debug", "Reset Museum Scanner", "", 0)
-		AddtextOptionST("Startup_Debug", "Reset Startup Tasks", "", 0)
 		AddtoggleOptionST("AdvancedDebugging", "Enable Debugging", advdebug)
+		AddEmptyOption()
 		AddEmptyOption()
 		AddHeaderOption("moreHUD Debug:")
 		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
+		AddTextOption("moreHUD clutter Count:", dbmClutter.GetSize() As Int, 1)
 		AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 1)
 		AddTextOption("moreHUD found count:", dbmFound.GetSize() As Int, 1)
-		AddTextOption("moreHUD Displayed count:", dbmDisp.GetSize() As Int, 1)
-		AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 1)
+		AddTextOption("moreHUD displayed count:", dbmDisp.GetSize() As Int, 1)
+		AddTextOption("moreHUD total Count:", (dbmMaster.GetSize() As Int + dbmClutter.GetSize() As Int), 1)
+		
 		AddEmptyOption()
 		AddHeaderOption("Mod Status:")
 		AddTextOptionST("StatusCheck", "Status:", GetStatusString(), 0)
 		AddTextOption("Setup Start:", RN_Setup_Start.GetValue() As Int, 1)
 		AddTextOption("Setup Finish:", RN_Setup_Finish.GetValue() As Int, 1)
-		AddTextOption("Setup Registered:", RN_Setup_Registered.GetValue() As Int, 1)
-		AddTextOption("Setup Done:", RN_Setup_Done.GetValue() As Int, 1)
 
 		SetCursorPosition(1)
 		
@@ -1010,7 +1023,6 @@ Function AddDebugPage()
 		endif	
 		
 		AddEmptyOption()
-		AddEmptyOption()
 		AddHeaderOption("moreHUD Icon Support:")
 		
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") < 30800
@@ -1024,15 +1036,13 @@ Function AddDebugPage()
 		else
 			AddTextOption("moreHUD Inventory Edition:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") + "]", 0)
 		endif
-		
+		AddEmptyOption()
 		AddEmptyOption()
 		AddEmptyOption()
 		AddEmptyOption()
 		AddEmptyOption()
 		AddHeaderOption("")
 		AddTextOption("SortWait:", DBM_SortWait.GetValue() As Int, 1)
-		AddTextOption("Safehouse Registered:", RN_Safehouse_Registered.GetValue() As Int, 1)
-		AddTextOption("Safehouse Done:", RN_Safehouse_Done.GetValue() As Int, 1)
 		AddTextOption("Scan Registered:", RN_Scan_Registered.GetValue() As Int, 1)
 		AddTextOption("Scan Done:", RN_Scan_Done.GetValue() As Int, 1)		
 	endif
@@ -1059,19 +1069,17 @@ EndFunction
 state RefreshMCM
 
 	Event OnSelectST()
-	
-			ShowMessage("Please exit the MCM and re-enter again to see changes", false, "Ok")
-			bool bRefresh = True
-			SetTitleText("=== PLEASE EXIT THE MCM ===")
-			While bRefresh
-				if !IsInMenuMode()
-					Build_Arrays()
-					BuildPatchArray(true, true)
-					AddDynamicPagesList()		
-					bRefresh = false
-					Debug.Notification("The Curators Companion: MCM Rebuilt")
-				endif
-			endWhile
+		bool bRefresh = True
+		SetTitleText("=== PLEASE EXIT THE MCM ===")
+		While bRefresh
+			if !IsInMenuMode()
+				Build_Arrays()
+				BuildPatchArray(true, true)
+				AddDynamicPagesList()		
+				bRefresh = false
+				Debug.Notification("The Curators Companion: MCM Rebuilt")
+			endif
+		endWhile
 	endEvent
 
 	function OnHighlightST()
@@ -1497,27 +1505,6 @@ endState
 
 ;;-------------------------------
 
-state Startup_Debug
-
-	Event OnSelectST()
-	
-		if ShowMessage("This will reset the startup tasks, do you want to reset now?", true, "Reset", "Cancel")
-			ShowMessage("Please wait a few minutes then save / load the game", false, "Ok")
-			RN_Setup_Done.SetValue(RN_Setup_Registered.GetValue())
-			RN_Safehouse_Done.SetValue(RN_Safehouse_Registered.GetValue())
-			ShowMessage("Please exit the MCM", false, "Ok")
-		endif
-		
-	EndEvent
-
-	Event OnHighlightST()
-
-		SetInfoText("Resets the TCC Startup tasks")
-	EndEvent
-endState
-
-;;-------------------------------
-
 state AdvancedDebugging
 
 	Event OnSelectST()		
@@ -1540,24 +1527,6 @@ state AdvancedDebugging
 	Event OnHighlightST()
 
 		SetInfoText("Enables TCC debug logging to Documents > My Games > Skyrim Special Edition > Logs > Script > User > TheCuratorsCompanion.log")
-	EndEvent
-endState
-
-;;-------------------------------
-
-State Update_Patches
-
-	Event OnSelectST()
-	
-		if ShowMessage("This will send an update event to all installed patches, do you want to update now?", true, "Update", "Cancel")
-			ShowMessage("Please exit the MCM and follow the on-screen instructions", false, "Ok")
-			RN_Utility.UpdatePatches()
-		endif			
-	EndEvent
-
-	Event OnHighlightST()
-
-		SetInfoText("Use this to add support for new items / displays from installed patches that have been updated mid-game")
 	EndEvent
 endState
 
@@ -1597,7 +1566,7 @@ state iRelicSimpleNotifications ;;Simple Notifications
 
 	Event OnHighlightST()
 
-		SetInfoText("Display a basic notification in the corner of the screen instead of the default pop-up message box.\n Default: Simple")
+		SetInfoText("Display a basic notification in the corner of the screen instead of the default pop-up message box.\n Default: Notification")
 	EndEvent
 endState
 
@@ -1736,10 +1705,10 @@ endfunction
 String function GetDefaultType(bool val)
 
 	if !val		
-		return "Default"
+		return "Messagebox"
 	endif
 	
-	return "Simple"
+	return "Notification"
 endfunction
 
 ;;-------------------------------
@@ -1774,7 +1743,7 @@ State ReplicaChecking
 		
 		if ReplicaTag
 			if showmessage("Would you like to turn on Replica Checking?", true, "Enable", "Cancel")
-				SetToggleOptionValueST(ReplicaTag)
+				SetTextOptionValueST(GetDefaultEnabled(ReplicaTag), false, "")
 				SetTitleText("=== Please Exit The MCM ===")
 				While IsInMenuMode()
 					Wait(1)
@@ -1785,7 +1754,7 @@ State ReplicaChecking
 			endif
 		else
 			if showmessage("Would you like to turn off Replica Checking?", true, "Disable", "Cancel")
-				SetToggleOptionValueST(ReplicaTag)
+				SetTextOptionValueST(GetDefaultEnabled(ReplicaTag), false, "")
 				SetTitleText("=== Please Exit The MCM ===")
 				While IsInMenuMode()
 					Wait(1)
@@ -1991,43 +1960,27 @@ state Safehouse_Disp
 					Wait(0.5)
 				endWhile
 				RN_Utility.SetUpSafehouse()
-				RN_SafeouseContent_Installed.SetValue(1)
+			else
+				Safehouse_Enabled = false
 			endif
-		endif			
-	EndFunction
-
-	Event OnHighlightST()
-
-		SetInfoText("Enable this to show moreHUD icons and add functionality to general Safehouse items including Safehouse Plus & CheeseMod for Everyone\n Default: Disabled \n (THIS FEATURE CAN NOT BE DISABLED ONCE TURNED ON)")
-	EndEvent
-endState
-
-;;-------------------------------
-
-state iAchievement_Enabled
-	
-	function OnSelectST()
-	
-		Achievements_Enabled = !Achievements_Enabled 
-		
-		if Achievements_Enabled
-			if ShowMessage("This will enable the TCC Achievements system which can grant perks, gold, increases to attributes and Unique items for reaching certain milestones within Legacy of the Dragonborn, do you want to enable now?", true, "Enable", "Cancel")
-				SetToggleOptionValueST(Achievements_Enabled)
-				ShowMessage("Please exit the MCM and wait for the setup complete notification", false, "Ok")
+		elseif !Safehouse_Enabled
+			if ShowMessage("This will disable moreHUD icons and functionality for all standard Safehouse displays, do you want to disable them now?", true, "Disable", "Cancel")
+				SetTextOptionValueST(GetDefaultEnabled(Safehouse_Enabled), false, "")
+				ShowMessage("Please exit the MCM and wait for the completed message to show", false, "Ok")
 				SetTitleText("=== PLEASE EXIT THE MCM ===")
 				While IsInMenuMode()
 					Wait(0.5)
 				endWhile
-				RN_Utility.SetUpAchievements()
+				RN_Utility.DisableSafehouse()
 			else
-				Achievements_Enabled = False
-			endif
+				Safehouse_Enabled = true
+			endif		
 		endif			
 	EndFunction
 
 	Event OnHighlightST()
 
-		SetInfoText("Enable this to turn on the achievements system.\n Default: Disabled \n (THIS FEATURE CAN NOT BE DISABLED ONCE TURNED ON)")
+		SetInfoText("Enable this to show moreHUD icons and add functionality to general Safehouse items including Safehouse Plus & CheeseMod for Everyone\n Default: Disabled")
 	EndEvent
 endState
 
@@ -2186,15 +2139,15 @@ endFunction
 
 string function GetCurrentMuseumCount(Int val)
 
-	Int Total_Room = 11	
+	Int Total_Room = 12
 	if RN_CreationClubContent_Installed.GetValue()
 		Total_Room += 1
 	endif
 
-	if RN_SafeouseContent_Installed.GetValue()
+	if Safehouse_Enabled
 		Total_Room += 1
 	endif
-
+	
 	return (val + "/" + Total_Room + " Sections")
 endFunction
 
@@ -2536,7 +2489,7 @@ Function Build_Arrays()
 
 ;;-------------------------------
 
-	RN_Museum_Global_Complete = new globalvariable[13]
+	RN_Museum_Global_Complete = new globalvariable[128]
 	_Index = 0
 	While _Index < _Museum_Global_Complete.GetSize()
 		globalvariable akvariable = _Museum_Global_Complete.GetAt(_Index) as globalvariable
@@ -2544,7 +2497,7 @@ Function Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Museum_Global_Count = new globalvariable[13]
+	RN_Museum_Global_Count = new globalvariable[128]
 	_Index = 0
 	While _Index < _Museum_Global_Count.GetSize()
 		globalvariable akvariable = _Museum_Global_Count.GetAt(_Index) as globalvariable
@@ -2552,7 +2505,7 @@ Function Build_Arrays()
 		_Index += 1
 	endWhile
 
-	RN_Museum_Global_Total = new globalvariable[13]
+	RN_Museum_Global_Total = new globalvariable[128]
 	_Index = 0
 	While _Index < _Museum_Global_Total.GetSize()
 		globalvariable akvariable = _Museum_Global_Total.GetAt(_Index) as globalvariable
@@ -2606,7 +2559,7 @@ Function Build_Arrays()
 	_Armory_Section_names[18] = "Steel Set"
 	_Armory_Section_names[19] = "Thane Weapons Set"
 	
-	_Museum_Section_names = new string[13]
+	_Museum_Section_names = new string[128]
 	_Museum_Section_names[0] = "Armory:"
 	_Museum_Section_names[1] = "Daedric Gallery:"
 	_Museum_Section_names[2] = "Dragonborn Hall:"
@@ -2619,7 +2572,8 @@ Function Build_Arrays()
 	_Museum_Section_names[9] = "Library:"
 	_Museum_Section_names[10] = "Natural Science:"
 	_Museum_Section_names[11] = "Safehouse:"
-	_Museum_Section_names[12] = "Storeroom:"
+	_Museum_Section_names[12] = "Safehouse Clutter:"
+	_Museum_Section_names[13] = "Storeroom:"
 	
 	RN_Ach_Highlight = new string[128]
 	RN_Ach_Highlight[0] = "Reach a total of 750 displays in the Museum"
@@ -2752,9 +2706,7 @@ Function AddModSupport(GlobalVariable _GVComplete, GlobalVariable _GVCount, Glob
 		akTotal.Mod(1)
 	endif
 	
-	if advdebug
-		TCCDebug.Log("MCM Registered Official Patch [" + _ModName + "] at position " + Index, 0)
-	endif
+	TCCDebug.Log("MCM Registered Official Patch [" + _ModName + "] at position " + Index, 0)
 endFunction
 
 ;;-------------------------------
@@ -2779,9 +2731,7 @@ Function AddCustomModSupport(GlobalVariable _GVComplete, GlobalVariable _GVCount
 		akTotal.Mod(1)
 	endif
 	
-	if advdebug
-		TCCDebug.Log("MCM Registered Custom Patch [" + _ModName + "] at position " + Index, 0)
-	endif
+	TCCDebug.Log("MCM Registered Custom Patch [" + _ModName + "] at position " + Index, 0)
 endFunction
 
 ;;-------------------------------
@@ -2800,9 +2750,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
 			RN_Section_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
-			if advdebug
-				TCCDebug.Log("MCM Registered Heavy Armory Section [" + _SectionName[Index] + "] at position " + Index, 0)
-			endif
+			TCCDebug.Log("MCM Registered Heavy Armory Section [" + _SectionName[Index] + "] at position " + Index, 0)
 		endWhile
 
 		RN_Section_ItemsList = ItemsList
@@ -2818,9 +2766,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section2_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
 			RN_Section2_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section2_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
-			if advdebug
-				TCCDebug.Log("MCM Registered Immersive Weapons Section [" + _SectionName[Index] + "] at position " + Index, 0)
-			endif
+			TCCDebug.Log("MCM Registered Immersive Weapons Section [" + _SectionName[Index] + "] at position " + Index, 0)
 		endWhile
 
 		RN_Section2_ItemsList = ItemsList as Formlist
@@ -2833,9 +2779,7 @@ endFunction
 Function BuildPatchArray(bool _create, bool _Rebuild)
 	
 	if _create
-		if advdebug
-			TCCDebug.Log("MCM - Building Patch Array", 0)
-		endif
+		TCCDebug.Log("MCM - Building Patch Array", 0)
 		
 		RN_Patches_Complete_Array = new globalvariable[128]
 		RN_Patches_Count_Array = new globalvariable[128]
@@ -2865,14 +2809,7 @@ Function BuildPatchArray(bool _create, bool _Rebuild)
 	endif
 	
 	if _Rebuild
-		
-		if advdebug
-			TCCDebug.Log("MCM - Sending Patch Array Event", 0)
-		endif
-		
-		RN_SupportedModCount.SetValue(0)
-		RN_CustomModCount.SetValue(0)
-		SendModEvent("TCCUpdate_Arrays")
+		API.UpdateArrays()
 	endif
 endFunction
 			

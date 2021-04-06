@@ -3,6 +3,8 @@ ScriptName RN_Utility_Setup extends Quest
 Import RN_Utility_Global
 
 RN_Utility_MCM property MCM auto
+RN_Utility_Script property Util auto
+RN_PatchAPI property APIScript auto
 
 Import Debug
 
@@ -31,7 +33,7 @@ formlist property TCC_ItemList_Museum_1 auto
 formlist property TCC_ItemList_Museum_2 auto
 
 ;;Formlists to control item lists. - Merged Formlist (Safehouse)
-formlist property TCC_ItemList_Safehouse auto ;;Merged Item List.
+formlist property TCC_ItemList_Clutter auto ;;Merged Item List.
 
 ;;Formlists to control item lists - Merged Formlist (Armory)
 formlist property TCC_ItemList_Armory auto
@@ -39,6 +41,7 @@ formlist property TCC_ItemList_Armory auto
 ;;Formlist to control item lists. - MoreHud.
 formlist property dbmNew auto
 formlist property dbmMaster auto
+formlist property dbmClutter auto
 
 ;;Formlists to control Display Reference lists - Misc Rooms
 formlist property TCC_DisplayList_Armory auto
@@ -52,7 +55,7 @@ formlist property TCC_DisplayList_Storeroom auto
 formlist property TCC_DisplayList_DaedricGallery auto
 formlist property TCC_DisplayList_HallofOddities auto
 formlist property TCC_DisplayList_DragonbornHall auto
-formlist property TCC_DisplayList_Safehouse auto
+formlist property TCC_DisplayList_Clutter auto
 
 ;;Globals to control Display Counts
 globalvariable property TCC_RoomEditCount_Armory auto
@@ -66,16 +69,9 @@ globalvariable property TCC_RoomEditCount_HallofOddities auto
 globalvariable property TCC_RoomEditCount_HallofSecrets auto
 globalvariable property TCC_RoomEditCount_Guildhouse auto
 globalvariable property TCC_RoomEditCount_Storeroom auto
-globalvariable property TCC_RoomEditCount_Safehouse auto
-
-;;General Variables
-globalvariable property RN_Setup_Done auto
-globalvariable property RN_Setup_Registered auto
-globalvariable property RN_Safehouse_Done auto
-globalvariable property RN_Safehouse_Registered auto
+globalvariable property TCC_RoomEditCount_Clutter auto
 
 bool Done
-bool SafehouseDone
 int Tracker
 int count
 
@@ -83,12 +79,9 @@ int count
 
 Event OnInit()
 	
-	RegisterForModEvent("TCCSetup_SH", "SafehouseSetup")
-	
 	if !Done
 		TCCDebug.Log("Main Mod Setup Event Received")
 		
-		RN_Setup_Registered.Mod(1)
 		Tracker = 1
 		RegisterForSingleUpdate(0)
 	endif			
@@ -96,27 +89,22 @@ endEvent
 
 ;;-- Functions ---------------------------------------
 
-Event SafehouseSetup(string eventName, string strArg, float numArg, Form sender)
+function SafehouseSetup()
 	
-	if !SafehouseDone
-		TCCDebug.Log("Safehouse Setup Event Received")
-
-		RN_Safehouse_Registered.Mod(1)
-		Tracker = 1
-		GoToState("Safehouse")
-		RegisterForSingleUpdate(0)
-	endif
-endEvent
+	GoToState("Safehouse")	
+	Tracker = 1
+	RegisterForSingleUpdate(0)
+endfunction
 
 ;;-- Functions ---------------------------------------
 
 Event OnUpdate()
 	
 	if Tracker == 0
-		if Count == 13
+		if Count == 18
 			Count = 0
 			Done = true
-			RN_Setup_Done.Mod(1)
+			Util.SetupMainDone = True
 			
 			if MCM.advdebug
 				TCCDebug.Log("Main Mod Setup Event Completed")
@@ -272,14 +260,44 @@ Event OnUpdate()
 		Count += 1
 		
 	elseif	Tracker == 13
-		Tracker = 0
+		Tracker = 14
 		RegisterForSingleUpdate(0)
 		
-		_onConsolidateDisplaysAll(_DisplaysArray06[0], TCC_DisplayList_DragonbornHall, TCC_RoomEditCount_DragonbornHall)
+		_onConsolidateDisplaysAll(_DisplaysArray06[0], TCC_DisplayList_DragonbornHall, TCC_RoomEditCount_DragonbornHall)	
+		Count += 1
+
+	elseif	Tracker == 14
+		Tracker = 15
+		RegisterForSingleUpdate(0)
+		
 		_onConsolidateDisplaysAll(_DisplaysArray06[1], TCC_DisplayList_DaedricGallery, TCC_RoomEditCount_DaedricGallery)
+		Count += 1
+		
+	elseif	Tracker == 15
+		Tracker = 16
+		RegisterForSingleUpdate(0)
+		
 		_onConsolidateDisplaysAll(_DisplaysArray06[2], TCC_DisplayList_HallofOddities, TCC_RoomEditCount_HallofOddities)
+		Count += 1
+
+	elseif	Tracker == 16
+		Tracker = 17
+		RegisterForSingleUpdate(0)
+		
 		_onConsolidateDisplaysAll(_DisplaysArray06[3], TCC_DisplayList_HallofSecrets, TCC_RoomEditCount_HallofSecrets)
+		Count += 1
+		
+	elseif	Tracker == 17
+		Tracker = 18
+		RegisterForSingleUpdate(0)
+		
 		_onConsolidateDisplaysAll(_DisplaysArray06[4], TCC_DisplayList_Guildhouse, TCC_RoomEditCount_Guildhouse)
+		Count += 1
+		
+	elseif	Tracker == 18
+		Tracker = 0
+		RegisterForSingleUpdate(0)
+	
 		_onConsolidateDisplaysAll(_DisplaysArray06[5], TCC_DisplayList_Storeroom, TCC_RoomEditCount_Storeroom)	
 		Count += 1
 	endif
@@ -289,14 +307,10 @@ endEvent
 
 state Safehouse
 
-	Event OnUpdate()	
-		
+	Event OnUpdate()
 		if Tracker == 0
-			if Count == 2
+			if Count == 7
 				Count = 0
-				SafehouseDone = true
-				RN_Safehouse_Done.Mod(1)
-				
 				if MCM.advdebug
 					TCCDebug.Log("Safehouse Setup Event Completed")
 				endif
@@ -305,7 +319,7 @@ state Safehouse
 				RegisterForSingleUpdate(0)
 			endif
 		
-		elseif Tracker == 1			
+		elseif Tracker == 1
 			Tracker = 2
 			RegisterForSingleUpdate(0)
 			
@@ -313,23 +327,52 @@ state Safehouse
 			While _index
 				_index -= 1
 				Formlist _List = _itemsArray06[_index]
-				_onConsolidateItems(_List, TCC_ItemList_Safehouse, dbmNew, dbmMaster)			
+				_onConsolidateItems(_List, TCC_ItemList_Clutter, dbmNew, dbmClutter)			
 			endWhile
 			Count += 1
 
-			
 		elseif	Tracker == 2
+			Tracker = 3
+			RegisterForSingleUpdate(0)
+
+			_onConsolidateDisplaysAll(_DisplaysArray09[0], TCC_DisplayList_Clutter, TCC_RoomEditCount_Clutter)
+			Count += 1
+
+		elseif	Tracker == 3
+			Tracker = 4
+			RegisterForSingleUpdate(0)
+
+			_onConsolidateDisplaysAll(_DisplaysArray09[1], TCC_DisplayList_Clutter, TCC_RoomEditCount_Clutter)	
+			Count += 1
+
+		elseif	Tracker == 4
+			Tracker = 5
+			RegisterForSingleUpdate(0)
+
+			_onConsolidateDisplaysAll(_DisplaysArray09[2], TCC_DisplayList_Clutter, TCC_RoomEditCount_Clutter)
+			Count += 1
+
+		elseif	Tracker == 5
+			Tracker = 6
+			RegisterForSingleUpdate(0)
+
+			_onConsolidateDisplaysAll(_DisplaysArray09[3], TCC_DisplayList_Clutter, TCC_RoomEditCount_Clutter)	
+			Count += 1
+
+		elseif	Tracker == 6
+			Tracker = 7
+			RegisterForSingleUpdate(0)
+
+			_onConsolidateDisplaysAll(_DisplaysArray09[4], TCC_DisplayList_Clutter, TCC_RoomEditCount_Clutter)
+			Count += 1
+
+		elseif	Tracker == 7
 			Tracker = 0
 			RegisterForSingleUpdate(0)
 
-			_onConsolidateDisplaysAll(_DisplaysArray09[0], TCC_DisplayList_Safehouse, TCC_RoomEditCount_Safehouse)
-			_onConsolidateDisplaysAll(_DisplaysArray09[1], TCC_DisplayList_Safehouse, TCC_RoomEditCount_Safehouse)
-			_onConsolidateDisplaysAll(_DisplaysArray09[2], TCC_DisplayList_Safehouse, TCC_RoomEditCount_Safehouse)
-			_onConsolidateDisplaysAll(_DisplaysArray09[3], TCC_DisplayList_Safehouse, TCC_RoomEditCount_Safehouse)
-			_onConsolidateDisplaysAll(_DisplaysArray09[4], TCC_DisplayList_Safehouse, TCC_RoomEditCount_Safehouse)
-			_onConsolidateDisplaysAll(_DisplaysArray09[5], TCC_DisplayList_Safehouse, TCC_RoomEditCount_Safehouse)	
+			_onConsolidateDisplaysAll(_DisplaysArray09[5], TCC_DisplayList_Clutter, TCC_RoomEditCount_Clutter)	
 			Count += 1
-		endif
+		endif	
 	endEvent
 endState
 		

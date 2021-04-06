@@ -11,7 +11,7 @@ RN_Utility_MCM Property MCM Auto
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;;Formlists to control item lists - Merged Formlist 1. (HOH, Lib)
-formlist property TCC_ItemList_Safehouse auto ;;Merged Item List.
+formlist property TCC_ItemList_Clutter auto ;;Merged Item List.
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties --------------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ formlist property dbmFound auto
 Auto State Silent
 	Event OnBeginState()
 		RemoveAllInventoryEventFilters()
-		AddInventoryEventFilter(TCC_ItemList_Safehouse as Form)
+		AddInventoryEventFilter(TCC_ItemList_Clutter as Form)
 	EndEvent
 	
 	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)	
@@ -47,7 +47,7 @@ endState
 State Notify
 	Event OnBeginState()
 		RemoveAllInventoryEventFilters()
-		AddInventoryEventFilter(TCC_ItemList_Safehouse as Form)
+		AddInventoryEventFilter(TCC_ItemList_Clutter as Form)
 	EndEvent
 	
 	Event OnItemAdded (Form akBaseItem, Int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)			

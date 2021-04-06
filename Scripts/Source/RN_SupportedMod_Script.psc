@@ -1,4 +1,4 @@
-scriptName RN_SupportedMod_Script extends ReferenceAlias
+scriptName RN_SupportedMod_Script extends quest
 
 Import Debug
 Import RN_Utility_Global
@@ -7,11 +7,14 @@ RN_Utility_MCM property MCM auto
 RN_Utility_PropManager property Util auto
 DBMSupportedModScript property DBM auto
 
+RN_PatchAPI property APIScript auto
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 																					;;AutoFill Properties
-bool _setupDone = false
+bool property _setupDone = false auto hidden
+bool bConfigured
 
 formlist property TCC_ItemList_Patches auto
 
@@ -25,8 +28,6 @@ formlist property DBM_RN_ExplorationDisplays auto
 formlist property RN_ExcludedItems_Generic auto
 formlist property TCC_TokenList_ExcludedItems auto
 
-globalvariable property RN_Setup_Done auto
-globalvariable property RN_Setup_Registered auto
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 globalvariable property RN_SupportedModCount auto
@@ -64,45 +65,114 @@ Int _ReturnInt
 
 ;;-- Events ---------------------------------------			
 
-Event onInit()
-	
-	Register()	
-endEvent
+Event OnInit()
 
-;;-- Events ---------------------------------------			
-	
-Event onPlayerLoadGame()
+	if (!DBM || !Util || !MCM)
+		TCCDebug.Log("Fatal Error, Script Property not set on quest " + self.GetName() + " ABORTING...", 2)
+		return
+	endIf
 
-	Register()
-endEvent
+	RegisterForSingleUpdate(0)	
+EndEvent
 
 ;;-- Events ---------------------------------------		
 
-Function Register()
+Event OnUpdate()
+	if bConfigured
+		RegisterModEvents()
+		UnregisterForUpdate()
+		Return
+	endif
+	
+	bConfigured = APIScript.RegisterSupportedMod(_ModName, Self, none, none, none)
+	RegisterModEvents()
+	RunSetup()
+EndEvent
 
+;;-- Events ---------------------------------------		
+
+Function RegisterModEvents()
+	
 	RegisterForModEvent("TCCScan", "_onScan")
-	RegisterForModEvent("TCCSetup_Patches", "_onSetup")
-	RegisterForModEvent("TCCUpdate_Patches", "_onPatchUpdate")
-	RegisterForModEvent("TCCUpdate_Counts", "_onCountUpdate")
-	RegisterForModEvent("TCCUpdate_Arrays", "_onArrayUpdate")
 	RegisterForModEvent("DBM DisplayEvent", "_OnDisplayEventReceived")
+endFunction
+
+;;-- Events ---------------------------------------		
+
+function RunSetup()
+	
+	Int _Index
+		
+	_Index = DBM.NewSectionItemLists.length		
+	While _Index
+		_Index -= 1
+		if DBM.NewSectionItemLists[_Index] != none
+			_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)	
+		endIf
+	endWhile
+
+	_Index = DBM.NewSectionItemAltLists.length		
+	While _Index
+		_Index -= 1
+		if DBM.NewSectionItemAltLists[_Index] != none
+			_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)
+		endIf
+	endWhile
+	
+	_Index = DBM.NewSectionDisplayRefLists.length		
+	While _Index
+		_Index -= 1
+		if DBM.NewSectionDisplayRefLists[_Index] != none 
+			_ReturnInt += _onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
+			_onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], Util._getDisplayRoom(DBM.NewSectionRoomNames[_Index]), Util._getDisplayTotal(DBM.NewSectionRoomNames[_Index]))
+		endIf
+	endWhile
+	
+;;------------ Quest / Exploration Displays
+	
+	_Index = 0
+	while _Index < _explorationDisplays.GetSize()
+		ObjectReference _Ref = _ExplorationDisplays.GetAt(_Index) as ObjectReference		
+		DBM_RN_ExplorationDisplays.AddForm(_Ref)
+		_Index += 1
+	EndWhile
+
+	_Index = 0
+	while _Index < _questDisplays.GetSize()
+		ObjectReference _Ref = _questDisplays.GetAt(_Index) as ObjectReference		
+		DBM_RN_QuestDisplays.AddForm(_Ref)
+		_Index += 1
+	EndWhile
+
+	_Index = 0
+	while _Index < _questDisplaysStage.GetSize()
+		ObjectReference _Ref = _questDisplaysStage.GetAt(_Index) as ObjectReference		
+		DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
+		_Index += 1
+	EndWhile	
+
+;;------------ Exclusion Forms
+
+	_Index = 0
+	while _Index < _ExcludedTransferItems.GetSize()
+		Form _Item = _ExcludedTransferItems.GetAt(_Index) as Form	
+		RN_ExcludedItems_Generic.AddForm(_Item)
+		_Index += 1
+	EndWhile		
+
+	_Index = 0
+	while _Index < _PrisonerChest.GetSize()
+		ObjectReference _Ref = _PrisonerChest.GetAt(_Index) as ObjectReference	
+		TCC_TokenList_ExcludedItems.AddForm(_Ref)
+		_Index += 1
+	EndWhile
+	
+	_setupDone = True
 endFunction
 
 ;;-- Events ---------------------------------------	
 
-Event _onSetup(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
-		
-	_RunSetup()
-endEvent
-
-;;-- Events ---------------------------------------	
-
-Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
-
-	if (!DBM || !Util || !MCM)
-		TCCDebug.Log("Fatal Error, Script Property not set on quest " + GetOwningQuest().GetName() + " ABORTING...", 2)
-		return
-	endIf
+function UpdateArrays()
 	
 	MCM.AddModSupport(_GlobalComplete, _GlobalCount, _GlobalTotal, _ModName, RN_SupportedModCount, DBM)
 	
@@ -110,134 +180,11 @@ Event _onArrayUpdate(string eventName, string strArg, float numArg, Form sender)
 		_CreateArray()
 		MCM.AddSectionSupport(_NewSectionGlobalCount, _NewSectionGlobalTotal, _NewSectionGlobalComplete, _ModName, _NewSectionArrayName, _NewSectionItemsList, _NewSectionDisplayList)
 	endIf
-endEvent
+endfunction	
 
 ;;-- Events ---------------------------------------		
 
-Function _RunSetup()
-	
-	RN_Setup_Registered.Mod(1)
-		
-	if (!DBM || !Util || !MCM)
-		TCCDebug.Log("Fatal Error, Script Property not set on quest " + GetOwningQuest().GetName() + " ABORTING...", 2)
-		RN_Setup_Done.Mod(1)
-		return
-	endIf
-	
-	if (!_setupDone)
-	
-		Util.UpdateReq = True
-		
-		if MCM.advdebug
-			TCCDebug.Log("Official Patch [" + _ModName  + "] - Setup Event Received...", 0)
-		endif
-		
-		Int _Index
-		
-		_Index = DBM.NewSectionItemLists.length		
-		While _Index
-			_Index -= 1
-			if DBM.NewSectionItemLists[_Index] != none
-				_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)	
-			endIf
-		endWhile
-
-		_Index = DBM.NewSectionItemAltLists.length		
-		While _Index
-			_Index -= 1
-			if DBM.NewSectionItemAltLists[_Index] != none
-				_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)
-			endIf
-		endWhile
-		
-		_Index = DBM.NewSectionDisplayRefLists.length		
-		While _Index
-			_Index -= 1
-			if DBM.NewSectionDisplayRefLists[_Index] != none 
-				_ReturnInt += _onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
-				_onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], Util._getDisplayRoom(DBM.NewSectionRoomNames[_Index]), Util._getDisplayTotal(DBM.NewSectionRoomNames[_Index]))
-			endIf
-		endWhile
-		
-;;------------ Quest / Exploration Displays
-		
-		_Index = 0
-		while _Index < _explorationDisplays.GetSize()
-			ObjectReference _Ref = _ExplorationDisplays.GetAt(_Index) as ObjectReference		
-			DBM_RN_ExplorationDisplays.AddForm(_Ref)
-			_Index += 1
-		EndWhile
-
-		_Index = 0
-		while _Index < _questDisplays.GetSize()
-			ObjectReference _Ref = _questDisplays.GetAt(_Index) as ObjectReference		
-			DBM_RN_QuestDisplays.AddForm(_Ref)
-			_Index += 1
-		EndWhile
-
-		_Index = 0
-		while _Index < _questDisplaysStage.GetSize()
-			ObjectReference _Ref = _questDisplaysStage.GetAt(_Index) as ObjectReference		
-			DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
-			_Index += 1
-		EndWhile	
-
-;;------------ Exclusion Forms
-
-		_Index = 0
-		while _Index < _ExcludedTransferItems.GetSize()
-			Form _Item = _ExcludedTransferItems.GetAt(_Index) as Form	
-			RN_ExcludedItems_Generic.AddForm(_Item)
-			_Index += 1
-		EndWhile		
-
-		_Index = 0
-		while _Index < _PrisonerChest.GetSize()
-			ObjectReference _Ref = _PrisonerChest.GetAt(_Index) as ObjectReference	
-			TCC_TokenList_ExcludedItems.AddForm(_Ref)
-			_Index += 1
-		EndWhile
-		
-;;------------
-		
-		RN_Setup_Done.Mod(1)
-		_setupDone = True
-		
-		
-		if MCM.advdebug
-			TCCDebug.Log("Official Patch [" + _ModName  + "] - Setup Event Completed", 0)
-		endif
-	else
-		RN_Setup_Done.Mod(1)
-		if MCM.advdebug
-			TCCDebug.Log("Official Patch [" + _ModName  + "] - Setup Event Already Completed", 0)
-		endif
-	endIf
-endFunction
-
-;;-- Events ---------------------------------------	
-
-Event _onPatchUpdate(string eventName, string strArg, float numArg, Form sender)
-
-	if (!DBM || !Util || !MCM)
-		TCCDebug.Log("Fatal Error, Script Property not set on quest " + GetOwningQuest().GetName() + " ABORTING...", 2)
-		return
-	endIf
-	
-	_setupDone = false	
-	_DisplayList.Revert()
-	_ReturnInt = 0
-	_RunSetup()
-endEvent	
-
-;;-- Events ---------------------------------------		
-
-Event _onCountUpdate(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
-
-	if (!DBM || !Util || !MCM)
-		TCCDebug.Log("Fatal Error, Script Property not set on quest " + GetOwningQuest().GetName() + " ABORTING...", 2)
-		return
-	endIf
+function UpdateCounts()
 	
 	_GlobalTotal.SetValue(_DisplayList.GetSize() - _ReturnInt)	
 	_GlobalCount.SetValue(_EnabledList.GetSize())
@@ -252,19 +199,13 @@ Event _onCountUpdate(string eventName, string strArg, float numArg, Form sender)
 			Index += 1
 		endWhile
 	endif
-endEvent
+endfunction
 
 ;;-- Events ---------------------------------------
 
 Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
 	
 	RN_Scan_Registered.Mod(1)
-
-	if (!DBM || !Util || !MCM)
-		TCCDebug.Log("Fatal Error, Script Property not set on quest " + GetOwningQuest().GetName() + " ABORTING...", 2)
-		RN_Scan_Done.Mod(1)
-		return
-	endIf
 	
 	if MCM.advdebug
 		TCCDebug.Log("Official Patch [" + _ModName  + "] - Scan Event Received...", 0)
