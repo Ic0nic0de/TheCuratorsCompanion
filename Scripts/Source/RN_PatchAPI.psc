@@ -20,35 +20,40 @@ EndEvent
 
 Bool Function RegisterSupportedMod(String sName, RN_SupportedMod_Script sHandler, TCC_CustomPatchScript cHandler, RN_Uniques_Setup uHandler, RN_SupportedSH_Script shHandler)
 	
-	Util.UnregisteredPatch = True
-	
 	while !SupportedModNames || !SupportedModHandlers
 		TCCDebug.Log("Patch API - Waiting for arrays to initialise.")
 		Utility.Wait(2)
 	endwhile
 	
-	int iNamesIndex = SupportedModNames.Find("")
-	int iHandlerIndex = SupportedModHandlers.Find(None)
+	int iNamesIndex = SupportedModNames.Find(sName)
+	if iNamesIndex == -1
 	
-	if (iHandlerIndex == iNamesIndex) && (iNamesIndex != -1)
-		if sHandler
-			SupportedModHandlers[iNamesIndex] = sHandler
-			SupportedModNames[iNamesIndex] = sName
-		elseif uHandler
-			SupportedModHandlers[iNamesIndex] = uHandler
-			SupportedModNames[iNamesIndex] = sName		
-		elseif cHandler
-			SupportedModHandlers[iNamesIndex] = cHandler
-			SupportedModNames[iNamesIndex] = sName	
-		elseif shHandler
-			SupportedModHandlers[iNamesIndex] = shHandler
-			SupportedModNames[iNamesIndex] = sName	
+		iNamesIndex = SupportedModNames.Find("")
+		int iHandlerIndex = SupportedModHandlers.Find(None)
+		
+		if (iHandlerIndex == iNamesIndex) && (iNamesIndex != -1)
+			
+			Util.UnregisteredPatch = True
+			
+			if sHandler
+				SupportedModHandlers[iNamesIndex] = sHandler
+				SupportedModNames[iNamesIndex] = sName
+			elseif uHandler
+				SupportedModHandlers[iNamesIndex] = uHandler
+				SupportedModNames[iNamesIndex] = sName		
+			elseif cHandler
+				SupportedModHandlers[iNamesIndex] = cHandler
+				SupportedModNames[iNamesIndex] = sName	
+			elseif shHandler
+				SupportedModHandlers[iNamesIndex] = shHandler
+				SupportedModNames[iNamesIndex] = sName	
+			endif
+			TCCDebug.Log("Patch API Registered - " + sName)	
+			Return True
+		else
+			TCCDebug.Log("Patch API - Failed to add " + sName + " support. Array sizes are: \n SupportedModHandlers = " + iHandlerIndex + "\n SupportedModNames = "+ iNamesIndex)
+			Return False
 		endif
-		TCCDebug.Log("Patch API Registered - " + sName)	
-		Return True
-	else
-		TCCDebug.Log("Patch API - Failed to add " + sName + " support. Array sizes are: \n SupportedModHandlers = " + iHandlerIndex + "\n SupportedModNames = "+ iNamesIndex)
-		Return False
 	endif
 EndFunction
 

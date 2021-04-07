@@ -55,189 +55,166 @@ ObjectReference Property TCCStaffRef Auto
 ObjectReference Property TCCCloakRef Auto
 ObjectReference Property TCCGoldAppleRef Auto
 
-Bool Checking
-
-;;----------------------------------------------------
-
-Event OnInit()
-
-	RegisterForModEvent("_RunAchievementsCheck", "_OnCheck")
-endEvent
-
-;;----------------------------------------------------
-
-Event OnPlayerLoadGame()
-
-	RegisterForModEvent("_RunAchievementsCheck", "_OnCheck")
-endEvent
-
-;;----------------------------------------------------
-
-Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
-
-	if !Checking
-		Checking = True
+Event OnUpdate()
 	
-		If _Complete < 8
+	If _Complete < 8
 
 ;;---------------------------------------------------- Master of Secrets - (Found & Displayed Ice's Spoon)
 
-			If !Ach30 && !DBM_StalhrimSpoonStat.IsDisabled()
-				Ach30 = True
-				RN_Achievements_Listener_Count.Mod(1)
-				RN_Ach30Complete.SetValue(1)
-				_Complete += 1
-				Master.Reward(MCM.Ach_Perks, false, None)
-				Master.Notify("Master of Secrets")
-			endIf
+		If !Ach30 && !DBM_StalhrimSpoonStat.IsDisabled()
+			Ach30 = True
+			RN_Achievements_Listener_Count.Mod(1)
+			RN_Ach30Complete.SetValue(1)
+			_Complete += 1
+			Master.Reward(MCM.Ach_Perks, false, None)
+			Master.Notify("Master of Secrets")
+		endIf
 
 ;;---------------------------------------------------- Deep Pockets - (Renovated Deepholme)
 
-			If !Ach31 && DBM_DHQuest.IsCompleted()
-				Ach31 = True
-				RN_Achievements_Listener_Count.Mod(1)
-				RN_Ach31Complete.SetValue(1)
-				_Complete += 1
-				Master.Reward(MCM.Ach_Perks, false, None)
-				Master.Notify("Deep Pockets")
-			endIf
+		If !Ach31 && DBM_DHQuest.IsCompleted()
+			Ach31 = True
+			RN_Achievements_Listener_Count.Mod(1)
+			RN_Ach31Complete.SetValue(1)
+			_Complete += 1
+			Master.Reward(MCM.Ach_Perks, false, None)
+			Master.Notify("Deep Pockets")
+		endIf
 
 ;;---------------------------------------------------- Guild Master Master - (All Guild Displays)
 
-			If !Ach32
-				Int _Count = 0
-				Int _Index = RN_Ach_List_32.GetSize()
-				
-				While _Index
-					_Index -= 1
-					ObjectReference _O = RN_Ach_List_32.GetAt(_Index) as ObjectReference
-					if _O.IsEnabled()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_32.GetSize()
-					Ach32 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach32Complete.SetValue(1)
-					_Complete += 1
-					TCCCloakRef.Enable()
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Guild Master Master")	
+		If !Ach32
+			Int _Count = 0
+			Int _Index = RN_Ach_List_32.GetSize()
+			
+			While _Index
+				_Index -= 1
+				ObjectReference _O = RN_Ach_List_32.GetAt(_Index) as ObjectReference
+				if _O.IsEnabled()
+					_Count += 1
 				endIf
-			endIf	
+			endWhile
+			
+			if _Count >= RN_Ach_List_32.GetSize()
+				Ach32 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach32Complete.SetValue(1)
+				_Complete += 1
+				TCCCloakRef.Enable()
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Guild Master Master")	
+			endIf
+		endIf	
 
 ;;---------------------------------------------------- Champion of All - (Completed All Daedric Quests)
 
-			If !Ach33
-				Int _Count = 0
-				Int _Index = RN_Ach_List_33.GetSize()
-				
-				While _Index
-					_Index -= 1
-					Quest _O = RN_Ach_List_33.GetAt(_Index) as Quest
-					if _O.IsCompleted()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_33.GetSize()
-					Ach33 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach33Complete.SetValue(1)
-					_Complete += 1
-					TCCStaffRef.Enable()
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Champion of All")		
-				endIf
-			endIf	
-
+		If !Ach33
+			Int _Count = 0
+			Int _Index = RN_Ach_List_33.GetSize()
 			
+			While _Index
+				_Index -= 1
+				Quest _O = RN_Ach_List_33.GetAt(_Index) as Quest
+				if _O.IsCompleted()
+					_Count += 1
+				endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_33.GetSize()
+				Ach33 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach33Complete.SetValue(1)
+				_Complete += 1
+				TCCStaffRef.Enable()
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Champion of All")		
+			endIf
+		endIf	
+
+		
 
 ;;---------------------------------------------------- Midas Touch - (Fill the treasury)
 
-			If !Ach34 && !dbm_goldpile03.IsDisabled() 						
-				Ach34 = True
-				RN_Achievements_Listener_Count.Mod(1)
-				RN_Ach34Complete.SetValue(1)
-				_Complete += 1
-				TCCGoldAppleRef.Enable()
-				Master.Reward(MCM.Ach_Perks, true, None)
-				Master.Notify("Midas Touch")
-			endIf
+		If !Ach34 && !dbm_goldpile03.IsDisabled() 						
+			Ach34 = True
+			RN_Achievements_Listener_Count.Mod(1)
+			RN_Ach34Complete.SetValue(1)
+			_Complete += 1
+			TCCGoldAppleRef.Enable()
+			Master.Reward(MCM.Ach_Perks, true, None)
+			Master.Notify("Midas Touch")
+		endIf
 
 ;;---------------------------------------------------- Deft Digger - (Take all perks from the Excavation skill tree)
 
-			If !AchExcavation
-				Int _Count = 0
-				Int _Index = RN_Ach_List_Excavation.GetSize()
-				
-				While _Index
-					_Index -= 1
-					perk _O = RN_Ach_List_Excavation.GetAt(_Index) as perk
-					if Game.GetPlayer().HasPerk(_O)
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_Excavation.GetSize()
-					AchExcavation = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_AchExcavationComplete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Deft Digger")		
+		If !AchExcavation
+			Int _Count = 0
+			Int _Index = RN_Ach_List_Excavation.GetSize()
+			
+			While _Index
+				_Index -= 1
+				perk _O = RN_Ach_List_Excavation.GetAt(_Index) as perk
+				if Game.GetPlayer().HasPerk(_O)
+					_Count += 1
 				endIf
-			endIf	
+			endWhile
+			
+			if _Count >= RN_Ach_List_Excavation.GetSize()
+				AchExcavation = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_AchExcavationComplete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Deft Digger")		
+			endIf
+		endIf	
 
 ;;---------------------------------------------------- Expedient - (Take all perks from the Expedition skill tree)
 
-			If !AchExpedition
-				Int _Count = 0
-				Int _Index = RN_Ach_List_Expedition.GetSize()
-				
-				While _Index
-					_Index -= 1
-					perk _O = RN_Ach_List_Expedition.GetAt(_Index) as perk
-					if Game.GetPlayer().HasPerk(_O)
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_Expedition.GetSize()
-					AchExpedition = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_AchExpeditionComplete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Expedient")		
+		If !AchExpedition
+			Int _Count = 0
+			Int _Index = RN_Ach_List_Expedition.GetSize()
+			
+			While _Index
+				_Index -= 1
+				perk _O = RN_Ach_List_Expedition.GetAt(_Index) as perk
+				if Game.GetPlayer().HasPerk(_O)
+					_Count += 1
 				endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_Expedition.GetSize()
+				AchExpedition = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_AchExpeditionComplete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Expedient")		
 			endIf
+		endIf
 
 ;;---------------------------------------------------- Expedient - (Take all perks from the Academia skill tree)
 
-			If !AchAcademia
-				Int _Count = 0
-				Int _Index = RN_Ach_List_Academia.GetSize()
-				
-				While _Index
-					_Index -= 1
-					perk _O = RN_Ach_List_Academia.GetAt(_Index) as perk
-					if Game.GetPlayer().HasPerk(_O)
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_Academia.GetSize()
-					AchAcademia = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_AchAcademiaComplete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Professor")		
+		If !AchAcademia
+			Int _Count = 0
+			Int _Index = RN_Ach_List_Academia.GetSize()
+			
+			While _Index
+				_Index -= 1
+				perk _O = RN_Ach_List_Academia.GetAt(_Index) as perk
+				if Game.GetPlayer().HasPerk(_O)
+					_Count += 1
 				endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_Academia.GetSize()
+				AchAcademia = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_AchAcademiaComplete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Professor")		
 			endIf
 		endIf
 	endIf
-	Checking = False
 endEvent

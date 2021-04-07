@@ -861,7 +861,7 @@ Function AddTrackingPage()
 			
 			if (TrackedNames[_Index] != "")
 				if (TrackedDisplays[_Index].IsEnabled())
-					AddTextOption(TrackedNames[_Index], "Displayed", 1)
+					AddToggleOption(TrackedNames[_Index], TrackedDisplays[_Index].IsEnabled(), 1)
 					PageIdx += 1
 				else
 					AddToggleOption(TrackedNames[_Index], TrackedDisplays[_Index].IsEnabled())
@@ -903,7 +903,7 @@ Function AddTrackingPage2()
 			
 			if (TrackedNames2[_Index] != "")
 				if (TrackedDisplays2[_Index].IsEnabled())
-					AddToggleOption(TrackedNames2[_Index], "Displayed", 1)
+					AddToggleOption(TrackedNames2[_Index], TrackedDisplays2[_Index].IsEnabled(), 1)
 					PageIdx += 1
 				else
 					AddToggleOption(TrackedNames2[_Index], TrackedDisplays2[_Index].IsEnabled())

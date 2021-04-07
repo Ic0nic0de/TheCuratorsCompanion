@@ -5,6 +5,15 @@ Import Debug
 ;Property to obtain values from MCM Script.
 RN_Utility_MCM Property MCM Auto
 
+RN_Achivement_Script_01 property Achievement01 auto
+RN_Achivement_Script_02 property Achievement02 auto
+RN_Achivement_Script_03 property Achievement03 auto
+RN_Achivement_Script_04 property Achievement04 auto
+RN_Achivement_Script_05 property Achievement05 auto
+RN_Achivement_Script_06 property Achievement06 auto
+
+RN_ComAchievement_Script_01 property Achievement07 auto
+RN_ComAchievement_Script_02 property Achievement08 auto
 ;Player.
 objectreference property PlayerRef auto
 
@@ -51,9 +60,7 @@ Event onCellAttach()
 	if !RN_Achievements_Listener_Complete.GetValue() && !RN_ComAchievements_Listener_Complete.GetValue()
 		if (RN_Achievements_Listener_Count.GetValue() == RN_Achievement_Globals.GetSize()) && (RN_ComAchievements_Listener_Count.GetValue() == RN_ComAchievement_Globals.GetSize())
 			Notification("The Curators Companion: All " + (RN_Achievement_Globals.GetSize() AS Int + RN_ComAchievement_Globals.GetSize() AS Int) + " Achievements Unlocked")
-			if MCM.advdebug
-				TCCDebug.Log("Achievements Master - All Available Achievements Completed", 0)
-			endif
+			TCCDebug.Log("Achievements Master - All Available Achievements Completed", 0)
 			RN_Achievements_Listener_Complete.SetValue(1)
 			RN_ComAchievements_Listener_Complete.SetValue(1)
 		else
@@ -62,7 +69,14 @@ Event onCellAttach()
 		endIf		
 	endIf
 	
-	SendModEvent("_RunAchievementsCheck")
+	Achievement01.RegisterForSingleUpdate(0)
+	Achievement02.RegisterForSingleUpdate(0)
+	Achievement03.RegisterForSingleUpdate(0)
+	Achievement04.RegisterForSingleUpdate(0)
+	Achievement05.RegisterForSingleUpdate(0)
+	Achievement06.RegisterForSingleUpdate(0)
+	Achievement07.RegisterForSingleUpdate(0)
+	Achievement08.RegisterForSingleUpdate(0)
 endEvent
 
 ;;-- Functions ---------------------------------------
@@ -75,9 +89,7 @@ function Notify(String _Message)
 	
 	if (MCM.Ach_Notify)
 		Notification("Achievement Unlocked! (" + _Message + ")")
-		if MCM.advdebug
-			TCCDebug.Log("Achievements Master - Achievement complete: " + _Message, 0)
-		endif
+		TCCDebug.Log("Achievements Master - Achievement complete: " + _Message, 0)
 	endIf
 	
 	PlayFX(MCM.IndexSounds)

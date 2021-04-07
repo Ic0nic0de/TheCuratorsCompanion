@@ -41,177 +41,154 @@ Formlist Property RN_Ach_List_21 Auto
 Formlist Property RN_Ach_List_22 Auto
 Formlist Property RN_Ach_List_23 Auto
 
-Bool Checking
-
-;;----------------------------------------------------
-
-Event OnInit()
-
-	RegisterForModEvent("_RunAchievementsCheck", "_OnCheck")
-endEvent
-
-;;----------------------------------------------------
-
-Event OnPlayerLoadGame()
-
-	RegisterForModEvent("_RunAchievementsCheck", "_OnCheck")
-endEvent
-
-;;----------------------------------------------------
-
-Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
-
-	if !Checking
-		Checking = True
+Event OnUpdate()
 	
-		If _Complete < 6
+	If _Complete < 6
 
 ;;---------------------------------------------------- Temper Tantrum - (Full Armory, Smithing at 100)
 
-			If !Ach18
-				Int _Count = 0
-				Int _Index = RN_Ach_List_18.GetSize()
-				
-				While _Index
-					_Index -= 1
-					GlobalVariable _O = RN_Ach_List_18.GetAt(_Index) as GlobalVariable
-					if _O.GetValue()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_18.GetSize() && Game.GetPlayer().GetActorValue("Smithing") == 100
-					Ach18 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach18Complete.SetValue(1)
-					_Complete += 1
-					
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Temper Tantrum")						
-				endIf
-			endIf	
+		If !Ach18
+			Int _Count = 0
+			Int _Index = RN_Ach_List_18.GetSize()
 			
+			While _Index
+				_Index -= 1
+				GlobalVariable _O = RN_Ach_List_18.GetAt(_Index) as GlobalVariable
+				if _O.GetValue()
+					_Count += 1
+				endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_18.GetSize() && Game.GetPlayer().GetActorValue("Smithing") == 100
+				Ach18 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach18Complete.SetValue(1)
+				_Complete += 1
+				
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Temper Tantrum")						
+			endIf
+		endIf	
+		
 ;;---------------------------------------------------- Taxidermist - (Completed all Animal Exhibits in the Hall of Nat. Science)
 
-			If !Ach19
-				Int _Count = 0
-				Int _Index = RN_Ach_List_19.GetSize()
-				
-				While _Index
-					_Index -= 1
-					ObjectReference _O = RN_Ach_List_19.GetAt(_Index) as ObjectReference
-					if _O.IsEnabled()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_19.GetSize()
-					Ach19 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach19Complete.SetValue(1)
-					_Complete += 1
-					
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Taxidermist")						
-				endIf
-			endIf	
+		If !Ach19
+			Int _Count = 0
+			Int _Index = RN_Ach_List_19.GetSize()
 			
+			While _Index
+				_Index -= 1
+				ObjectReference _O = RN_Ach_List_19.GetAt(_Index) as ObjectReference
+				if _O.IsEnabled()
+					_Count += 1
+				endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_19.GetSize()
+				Ach19 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach19Complete.SetValue(1)
+				_Complete += 1
+				
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Taxidermist")						
+			endIf
+		endIf	
+		
 ;;---------------------------------------------------- By All of the Gods! - (Displayed all Divines Shrines)
 
-			If !Ach20
-				Int _Count = 0
-				Int _Index = RN_Ach_List_20.GetSize()
-				
-				While _Index
-					_Index -= 1
-					ObjectReference _O = RN_Ach_List_20.GetAt(_Index) as ObjectReference
-					if _O.IsEnabled()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_20.GetSize()
-					Ach20 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach20Complete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("By All of the Gods!")					
-				endIf
-			endIf	
+		If !Ach20
+			Int _Count = 0
+			Int _Index = RN_Ach_List_20.GetSize()
 			
+			While _Index
+				_Index -= 1
+				ObjectReference _O = RN_Ach_List_20.GetAt(_Index) as ObjectReference
+				if _O.IsEnabled()
+					_Count += 1
+				endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_20.GetSize()
+				Ach20 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach20Complete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("By All of the Gods!")					
+			endIf
+		endIf	
+		
 ;;---------------------------------------------------- Gearhead - (Displayed All Dwemer Artifacts)
 
-			If !Ach21
-				Int _Count = 0
-				Int _Index = RN_Ach_List_21.GetSize()
-				
-				While _Index
-					_Index -= 1
-					ObjectReference _O = RN_Ach_List_21.GetAt(_Index) as ObjectReference
-					if _O.IsEnabled()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_21.GetSize()
-					Ach21 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach21Complete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Gearhead")							
+		If !Ach21
+			Int _Count = 0
+			Int _Index = RN_Ach_List_21.GetSize()
+			
+			While _Index
+				_Index -= 1
+				ObjectReference _O = RN_Ach_List_21.GetAt(_Index) as ObjectReference
+				if _O.IsEnabled()
+					_Count += 1
 				endIf
-			endIf	
+			endWhile
+			
+			if _Count >= RN_Ach_List_21.GetSize()
+				Ach21 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach21Complete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Gearhead")							
+			endIf
+		endIf	
 
 ;;---------------------------------------------------- Blind Construction - (Displayed All Falmer Artifacts)
 
-			If !Ach22
-				Int _Count = 0
-				Int _Index = RN_Ach_List_22.GetSize()
-				
-				While _Index
-					_Index -= 1
-					ObjectReference _O = RN_Ach_List_22.GetAt(_Index) as ObjectReference
-					if _O.IsEnabled()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_22.GetSize()
-					Ach22 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach22Complete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Blind Construction")	
-				endIf
-			endIf	
+		If !Ach22
+			Int _Count = 0
+			Int _Index = RN_Ach_List_22.GetSize()
 			
+			While _Index
+				_Index -= 1
+				ObjectReference _O = RN_Ach_List_22.GetAt(_Index) as ObjectReference
+				if _O.IsEnabled()
+					_Count += 1
+				endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_22.GetSize()
+				Ach22 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach22Complete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Blind Construction")	
+			endIf
+		endIf	
+		
 ;;---------------------------------------------------- Children of the Sky - (Displayed All Nordic Artifacts)
 
-			If !Ach23
-				Int _Count = 0
-				Int _Index = RN_Ach_List_23.GetSize()
-				
-				While _Index
-					_Index -= 1
-					ObjectReference _O = RN_Ach_List_23.GetAt(_Index) as ObjectReference
-					if _O.IsEnabled()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_23.GetSize()
-					Ach23 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach23Complete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Children of the Sky")	
+		If !Ach23
+			Int _Count = 0
+			Int _Index = RN_Ach_List_23.GetSize()
+			
+			While _Index
+				_Index -= 1
+				ObjectReference _O = RN_Ach_List_23.GetAt(_Index) as ObjectReference
+				if _O.IsEnabled()
+					_Count += 1
 				endIf
-			endIf						
-		endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_23.GetSize()
+				Ach23 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach23Complete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Children of the Sky")	
+			endIf
+		endIf						
 	endIf
-	Checking = False
 endEvent

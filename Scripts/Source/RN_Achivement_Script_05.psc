@@ -46,137 +46,114 @@ Formlist Property RN_Ach_List_29 Auto
 ;;Properties for reward items.
 ObjectReference Property MiniFafnirRef Auto
 
-Bool Checking
-
-;;----------------------------------------------------
-
-Event OnInit()
-
-	RegisterForModEvent("_RunAchievementsCheck", "_OnCheck")
-endEvent
-
-;;----------------------------------------------------
-
-Event OnPlayerLoadGame()
-
-	RegisterForModEvent("_RunAchievementsCheck", "_OnCheck")
-endEvent
-
-;;----------------------------------------------------
-
-Event _OnCheck(string eventName, string strArg, float numArg, Form sender)
-
-	if !Checking
-		Checking = True
+Event OnUpdate()
 		
-		If _Complete < 6
+	If _Complete < 6
 
 ;;---------------------------------------------------- Ghostbuster - (Braved the Haunted Quest)
-		 
-			If !Ach24 && DBM_HauntedMuseumQuest.GetStageDone(15)
-				Ach24 = True
-				RN_Achievements_Listener_Count.Mod(1)
-				RN_Ach24Complete.SetValue(1)
-				_Complete += 1
-				Master.Reward(MCM.Ach_Perks, true, None)
-				Master.Notify("Ghostbuster")
-			endIf	
+	 
+		If !Ach24 && DBM_HauntedMuseumQuest.GetStageDone(15)
+			Ach24 = True
+			RN_Achievements_Listener_Count.Mod(1)
+			RN_Ach24Complete.SetValue(1)
+			_Complete += 1
+			Master.Reward(MCM.Ach_Perks, true, None)
+			Master.Notify("Ghostbuster")
+		endIf	
 
 ;;---------------------------------------------------- Canvas Collector - (Displayed All Museum Paintings)
 
-			If !Ach25
-				Int _Count = 0
-				Int _Index = RN_Ach_List_25.GetSize()
-				
-				While _Index
-					_Index -= 1
-					ObjectReference _O = RN_Ach_List_25.GetAt(_Index) as ObjectReference
-					if _O.IsEnabled()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_25.GetSize()
-					Ach25 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach25Complete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					Master.Notify("Canvas Collector")
+		If !Ach25
+			Int _Count = 0
+			Int _Index = RN_Ach_List_25.GetSize()
+			
+			While _Index
+				_Index -= 1
+				ObjectReference _O = RN_Ach_List_25.GetAt(_Index) as ObjectReference
+				if _O.IsEnabled()
+					_Count += 1
 				endIf
-			endIf	
+			endWhile
+			
+			if _Count >= RN_Ach_List_25.GetSize()
+				Ach25 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach25Complete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				Master.Notify("Canvas Collector")
+			endIf
+		endIf	
 
 ;;---------------------------------------------------- That's all Folks - (Roll the credits)	
 
-			If !Ach26 && DBM_Excavation03Cleanup.GetStageDone(20)
-				Ach26 = True
-				RN_Achievements_Listener_Count.Mod(1)
-				RN_Ach26Complete.SetValue(1)
-				_Complete += 1
-				Master.Notify("That's all Folks")
-				Master.Reward(MCM.Ach_Perks, true, None, "Speechcraft", 5)
-			endIf
-			
+		If !Ach26 && DBM_Excavation03Cleanup.GetStageDone(20)
+			Ach26 = True
+			RN_Achievements_Listener_Count.Mod(1)
+			RN_Ach26Complete.SetValue(1)
+			_Complete += 1
+			Master.Notify("That's all Folks")
+			Master.Reward(MCM.Ach_Perks, true, None, "Speechcraft", 5)
+		endIf
+		
 ;;---------------------------------------------------- Expansionist - (Built All Guild Outposts)
 
-			If !Ach27
-				Int _Count = 0
-				Int _Index = RN_Ach_List_27.GetSize()
-				
-				While _Index
-					_Index -= 1
-					Quest _O = RN_Ach_List_27.GetAt(_Index) as Quest
-					if _O.IsCompleted()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_27.GetSize()
-					Ach27 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach27Complete.SetValue(1)
-					_Complete += 1
-					Master.Reward(MCM.Ach_Perks, true, None)
-					MiniFafnirRef.Enable()
-					Master.Notify("Expansionist")
+		If !Ach27
+			Int _Count = 0
+			Int _Index = RN_Ach_List_27.GetSize()
+			
+			While _Index
+				_Index -= 1
+				Quest _O = RN_Ach_List_27.GetAt(_Index) as Quest
+				if _O.IsCompleted()
+					_Count += 1
 				endIf
-			endIf	
+			endWhile
+			
+			if _Count >= RN_Ach_List_27.GetSize()
+				Ach27 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach27Complete.SetValue(1)
+				_Complete += 1
+				Master.Reward(MCM.Ach_Perks, true, None)
+				MiniFafnirRef.Enable()
+				Master.Notify("Expansionist")
+			endIf
+		endIf	
 
 ;;---------------------------------------------------- Forgive and Forget - (Forgave Avram)	
 
-			If !Ach28 && DBM_MuseumHeist.GetStageDone(57)
-				Ach28 = True
-				RN_Achievements_Listener_Count.Mod(1)
-				RN_Ach28Complete.SetValue(1)
-				_Complete += 1
-				Master.Reward(false, true, None, "Speechcraft", 5)
-				Master.Notify("Forgive and Forget")
-			endIf
+		If !Ach28 && DBM_MuseumHeist.GetStageDone(57)
+			Ach28 = True
+			RN_Achievements_Listener_Count.Mod(1)
+			RN_Ach28Complete.SetValue(1)
+			_Complete += 1
+			Master.Reward(false, true, None, "Speechcraft", 5)
+			Master.Notify("Forgive and Forget")
+		endIf
 
 ;;---------------------------------------------------- Yer a Wizard [NAME] - (Mastered Every Spell School)
 
-			If !Ach29
-				Int _Count = 0
-				Int _Index = RN_Ach_List_29.GetSize()
-				
-				While _Index
-					_Index -= 1
-					ObjectReference _O = RN_Ach_List_29.GetAt(_Index) as ObjectReference
-					if _O.IsEnabled()
-						_Count += 1
-					endIf
-				endWhile
-				
-				if _Count >= RN_Ach_List_29.GetSize()
-					Ach29 = True
-					RN_Achievements_Listener_Count.Mod(1)
-					RN_Ach29Complete.SetValue(1)
-					_Complete += 1
-					Master.Reward(false, true, None, "Magicka", 10)
-					Master.Notify("Yer a Wizard " + PlayerRef.GetBaseObject().GetName())									
+		If !Ach29
+			Int _Count = 0
+			Int _Index = RN_Ach_List_29.GetSize()
+			
+			While _Index
+				_Index -= 1
+				ObjectReference _O = RN_Ach_List_29.GetAt(_Index) as ObjectReference
+				if _O.IsEnabled()
+					_Count += 1
 				endIf
-			endIf							
-		endIf
+			endWhile
+			
+			if _Count >= RN_Ach_List_29.GetSize()
+				Ach29 = True
+				RN_Achievements_Listener_Count.Mod(1)
+				RN_Ach29Complete.SetValue(1)
+				_Complete += 1
+				Master.Reward(false, true, None, "Magicka", 10)
+				Master.Notify("Yer a Wizard " + PlayerRef.GetBaseObject().GetName())									
+			endIf
+		endIf							
 	endIf
-	Checking = False
 endEvent
