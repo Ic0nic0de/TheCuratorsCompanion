@@ -22,7 +22,6 @@ Formlist property _Museum_Global_Complete auto
 Formlist property _Museum_Global_Count auto
 Formlist property _Museum_Global_Total auto
 Formlist property _Museum_Message_Notification auto
-Formlist property _Museum_Message_Default auto
 
 Formlist _DisplayList
 Formlist _EnabledList
@@ -30,7 +29,6 @@ GlobalVariable _Complete
 GlobalVariable _Count
 GlobalVariable _Total
 Message _Notification
-Message _Message
 
 Bool bExclude
 	
@@ -58,7 +56,7 @@ endEvent
 
 Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
 
-	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue() || _SectionToScan == 12 && !MCM.Safehouse_Enabled
+	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue()
 		bExclude = True
 	else
 		bExclude = False
@@ -86,11 +84,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 			endif
 
 			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
-				if (MCM.ShowSimpleNotificationVal)
-					_Notification.Show()
-				else
-					_Message.Show()
-				endif
+				_Notification.Show()
 			endif
 		endIf
 	endIf
@@ -107,7 +101,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	endif
 
 ;;----------	
-	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue() || _SectionToScan == 12 && !MCM.Safehouse_Enabled
+	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue()
 		
 		RN_Scan_Done.Mod(1)
 		if MCM.advdebug
@@ -138,11 +132,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 			endIf
 			
 			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
-				if (MCM.ShowSimpleNotificationVal)
-					_Notification.Show()
-				else
-					_Message.Show()
-				endif
+				_Notification.Show()
 			endif
 		endIf
 		
@@ -162,5 +152,4 @@ Function Setup()
 	_Count = _Museum_Global_Count.GetAt(_SectionToScan) as GlobalVariable
 	_Total = _Museum_Global_Total.GetAt(_SectionToScan) as GlobalVariable	
 	_Notification = _Museum_Message_Notification.GetAt(_SectionToScan) as Message
-	_Message = _Museum_Message_Default.GetAt(_SectionToScan) as Message
 endFunction

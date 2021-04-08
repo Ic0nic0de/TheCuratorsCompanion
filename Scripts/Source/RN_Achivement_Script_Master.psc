@@ -39,6 +39,8 @@ Formlist Property RN_ComAchievement_Globals Auto
 ;Properties for visual & sound effects.
 Sound Property TCC_Ach_Sound Auto
 Sound Property TCC_Ach_SoundCheer Auto
+Sound Property TCC_Ach_SoundBrass Auto
+
 VisualEffect Property TCC_AchievementFX Auto
 
 ;Rewards Container.
@@ -81,6 +83,25 @@ endEvent
 
 ;;-- Functions ---------------------------------------
 
+function preview()
+
+	if (MCM.Ach_Visual)
+		TCC_AchievementFX.Play(PlayerRef)
+	endIf
+	
+	if (MCM.Ach_Notify)
+		Notification("Achievement Unlocked! (Achievement!)")
+	endIf	
+	
+	PlayFX(MCM.IndexSounds)
+
+	if (MCM.Ach_Visual)
+		TCC_AchievementFX.Stop(PlayerRef)
+	endIf
+endFunction	
+
+;;-- Functions ---------------------------------------
+
 function Notify(String _Message)
 		
 	if (MCM.Ach_Visual)
@@ -107,6 +128,8 @@ function PlayFX(Int _Value)
 		TCC_Ach_Sound.Playandwait(PlayerRef)
 	elseif _Value == 1
 		TCC_Ach_SoundCheer.Playandwait(PlayerRef)
+	elseif _Value == 2
+		TCC_Ach_SoundBrass.Playandwait(PlayerRef)
 	endIf
 endfunction
 

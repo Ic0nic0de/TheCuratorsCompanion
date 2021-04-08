@@ -71,22 +71,24 @@ Event OnInit()
 		TCCDebug.Log("Fatal Error, Script Property not set on quest " + self.GetName() + " ABORTING...", 2)
 		return
 	endIf
-
-	RegisterForSingleUpdate(0)	
+	
+	APIScript.UnregisteredPatch = True
+	RegisterForSingleUpdate(Utility.RandomInt(1,5))	
 EndEvent
 
 ;;-- Events ---------------------------------------		
 
 Event OnUpdate()
+	
+	UnregisterForUpdate()
+	
 	if bConfigured
 		RegisterModEvents()
-		UnregisterForUpdate()
-		Return
+	else
+		bConfigured = APIScript.RegisterSupportedMod(_ModName, Self, none)
+		RegisterModEvents()
+		RunSetup()	
 	endif
-	
-	bConfigured = APIScript.RegisterSupportedMod(_ModName, Self, none, none, none)
-	RegisterModEvents()
-	RunSetup()
 EndEvent
 
 ;;-- Events ---------------------------------------		
@@ -100,72 +102,83 @@ endFunction
 ;;-- Events ---------------------------------------		
 
 function RunSetup()
-	
-	Int _Index
+
+	if (!_setupDone)
 		
-	_Index = DBM.NewSectionItemLists.length		
-	While _Index
-		_Index -= 1
-		if DBM.NewSectionItemLists[_Index] != none
-			_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)	
-		endIf
-	endWhile
+		Int _Index = DBM.NewSectionItemLists.length		
+		While _Index
+			_Index -= 1
+			if DBM.NewSectionItemLists[_Index] != none
+				_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)	
+			endIf
+		endWhile
 
-	_Index = DBM.NewSectionItemAltLists.length		
-	While _Index
-		_Index -= 1
-		if DBM.NewSectionItemAltLists[_Index] != none
-			_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)
-		endIf
-	endWhile
-	
-	_Index = DBM.NewSectionDisplayRefLists.length		
-	While _Index
-		_Index -= 1
-		if DBM.NewSectionDisplayRefLists[_Index] != none 
-			_ReturnInt += _onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
-			_onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], Util._getDisplayRoom(DBM.NewSectionRoomNames[_Index]), Util._getDisplayTotal(DBM.NewSectionRoomNames[_Index]))
-		endIf
-	endWhile
-	
-;;------------ Quest / Exploration Displays
-	
-	_Index = 0
-	while _Index < _explorationDisplays.GetSize()
-		ObjectReference _Ref = _ExplorationDisplays.GetAt(_Index) as ObjectReference		
-		DBM_RN_ExplorationDisplays.AddForm(_Ref)
-		_Index += 1
-	EndWhile
+		_Index = DBM.NewSectionItemAltLists.length		
+		While _Index
+			_Index -= 1
+			if DBM.NewSectionItemAltLists[_Index] != none
+				_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)
+			endIf
+		endWhile
+		
+		_Index = DBM.NewSectionDisplayRefLists.length		
+		While _Index
+			_Index -= 1
+			if DBM.NewSectionDisplayRefLists[_Index] != none 
+				_ReturnInt += _onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
+				_onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], Util._getDisplayRoom(DBM.NewSectionRoomNames[_Index]), Util._getDisplayTotal(DBM.NewSectionRoomNames[_Index]))
+			endIf
+		endWhile
+		
+	;;------------ Quest / Exploration Displays
+		
+		if (_explorationDisplays)
+			_Index = 0
+			while _Index < _explorationDisplays.GetSize()
+				ObjectReference _Ref = _ExplorationDisplays.GetAt(_Index) as ObjectReference		
+				DBM_RN_ExplorationDisplays.AddForm(_Ref)
+				_Index += 1
+			EndWhile
+		endif
 
-	_Index = 0
-	while _Index < _questDisplays.GetSize()
-		ObjectReference _Ref = _questDisplays.GetAt(_Index) as ObjectReference		
-		DBM_RN_QuestDisplays.AddForm(_Ref)
-		_Index += 1
-	EndWhile
+		if (_questDisplays)
+			_Index = 0
+			while _Index < _questDisplays.GetSize()
+				ObjectReference _Ref = _questDisplays.GetAt(_Index) as ObjectReference		
+				DBM_RN_QuestDisplays.AddForm(_Ref)
+				_Index += 1
+			EndWhile
+		endif
+		
+		if (_questDisplaysStage)
+			_Index = 0
+			while _Index < _questDisplaysStage.GetSize()
+				ObjectReference _Ref = _questDisplaysStage.GetAt(_Index) as ObjectReference		
+				DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
+				_Index += 1
+			EndWhile	
+		endif
+		
+	;;------------ Exclusion Forms
 
-	_Index = 0
-	while _Index < _questDisplaysStage.GetSize()
-		ObjectReference _Ref = _questDisplaysStage.GetAt(_Index) as ObjectReference		
-		DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
-		_Index += 1
-	EndWhile	
-
-;;------------ Exclusion Forms
-
-	_Index = 0
-	while _Index < _ExcludedTransferItems.GetSize()
-		Form _Item = _ExcludedTransferItems.GetAt(_Index) as Form	
-		RN_ExcludedItems_Generic.AddForm(_Item)
-		_Index += 1
-	EndWhile		
-
-	_Index = 0
-	while _Index < _PrisonerChest.GetSize()
-		ObjectReference _Ref = _PrisonerChest.GetAt(_Index) as ObjectReference	
-		TCC_TokenList_ExcludedItems.AddForm(_Ref)
-		_Index += 1
-	EndWhile
+		if (_ExcludedTransferItems)
+			_Index = 0
+			while _Index < _ExcludedTransferItems.GetSize()
+				Form _Item = _ExcludedTransferItems.GetAt(_Index) as Form	
+				RN_ExcludedItems_Generic.AddForm(_Item)
+				_Index += 1
+			EndWhile		
+		endif
+		
+		if (_PrisonerChest)
+			_Index = 0
+			while _Index < _PrisonerChest.GetSize()
+				ObjectReference _Ref = _PrisonerChest.GetAt(_Index) as ObjectReference	
+				TCC_TokenList_ExcludedItems.AddForm(_Ref)
+				_Index += 1
+			EndWhile
+		endif
+	endif
 	
 	_setupDone = True
 endFunction
@@ -219,11 +232,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 		endWhile
 		
 		if (CheckValueCount1(_GlobalCount, _GlobalTotal, _GlobalComplete) && (MCM.ShowSetCompleteVal))
-			if (MCM.ShowSimpleNotificationVal)
-				_CompleteNotification.Show()
-			else
-				_CompleteMessage.Show()
-			endIf
+			_CompleteNotification.Show()
 		endIf	
 	endIf
 	
@@ -259,11 +268,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 		endif
 		
 		if (CheckValueCount1(_GlobalCount, _GlobalTotal, _GlobalComplete) && (MCM.ShowSetCompleteVal)) 
-			if (MCM.ShowSimpleNotificationVal)
-				_CompleteNotification.Show()
-			else
-				_CompleteMessage.Show()
-			endif
+			_CompleteNotification.Show()
 		endif
 	endIf
 endEvent

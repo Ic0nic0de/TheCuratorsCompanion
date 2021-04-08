@@ -7,13 +7,12 @@ import utility
 import debug
 import RN_Utility_Global
 
-RN_Utility_Script property RN_Utility auto
+RN_Utility_Script property Util auto
 RN_Main_Armory property _AddItemArmory auto
-RN_Main_Safehouse property _AddItemSafehoue auto
 RN_Main_Museum_HOHLIB property _AddItemMain_1 auto
 RN_Main_Museum_EEHMISC property _AddItemMain_2 auto
 RN_Main_SupportedMods property _AddItemPatches auto
-
+RN_Achivement_Script_Master property AchMaster auto
 RN_PatchAPI property API auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,18 +21,19 @@ RN_PatchAPI property API auto
 
 ;; String Returns
 string[] PagesList
-string Status_Return
 
 bool property advdebug auto hidden
 bool Token_Vis conditional
 
-bool property Safehouse_Enabled auto hidden
 bool Ach_Highlight
 bool Property Ach_Perks auto hidden
 bool property ReplicaTag auto hidden
 
 Bool Page1
 Bool Page2
+Bool Page3
+Bool Page4
+Bool Page5
 
 ;; General Globals
 globalvariable property DBM_SortWait auto
@@ -51,7 +51,6 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
-formlist property dbmClutter auto
 formlist property TCC_TokenList_NoShipmentCrates auto
 globalvariable property RN_moreHUD_Option auto
 
@@ -76,12 +75,10 @@ bool property ShowMuseumVal = true auto hidden ;;Museum Notifications
 bool property ShowArmoryVal = true auto hidden ;;Armory Notifications
 bool property ShowModsVal = true auto hidden ;;Supported Mod Notifications
 bool property ShowSetCompleteVal = true auto hidden ;;Section / Set Completion Notifications
-bool property ShowSimpleNotificationVal = true auto hidden ;;Simple Notification (No MessageBox)
 bool property ShowListenerVal = true auto hidden ;;Notifications for Display Listeners
 bool property Restricted auto hidden ;;Storage Restriction Value
 bool property ShowStartup = true auto hidden ;; Shows Startup Messages
 
-bool property ScanNotificationsval auto hidden ;; Museum Scan Notifications
 bool property Ach_Notify = true auto hidden
 bool property Ach_Visual = true auto hidden
 
@@ -131,9 +128,13 @@ globalvariable property RN_Museum_Dibella_Statues_Complete auto
 Formlist property _Museum_Global_Complete auto
 Formlist property _Museum_Global_Count auto
 Formlist property _Museum_Global_Total auto
+Formlist property Museum_Secton_Items_Tracking auto
+Formlist property Museum_Secton_Displays_Tracking auto
 GlobalVariable[] RN_Museum_Global_Complete 
 GlobalVariable[] RN_Museum_Global_Count 
 GlobalVariable[] RN_Museum_Global_Total 
+Int[] Museum_Invalid_Position
+Int[] Museum_Secton_Position
 String[] _Museum_Section_names
 
 Formlist property _Armory_Global_Complete auto
@@ -200,18 +201,22 @@ Int Index_Section2
 
 Quest TrackedQuest
 String TrackedPatch
-GlobalVariable TrackedCount
-GlobalVariable TrackedTotal
 
 ObjectReference[] TrackedDisplays
 ObjectReference[] TrackedDisplays2
+ObjectReference[] TrackedDisplays3
+ObjectReference[] TrackedDisplays4
+ObjectReference[] TrackedDisplays5
 String[] TrackedNames
 String[] TrackedNames2
+String[] TrackedNames3
+String[] TrackedNames4
+String[] TrackedNames5
 
 Int SetVal
 Int SetVal2
 Int SetVal3
-
+		
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -251,12 +256,32 @@ Event AddDynamicPagesList()
 	x += 1	
 	
 	Q = PagesList.Find("")	
-		PagesList[Q] = "Display Tracker (1/2)"
+		PagesList[Q] = "Display Tracker (1)"
 	x += 1
-
-	Q = PagesList.Find("")	
-		PagesList[Q] = "Display Tracker (2/2)"
-	x += 1
+	
+	if Page2
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (2)"
+		x += 1
+	endif
+	
+	if Page3
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (3)"
+		x += 1
+	endif
+	
+	if Page4
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (4)"
+		x += 1
+	endif
+	
+	if Page5
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (5)"
+		x += 1
+	endif
 	
 	Q = PagesList.Find("")	
 		PagesList[Q] = " "
@@ -283,7 +308,7 @@ Event OnPageReset(string page)
 	else
 		UnloadCustomContent()
 	endif
-	
+		
 	AddDynamicPagesList()
 	AddSettingsPage()
 	AddAdvancedPage()
@@ -295,6 +320,9 @@ Event OnPageReset(string page)
 	AddDebugPage()
 	AddTrackingPage()
 	AddTrackingPage2()
+	AddTrackingPage3()
+	AddTrackingPage4()
+	AddTrackingPage5()
 	InitmoreHUDChoiceList()
 	InitAchievementSoundList()
 	InitAttributeList()
@@ -317,10 +345,11 @@ EndFunction
 
 Function InitAchievementSoundList()
 
-	AchievementSoundList = new string[3]
+	AchievementSoundList = new string[4]
 	AchievementSoundList[0] = "Default Sound FX"
 	AchievementSoundList[1] = "Crowd Cheer FX"
-	AchievementSoundList[2] = "No Sound FX"
+	AchievementSoundList[2] = "Brass Triumph FX"
+	AchievementSoundList[3] = "No Sound FX"
 EndFunction
 
 ;-- Events --------------------------------
@@ -361,9 +390,8 @@ Function AddSettingsPage()
 		AddTextOptionST("iRelicArmoryNotifications", "Armory Items:", GetDefaultOnOff(ShowArmoryVal), 0)	
 		AddTextOptionST("iRelicModsNotifications", "Patch(es) Items:", GetDefaultOnOff(ShowModsVal), 0)
 		AddTextOptionST("iRelicListenerNotifications", "Listeners:", GetDefaultOnOff(ShowListenerVal), 0)
-		AddTextOptionST("iRelicSetCompleteNotifications", "Collection / Set Completion:", GetDefaultOnOff(ShowSetCompleteVal), 0)
-		AddTextOptionST("iRelicSimpleNotifications", "Notification Style:", GetDefaultType(ShowSimpleNotificationVal), 0)
-		
+		AddTextOptionST("iRelicSetCompleteNotifications", "Set Completion:", GetDefaultOnOff(ShowSetCompleteVal), 0)
+			
 		AddEmptyOption()		
 		AddHeaderOption("General Settings:")
 		AddTextOptionST("iRelicShowStartup", "Startup Notifications:", GetDefaultStartup(ShowStartup), 0)	
@@ -373,12 +401,11 @@ Function AddSettingsPage()
 		SetCursorPosition(1)			
 		AddHeaderOption("Mod Info:")
 		
-		AddTextOption("Thanks for downloading The Curators Companion, please", "", 0)
-		AddTextOption("read the mod description on Nexus to learn about all", "", 0)
-		AddTextOption("the different features this mod provides.", "", 0)
+		AddTextOption("Thanks for downloading The Curators Companion.", "", 0)
+		AddTextOption("Please read the information on the Nexus page", "", 0)
+		AddTextOption("to get familiar with all the features.", "", 0)
 		AddEmptyOption()
-		AddTextOption("", "Developed By [Ic0n]Ic0de", 0)
-		AddTextOption("", "Version 6.0.0", 0)	
+		AddTextOption("", "Developed By [Ic0n]Ic0de - Version 6.0.0", 0)
 		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
@@ -405,24 +432,12 @@ Function AddAdvancedPage()
 		else
 			AddtextOption("moreHUD Icon Settings:", "<font color='#750e0e'>moreHUD Not Found</font>")
 		endif
-
-		if RN_Setup_Start.GetValue()
-			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", "Wait For Setup...", 1)
-		else
-			AddTextOptionST("Safehouse_Disp", "moreHUD Safehouse Integration:", GetDefaultEnabled(Safehouse_Enabled), 0)
-		endif
 		
 		if RN_Setup_Start.GetValue()
 			AddTextOptionST("ReplicaChecking", "moreHUD Replica Checking:", "Wait For Setup...", 1)
 		else
 			AddTextOptionST("ReplicaChecking", "moreHUD Replica Checking:", GetDefaultEnabled(ReplicaTag), 0)
-		endif
-		
-		AddEmptyOption()
-		
-		AddHeaderOption("Museum Scan:")
-		AddTextOptionST("ScanNotifications", "Museum Scan Notifications", GetDefaultEnabled(ScanNotificationsval), 0)
-		AddTextOptionST("ScanMuseum", "Museum Scan (Manual)", "Scan Now", 0)			
+		endif				
 		
 		AddEmptyOption()
 
@@ -431,6 +446,7 @@ Function AddAdvancedPage()
 		AddTextOptionST("iRelicRestrictionOptions", "Relic Storage Restriction:" , GetDefaultOnOff(Restricted), 0)
 		AddTextOptionST("Token_Visibility", "Storage Token Recipe:", GetDefaultOnOff(Token_Vis), 0)
 		AddMenuOptionST("TransferListOptions", "Transfer Station:", TransferList[IndexTransfer])
+		
 		SetCursorPosition(1)
 		AddHeaderOption("Custom Storage Containers: (" + TCC_TokenList_NoShipmentCrates.GetSize() as Int + "/6)")
 		ObjectReference _Container
@@ -451,7 +467,8 @@ Function AddAdvancedPage()
 			AddTextOption(_Container.GetDisplayName(), _ContainerLocation, 0)
 		endWhile
 		
-		SetCursorPosition(19)
+		AddEmptyOption()
+		AddEmptyOption()
 		AddHeaderOption("Custom Storage Containers Information:")
 		AddTextOptionST("ShowCustomContainerInfo", "Click to Show Information", "", 0)		
 	endif
@@ -488,7 +505,7 @@ Function AddAchievementsPage()
 			SetCursorPosition(PageIdx + 1)
 			if RN_Ach_Globals[_Index] != none
 				if RN_Ach_Globals[_Index].GetValue()
-					if _Index == 28
+					if _Index == 29
 						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Awarded", 0)
 						PageIdx += 1
 					else
@@ -496,7 +513,7 @@ Function AddAchievementsPage()
 						PageIdx += 1
 					endif
 				else
-					if _Index == 28
+					if _Index == 29
 						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Locked", 1)
 						PageIdx += 1
 					else
@@ -508,9 +525,9 @@ Function AddAchievementsPage()
 			_Index +=1		
 		endWhile
 		
-		SetCursorPosition(PageIdx + 2)
+		SetCursorPosition(PageIdx + 1)
 		AddHeaderOption("Community Achievements:")
-		PageIdx += 2
+		PageIdx += 1
 		SetCursorPosition(PageIdx + 1) 
 		AddHeaderOption("Awarded: " + GetCurrentAchievementCount(RN_ComAchievements_Listener_Count, RN_ComAchievement_Globals) + " Community Achievements")
 		PageIdx += 1
@@ -547,24 +564,24 @@ Function AddMuseumSetsPage()
 				
 		Int _Index = 0
 		Int _Length = RN_Museum_Global_Complete.length
-		While _Index < _Length 			
-			
+		While _Index < _Length			
+				
 			if RN_Museum_Global_Complete[_Index] != none
 				if RN_Museum_Global_Complete[_Index].GetValue()
 					AddTextOption(_Museum_Section_names[_Index], "Complete", 1)
 				elseif RN_Scan_Registered.GetValue()
 					AddTextOption(_Museum_Section_names[_Index], "Updating...", 1)
 				else
-					AddTextOption(_Museum_Section_names[_Index], self.GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
+					if _Index == 8 || _Index == 11
+						Museum_Invalid_Position[_Index] = AddTextOption(_Museum_Section_names[_Index], self.GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
+					else
+						Museum_Secton_Position[_Index] = AddTextOption(_Museum_Section_names[_Index], self.GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
+					endif
 				endif
 			endif
 			_Index += 1
 			
 			if _Index == 8 && !RN_CreationClubContent_Installed.GetValue()
-				_Index += 1
-			endif
-			
-			if _Index == 12 && !Safehouse_Enabled
 				_Index += 1
 			endif
 		endWhile
@@ -630,25 +647,22 @@ Function AddMuseumSetsPage()
 		if RN_CreationClubContent_Installed.GetValue()
 			AddEmptyOption()
 		endif
-		if Safehouse_Enabled
-			AddEmptyOption()
-		endif
 		AddEmptyOption()
 		AddEmptyOption()		
 		AddTextOption("Completed:", GetCurrentMuseumCount(SetVal), 0)
 		AddEmptyOption()
-		AddHeaderOption("Display Information:")
-		AddTextOption("This section can be used to keep track of displays from", "", 0)
-		AddTextOption("completing quests, exploring the world, levelling your", "", 0)
-		AddTextOption("skills and finding certain items hidden around the world", "", 0)
-		AddTextOption("such as paintings and Dibella statues.", "", 0)
+		AddHeaderOption("Display Information:")		
+		AddTextOption("This section of the MCM can be used to keep track of", "", 0)
+		AddTextOption("displays from completing quests, Levelling up skills", "", 0)
+		AddTextOption("exploring the world and finding hidden items such as", "", 0)
+		AddTextOption("paintings and Dibella statues.", "", 0)
 		AddEmptyOption()
 		AddTextOption("Completed:", self.GetDisplaySectionCount(iDisplaySectionComplete), 0)
 		AddEmptyOption()
 		AddHeaderOption("Wealth Information:")
-		AddTextOption("This section tracks the Museum value as well as the Gold", "", 0)
-		AddTextOption("value of the Treasury rooms, the figures update after", "", 0)
-		AddTextOption("displaying items or adding / removing Gold.", "", 0)
+		AddTextOption("This section tracks the Museum value as well as the", "", 0)
+		AddTextOption("gold value of the different treasury rooms.", "", 0)
+		AddEmptyOption()
 		AddTextOptionST("GetMuseumValue", "Total Museum value:", self.GetTotalTreasuryValue(RN_MuseumValue, RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3), 0)
 	endif
 endFunction
@@ -756,101 +770,83 @@ Function AddCompletedModsPage()
 		SetVal = BuildTotalsArray(SetVal, RN_Patches_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)				
-		
-		AddHeaderOption("Untracked Patch(es):", 0)
-		if (Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255 && Safehouse_Enabled)
-			AddTextOptionST("SHBox", "Safehouse Plus", "<font color='#2b6320'>Installed</font>", 0)
-		else
-			AddTextOptionST("SHBox", "Safehouse Plus", "<font color='#750e0e'>Not Installed</font>", 0)
-		endif
-		
+		AddHeaderOption(GetCurrentCountInt(SetVal, RN_SupportedModCount) + " Official Patch(es) Completed", 0)
 		SetCursorPosition(1)
 		AddHeaderOption("", 0)
 		
-		if (Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255 && Safehouse_Enabled)
-			AddTextOptionST("CHBox", "Cheesemod for Everyone", "<font color='#2b6320'>Installed</font>", 0)
-		else
-			AddTextOptionST("CHBox", "Cheesemod for Everyone", "<font color='#750e0e'>Not Installed</font>", 0)
-		endif	
-		
-		SetCursorPosition(4)
-		AddHeaderOption(GetCurrentCountInt(SetVal, RN_SupportedModCount) + " Official Patch(es) Completed", 0)
-		
-		SetCursorPosition(5)
-		AddHeaderOption("", 0)
-		
-		if RN_SupportedModCount.GetValue() > 0
-			Int PageIdx = 5	
-			Int _Index = 0
-			While _Index < RN_Patches_Name.length			
-				SetCursorPosition(PageIdx + 1)
-				if RN_Patches_Name[_Index] != ""
-					if RN_Patches_Complete_Array[_Index].GetValue()
-						AddTextOption(RN_Patches_Name[_Index], "Complete", 1)
-						PageIdx += 1
-					elseif RN_Scan_Registered.GetValue()
-						AddTextOption(RN_Patches_Name[_Index], "Updating...", 1)
-						PageIdx += 1
-					else
-						RN_Patches_Position_Array[_Index] = AddTextOption(RN_Patches_Name[_Index], self.GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]), 0)
-						PageIdx += 1
-					endif
+		Int PageIdx = 1	
+		Int _Index = 0
+		While _Index < RN_Patches_Name.length			
+			SetCursorPosition(PageIdx + 1)
+			if RN_Patches_Name[_Index] != ""
+				if RN_Patches_Complete_Array[_Index].GetValue()
+					AddTextOption(RN_Patches_Name[_Index], "Complete", 1)
+					PageIdx += 1
+				elseif RN_Scan_Registered.GetValue()
+					AddTextOption(RN_Patches_Name[_Index], "Updating...", 1)
+					PageIdx += 1
+				else
+					RN_Patches_Position_Array[_Index] = AddTextOption(RN_Patches_Name[_Index], self.GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]), 0)
+					PageIdx += 1
 				endif
-				_Index +=1
-			endWhile
-		else
-			SetCursorPosition(4)
-			AddHeaderOption("Official Patch(es)", 0)
-			AddTextOption("No Trackable Patch(es) Installed", "", 1)
-		endif
+			endif
+			_Index +=1
+		endWhile
 	endif
 endFunction
 
-State CHBox
-	event OnHighlightST() 
-		if (Game.GetModByName("LOTD_TCC_CheeseMod.esp") != 255)
-			if !Safehouse_Enabled
-				SetInfoText("Cheesemod for Everyone appears to be in your load order, please enable 'Safehouse Integration' from the 'Advanced Settings' page to enable TCC features on items from this mod.")
-			else
-				SetInfoText("Cheesemod for Everyone appears to be in your load order and configured correctly, please remember items from this patch can not be tracked")
-			endif
-		else
-			SetInfoText("The Cheesemod for Everyone patch does not appear to be enabled in your load order")
-		endif
-	endevent
-endstate
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------------------------------------Mods Page -------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-State SHBox
-	event OnHighlightST() 
-		if (Game.GetModByName("LOTD_TCC_SafehousePlus.esp") != 255)
-			if !Safehouse_Enabled
-				SetInfoText("Safehouse Plus appears to be in your load order, please enable 'Safehouse Integration' from the 'Advanced Settings' page to enable TCC features on items from this mod.")
-			else
-				SetInfoText("Safehouse Plus appears to be in your load order and configured correctly, please remember items from this patch can not be tracked")
+Function AddCustomModsPage()
+
+	if CurrentPage == "Custom Patches"
+		SetVal = BuildTotalsArray(SetVal, RN_Custom_Complete_Array)
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		SetCursorPosition(0)									
+		AddHeaderOption(GetCurrentCountInt(SetVal, RN_CustomModCount) + " Custom Patch(es) Completed", 0)
+		SetCursorPosition(1)
+		AddHeaderOption("", 0)
+		
+		Int PageIdx = 1
+		Int _Index = 0
+		While _Index < RN_Custom_Name.length
+			SetCursorPosition(PageIdx + 1)
+			if RN_Custom_Name[_Index] != ""
+				if RN_Custom_Complete_Array[_Index].GetValue()
+					AddTextOption(RN_Custom_Name[_Index], "Complete", 1)
+					PageIdx += 1
+				elseif RN_Scan_Registered.GetValue()
+					AddTextOption(RN_Custom_Name[_Index], "Updating...", 1)
+					PageIdx += 1
+				else
+					RN_Custom_Position_Array[_Index] = AddTextOption(RN_Custom_Name[_Index], self.GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]), 0)
+					PageIdx += 1
+				endif
 			endif
-		else
-			SetInfoText("The Safehouse Plus patch does not appear to be enabled in your load order")
-		endif
-	endevent
-endstate
+			_Index +=1			
+		endWhile	
+	endif
+endFunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Patch Tracking Page 1 --------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Function AddTrackingPage()
-
-	if CurrentPage == "Display Tracker (1/2)"
-
+	
+	if CurrentPage == "Display Tracker (1)"
+		
 		if !Page1
 			AddTextOption("No Tracking Data To Display...", "", 1)
 			return
 		endif
-		
+	
 		SetTitleText(TrackedPatch)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)									
-		AddHeaderOption(TrackedCount.GetValue() as Int + " / " + TrackedTotal.GetValue() as Int + " Displays Enabled", 0)
+		AddHeaderOption(TrackedPatch + " Displays", 0)
 		SetCursorPosition(1)
 		AddHeaderOption("", 0)
 		
@@ -873,6 +869,8 @@ Function AddTrackingPage()
 		
 		if Page2
 			AddTextOption("Continue on Page 2...", "", 1)
+		else
+			AddTextOption("End of Displays...", "", 1)
 		endif
 	endif
 endFunction
@@ -882,7 +880,7 @@ endFunction
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Function AddTrackingPage2()
-	if CurrentPage == "Display Tracker (2/2)"
+	if CurrentPage == "Display Tracker (2)"
 	
 		if !Page2
 			AddTextOption("No Tracking Data To Display...", "", 1)
@@ -892,7 +890,7 @@ Function AddTrackingPage2()
 		SetTitleText(TrackedPatch)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)									
-		AddHeaderOption(TrackedCount.GetValue() as Int + " / " + TrackedTotal.GetValue() as Int + " Displays Enabled", 0)
+		AddHeaderOption(TrackedPatch + " Displays", 0)
 		SetCursorPosition(1)
 		AddHeaderOption("", 0)
 		
@@ -912,45 +910,140 @@ Function AddTrackingPage2()
 			endif
 			_Index +=1			
 		endWhile
+		
+		if Page3
+			AddTextOption("Continue on Page 3...", "", 1)
+		else
+			AddTextOption("End of Displays...", "", 1)
+		endif
 	endif
 endFunction	
+
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------- Patch Tracking Page 3 --------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Function AddTrackingPage3()
+	if CurrentPage == "Display Tracker (3)"
 	
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------Mods Page -------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-Function AddCustomModsPage()
-
-	if CurrentPage == "Custom Patches"
-		SetVal = BuildTotalsArray(SetVal, RN_Custom_Complete_Array)
+		if !Page3
+			AddTextOption("No Tracking Data To Display...", "", 1)
+			return
+		endif
+		
+		SetTitleText(TrackedPatch)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)									
-		AddHeaderOption(GetCurrentCountInt(SetVal, RN_CustomModCount) + " Custom Patch(es) Completed", 0)
+		AddHeaderOption(TrackedPatch + " Displays", 0)
+		SetCursorPosition(1)
+		AddHeaderOption("", 0)
+	
+		Int PageIdx = 1
+		Int _Index = 0
+		While _Index < TrackedDisplays3.length
+			SetCursorPosition(PageIdx + 1)
+			
+			if (TrackedNames3[_Index] != "")
+				if (TrackedDisplays3[_Index].IsEnabled())
+					AddToggleOption(TrackedNames3[_Index], TrackedDisplays3[_Index].IsEnabled(), 1)
+					PageIdx += 1
+				else
+					AddToggleOption(TrackedNames3[_Index], TrackedDisplays3[_Index].IsEnabled())
+					PageIdx += 1
+				endif
+			endif
+			_Index +=1			
+		endWhile
+		
+		if Page4
+			AddTextOption("Continue on Page 4...", "", 1)
+		else
+			AddTextOption("End of Displays...", "", 1)
+		endif
+	endif
+endFunction	
+
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------- Patch Tracking Page 4 --------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Function AddTrackingPage4()
+	if CurrentPage == "Display Tracker (4)"
+	
+		if !Page4
+			AddTextOption("No Tracking Data To Display...", "", 1)
+			return
+		endif
+		
+		SetTitleText(TrackedPatch)
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		SetCursorPosition(0)									
+		AddHeaderOption(TrackedPatch + " Displays", 0)
 		SetCursorPosition(1)
 		AddHeaderOption("", 0)
 		
-		if RN_CustomModCount.GetValue() > 0
-			Int PageIdx = 1
-			Int _Index = 0
-			While _Index < RN_Custom_Name.length
-				SetCursorPosition(PageIdx + 1)
-				if RN_Custom_Name[_Index] != ""
-					if RN_Custom_Complete_Array[_Index].GetValue()
-						AddTextOption(RN_Custom_Name[_Index], "Complete", 1)
-						PageIdx += 1
-					elseif RN_Scan_Registered.GetValue()
-						AddTextOption(RN_Custom_Name[_Index], "Updating...", 1)
-						PageIdx += 1
-					else
-						RN_Custom_Position_Array[_Index] = AddTextOption(RN_Custom_Name[_Index], self.GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]), 0)
-						PageIdx += 1
-					endif
+		Int PageIdx = 1
+		Int _Index = 0
+		While _Index < TrackedDisplays4.length
+			SetCursorPosition(PageIdx + 1)
+			
+			if (TrackedNames4[_Index] != "")
+				if (TrackedDisplays4[_Index].IsEnabled())
+					AddToggleOption(TrackedNames4[_Index], TrackedDisplays4[_Index].IsEnabled(), 1)
+					PageIdx += 1
+				else
+					AddToggleOption(TrackedNames4[_Index], TrackedDisplays4[_Index].IsEnabled())
+					PageIdx += 1
 				endif
-				_Index +=1			
-			endWhile	
+			endif
+			_Index +=1			
+		endWhile
+		
+		if Page5
+			AddTextOption("Continue on Page 5...", "", 1)
+		else
+			AddTextOption("End of Displays...", "", 1)
 		endif
 	endif
-endFunction
+endFunction	
+
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------- Patch Tracking Page 5 --------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Function AddTrackingPage5()
+	if CurrentPage == "Display Tracker (5)"
+	
+		if !Page5
+			AddTextOption("No Tracking Data To Display...", "", 1)
+			return
+		endif
+		
+		SetTitleText(TrackedPatch)
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		SetCursorPosition(0)									
+		AddHeaderOption(TrackedPatch + " Displays", 0)
+		SetCursorPosition(1)
+		AddHeaderOption("", 0)
+	
+		Int PageIdx = 1
+		Int _Index = 0
+		While _Index < TrackedDisplays5.length
+			SetCursorPosition(PageIdx + 1)
+			
+			if (TrackedNames5[_Index] != "")
+				if (TrackedDisplays5[_Index].IsEnabled())
+					AddToggleOption(TrackedNames5[_Index], TrackedDisplays5[_Index].IsEnabled(), 1)
+					PageIdx += 1
+				else
+					AddToggleOption(TrackedNames5[_Index], TrackedDisplays5[_Index].IsEnabled())
+					PageIdx += 1
+				endif
+			endif
+			_Index +=1			
+		endWhile
+	endif
+endFunction	
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;-------------------------------------------------------------------------------- Debug Page ------------------------------------------------------------------------------------------------------
@@ -982,17 +1075,18 @@ Function AddDebugPage()
 		SetCursorPosition(0)
 		AddHeaderOption("Debug Options:")
 		
-		AddTextOptionST("Scan_Debug", "Reset Museum Scanner", "", 0)
-		AddtoggleOptionST("AdvancedDebugging", "Enable Debugging", advdebug)
+		AddTextOptionST("Scan_Debug", "Reset Museum Scanner", "Reset", 0)
+		AddTextOptionST("AchPreview", "Preview Achievement FX", "Preview", 0)
+		AddTextOptionST("ScanMuseum", "Confirm Museum Counts", "Update", 0)
+		AddTextOptionST("AdvancedDebugging", "Enable Debugging", GetDefaultEnabled(advdebug))
 		AddEmptyOption()
 		AddEmptyOption()
 		AddHeaderOption("moreHUD Debug:")
 		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
-		AddTextOption("moreHUD clutter Count:", dbmClutter.GetSize() As Int, 1)
 		AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 1)
 		AddTextOption("moreHUD found count:", dbmFound.GetSize() As Int, 1)
 		AddTextOption("moreHUD displayed count:", dbmDisp.GetSize() As Int, 1)
-		AddTextOption("moreHUD total Count:", (dbmMaster.GetSize() As Int + dbmClutter.GetSize() As Int), 1)
+		AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 1)
 		
 		AddEmptyOption()
 		AddHeaderOption("Mod Status:")
@@ -1023,6 +1117,8 @@ Function AddDebugPage()
 		endif	
 		
 		AddEmptyOption()
+		AddEmptyOption()
+		AddEmptyOption()
 		AddHeaderOption("moreHUD Icon Support:")
 		
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") < 30800
@@ -1036,7 +1132,6 @@ Function AddDebugPage()
 		else
 			AddTextOption("moreHUD Inventory Edition:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") + "]", 0)
 		endif
-		AddEmptyOption()
 		AddEmptyOption()
 		AddEmptyOption()
 		AddEmptyOption()
@@ -1073,8 +1168,14 @@ state RefreshMCM
 		SetTitleText("=== PLEASE EXIT THE MCM ===")
 		While bRefresh
 			if !IsInMenuMode()
+				Page1 = False
+				Page2 = False
+				Page3 = False
+				Page4 = False
+				Page5 = False
 				Build_Arrays()
 				BuildPatchArray(true, true)
+				
 				AddDynamicPagesList()		
 				bRefresh = false
 				Debug.Notification("The Curators Companion: MCM Rebuilt")
@@ -1144,10 +1245,8 @@ Function Begin_Config_Save()
 		jsonutil.SetPathIntValue("TCC_Config", ".!ShowArmoryVal", ShowArmoryVal as Int)	
 		jsonutil.SetPathIntValue("TCC_Config", ".!ShowModsVal", ShowModsVal as Int)	
 		jsonutil.SetPathIntValue("TCC_Config", ".!ShowSetCompleteVal", ShowSetCompleteVal as Int)	
-		jsonutil.SetPathIntValue("TCC_Config", ".!ShowSimpleNotificationVal", ShowSimpleNotificationVal as Int)	
 		jsonutil.SetPathIntValue("TCC_Config", ".!ShowListenerVal", ShowListenerVal as Int)			
 		jsonutil.SetPathIntValue("TCC_Config", ".!ShowStartup", ShowStartup as Int)	
-		jsonutil.SetPathIntValue("TCC_Config", ".!ScanNotificationsval", ScanNotificationsval as Int)	
 		jsonutil.SetPathIntValue("TCC_Config", ".!Restricted", Restricted as Int)	
 		jsonutil.SetPathIntValue("TCC_Config", ".!Token_Vis", Token_Vis as Int)
 		jsonutil.SetPathIntValue("TCC_Config", ".!Ach_Notify", Ach_Notify as Int)
@@ -1188,11 +1287,9 @@ Function Begin_Config_Load()
 			if ShowMuseumVal
 				_AddItemMain_1.GoToState("Notify")
 				_AddItemMain_2.GoToState("Notify")
-				_AddItemSafehoue.GoToState("Notify")
 			else
 				_AddItemMain_1.GoToState("Silent")
 				_AddItemMain_2.GoToState("Silent")
-				_AddItemSafehoue.GoToState("Silent")
 			endif				
 
 			ShowArmoryVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowArmoryVal", ShowArmoryVal as Int))
@@ -1210,10 +1307,8 @@ Function Begin_Config_Load()
 			endif
 			
 			ShowSetCompleteVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowSetCompleteVal", ShowSetCompleteVal as Int))
-			ShowSimpleNotificationVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowSimpleNotificationVal", ShowSimpleNotificationVal as Int))
 			ShowListenerVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowListenerVal", ShowListenerVal as Int))
 			ShowStartup = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowStartup", ShowStartup as Int))
-			ScanNotificationsval = (jsonutil.GetPathIntValue("TCC_Config", ".!ScanNotificationsval", ScanNotificationsval as Int))
 			Restricted = (jsonutil.GetPathIntValue("TCC_Config", ".!Restricted", Restricted as Int))
 			Token_Vis = (jsonutil.GetPathIntValue("TCC_Config", ".!Token_Vis", Token_Vis as Int))
 			Ach_Notify = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Notify", Ach_Notify as Int))
@@ -1348,7 +1443,6 @@ Function Begin_Config_Default()
 	ShowMuseumVal = False
 	_AddItemMain_1.GoToState("Silent")
 	_AddItemMain_2.GoToState("Silent")
-	_AddItemSafehoue.GoToState("Silent")
 	
 	ShowArmoryVal = False
 	_AddItemArmory.GoToState("Silent")
@@ -1357,7 +1451,6 @@ Function Begin_Config_Default()
 	_AddItemPatches.GoToState("Silent")
 	
 	ShowSetCompleteVal = True
-	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
 	ShowStartup = True
 	Restricted = True
@@ -1375,8 +1468,6 @@ Function Begin_Config_Default()
 		AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
 		AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
 	endif
-	
-	ScanNotificationsval = True
 	
 	Token_Vis = True
 	IndexTransfer = 0
@@ -1400,7 +1491,6 @@ Function Begin_Config_Author()
 	ShowMuseumVal = False
 	_AddItemMain_1.GoToState("Silent")
 	_AddItemMain_2.GoToState("Silent")
-	_AddItemSafehoue.GoToState("Silent")
 	
 	ShowArmoryVal = False
 	_AddItemArmory.GoToState("Silent")
@@ -1409,7 +1499,6 @@ Function Begin_Config_Author()
 	_AddItemPatches.GoToState("Silent")
 	
 	ShowSetCompleteVal = True
-	ShowSimpleNotificationVal = True
 	ShowListenerVal = True
 	ShowStartup = True
 	Token_Vis = True
@@ -1429,7 +1518,6 @@ Function Begin_Config_Author()
 	endif
 	
 	Restricted = False
-	ScanNotificationsval = True
 	
 	Ach_Notify = True
 	Ach_Visual = True
@@ -1454,7 +1542,7 @@ state ScanMuseum
 		if ShowMessage("This will start the process of Scanning the Museum for completed sets... do you want to scan now?", true, "Scan", "Cancel")
 			ShowMessage("Please exit the MCM and wait for the scan to complete", false, "Ok")
 			SetTitleText("=== PLEASE EXIT THE MCM ===")
-			RN_Utility.ScanMuseum()
+			Util.ScanMuseum()
 		endif
 	endEvent
 
@@ -1462,22 +1550,6 @@ state ScanMuseum
 
 		SetInfoText("Selecting this option will scan the Museum & Armory for all displayed items and update the listings within this mod.")
 	endEvent
-endState
-
-;;------------------------------
-
-state ScanNotifications
-
-	Event OnSelectST()
-	
-		ScanNotificationsval = !ScanNotificationsval
-		SetTextOptionValueST(GetDefaultEnabled(ScanNotificationsval), false, "")
-	EndEvent
-
-	Event OnHighlightST()
-
-		SetInfoText("Enables / Disables Museum Scanner Notifications\n Default: Enabled")
-	EndEvent
 endState
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1505,6 +1577,27 @@ endState
 
 ;;-------------------------------
 
+state AchPreview
+
+	Event OnSelectST()
+	
+		ShowMessage("Please exit the MCM to preview the current achievement FX settings", false, "Ok")
+		SetTitleText("=== Please Exit The MCM ===")
+		While IsInMenuMode()
+			Wait(1)
+		endwhile
+		
+		AchMaster.Preview()	
+	EndEvent
+
+	Event OnHighlightST()
+
+		SetInfoText("Select and then exit the MCM to preview the current achievement FX settings")
+	EndEvent
+endState
+
+;;-------------------------------
+
 state AdvancedDebugging
 
 	Event OnSelectST()		
@@ -1521,7 +1614,7 @@ state AdvancedDebugging
 		endIf
 		
 		
-		SetToggleOptionValueST(advdebug)
+		SetTextOptionValueST(GetDefaultEnabled(advdebug))
 	EndEvent
 
 	Event OnHighlightST()
@@ -1540,7 +1633,7 @@ state RebuildLists
 			if ShowMessage("This will rebuild and update the moreHUD lists for all new / found / displayed items, do you want to rebuild now?", true, "Rebuild", "Cancel")
 				
 				ShowMessage("Please exit the MCM and wait for a completion message", false, "Ok")
-				RN_Utility.RebuildLists()
+				Util.RebuildLists()
 			endif
 		endif
 	EndEvent
@@ -1555,21 +1648,6 @@ endState
 ;;----------------------------------------------------------------------------- Notifications Options -----------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-state iRelicSimpleNotifications ;;Simple Notifications
-
-
-	Event OnSelectST()
-		ShowSimpleNotificationVal = !ShowSimpleNotificationVal 
-		
-		SetTextOptionValueST(GetDefaultType(ShowSimpleNotificationVal), false, "")
-	EndEvent
-
-	Event OnHighlightST()
-
-		SetInfoText("Display a basic notification in the corner of the screen instead of the default pop-up message box.\n Default: Notification")
-	EndEvent
-endState
-
 ;;-------------------------------
 
 state iRelicMuseumNotifications
@@ -1580,11 +1658,9 @@ state iRelicMuseumNotifications
 		if ShowMuseumVal
 			_AddItemMain_1.GoToState("Notify")
 			_AddItemMain_2.GoToState("Notify")
-			_AddItemSafehoue.GoToState("Notify")
 		else
 			_AddItemMain_1.GoToState("Silent")
 			_AddItemMain_2.GoToState("Silent")
-			_AddItemSafehoue.GoToState("Silent")
 		endif
 		
 		SetTextOptionValueST(GetDefaultOnOff(ShowMuseumVal), false, "")
@@ -1748,7 +1824,7 @@ State ReplicaChecking
 				While IsInMenuMode()
 					Wait(1)
 				endwhile
-				RN_Utility.EnableReplica()
+				Util.EnableReplica()
 			else
 				ReplicaTag = False
 			endif
@@ -1759,7 +1835,7 @@ State ReplicaChecking
 				While IsInMenuMode()
 					Wait(1)
 				endwhile
-				RN_Utility.DisableReplica()
+				Util.DisableReplica()
 			else
 				ReplicaTag = True
 			endif
@@ -1945,47 +2021,6 @@ endState
 
 ;;-------------------------------
 
-state Safehouse_Disp
-	
-	function OnSelectST()
-	
-		Safehouse_Enabled = !Safehouse_Enabled 
-		
-		if Safehouse_Enabled
-			if ShowMessage("This will Enable moreHUD icons and functionality for all standard Safehouse displays, do you want to enable now?", true, "Enable", "Cancel")
-				SetTextOptionValueST(GetDefaultEnabled(Safehouse_Enabled), false, "")
-				ShowMessage("Please exit the MCM and wait for the setup complete notification", false, "Ok")
-				SetTitleText("=== PLEASE EXIT THE MCM ===")
-				While IsInMenuMode()
-					Wait(0.5)
-				endWhile
-				RN_Utility.SetUpSafehouse()
-			else
-				Safehouse_Enabled = false
-			endif
-		elseif !Safehouse_Enabled
-			if ShowMessage("This will disable moreHUD icons and functionality for all standard Safehouse displays, do you want to disable them now?", true, "Disable", "Cancel")
-				SetTextOptionValueST(GetDefaultEnabled(Safehouse_Enabled), false, "")
-				ShowMessage("Please exit the MCM and wait for the completed message to show", false, "Ok")
-				SetTitleText("=== PLEASE EXIT THE MCM ===")
-				While IsInMenuMode()
-					Wait(0.5)
-				endWhile
-				RN_Utility.DisableSafehouse()
-			else
-				Safehouse_Enabled = true
-			endif		
-		endif			
-	EndFunction
-
-	Event OnHighlightST()
-
-		SetInfoText("Enable this to show moreHUD icons and add functionality to general Safehouse items including Safehouse Plus & CheeseMod for Everyone\n Default: Disabled")
-	EndEvent
-endState
-
-;;-------------------------------
-
 State Disable_AchievementPerks
 
 	function OnSelectST()
@@ -2112,9 +2147,8 @@ string function GetCurrentCount(GlobalVariable akVariable, GlobalVariable akVari
 	
 	Int Current_Count = (akVariable.GetValue()) as Int	
 	Int Total_Count = (akVariableB.GetValue()) as Int
-	
-		Status_Return = (Current_Count + "/" + Total_Count)
-	return Status_Return
+
+	return (Current_Count + "/" + Total_Count) as String
 endFunction
 
 ;;-------------------------------
@@ -2143,10 +2177,6 @@ string function GetCurrentMuseumCount(Int val)
 	if RN_CreationClubContent_Installed.GetValue()
 		Total_Room += 1
 	endif
-
-	if Safehouse_Enabled
-		Total_Room += 1
-	endif
 	
 	return (val + "/" + Total_Room + " Sections")
 endFunction
@@ -2155,8 +2185,7 @@ endFunction
 
 string function GetCurrentAchievementCount(GlobalVariable akVariable, formlist akTotal)
 
-		Status_Return = (akVariable.GetValue() as Int + "/" + akTotal.GetSIze() as Int)
-	return Status_Return
+	return (akVariable.GetValue() as Int + "/" + akTotal.GetSIze() as Int)
 endFunction
 
 ;;-------------------------------
@@ -2165,8 +2194,7 @@ string function GetDisplaySectionCount(GlobalVariable akVariable)
 	
 	Int Current_Count = (akVariable.GetValue()) as Int	
 	
-		Status_Return = (Current_Count + "/6 Sections")
-	return Status_Return
+	return (Current_Count + "/6 Sections")
 endFunction
 
 ;;-------------------------------
@@ -2208,19 +2236,26 @@ endFunction
 	
 ;;-------------------------------
 
-Function SetupPage(Quest _Quest, GlobalVariable _Count, GlobalVariable _Total, String _Name, Formlist _Items = none, Formlist _Displays = none)
+Function SetupPage(Quest _Quest, String _Name, Formlist _Items = none, Formlist _Displays = none)
 
 	SetTitleText("=== Please Wait ===")
 	TrackedNames = new string[128]
 	TrackedNames2 = new string[128]
+	TrackedNames3 = new string[128]
+	TrackedNames4 = new string[128]
+	TrackedNames5 = new string[128]
 	TrackedDisplays = new objectreference[128]
 	TrackedDisplays2 = new objectreference[128]
+	TrackedDisplays3 = new objectreference[128]
+	TrackedDisplays4 = new objectreference[128]
+	TrackedDisplays5 = new objectreference[128]
 	TrackedQuest = _Quest
-	TrackedCount = _Count
-	TrackedTotal = _Total
 	TrackedPatch = 	_Name
 	Page1 = True
 	Page2 = False
+	Page3 = False
+	Page4 = False
+	Page5 = False
 	
 	if _Quest
 		SetTrackerArray()
@@ -2235,11 +2270,20 @@ endFunction
 Event OnOptionSelect(Int _Val)
 	
 	Int Index
-	if CurrentPage == "Official Patches"
+
+	if CurrentPage == "Museum Sections"
+		Index = Museum_Secton_Position.find(_Val)
+		if Index != -1 
+			if ShowMessage("Would you like to start tracking the " + _Museum_Section_names[Index] + "?", true, "Track", "Cancel")
+				SetupPage(none, _Museum_Section_names[Index], Museum_Secton_Items_Tracking.GetAt(Index) as formlist, Museum_Secton_Displays_Tracking.GetAt(Index) as formlist)
+			endif
+		endif
+		
+	elseif CurrentPage == "Official Patches"
 		Index = RN_Patches_Position_Array.find(_Val)
 		if Index != -1 
 			if ShowMessage("Would you like to start tracking " + RN_Patches_Name[Index] + "?", true, "Track", "Cancel")
-				SetupPage(RN_Patches_Quests_Array[Index], RN_Patches_Count_Array[Index], RN_Patches_Total_Array[Index], RN_Patches_Name[Index])
+				SetupPage(RN_Patches_Quests_Array[Index], RN_Patches_Name[Index])
 			endif
 		endif
 		
@@ -2247,7 +2291,7 @@ Event OnOptionSelect(Int _Val)
 		Index = RN_Custom_Position_Array.find(_Val)
 		if Index != -1 
 			if ShowMessage("Would you like to start tracking " + RN_Custom_Name[Index] + "?", true, "Track", "Cancel")
-				SetupPage(RN_Custom_Quests_Array[Index], RN_Custom_Count_Array[Index], RN_Custom_Total_Array[Index], RN_Custom_Name[Index])		
+				SetupPage(RN_Custom_Quests_Array[Index], RN_Custom_Name[Index])		
 			endif
 		endif
 		
@@ -2255,19 +2299,19 @@ Event OnOptionSelect(Int _Val)
 		Index = _Armory_Section_Position.find(_Val)
 		if Index != -1 
 			if ShowMessage("Would you like to start tracking the " + _Armory_Section_names[Index] + "?", true, "Track", "Cancel")
-				SetupPage(None, RN_Armory_Global_Count[Index], RN_Armory_Global_Total[Index], _Armory_Section_names[Index], _Armory_Formlist_Items_Tracking.GetAt(Index) as formlist, _Armory_Formlist_Displays_Tracking.GetAt(Index) as formlist)
+				SetupPage(None, _Armory_Section_names[Index], _Armory_Formlist_Items_Tracking.GetAt(Index) as formlist, _Armory_Formlist_Displays_Tracking.GetAt(Index) as formlist)
 			endif
 		else
 			Index = RN_Section_Position_Array.find(_Val)
 			if Index != -1 
 				if ShowMessage("Would you like to start tracking the Heavy Armory " + RN_Section_Name[Index] + "?", true, "Track", "Cancel")
-					SetupPage(None, RN_Section_Count_Array[Index], RN_Section_Total_Array[Index], "Heavy Armory -" + RN_Section_Name[Index], RN_Section_ItemsList.GetAt(Index) as formlist, RN_Section_DisplaysList.GetAt(Index) as formlist)
+					SetupPage(None, "Heavy Armory - " + RN_Section_Name[Index], RN_Section_ItemsList.GetAt(Index) as formlist, RN_Section_DisplaysList.GetAt(Index) as formlist)
 				endif
 			else
 				Index = RN_Section2_Position_Array.find(_Val)
 				if Index != -1 
 					if ShowMessage("Would you like to start tracking the Immersive Weapons " + RN_Section2_Name[Index] + "?", true, "Track", "Cancel")
-						SetupPage(None, RN_Section2_Count_Array[Index], RN_Section2_Total_Array[Index], "Immersive Weapons - " + RN_Section2_Name[Index], RN_Section2_ItemsList.GetAt(Index) as formlist, RN_Section2_DisplaysList.GetAt(Index) as formlist)
+						SetupPage(None, "Immersive Weapons - " + RN_Section2_Name[Index], RN_Section2_ItemsList.GetAt(Index) as formlist, RN_Section2_DisplaysList.GetAt(Index) as formlist)
 					endif
 				endif
 			endif
@@ -2278,9 +2322,21 @@ EndEvent
 ;;-------------------------------
 
 Event OnOptionHighlight(Int _Val)
-
+		
 	Int Index
-	if CurrentPage == "Official Patches"
+
+	if CurrentPage == "Museum Sections"
+		Index = Museum_Secton_Position.find(_Val)
+		if Index != -1 
+			SetInfoText("Click to track the " + _Museum_Section_names[Index] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from patches.")
+		else
+			Index = Museum_Invalid_Position.find(_Val)
+			if Index != -1 
+				SetInfoText("This Museum room can not be tracked in the Display Tracker.")	
+			endif
+		endif
+		
+	elseif CurrentPage == "Official Patches"
 		Index = RN_Patches_Position_Array.find(_Val)
 		if Index != -1 
 			SetInfoText("Click to track " + RN_Patches_Name[Index] + " in the Display Tracker.")
@@ -2318,27 +2374,43 @@ Event OnOptionHighlight(Int _Val)
 		endif
 	endif
 EndEvent
-		
+
 ;;-------------------------------
 
 Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
-
+	
 	Int ArrayPos = 0
-	Int Index = 0
-		
+	Int FillSection = 0
+	
 	Formlist flist = AfListA as Formlist
 	Formlist Dlist = afListB as Formlist					
 		
-	Int Index2 = 0
-	While Index2 < Dlist.GetSize()		
+	Int Index = 0
+	While Index < Dlist.GetSize()		
 
 		if ArrayPos >= 125 && !Page2
+			FillSection = 2
 			Page2 = True
+			ArrayPos = 0
+
+		elseif ArrayPos >= 125 && !Page3
+			FillSection = 3
+			Page3 = True
+			ArrayPos = 0
+
+		elseif ArrayPos >= 125 && !Page4
+			FillSection = 4		
+			Page4 = True
+			ArrayPos = 0
+
+		elseif ArrayPos >= 125 && !Page5
+			FillSection = 5
+			Page5 = True
 			ArrayPos = 0
 		endif
 		
-		Form fDisp = Dlist.GetAt(Index2)
-		Form fItem = flist.GetAt(Index2)
+		Form fDisp = Dlist.GetAt(Index)
+		Form fItem = flist.GetAt(Index)
 		ObjectReference DispRef = None	
 	
 		if fDisp as FormList
@@ -2372,17 +2444,33 @@ Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
 			DispName = "!Error"
 		endif
 			
-		if Page2
+		if FillSection == 5
+			TrackedNames5[ArrayPos] = DispName
+			TrackedDisplays5[ArrayPos] = DispRef
+			ArrayPos += 1
+			
+		elseif FillSection == 4
+			TrackedNames4[ArrayPos] = DispName
+			TrackedDisplays4[ArrayPos] = DispRef
+			ArrayPos += 1
+			
+		elseif FillSection == 3
+			TrackedNames3[ArrayPos] = DispName
+			TrackedDisplays3[ArrayPos] = DispRef
+			ArrayPos += 1
+			
+		elseif FillSection == 2
 			TrackedNames2[ArrayPos] = DispName
 			TrackedDisplays2[ArrayPos] = DispRef
-			ArrayPos += 1				
+			ArrayPos += 1	
+			
 		else
 			TrackedNames[ArrayPos] = DispName
 			TrackedDisplays[ArrayPos] = DispRef
 			ArrayPos += 1				
 		endif
 			
-		Index2 += 1
+		Index += 1
 	endwhile
 endFunction
 
@@ -2528,13 +2616,28 @@ Function Build_Arrays()
 		RN_ComAch_Globals[_Index] = akvariable
 		_Index += 1
 	endWhile
-	
-	TrackedDisplays = new objectreference[128]
-	TrackedDisplays2 = new objectreference[128]
 
 	TrackedNames = new string[128]
 	TrackedNames2 = new string[128]
+	TrackedNames3 = new string[128]
+	TrackedNames4 = new string[128]
+	TrackedNames5 = new string[128]
 	
+	TrackedDisplays = new objectreference[128]
+	TrackedDisplays2 = new objectreference[128]
+	TrackedDisplays3 = new objectreference[128]
+	TrackedDisplays4 = new objectreference[128]
+	TrackedDisplays5 = new objectreference[128]
+	
+	TrackedQuest = none
+	TrackedPatch = ""
+	
+	Page1 = False
+	Page2 = False
+	Page3 = False
+	Page4 = False
+	Page5 = False
+
 ;;-------------------------------
 	_Armory_Section_Position = new Int[128]
 	_Armory_Section_names = new string[20]
@@ -2559,100 +2662,103 @@ Function Build_Arrays()
 	_Armory_Section_names[18] = "Steel Set"
 	_Armory_Section_names[19] = "Thane Weapons Set"
 	
+	Museum_Secton_Position = new Int[128]
+	Museum_Invalid_Position = new Int[128]
 	_Museum_Section_names = new string[128]
-	_Museum_Section_names[0] = "Armory:"
-	_Museum_Section_names[1] = "Daedric Gallery:"
-	_Museum_Section_names[2] = "Dragonborn Hall:"
-	_Museum_Section_names[3] = "Guildhouse:"
-	_Museum_Section_names[4] = "Hall of Heroes:"
-	_Museum_Section_names[5] = "Hall of Lost Empires:"
-	_Museum_Section_names[6] = "Hall of Oddities:"
-	_Museum_Section_names[7] = "Hall of Secrets:"
-	_Museum_Section_names[8] = "Hall of Wonders:"
-	_Museum_Section_names[9] = "Library:"
-	_Museum_Section_names[10] = "Natural Science:"
-	_Museum_Section_names[11] = "Safehouse:"
-	_Museum_Section_names[12] = "Safehouse Clutter:"
-	_Museum_Section_names[13] = "Storeroom:"
+	_Museum_Section_names[0] = "Armory"
+	_Museum_Section_names[1] = "Daedric Gallery"
+	_Museum_Section_names[2] = "Dragonborn Hall"
+	_Museum_Section_names[3] = "Guildhouse"
+	_Museum_Section_names[4] = "Hall of Heroes"
+	_Museum_Section_names[5] = "Hall of Lost Empires"
+	_Museum_Section_names[6] = "Hall of Oddities"
+	_Museum_Section_names[7] = "Hall of Secrets"
+	_Museum_Section_names[8] = "Hall of Wonders"
+	_Museum_Section_names[9] = "Library"
+	_Museum_Section_names[10] = "Natural Science"
+	_Museum_Section_names[11] = "Safehouse"
+	_Museum_Section_names[12] = "Storeroom"
 	
 	RN_Ach_Highlight = new string[128]
-	RN_Ach_Highlight[0] = "Reach a total of 750 displays in the Museum"
-	RN_Ach_Highlight[1] = "Reach a total of 1000 displays in the Museum"
-	RN_Ach_Highlight[2] = "Reach a total of 100 book displays in the Museum"
-	RN_Ach_Highlight[3] = "Reach a total of 250 book displays in the Museum"
-	RN_Ach_Highlight[4] = "Find and display all the Explorer Relics in the Guildhouse"
-	RN_Ach_Highlight[5] = "Find and display all the Gems in the Gallery of Natural Science"
-	RN_Ach_Highlight[6] = "Find and display all the Shells for the Tide Pool in the Gallery of Natural Science"
-	RN_Ach_Highlight[7] = "Find and display all 10 Decks of Cards in the Hall of Oddities"
-	RN_Ach_Highlight[8] = "Find and display the complete Coin Collection in the Hall of Oddities"
-	RN_Ach_Highlight[9] = "Complete all side quests from Auryen's Notes"
-	RN_Ach_Highlight[10] = "Locate and interact with all Standing Stones around Skyrim"
-	RN_Ach_Highlight[11] = "Locate and interact with all Word Walls around Skyrim"
-	RN_Ach_Highlight[12] = "Find and display all Dragon Priest Masks and Dragon Claws in the Hall of Heroes"	
-	RN_Ach_Highlight[13] = "Help the people of Skyrim and become the Thane of every Hold"
-	RN_Ach_Highlight[14] = "Find and display all the pieces from the Arms of the Crusader set in the Hall of Heroes"
-	RN_Ach_Highlight[15] = "Visit Solitude and complete the Legacy starting quest to open the Museum"
-	RN_Ach_Highlight[16] = "Find and display all the Black Books in the Daedric Gallery"
-	RN_Ach_Highlight[17] = "Fill the Armory and reach a Smithing level of 100, this achievement does not count items from supported mods"
-	RN_Ach_Highlight[18] = "Build all creature displays in the Gallery of Natural Science"
-	RN_Ach_Highlight[19] = "Locate and interact with the 9 Shrines of the Divines around Skyrim"
-	RN_Ach_Highlight[20] = "Locate or craft all Dwemer artifacts in the Reception Hall"
-	RN_Ach_Highlight[21] = "Locate or craft all Falmer artifacts in the Reception Hall"
-	RN_Ach_Highlight[22] = "Locate or craft all Nordic artifacts in the Reception Hall"
-	RN_Ach_Highlight[23] = "Agree to help Brother Ikard and don't skip the Haunted Museum quest"
-	RN_Ach_Highlight[24] = "Display all Museum Paintings"
-	RN_Ach_Highlight[25] = "Complete all Excavations and roll the credits"
-	RN_Ach_Highlight[26] = "Build all the Explorer Outposts"
-	RN_Ach_Highlight[27] = "Forgive Avram after Shadows of One's Past"
-	RN_Ach_Highlight[28] = "Become a Master of each spell school"
-	RN_Ach_Highlight[29] = "Find and display Ice's Stalhrim Spoon of Assassination"
-	RN_Ach_Highlight[30] = "Renovate Deepholme"
-	RN_Ach_Highlight[31] = "Display all Guild Displays in the Dragonborn Hall"
-	RN_Ach_Highlight[32] = "Complete all Daedric Quests"
-	RN_Ach_Highlight[33] = "Take all that gold and fill the Treasury!"
-	RN_Ach_Highlight[34] = "Take all perks from the Excavation skill tree" 
-	RN_Ach_Highlight[35] = "Take all perks from the Expedition skill tree"
-	RN_Ach_Highlight[36] = "Take all perks from the Academia skill tree"
+	RN_Ach_Highlight[0] = "Reach a total of 500 displays in the Museum"
+	RN_Ach_Highlight[1] = "Reach a total of 750 displays in the Museum\n *Completing this achievement rewards a unique displayable item"
+	RN_Ach_Highlight[2] = "Reach a total of 1000 displays in the Museum\n *Completing this achievement rewards a unique displayable item"
+	RN_Ach_Highlight[3] = "Reach a total of 100 book displays in the Museum"
+	RN_Ach_Highlight[4] = "Reach a total of 250 book displays in the Museum\n *Completing this achievement rewards a unique displayable item"
+	RN_Ach_Highlight[5] = "Find and display all the Explorer Relics in the Guildhouse\n *Completing this achievement rewards a unique displayable item"
+	RN_Ach_Highlight[6] = "Find and display all the Gems in the Gallery of Natural Science"
+	RN_Ach_Highlight[7] = "Find and display all the Shells for the Tide Pool in the Gallery of Natural Science"
+	RN_Ach_Highlight[8] = "Find and display all 10 Decks of Cards in the Hall of Oddities"
+	RN_Ach_Highlight[9] = "Find and display the complete Coin Collection in the Hall of Oddities"
+	RN_Ach_Highlight[10] = "Complete all side quests from Auryen's Notes"
+	RN_Ach_Highlight[11] = "Locate and interact with all Standing Stones around Skyrim"
+	RN_Ach_Highlight[12] = "Locate and interact with all Word Walls around Skyrim"
+	RN_Ach_Highlight[13] = "Find and display all Dragon Priest Masks and Dragon Claws in the Hall of Heroes"	
+	RN_Ach_Highlight[14] = "Help the people of Skyrim and become the Thane of every Hold"
+	RN_Ach_Highlight[15] = "Find and display all the pieces from the Arms of the Crusader set in the Hall of Heroes"
+	RN_Ach_Highlight[16] = "Visit Solitude and complete the Legacy starting quest to open the Museum"
+	RN_Ach_Highlight[17] = "Find and display all the Black Books in the Daedric Gallery"
+	RN_Ach_Highlight[18] = "Fill the Armory and reach a Smithing level of 100, this achievement does not count items from supported mods"
+	RN_Ach_Highlight[19] = "Build all creature displays in the Gallery of Natural Science"
+	RN_Ach_Highlight[20] = "Locate and interact with the 9 Shrines of the Divines around Skyrim"
+	RN_Ach_Highlight[21] = "Locate or craft all Dwemer artifacts in the Reception Hall"
+	RN_Ach_Highlight[22] = "Locate or craft all Falmer artifacts in the Reception Hall"
+	RN_Ach_Highlight[23] = "Locate or craft all Nordic artifacts in the Reception Hall"
+	RN_Ach_Highlight[24] = "Agree to help Brother Ikard and don't skip the Haunted Museum quest"
+	RN_Ach_Highlight[25] = "Display all Museum Paintings"
+	RN_Ach_Highlight[26] = "Complete all Excavations and roll the credits"
+	RN_Ach_Highlight[27] = "Build all the Explorer Outposts\n *Completing this achievement rewards a unique displayable item"
+	RN_Ach_Highlight[28] = "Forgive Avram after Shadows of One's Past"
+	RN_Ach_Highlight[29] = "Become a Master of each spell school"
+	RN_Ach_Highlight[30] = "Find and display Ice's Stalhrim Spoon of Assassination"
+	RN_Ach_Highlight[31] = "Renovate Deepholme"
+	RN_Ach_Highlight[32] = "Display all Guild Displays in the Dragonborn Hall\n *Completing this achievement rewards a unique displayable item"
+	RN_Ach_Highlight[33] = "Complete all Daedric Quests \n *Completing this achievement rewards a unique displayable item"
+	RN_Ach_Highlight[34] = "Take all that gold and fill the Treasury!"
+	RN_Ach_Highlight[35] = "Take all perks from the Excavation skill tree" 
+	RN_Ach_Highlight[36] = "Take all perks from the Expedition skill tree"
+	RN_Ach_Highlight[37] = "Take all perks from the Academia skill tree"
 	
 	RN_Ach_Position = new int[128]
 	RN_Ach_AchName = new string[128]
-	RN_Ach_AchName[0] = "Collector"
-	RN_Ach_AchName[1] = "Hoarder"
-	RN_Ach_AchName[2] = "Junior Librarian"
-	RN_Ach_AchName[3] = "Bibliophile"
-	RN_Ach_AchName[4] = "Spelunker"
-	RN_Ach_AchName[5] = "Lapidarist"
-	RN_Ach_AchName[6] = "Conchologist"
-	RN_Ach_AchName[7] = "Fusilatelist"
-	RN_Ach_AchName[8] = "Numismatist"
-	RN_Ach_AchName[9] = "Expert Sleuth"
-	RN_Ach_AchName[10] = "Pillar of Nirn"
-	RN_Ach_AchName[11] = "Noise Complaint"
-	RN_Ach_AchName[12] = "Masquerader"	
-	RN_Ach_AchName[13] = "That's Sir Thane to You"
-	RN_Ach_AchName[14] = "Guardian of the Divine"
-	RN_Ach_AchName[15] = "Cut the Ribbon"
-	RN_Ach_AchName[16] = "Tentacle Afficianado"
-	RN_Ach_AchName[17] = "Temper Tantrum"
-	RN_Ach_AchName[18] = "Taxidermist"
-	RN_Ach_AchName[19] = "By All of the Gods!"
-	RN_Ach_AchName[20] = "Gearhead"
-	RN_Ach_AchName[21] = "Blind Construction"
-	RN_Ach_AchName[22] = "Children of the Sky"
-	RN_Ach_AchName[23] = "Ghostbuster"
-	RN_Ach_AchName[24] = "Canvas Collector"
-	RN_Ach_AchName[25] = "That's all Folks"
-	RN_Ach_AchName[26] = "Expansionist"
-	RN_Ach_AchName[27] = "Forgive and Forget"
-	RN_Ach_AchName[28] = "Yer a Wizard "
-	RN_Ach_AchName[29] = "Master of Secrets"
-	RN_Ach_AchName[30] = "Deep Pockets"
-	RN_Ach_AchName[31] = "Guild Master Master"
-	RN_Ach_AchName[32] = "Champion of All"
-	RN_Ach_AchName[33] = "Midas Touch"
-	RN_Ach_AchName[34] = "Deft Digger"
-	RN_Ach_AchName[35] = "Expedient"
-	RN_Ach_AchName[36] = "Professor"
+	RN_Ach_AchName[0] = "Hobbyist"
+	RN_Ach_AchName[1] = "Collector*"
+	RN_Ach_AchName[2] = "Hoarder*"
+	RN_Ach_AchName[3] = "Junior Librarian"
+	RN_Ach_AchName[4] = "Bibliophile*"
+	RN_Ach_AchName[5] = "Spelunker*"
+	RN_Ach_AchName[6] = "Lapidarist"
+	RN_Ach_AchName[7] = "Conchologist"
+	RN_Ach_AchName[8] = "Fusilatelist"
+	RN_Ach_AchName[9] = "Numismatist"
+	RN_Ach_AchName[10] = "Expert Sleuth"
+	RN_Ach_AchName[11] = "Pillar of Nirn"
+	RN_Ach_AchName[12] = "Noise Complaint"
+	RN_Ach_AchName[13] = "Masquerader"	
+	RN_Ach_AchName[14] = "That's Sir Thane to You"
+	RN_Ach_AchName[15] = "Guardian of the Divine"
+	RN_Ach_AchName[16] = "Cut the Ribbon"
+	RN_Ach_AchName[17] = "Tentacle Afficianado"
+	RN_Ach_AchName[18] = "Temper Tantrum"
+	RN_Ach_AchName[19] = "Taxidermist"
+	RN_Ach_AchName[20] = "By All of the Gods!"
+	RN_Ach_AchName[21] = "Gearhead"
+	RN_Ach_AchName[22] = "Blind Construction"
+	RN_Ach_AchName[23] = "Children of the Sky"
+	RN_Ach_AchName[24] = "Ghostbuster"
+	RN_Ach_AchName[25] = "Canvas Collector"
+	RN_Ach_AchName[26] = "That's all Folks"
+	RN_Ach_AchName[27] = "Expansionist*"
+	RN_Ach_AchName[28] = "Forgive and Forget"
+	RN_Ach_AchName[29] = "Yer a Wizard "
+	RN_Ach_AchName[30] = "Master of Secrets"
+	RN_Ach_AchName[31] = "Deep Pockets"
+	RN_Ach_AchName[32] = "Guild Master Master*"
+	RN_Ach_AchName[33] = "Champion of All*"
+	RN_Ach_AchName[34] = "Midas Touch"
+	RN_Ach_AchName[35] = "Deft Digger"
+	RN_Ach_AchName[36] = "Expedient"
+	RN_Ach_AchName[37] = "Professor"
 	
 	RN_ComAch_Position = new int[128]
 	RN_ComAch_AchName = new string[128]
@@ -2661,7 +2767,7 @@ Function Build_Arrays()
 	RN_ComAch_AchName[2] = "Don't ask where I got them"
 	RN_ComAch_AchName[3] = "Food of the Gods"
 	RN_ComAch_AchName[4] = "One Small Step"
-	RN_ComAch_AchName[5] = "Jade Emperor"
+	RN_ComAch_AchName[5] = "Jade Emperor*"
 	RN_ComAch_AchName[6] = "Bibbidi-Bobbidi-Boo"
 	RN_ComAch_AchName[7] = "Sommelier"
 	RN_ComAch_AchName[8] = "Ic0nic Collector"
@@ -2675,7 +2781,7 @@ Function Build_Arrays()
 	RN_ComAch_Highlight[2] = "Find and display all skulls in the Hall of Secrets\n Achievement idea by: WillowWisp"
 	RN_ComAch_Highlight[3] = "Take home a snack from Sovngarde\n Achievement idea by: WillowWisp"
 	RN_ComAch_Highlight[4] = "Locate and display all the planetarium cubes\n Achievement idea by: WillowWisp"
-	RN_ComAch_Highlight[5] = "Collect and display all the Jade statues\n Achievement idea by: Megalorex"
+	RN_ComAch_Highlight[5] = "Collect and display all the Jade statues\n Achievement idea by: Megalorex\n *Completing this achievement rewards a unique displayable item"
 	RN_ComAch_Highlight[6] = "Fill the magic staff display in the Hall of Heroes\n Achievement idea by: Captain Blob-eye"
 	RN_ComAch_Highlight[7] = "Display all beverages in the Museum Storeroom\n Achievement idea by: NGIS"
 	RN_ComAch_Highlight[8] = "Collect and display all the unique items from The Curators Companion\n Achievement idea by: Captain Blob-eye"
@@ -2810,6 +2916,8 @@ Function BuildPatchArray(bool _create, bool _Rebuild)
 	
 	if _Rebuild
 		API.UpdateArrays()
+		API.UpdateCounts()
+		Util.InitGlobals()
 	endif
 endFunction
 			

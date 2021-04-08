@@ -53,7 +53,6 @@ Formlist Property RN_Ach_List_Academia Auto
 ;;Properties for reward items.
 ObjectReference Property TCCStaffRef Auto
 ObjectReference Property TCCCloakRef Auto
-ObjectReference Property TCCGoldAppleRef Auto
 
 Event OnUpdate()
 	
@@ -140,7 +139,6 @@ Event OnUpdate()
 			RN_Achievements_Listener_Count.Mod(1)
 			RN_Ach34Complete.SetValue(1)
 			_Complete += 1
-			TCCGoldAppleRef.Enable()
 			Master.Reward(MCM.Ach_Perks, true, None)
 			Master.Notify("Midas Touch")
 		endIf

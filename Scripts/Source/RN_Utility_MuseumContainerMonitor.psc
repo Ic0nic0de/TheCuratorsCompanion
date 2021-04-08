@@ -11,7 +11,6 @@ formlist property DBM_ReplicaItems auto
 formlist property dbmNew auto
 formlist property dbmFound auto
 formlist property dbmDisp auto
-formlist property dbmClutter auto
 
 formlist property TCC_TokenList auto
 
@@ -21,7 +20,7 @@ objectreference property DISPLAYCHEST auto
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 
-	if dbmNew.HasForm(akBaseItem) && !dbmClutter.HasForm(akBaseItem) || dbmFound.HasForm(akBaseItem) && !dbmClutter.HasForm(akBaseItem)
+	if dbmNew.HasForm(akBaseItem) || dbmFound.HasForm(akBaseItem)
 		updateFormlists(akBaseitem, true)
 	endIf
 endEvent			
@@ -35,7 +34,7 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
 			;;Do Nothinhg
 		else
 			if self.GetItemCount(akBaseItem) == 0
-				if dbmDisp.HasForm(akBaseItem) && !dbmClutter.HasForm(akBaseItem)
+				if dbmDisp.HasForm(akBaseItem) 
 					updateFormlists(akBaseitem, false, akDestContainer)
 				endIf
 			endIf	
@@ -44,7 +43,7 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
 	else
 		
 		if self.GetItemCount(akBaseItem) == 0
-			if dbmDisp.HasForm(akBaseItem) && !dbmClutter.HasForm(akBaseItem)
+			if dbmDisp.HasForm(akBaseItem)
 				updateFormlists(akBaseitem, false, akDestContainer)
 			endIf
 		endIf	

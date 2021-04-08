@@ -27,9 +27,6 @@ message property DBM_ScanMuseum_Finished_Message auto
 message property ModStartup auto
 message property ModStartupDone auto
 
-message property TCC_SafehouseSetupFinished auto
-message property TCC_SafehouseDisableFinished auto
-
 message property ModStartup_UpdatingLists auto
 Message property ModConfigFinished auto
 
@@ -37,7 +34,6 @@ bool bSettingup
 bool bScanning
 bool bMoreHUDListsCreated
 bool Maintaining
-bool property UnregisteredPatch auto hidden
 
 ;;Do Not Fill this property.
 objectreference property DBM_CloaksStorage auto
@@ -59,7 +55,6 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
-formlist property dbmClutter auto
 
 ;;Replica Formlists
 formlist property DBM_ReplicaBaseItems auto
@@ -72,18 +67,12 @@ formlist property DBM_RN_ExplorationDisplays auto
 formlist property TCC_DisplayList_Paintings auto
 formlist property TCC_DisplayList_DibellaStatues auto
 
-;;Safehouse
-formlist property TCC_DisplayList_Clutter auto
-formlist property TCC_ItemList_Clutter auto
-
 ;;Custom Storage
 formlist property TCC_TokenList auto
 
 ;;Main Storage
 formlist property _MuseumContainerList auto
 formlist property _MuseumContainerList_WP auto
-formlist property _SafehouseContainerList auto
-formlist property _SafehouseContainerList_WP auto
 
 Formlist property _Armory_Formlist_Displays auto
 Formlist property _Armory_Global_Total auto
@@ -114,10 +103,6 @@ globalvariable property GV_SectionHallofHeroes auto
 globalvariable property GV_SectionDaedricGallery auto
 globalvariable property GV_SectionHOLE auto
 
-globalvariable property TCC_RoomEditCount_Clutter auto
-globalvariable property DBM_GV_SectionClutter auto
-globalvariable property GV_SectionClutter_Count auto
-
 bool property SetupMainDone auto hidden
 
 
@@ -139,6 +124,9 @@ State initialsetup
 
 	Event OnUpdate()
 		
+		LItemSpellTomes00AllSpells.AddForm(RN_RSC_SpellTome, 1 , 1)
+		LItemSpellTomes00AllSpells.AddForm(RN_TransferContainer_SpellTome, 1 , 1)
+	
 		if RN_Setup_Finish.GetValue()
 			TCCDebug.Log("Utility - Setup already completed with " + RN_Setup_Finish.GetValue(), 0)	
 		else
@@ -146,7 +134,7 @@ State initialsetup
 			DBM_SortWait.setvalue(1)
 			RN_Setup_Start.setvalue(1)
 			
-			Wait(5)
+			Wait(10)
 			
 			API.CheckPatches()
 			while !SetupMainDone
@@ -171,7 +159,7 @@ State initialsetup
 			RN_Setup_Start.setvalue(0)
 			RN_Setup_Finish.setvalue(1)		
 			DBM_SortWait.setvalue(0)				
-			UnregisteredPatch = false	
+			API.UnregisteredPatch = false	
 			
 			While IsInMenuMode()
 				Wait(1)
@@ -190,12 +178,8 @@ endstate
 
 function ManageLists()
 
-	LItemSpellTomes00AllSpells.AddForm(RN_RSC_SpellTome, 1 , 1)
-	LItemSpellTomes00AllSpells.AddForm(RN_TransferContainer_SpellTome, 1 , 1)
-	
 	TCC_TokenList.AddForm(PlayerRef)
 	_MuseumContainerList_WP.AddForm(PlayerRef)
-	_SafehouseContainerList_WP.AddForm(PlayerRef)
 		
 	SendModEvent("Update_TokenArray", "Updating Token Array")
 endfunction
@@ -247,11 +231,7 @@ function CreateMoreHudLists()
 				endif
 			endIf
 		endWhile
-	endWhile
-
-	if (RN_MCM.Safehouse_Enabled) ; Check safehouse storage for displayed items.		
-		sendmodevent("SH_Update")
-	endIf				
+	endWhile			
 		
 	RN_MoreHud_Option.setvalue(1)	
 	
@@ -374,6 +354,8 @@ endFunction
 
 Event onUpdate()
 	
+	;float ftimeStart = Utility.GetCurrentRealTime()
+
 	Maintaining = true
 	
 	if RN_MCM.ShowStartup 
@@ -384,19 +366,20 @@ Event onUpdate()
 	RN_Setup_Start.setvalue(1)
 	DBM_SortWait.setvalue(1)
 	
-	if UnregisteredPatch
+	if API.UnregisteredPatch
 		ModStartup_UpdatingLists.Show()
-		Wait(2)
+		Wait(5)
 		API.CheckPatches()
+		API.UpdateCounts()
+		InitGlobals()
 		CreateMoreHudLists()
 		RN_MCM.BuildPatchArray(true, true)
-		UnregisteredPatch = False	
+		API.UnregisteredPatch = False
+		ModConfigFinished.Show(API.SupportedModHandlers.Find(none))
 	endif
 	
 	ManageLists()
-	InitGlobals()
 	InitIcons()
-	API.UpdateCounts()
 	
 	RN_Setup_Start.setvalue(0)
 	RN_Setup_Finish.setvalue(1)			
@@ -408,6 +391,9 @@ Event onUpdate()
 		ModStartupDone.Show()
 	endIf
 	Maintaining = false
+	
+	;float ftimeEnd = Utility.GetCurrentRealTime()
+	;Debug.Notification("Update Script took " + (ftimeEnd - ftimeStart) + " seconds to run")
 endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -419,13 +405,10 @@ endEvent
 function ScanMuseum()
 	
 	TCCDebug.Log("Utility - Scanning Museum...", 0)
-
-	if RN_MCM.ScanNotificationsval 
-		While IsInMenuMode()
-			Wait(1)
-		endWhile
-		DBM_ScanMuseum_Message.Show()
-	endIf
+	While IsInMenuMode()
+		Wait(1)
+	endWhile
+	DBM_ScanMuseum_Message.Show()
 	
 	bScanning = True
 	DBM_SortWait.setvalue(1)
@@ -446,12 +429,10 @@ function FinishScan(Int _Wait)
 			RN_Scan_Done.setvalue(0)
 			DBM_SortWait.setvalue(0)
 			RN_Scan_Registered.setvalue(0)
-			if RN_MCM.ScanNotificationsval
-				While IsInMenuMode()
-					Wait(1)
-				endWhile
-				DBM_ScanMuseum_Finished_Message.Show()
-			endif
+			While IsInMenuMode()
+				Wait(1)
+			endWhile
+			DBM_ScanMuseum_Finished_Message.Show()
 		endIf		
 	endWhile
 	
@@ -486,24 +467,10 @@ Function RebuildLists()
 		dbmNew.AddForm(_item)
 
 		if (_Index % 500 == 0) 
-			Debug.Notification("The Curators Companion: Rebuilding main lists... (" + _Index + " / " + _Total + ")")
+			Debug.Notification("The Curators Companion: Rebuilding moreHUD lists... (" + _Index + " / " + _Total + ")")
 		endIf
 		_Index += 1
 	endWhile
-	
-	if RN_MCM.Safehouse_Enabled
-		_Total = dbmClutter.GetSize()
-		_Index = 0
-		While _Index < _Total
-			form _item = dbmClutter.GetAt(_Index) as form
-			dbmNew.AddForm(_item)
-
-			if (_Index % 50 == 0) 
-				Debug.Notification("The Curators Companion: Rebuilding clutter lists... (" + _Index + " / " + _Total + ")")
-			endIf
-			_Index += 1
-		endWhile
-	endif
 	
 	CreateMoreHudLists()
 
@@ -515,109 +482,6 @@ Function RebuildLists()
 	TCCDebug.Log("Utility - dbmFound = " + dbmFound.GetSize() as Int, 0)
 	TCCDebug.Log("Utility - dbmDisp = " + dbmDisp.GetSize() as Int, 0)
 	TCCDebug.Log("Utility - dbmMaster = " + dbmMaster.GetSize() as Int, 0)
-	TCCDebug.Log("Utility - dbmClutter = " + dbmClutter.GetSize() as Int, 0)
-endFunction
-
-;;-- Functions ---------------------------------------
-
-Function SetUpSafehouse()
-	
-	TCCDebug.Log("Utility - Enable Safehouse Request Received...", 0)
-	
-	DBM_SortWait.setvalue(1)
-	bSettingup = true
-	
-	Int _Index = _SafehouseContainerList.GetSize()
-	While _Index
-		_Index -= 1
-		ObjectReference _Container = _SafehouseContainerList.GetAT(_Index) as ObjectReference
-		TCC_TokenList.AddForm(_Container)
-		
-		TCCDebug.Log("Utility - Added Safehouse Container " +  _Container.GetBaseObject().GetName() + " to TCC_TokenList", 0)
-	endWhile
-	SendModEvent("Update_TokenArray", "Updating Token Array")
-	
-	Debug.Notification("The Curators Companion: Adding Safehouse Integration...")
-	setupscript.SafehouseSetup()
-	API.CheckPatches()
-			
-	Int	Index = TCC_TokenList.GetSize() ;; Check player and custom storage for found items.
-	While Index
-		Index -= 1
-		ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference	
-
-		TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)				
-
-		Int _Index2 = _Container.GetNumItems()
-		While _Index2
-			_Index2 -= 1
-			Form _ItemRelic = _Container.GetNthForm(_Index2)
-			if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
-				dbmNew.RemoveAddedForm(_ItemRelic)
-				dbmFound.AddForm(_ItemRelic)
-			endIf
-		endWhile
-	endWhile
-		
-	sendmodevent("SH_Update")	
-			
-	Wait(5)
-			
-	InitGlobals()
-	bSettingup = False
-	DBM_SortWait.setvalue(0)
-	While IsInMenuMode()
-		Wait(1)
-	endWhile
-	TCC_SafehouseSetupFinished.Show()		
-	
-
-	TCCDebug.Log("Utility - Enable Safehouse Request Completed", 0)
-endFunction
-
-;;-- Functions ---------------------------------------
-
-Function DisableSafehouse()
-	
-
-	TCCDebug.Log("Utility - Disable Safehouse Request Received...", 0)
-	
-	Debug.Notification("The Curators Companion: Removing Safehouse Integration...")
-	
-	DBM_SortWait.setvalue(1)
-	bSettingup = true
-
-	dbmClutter.Revert()	
-	TCC_ItemList_Clutter.Revert()
-	TCC_DisplayList_Clutter.Revert()
-	TCC_RoomEditCount_Clutter.SetValue(0)
-	DBM_GV_SectionClutter.SetValue(0)
-	GV_SectionClutter_Count.SetValue(0)
-	
-	API.RemoveSafehouse()
-	
-	Int _Index = _SafehouseContainerList.GetSize()
-	While _Index
-		_Index -= 1
-		ObjectReference _Container = _SafehouseContainerList.GetAT(_Index) as ObjectReference
-		TCC_TokenList.RemoveAddedForm(_Container)
-
-		TCCDebug.Log("Utility - Removed Safehouse Container " +  _Container.GetBaseObject().GetName() + " from TCC_TokenList", 0)
-	endWhile
-	SendModEvent("Update_TokenArray", "Updating Token Array")
-			
-	Wait(5)		
-	InitGlobals()
-	bSettingup = False
-	DBM_SortWait.setvalue(0)
-	While IsInMenuMode()
-		Wait(1)
-	endWhile
-	TCC_SafehouseDisableFinished.Show()		
-	
-	RebuildLists()
-	
-	TCCDebug.Log("Utility - Disable Safehouse Request Completed", 0)
 endFunction
 
 ;;-- Functions ---------------------------------------

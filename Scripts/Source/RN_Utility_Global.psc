@@ -276,180 +276,177 @@ Int Function GetArrayPos(String _ModName) global
 	
 	elseif (_ModName == "Follower - Kaidan")
 		Return 36
-		
-	elseif (_ModName == "Follower - M'rissi")
-		Return 37
 	
 	elseif (_ModName == "Forgotten Seasons")
-		Return 38
+		Return 37
 	
 	elseif (_ModName == "Fossil Mining")
-		Return 39
+		Return 38
 
 	elseif (_ModName == "Goblins")
-		Return 40
+		Return 39
 	
 	elseif (_ModName == "Guard Armor Replacer")
-		Return 41
+		Return 40
 	
 	elseif (_ModName == "Heavy Armory")
-		Return 42
+		Return 41
 	
 	elseif (_ModName == "Helgen Reborn")
-		Return 43
+		Return 42
 	
 	elseif (_ModName == "Ice Blade of the Monarch")
-		Return 44
+		Return 43
 	
 	elseif (_ModName == "Immersive Armors")
-		Return 45
+		Return 44
 	
 	elseif (_ModName == "Immersive College Of Winterhold")
-		Return 46
+		Return 45
 
 	elseif (_ModName == "Immersive Weapons")
-		Return 47
+		Return 46
 	
 	elseif (_ModName == "Inn Soaps")
-		Return 48
+		Return 47
 	
 	elseif (_ModName == "Interesting NPC's")
-		Return 49
+		Return 48
 	
 	elseif (_ModName == "Jaysus Swords")
-		Return 50
+		Return 49
 	
 	elseif (_ModName == "konahrik's accoutrements")
-		Return 51
+		Return 50
 	
 	elseif (_ModName == "Kthonia's Weapon Pack")
-		Return 52
+		Return 51
 	
 	elseif (_ModName == "Moon And Star")
-		Return 53
+		Return 52
 
 	elseif (_ModName == "Moonpath To Elsweyr")
-		Return 54
+		Return 53
 	
 	elseif (_ModName == "Netch Leather Armor")
-		Return 55
+		Return 54
 	
 	elseif (_ModName == "New Treasure Hunt")
-		Return 56
+		Return 55
 	
 	elseif (_ModName == "Nix-Hound")
-		Return 57
+		Return 56
 	
 	elseif (_ModName == "Nordic Jewelry")
-		Return 58
+		Return 57
 	
 	elseif (_ModName == "Oblivion Artifacts")
-		Return 59
+		Return 58
 	
 	elseif (_ModName == "Path of the Revanant")
-		Return 60
+		Return 59
 
 	elseif (_ModName == "Pets of Skyrim")
-		Return 61
+		Return 60
 	
 	elseif (_ModName == "Plague of the Dead")
-		Return 62
+		Return 61
 	
 	elseif (_ModName == "Project AHO")
-		Return 63
+		Return 62
 	
 	elseif (_ModName == "Rare Curios")
-		Return 64
+		Return 63
 	
 	elseif (_ModName == "Reliquary of Myth")
-		Return 65
+		Return 64
 	
 	elseif (_ModName == "Royal Armory")
-		Return 66
+		Return 65
 	
 	elseif (_ModName == "Ruin's Edge")
-		Return 67
+		Return 66
 
 	elseif (_ModName == "Saints & Seducers")
-		Return 68
+		Return 67
 	
 	elseif (_ModName == "Saturalia Holiday Pack")
-		Return 69
+		Return 68
 	
 	elseif (_ModName == "Shadowrend")
-		Return 70
+		Return 69
 	
 	elseif (_ModName == "Skyrim Sewers")
-		Return 71
+		Return 70
 	
 	elseif (_ModName == "Skyrim Underground")
-		Return 72
+		Return 71
 	
 	elseif (_ModName == "Skyrim Unique Treasures")
-		Return 73
+		Return 72
 	
 	elseif (_ModName == "Spell Knight Armor")
-		Return 74
+		Return 73
 
 	elseif (_ModName == "Staff of Hasedoki")
-		Return 75
+		Return 74
 	
 	elseif (_ModName == "Staff of Sheogorath")
-		Return 76
+		Return 75
 	
 	elseif (_ModName == "Stendarr's Hammer")
-		Return 77
+		Return 76
 
 	elseif (_ModName == "The Curators Companion")
-		Return 78
+		Return 77
 		
 	elseif (_ModName == "Teldryn Serious")
-		Return 79
+		Return 78
 	
 	elseif (_ModName == "The Forgotten City")
-		Return 80
+		Return 79
 	
 	elseif (_ModName == "The Gray Cowl Of Nocturnal")
-		Return 81
+		Return 80
 	
 	elseif (_ModName == "The Gray Cowl Returns!")
-		Return 82
+		Return 81
 
 	elseif (_ModName == "The Wheels Of Lull")
-		Return 83
+		Return 82
 	
 	elseif (_ModName == "Tools of Kagrenac")
-		Return 84
+		Return 83
 	
 	elseif (_ModName == "Treasure Hunter")
-		Return 85
+		Return 84
 	
 	elseif (_ModName == "Umbra")
-		Return 86
+		Return 85
 	
 	elseif (_ModName == "Undeath")
-		Return 87
+		Return 86
 	
 	elseif (_ModName == "Vigil Enforcer Armor Set")
-		Return 88
+		Return 87
 	
 	elseif (_ModName == "Vigilant.")
-		Return 89
+		Return 88
 
 	elseif (_ModName == "Volkihar Knight")
-		Return 90
+		Return 89
 	
 	elseif (_ModName == "Wild Horses")
-		Return 91
+		Return 90
 	
 	elseif (_ModName == "Wintersun")
-		Return 92
+		Return 91
 	
 	elseif (_ModName == "Wyrmstooth")
-		Return 93
+		Return 92
 	
 	elseif (_ModName == "Zim's Thane Weapons")
-		Return 94
+		Return 93
 	endIf
 		
 	return 999

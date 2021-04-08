@@ -6,10 +6,7 @@ Import RN_Utility_Global
 
 RN_Utility_MCM property MCM auto
 
-message property RN_Paintings_Complete_Message auto
 message property RN_Paintings_Complete_Notification auto
-
-message property RN_Dibella_Complete_Message auto
 message property RN_Dibella_Complete_Notification auto
 
 formlist property TCC_DisplayList_Paintings auto
@@ -75,11 +72,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 			endIf
 		
 			if (CheckValueCount1(RN_Museum_Dibella_Statues_Count, RN_Museum_Dibella_Statues_Total, RN_Museum_Dibella_Statues_Complete) && (MCM.ShowSetCompleteVal)) 
-				if (MCM.ShowSimpleNotificationVal)
-					RN_Dibella_Complete_Notification.Show()
-				else
-					RN_Dibella_Complete_Message.Show()
-				endif
+				RN_Dibella_Complete_Notification.Show()
 			endif
 		endIf
 	
@@ -106,11 +99,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 
 		
 			if (CheckValueCount1(RN_Museum_Paintings_Count, RN_Museum_Paintings_Total, RN_Museum_Paintings_Complete) && (MCM.ShowSetCompleteVal)) 
-				if (MCM.ShowSimpleNotificationVal)
-					RN_Paintings_Complete_Notification.Show()
-				else
-					RN_Paintings_Complete_Message.Show()
-				endif
+				RN_Paintings_Complete_Notification.Show()
 			endif
 		endIf
 	endIf
@@ -133,11 +122,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 		_onDisplayCheck(TCC_DisplayList_Paintings, TCC_EnabledList_Paintings, RN_Museum_Paintings_Count)
 		
 		if (CheckValueCount1(RN_Museum_Paintings_Count, RN_Museum_Paintings_Total, RN_Museum_Paintings_Complete) && (MCM.ShowSetCompleteVal)) 
-			if (MCM.ShowSimpleNotificationVal)
-				RN_Paintings_Complete_Notification.Show()
-			else
-				RN_Paintings_Complete_Message.Show()
-			endif
+			RN_Paintings_Complete_Notification.Show()
 		endif
 	endIf
 
@@ -146,11 +131,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 		_onDisplayCheck(TCC_DisplayList_DibellaStatues, TCC_EnabledList_DibellaStatues, RN_Museum_Dibella_Statues_Count)
 		
 		if (CheckValueCount1(RN_Museum_Dibella_Statues_Count, RN_Museum_Dibella_Statues_Total, RN_Museum_Dibella_Statues_Complete) && (MCM.ShowSetCompleteVal)) 
-			if (MCM.ShowSimpleNotificationVal)
-				RN_Dibella_Complete_Notification.Show()
-			else
-				RN_Dibella_Complete_Message.Show()
-			endif
+			RN_Dibella_Complete_Notification.Show()
 		endif
 	endIf
 	

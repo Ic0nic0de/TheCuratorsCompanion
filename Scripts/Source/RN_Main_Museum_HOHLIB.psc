@@ -18,10 +18,6 @@ formlist property TCC_ItemList_Museum_1 auto ;;Merged Item List.
 ;;----------------------------------------------------------------------------- General Properties --------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-;;Item Messagebox.
-Message property DBM_FoundRelicMessage auto
-Message property DBM_FoundRelicMessageComplete auto
-
 ;;Item Notifications.
 Message property DBM_FoundRelicNotification auto
 
@@ -59,15 +55,7 @@ State Notify
 		if DBMNew.HasForm(akBaseItem) && !DBMFound.HasForm(akBaseItem) && !DBMDisp.HasForm(akBaseItem)	
 			ObjectReference FoundRelic = PlayerRef.PlaceAtMe(akBaseItem, 1, false, true)
 			FoundAlias.ForceRefTo(FoundRelic)
-			if (!MCM.ShowSimpleNotificationVal)
-				if (DBM_MuseumIntro.IsCompleted())
-					DBM_FoundRelicMessageComplete.Show()
-				else
-					DBM_FoundRelicMessage.Show()
-				endIf						
-			else
-				DBM_FoundRelicNotification.Show()
-			endIf
+			DBM_FoundRelicNotification.Show()
 			FoundAlias.Clear()
 			FoundRelic.Delete()
 		endIf

@@ -10,6 +10,7 @@ Bool Ach02
 Bool Ach03
 Bool Ach04
 Bool Ach05
+Bool AchBackPack
 Int _Complete
 
 ;Property to obtain values from MCM Script.
@@ -27,6 +28,7 @@ GlobalVariable Property RN_Ach02Complete Auto
 GlobalVariable Property RN_Ach03Complete Auto
 GlobalVariable Property RN_Ach04Complete Auto
 GlobalVariable Property RN_Ach05Complete Auto
+GlobalVariable Property RN_AchBackpackComplete Auto
 
 ;Properties for Checking completion.
 GlobalVariable Property DBM_DisplayCount Auto
@@ -38,17 +40,30 @@ GlobalVariable Property GV_SectionGuildhouse Auto
 MiscObject Property Gold001 Auto
 ObjectReference Property TCCShieldRef Auto
 ObjectReference Property TCCSwordRef Auto
+ObjectReference Property TCCBackpackRef Auto
 ObjectReference Property StoryBookReward Auto
 
 Event OnUpdate()
 		
-	If _Complete < 5
-		
-		If !Ach01 && DBM_DisplayCount.GetValue() >= 750			
+	If _Complete < 6
+
+		If !Ach01 && DBM_DisplayCount.GetValue() >= 500			
 			Ach01 = True
 			RN_Achievements_Listener_Count.Mod(1)
 			RN_Ach01Complete.SetValue(1)
 			_Complete += 1
+			Master.Reward(MCM.Ach_Perks, true, None)
+			Master.Notify("Hobbyist")
+		endIf
+
+;;---------------------------------------------------- Collector - (Reached 750 Displays)
+		
+		If !AchBackPack && DBM_DisplayCount.GetValue() >= 750			
+			AchBackPack = True
+			RN_Achievements_Listener_Count.Mod(1)
+			RN_AchBackpackComplete.SetValue(1)
+			_Complete += 1
+			TCCBackpackRef.Enable()
 			Master.Reward(MCM.Ach_Perks, true, None)
 			Master.Notify("Collector")
 		endIf
