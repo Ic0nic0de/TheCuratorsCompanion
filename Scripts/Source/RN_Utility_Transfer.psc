@@ -41,7 +41,7 @@ Function RunCustomTransfer()
 	While Index
 		Index -= 1
 		ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference
-		if _Container != PlayerRef
+		if _Container && _Container != PlayerRef
 			Int Index2 = _Container.GetNumItems()
 			While Index2
 				Index2 -= 1
@@ -73,25 +73,27 @@ Function RunAllTransfer()
 	Bool Transferable
 	While Index
 		Index -= 1
-		ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference		
-		Int Index2 = _Container.GetNumItems()
-		While Index2
-			Index2 -= 1
-			Form ItemRelic = _Container.GetNthForm(Index2)
-			if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic)
-				if _Container as Actor && _Container != PlayerRef
-					Actor _Actor = _Container as Actor
-					Transferable = !_Actor.IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
-				else
-					Transferable = !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
-				endIF
-				
-				if Transferable
-					_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
-					_Transfered += 1
+		ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference	
+		if _Container
+			Int Index2 = _Container.GetNumItems()
+			While Index2
+				Index2 -= 1
+				Form ItemRelic = _Container.GetNthForm(Index2)
+				if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic)
+					if _Container as Actor && _Container != PlayerRef
+						Actor _Actor = _Container as Actor
+						Transferable = !_Actor.IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
+					else
+						Transferable = !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
+					endIF
+					
+					if Transferable
+						_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
+						_Transfered += 1
+					endIf
 				endIf
-			endIf
-		endWhile
+			endWhile
+		endif
 	endWhile
 	DisplayFunc()
 endFunction

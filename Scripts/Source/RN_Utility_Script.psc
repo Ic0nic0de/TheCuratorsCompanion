@@ -105,7 +105,6 @@ globalvariable property GV_SectionHOLE auto
 
 bool property SetupMainDone auto hidden
 
-
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------- Start of Script -----------------------------------------------------------------------------------------------------
@@ -194,43 +193,44 @@ function CreateMoreHudLists()
 	While _Index 
 		_Index -= 1
 		ObjectReference _Container = _MuseumContainerList.GetAt(_Index) as ObjectReference
-		
-		TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
-		
-		Int _Index2 = _Container.GetNumItems()
-		while _Index2
-			_Index2 -= 1		
-			Form _ItemRelic = _Container.GetNthForm(_Index2)
-			if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) || dbmFound.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) 
-				dbmNew.RemoveAddedForm(_ItemRelic)
-				dbmFound.RemoveAddedForm(_ItemRelic)
-				dbmDisp.AddForm(_ItemRelic)
-				if RN_MCM.ReplicaTag 
-					ProcessReplica(_ItemRelic, true)
-				endif
-			endIf
-		endWhile
+		if _Container
+			TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
+			Int _Index2 = _Container.GetNumItems()
+			while _Index2
+				_Index2 -= 1		
+				Form _ItemRelic = _Container.GetNthForm(_Index2)
+				if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) || dbmFound.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic) 
+					dbmNew.RemoveAddedForm(_ItemRelic)
+					dbmFound.RemoveAddedForm(_ItemRelic)
+					dbmDisp.AddForm(_ItemRelic)
+					if RN_MCM.ReplicaTag 
+						ProcessReplica(_ItemRelic, true)
+					endif
+				endIf
+			endWhile
+		endif
 	endWhile
 			
 	_Index = TCC_TokenList.GetSize() ;; Check player and custom storage for found items.
 	While _Index
 		_Index -= 1
 		ObjectReference _Container = TCC_TokenList.GetAt(_Index) as ObjectReference		
+		if _Container
+			TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
 
-		TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
-
-		Int _Index2 = _Container.GetNumItems()
-		While _Index2
-			_Index2 -= 1
-			Form _ItemRelic = _Container.GetNthForm(_Index2)
-			if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
-				dbmNew.RemoveAddedForm(_ItemRelic)
-				dbmFound.AddForm(_ItemRelic)
-				if RN_MCM.ReplicaTag 
-					ProcessReplica(_ItemRelic, false)
-				endif
-			endIf
-		endWhile
+			Int _Index2 = _Container.GetNumItems()
+			While _Index2
+				_Index2 -= 1
+				Form _ItemRelic = _Container.GetNthForm(_Index2)
+				if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
+					dbmNew.RemoveAddedForm(_ItemRelic)
+					dbmFound.AddForm(_ItemRelic)
+					if RN_MCM.ReplicaTag 
+						ProcessReplica(_ItemRelic, false)
+					endif
+				endIf
+			endWhile
+		endif
 	endWhile			
 		
 	RN_MoreHud_Option.setvalue(1)	
@@ -354,7 +354,7 @@ endFunction
 
 Event onUpdate()
 	
-	;float ftimeStart = Utility.GetCurrentRealTime()
+	float ftimeStart = Utility.GetCurrentRealTime()
 
 	Maintaining = true
 	
@@ -392,8 +392,8 @@ Event onUpdate()
 	endIf
 	Maintaining = false
 	
-	;float ftimeEnd = Utility.GetCurrentRealTime()
-	;Debug.Notification("Update Script took " + (ftimeEnd - ftimeStart) + " seconds to run")
+	float ftimeEnd = Utility.GetCurrentRealTime()
+	TCCDebug.Log("Util - Maintenance function completed in " + (ftimeEnd - ftimeStart) + " seconds.")
 endEvent
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -482,6 +482,71 @@ Function RebuildLists()
 	TCCDebug.Log("Utility - dbmFound = " + dbmFound.GetSize() as Int, 0)
 	TCCDebug.Log("Utility - dbmDisp = " + dbmDisp.GetSize() as Int, 0)
 	TCCDebug.Log("Utility - dbmMaster = " + dbmMaster.GetSize() as Int, 0)
+endFunction
+
+;;-- Functions ---------------------------------------
+
+Function ConfirmIcons()
+	
+	TCCDebug.Log("Utility - Checking moreHUD Lists for duplicate forms...", 0)
+	
+	Debug.Notification("The Curators Companion: Checking moreHUD Lists...")
+	Debug.Notification("The Curators Companion: Do not add / remove any items from inventory")
+	
+	DBM_SortWait.SetValue(1)
+	Int Index = 0
+	While Index < dbmNew.GetSize()
+		form _item = dbmNew.GetAt(Index) as form
+		if (dbmDisp.Hasform(_item) || dbmFound.HasForm(_item))
+			TCCDebug.Log("Utility - Found duplicate formID [" + _item.GetName() + "] " + _Item + " at position " + Index + "  while checking the dbmNew list", 2)
+		endif
+
+		if (!dbmMaster.HasForm(_item))
+			TCCDebug.Log("Utility - Found erroneous formID [" + _item.GetName() + "] " + _Item + " at position " + Index + "  while checking the dbmNew list", 2)
+		endif
+			
+		if (Index % 250 == 0) 
+			Debug.Notification("The Curators Companion: Checking dbmNew moreHUD list (" + Index + " / " + dbmNew.GetSize() + ")")
+		endIf	
+		Index += 1
+	endWhile
+	
+	Index = 0
+	While Index < dbmFound.GetSize()
+		form _item = dbmFound.GetAt(Index) as form
+		if (dbmNew.Hasform(_item) || dbmDisp.HasForm(_item))
+			TCCDebug.Log("Utility - Found duplicate formID [" + _item.GetName() + "] " + _Item + " at position " + Index + "  while checking the dbmFound list", 2)
+		endif
+
+		if (!dbmMaster.HasForm(_item))
+			TCCDebug.Log("Utility - Found erroneous formID [" + _item.GetName() + "] " + _Item + " at position " + Index + "  while checking the dbmFound list", 2)
+		endif
+			
+		if (Index % 250 == 0) 
+			Debug.Notification("The Curators Companion: Checking dbmFound moreHUD list (" + Index + " / " + dbmFound.GetSize() + ")")
+		endIf	
+		Index += 1
+	endWhile
+	
+	Index = 0
+	While Index < dbmDisp.GetSize()
+		form _item = dbmDisp.GetAt(Index) as form
+		if (dbmNew.Hasform(_item) || dbmFound.HasForm(_item))
+			TCCDebug.Log("Utility - Found duplicate formID [" + _item.GetName() + "] " + _Item + " at position " + Index + "  while checking the dbmDisp list", 2)
+		endif
+
+		if (!dbmMaster.HasForm(_item))
+			TCCDebug.Log("Utility - Found erroneous formID [" + _item.GetName() + "] " + _Item + " at position " + Index + "  while checking the dbmDisp list", 2)
+		endif
+			
+		if (Index % 250 == 0) 
+			Debug.Notification("The Curators Companion: Checking dbmDisp moreHUD list (" + Index + " / " + dbmDisp.GetSize() + ")")
+		endIf	
+		Index += 1
+	endWhile
+	DBM_SortWait.SetValue(0)
+	
+	Debug.Notification("The Curators Companion: moreHUD Lists check complete")
 endFunction
 
 ;;-- Functions ---------------------------------------

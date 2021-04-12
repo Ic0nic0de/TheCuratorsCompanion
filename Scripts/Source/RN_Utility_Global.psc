@@ -15,8 +15,8 @@ Utility function _onConsolidateItems (Formlist afListA, Formlist afListB, Formli
 		Index -= 1
 		Form formToProcess = afListA.GetAt(Index) As Form		
 			if (formToProcess As Formlist)
-			Formlist nestedList = formToProcess As Formlist
-			Int Index2 = nestedList.GetSize()							
+				Formlist nestedList = formToProcess As Formlist
+				Int Index2 = nestedList.GetSize()							
 				While Index2
 					Index2 -= 1
 					formToProcess = nestedList.GetAt(Index2) as Form	

@@ -647,8 +647,8 @@ Function AddMuseumSetsPage()
 		if RN_CreationClubContent_Installed.GetValue()
 			AddEmptyOption()
 		endif
-		AddEmptyOption()
-		AddEmptyOption()		
+		AddEmptyOption()	
+		AddTextOption("Completed:", GetCurrentDisplayCount() + " Displays", 0)
 		AddTextOption("Completed:", GetCurrentMuseumCount(SetVal), 0)
 		AddEmptyOption()
 		AddHeaderOption("Display Information:")		
@@ -1049,6 +1049,15 @@ endFunction
 ;;-------------------------------------------------------------------------------- Debug Page ------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+string function GetIconStatus()
+	
+	if ((dbmNew.GetSize()) + (dbmFound.GetSize()) + (dbmDisp.GetSize())) == (dbmMaster.GetSize())
+		return "No Errors Detected"
+	endif
+	
+	return "Rebuild Suggested"
+endfunction
+
 string function GetStatusString()
 
 	if RN_Scan_Done.GetValue() > RN_Scan_Registered.GetValue()
@@ -1082,15 +1091,14 @@ Function AddDebugPage()
 		AddEmptyOption()
 		AddEmptyOption()
 		AddHeaderOption("moreHUD Debug:")
-		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
 		AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 1)
 		AddTextOption("moreHUD found count:", dbmFound.GetSize() As Int, 1)
 		AddTextOption("moreHUD displayed count:", dbmDisp.GetSize() As Int, 1)
 		AddTextOption("moreHUD total Count:", dbmMaster.GetSize() As Int, 1)
-		
+		AddTextOption("Status:", GetIconStatus(), 0)		
 		AddEmptyOption()
 		AddHeaderOption("Mod Status:")
-		AddTextOptionST("StatusCheck", "Status:", GetStatusString(), 0)
+		AddTextOption("Status:", GetStatusString(), 0)
 		AddTextOption("Setup Start:", RN_Setup_Start.GetValue() As Int, 1)
 		AddTextOption("Setup Finish:", RN_Setup_Finish.GetValue() As Int, 1)
 
@@ -1133,8 +1141,8 @@ Function AddDebugPage()
 			AddTextOption("moreHUD Inventory Edition:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") + "]", 0)
 		endif
 		AddEmptyOption()
-		AddEmptyOption()
-		AddEmptyOption()
+		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
+		AddTextOptionST("ConfirmIcons", "moreHUD Icons Check:", "Verify", 0)
 		AddEmptyOption()
 		AddHeaderOption("")
 		AddTextOption("SortWait:", DBM_SortWait.GetValue() As Int, 1)
@@ -1633,6 +1641,10 @@ state RebuildLists
 			if ShowMessage("This will rebuild and update the moreHUD lists for all new / found / displayed items, do you want to rebuild now?", true, "Rebuild", "Cancel")
 				
 				ShowMessage("Please exit the MCM and wait for a completion message", false, "Ok")
+				SetTitleText("=== Please Exit The MCM ===")
+				While IsInMenuMode()
+					Wait(1)
+				endwhile
 				Util.RebuildLists()
 			endif
 		endif
@@ -1641,6 +1653,31 @@ state RebuildLists
 	Event OnHighlightST()
 
 		SetInfoText("This option will rebuild the moreHUD lists -- Only to be used if prompted or advised by Developer.")
+	EndEvent
+endState
+
+;;-------------------------------
+
+state ConfirmIcons
+
+	Event OnSelectST()
+	
+		if IsInMenuMode()
+			if ShowMessage("Do you want to run the function now?", true, "Run", "Cancel")
+				
+				ShowMessage("Please exit the MCM and wait for a completion message", false, "Ok")
+				SetTitleText("=== Please Exit The MCM ===")
+				While IsInMenuMode()
+					Wait(1)
+				endwhile
+				Util.ConfirmIcons()
+			endif
+		endif
+	EndEvent
+
+	Event OnHighlightST()
+
+		SetInfoText("This function will check each form present in the moreHUD Total list and check for the form being present in each of the new, found and displayed lists, if a form is present in more than 1 list then an error has likely occured and the form will be printed to the Papyrus log for investigation.")
 	EndEvent
 endState
 
@@ -2183,6 +2220,31 @@ endFunction
 
 ;;-------------------------------
 
+string function GetCurrentDisplayCount()
+	
+	Int Count = 0
+	Int Total = 0
+	Int Index = 0 
+	
+	While Index < RN_Museum_Global_Count.Length
+		if RN_Museum_Global_Count[Index] != none
+			Count += (RN_Museum_Global_Count[Index].GetValue() as Int)
+			Total += (RN_Museum_Global_Total[Index].GetValue() as Int)
+		endif
+		Index += 1
+	endwhile
+	
+	Count += (RN_Museum_Paintings_Count.GetValue() as Int)
+	Total += (RN_Museum_Paintings_Total.GetValue() as Int)
+
+	Count += (RN_Museum_Dibella_Statues_Count.GetValue() as Int)
+	Total += (RN_Museum_Dibella_Statues_Total.GetValue() as Int)
+	
+	return (Count + " / " + Total)
+endFunction
+
+;;-------------------------------
+
 string function GetCurrentAchievementCount(GlobalVariable akVariable, formlist akTotal)
 
 	return (akVariable.GetValue() as Int + "/" + akTotal.GetSIze() as Int)
@@ -2549,8 +2611,8 @@ endFunction
 
 Function Build_Arrays()	
 	
-	Int _Index
-
+	Int _Index	
+	
 	RN_Armory_Global_Count = new globalvariable[20]
 	_Index = 0
 	While _Index < _Armory_Global_Count.GetSize()
