@@ -13,6 +13,8 @@ GlobalVariable Property RN_Skills_Listener_Count Auto
 Globalvariable Property RN_Skills_Listener_Complete Auto
 GlobalVariable Property iDisplaySectionComplete Auto
 
+message property TCC_SectionComplete_Skill auto
+
 ;; Skill Mastery Values
 Bool DBM_RN_Smithing = false
 Bool DBM_RN_Enchanting = false
@@ -244,11 +246,11 @@ State Running
 			endIf
 		endIf
 
-		if (WarriorCount >= 3) && (MageCount >= 3) && (StealthCount >= 3) && DBM_RN_Smithing && DBM_RN_Enchanting && DBM_RN_Alchemy
-			
-			Notification("The Curators Companion: All Skills Displays Unlocked")
+		if (WarriorCount >= 3) && (MageCount >= 3) && (StealthCount >= 3) && DBM_RN_Smithing && DBM_RN_Enchanting && DBM_RN_Alchemy	
+
 			RN_Skills_Listener_Complete.SetValue(1)
-			iDisplaySectionComplete.SetValue(1)
+			iDisplaySectionComplete.Mod(1)
+			TCC_SectionComplete_Skill.Show()
 			Done = True
 		else
 			RegisterForSingleUpdate(1)

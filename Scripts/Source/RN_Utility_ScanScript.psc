@@ -10,8 +10,6 @@ int property _SectionToScan auto
 
 string property _RoomName auto
 
-ObjectReference[] property _Armory_Helms_Displays auto
-
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 globalvariable property RN_CreationClubContent_Installed auto
@@ -65,7 +63,7 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 	if !bExclude
 		if !_Complete.GetValue()
 			ObjectReference Disp = DisplayRef as ObjectReference
-			if _DisplayList.HasForm(Disp) || _SectionToScan == 0 && _Armory_Helms_Displays.Find(Disp) != -1
+			if _DisplayList.HasForm(Disp)
 				if EnableState
 					_EnabledList.AddForm(Disp)
 					if MCM.advdebug
@@ -113,23 +111,6 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 		if !_Complete.GetValue()
 		
 			_onDisplayCheck(_DisplayList, _EnabledList, _Count)
-			
-			if _SectionToScan == 0
-				Int _Index2 = 0
-				Int _Length2 = _Armory_Helms_Displays.length
-				While _Index2 < _Length2
-				ObjectReference formToProcess = _Armory_Helms_Displays[_Index2] As ObjectReference
-					if !_EnabledList.HasForm(formToProcess) && !formToProcess.IsDisabled()
-						_EnabledList.AddForm(formToProcess)
-						
-					elseif _EnabledList.HasForm(formToProcess) && formToProcess.IsDisabled()
-						_EnabledList.RemoveAddedForm(formToProcess)	
-					endIf
-					_Index2 += 1
-				endWhile		
-				
-				_Count.setvalue(_EnabledList.GetSize())
-			endIf
 			
 			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
 				_Notification.Show()

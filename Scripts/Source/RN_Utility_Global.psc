@@ -119,7 +119,7 @@ Utility function _onDisplayCheck (Formlist afListA, Formlist afListB, GlobalVari
 		endIf
 	endWhile
 endFunction
-
+	
 ;;-- Functions ---------------------------------------
 
 Bool Function CheckValueCount1(GlobalVariable aKVariable_Count, GlobalVariable aKVariable_Total, GlobalVariable akVariable) global

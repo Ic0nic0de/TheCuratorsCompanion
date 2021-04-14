@@ -67,9 +67,7 @@ function updateFormlists(form akBaseItem, bool added, ObjectReference akContaine
 		endIf
 	endIf
 	
-	if RN_MCM.ReplicaTag
-		ProcessReplica(akBaseItem, added, akContainer)
-	endif
+	ProcessReplica(akBaseItem, added, akContainer)
 endFunction
 
 function ProcessReplica(form akBaseItem, bool added, ObjectReference akContainer = none)

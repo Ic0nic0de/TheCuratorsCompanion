@@ -12,6 +12,8 @@ GlobalVariable Property RN_Thane_Listener_Count Auto
 GlobalVariable Property RN_Thane_Listener_Complete Auto
 GlobalVariable Property iDisplaySectionComplete Auto
 
+message property TCC_SectionComplete_Thane auto
+
 Int AllThane = 0
 Bool Reach = false
 Bool Rift = false
@@ -161,11 +163,10 @@ State Running
 		endIf
 
 		If AllThane == 9
-		
-			Notification("The Curators Companion: All Thane Banners Unlocked")
-			
+
 			RN_Thane_Listener_Complete.SetValue(1)
-			iDisplaySectionComplete.SetValue(1)
+			iDisplaySectionComplete.Mod(1)
+			TCC_SectionComplete_Thane.Show()
 			Done = True
 		else
 			RegisterForSingleUpdate(1)

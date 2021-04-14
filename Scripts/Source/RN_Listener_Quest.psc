@@ -33,6 +33,9 @@ GlobalVariable Property iDisplaySectionComplete Auto
 
 Bool FirstRun = True
 Bool Done
+
+message property TCC_SectionComplete_Quest auto
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -166,9 +169,9 @@ State Running
 
 		if CheckStage && CheckQuests && CheckBards && CheckCivilWar && CheckDawnguard
 			
-			Notification("The Curators Companion: All Quest Displays Unlocked")
 			RN_Quest_Listener_Complete.SetValue(1)
-			iDisplaySectionComplete.SetValue(1)
+			iDisplaySectionComplete.Mod(1)
+			TCC_SectionComplete_Quest.Show()
 			Done = True
 		else
 			RegisterForSingleUpdate(1)

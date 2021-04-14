@@ -2,7 +2,7 @@ scriptName RN_Listener_Explore extends referencealias
 
 Import Debug
 
-Bool Exploration_Complete = false
+Bool Exploration_Complete
 
 ;;Property to obtain values from MCM Script.
 RN_Utility_MCM Property MCM Auto
@@ -17,11 +17,14 @@ Formlist Property DBM_RN_ExplorationDisplays Auto
 Formlist Property DBM_RN_ExplorationDisplays_Enabled Auto
 
 ;;550 Display Count Display (Spirit Of Adventure)
-Bool DBM_RN_SpiritComplete = false
+Bool FirstRun = True
+Bool SpiritDone
+Bool Done
+
 GlobalVariable Property DBM_DisplayCount Auto
 
-Bool FirstRun = True
-Bool Done
+message property TCC_SectionComplete_Exploration auto
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -82,20 +85,20 @@ State Running
 			endIf
 		endIf		
 
-		if !DBM_RN_SpiritComplete
+		if !SpiritDone
 			if (DBM_DisplayCount.GetValue() as Int) >= 550
-				DBM_RN_SpiritComplete = TRUE
+				SpiritDone = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notification("Museum Display Added: The Spoils of Adventure")
 				endIf
 			endIf
 		endIf
 
-		if Exploration_Complete && DBM_RN_SpiritComplete
-			
-			Notification("The Curators Companion: All Exploration Displays Unlocked")			
+		if Exploration_Complete && SpiritDone
+					
 			RN_Exploration_Listener_Complete.SetValue(1)
-			iDisplaySectionComplete.SetValue(1)
+			iDisplaySectionComplete.Mod(1)
+			TCC_SectionComplete_Exploration.Show()
 			Done = true
 		else
 			RegisterForSingleUpdate(1)

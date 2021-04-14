@@ -14,6 +14,7 @@ RN_Main_Museum_EEHMISC property _AddItemMain_2 auto
 RN_Main_SupportedMods property _AddItemPatches auto
 RN_Achivement_Script_Master property AchMaster auto
 RN_PatchAPI property API auto
+TCC_IconSetScript property IconScript auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties -------------------------------------------------------------------------------------------------
@@ -27,7 +28,6 @@ bool Token_Vis conditional
 
 bool Ach_Highlight
 bool Property Ach_Perks auto hidden
-bool property ReplicaTag auto hidden
 
 Bool Page1
 Bool Page2
@@ -52,11 +52,14 @@ formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
 formlist property TCC_TokenList_NoShipmentCrates auto
-globalvariable property RN_moreHUD_Option auto
 
 string[] moreHUDChoiceList 
-int IndexmoreHUD = 0
+int property IndexmoreHUD auto hidden
 int moreHUDOptions
+
+string[] moreHUDInventoryChoiceList 
+int property IndexmoreHUDInventory auto hidden
+int moreHUDInventoryOptions
 
 string[] AchievementSoundList
 int property IndexSounds auto hidden
@@ -71,13 +74,13 @@ int property IndexTransfer auto hidden
 int TransferListOptions
 
 ;; bool Properties
-bool property ShowMuseumVal = true auto hidden ;;Museum Notifications
-bool property ShowArmoryVal = true auto hidden ;;Armory Notifications
-bool property ShowModsVal = true auto hidden ;;Supported Mod Notifications
-bool property ShowSetCompleteVal = true auto hidden ;;Section / Set Completion Notifications
-bool property ShowListenerVal = true auto hidden ;;Notifications for Display Listeners
-bool property Restricted auto hidden ;;Storage Restriction Value
-bool property ShowStartup = true auto hidden ;; Shows Startup Messages
+bool property ShowMuseumVal = true auto hidden
+bool property ShowArmoryVal = true auto hidden
+bool property ShowModsVal = true auto hidden
+bool property ShowSetCompleteVal = true auto hidden
+bool property ShowListenerVal = true auto hidden
+bool property Restricted auto hidden
+bool property ShowStartup = true auto hidden
 
 bool property Ach_Notify = true auto hidden
 bool property Ach_Visual = true auto hidden
@@ -95,35 +98,17 @@ globalvariable property RN_CustomModCount auto
 globalvariable property RN_CreationClubContent_Installed auto
 
 ;; Treasury Globals
-globalvariable property RN_MuseumValue auto
 globalvariable property RN_Treasury_Count auto
 globalvariable property RN_Treasury_Count2 auto
 globalvariable property RN_Treasury_Count3 auto
 
 ;;Globals for Display Listener
-globalvariable property RN_Quest_Listener_Total auto
-globalvariable property RN_Quest_Listener_Count auto
-globalvariable property RN_Quest_Listener_Complete auto
-
-globalvariable property RN_Exploration_Listener_Total auto
-globalvariable property RN_Exploration_Listener_Count auto
-globalvariable property RN_Exploration_Listener_Complete auto
 
 globalvariable property RN_Thane_Listener_Total auto
-globalvariable property RN_Thane_Listener_Count auto
-globalvariable property RN_Thane_Listener_Complete auto
-
 globalvariable property RN_Skills_Listener_Total auto
-globalvariable property RN_Skills_Listener_Count auto
-globalvariable property RN_Skills_Listener_Complete auto
 
-globalvariable property RN_Museum_Paintings_Total auto
-globalvariable property RN_Museum_Paintings_Count auto
-globalvariable property RN_Museum_Paintings_Complete auto
-
-globalvariable property RN_Museum_Dibella_Statues_Total auto
-globalvariable property RN_Museum_Dibella_Statues_Count auto
-globalvariable property RN_Museum_Dibella_Statues_Complete auto
+globalvariable property RN_Museum_MiscItems_Total auto
+globalvariable property RN_Museum_MiscItems_Count auto
 
 Formlist property _Museum_Global_Complete auto
 Formlist property _Museum_Global_Count auto
@@ -136,6 +121,17 @@ GlobalVariable[] RN_Museum_Global_Total
 Int[] Museum_Invalid_Position
 Int[] Museum_Secton_Position
 String[] _Museum_Section_names
+
+Formlist property _Museum_Global_Complete2 auto
+Formlist property _Museum_Global_Count2 auto
+Formlist property _Museum_Global_Total2 auto
+Formlist property Museum_Secton_Items_Tracking2 auto
+Formlist property Museum_Secton_Displays_Tracking2 auto
+GlobalVariable[] RN_Museum_Global_Complete2 
+GlobalVariable[] RN_Museum_Global_Count2
+GlobalVariable[] RN_Museum_Global_Total2 
+Int[] Museum_Secton_Position2
+String[] _Museum_Section_names2
 
 Formlist property _Armory_Global_Complete auto
 Formlist property _Armory_Global_Count auto
@@ -339,6 +335,13 @@ Function InitmoreHUDChoiceList()
 	moreHUDChoiceList[2] = "Show Found Icons"
 	moreHUDChoiceList[3] = "Show Displayed Icons"
 	moreHUDChoiceList[4] = "Hide All Icons"
+
+	moreHUDInventoryChoiceList = new string[5]
+	moreHUDInventoryChoiceList[0] = "Show All Icons"
+	moreHUDInventoryChoiceList[1] = "Show New Icons"
+	moreHUDInventoryChoiceList[2] = "Show Found Icons"
+	moreHUDInventoryChoiceList[3] = "Show Displayed Icons"
+	moreHUDInventoryChoiceList[4] = "Hide All Icons"
 EndFunction
 
 ;-- Events --------------------------------
@@ -427,17 +430,18 @@ Function AddAdvancedPage()
 		
 		AddHeaderOption("moreHUD Settings:")
 		
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017 || SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-			AddMenuOptionST("moreHUDOptions", "moreHUD Icons Settings:", moreHUDChoiceList[IndexmoreHUD])	
+		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
+			AddMenuOptionST("moreHUDOptions", "moreHUD Main HUD:", moreHUDChoiceList[IndexmoreHUD])	
 		else
-			AddtextOption("moreHUD Icon Settings:", "<font color='#750e0e'>moreHUD Not Found</font>")
-		endif
+			AddtextOption("moreHUD Main HUD:", "<font color='#750e0e'>moreHUD Not Found</font>")
+		endif		
 		
-		if RN_Setup_Start.GetValue()
-			AddTextOptionST("ReplicaChecking", "moreHUD Replica Checking:", "Wait For Setup...", 1)
+		
+		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
+			AddMenuOptionST("moreHUDInventoryOptions", "moreHUD Inventory:", moreHUDInventoryChoiceList[IndexmoreHUDInventory])	
 		else
-			AddTextOptionST("ReplicaChecking", "moreHUD Replica Checking:", GetDefaultEnabled(ReplicaTag), 0)
-		endif				
+			AddtextOption("moreHUD Inventory:", "<font color='#750e0e'>moreHUD Inventory Not Found</font>")
+		endif			
 		
 		AddEmptyOption()
 
@@ -560,7 +564,7 @@ Function AddMuseumSetsPage()
 		SetVal = BuildTotalsArray(SetVal, RN_Museum_Global_Complete)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)	
-		AddHeaderOption("Museum Sections:")	
+		AddHeaderOption("Museum Rooms:")	
 				
 		Int _Index = 0
 		Int _Length = RN_Museum_Global_Complete.length
@@ -568,14 +572,14 @@ Function AddMuseumSetsPage()
 				
 			if RN_Museum_Global_Complete[_Index] != none
 				if RN_Museum_Global_Complete[_Index].GetValue()
-					AddTextOption(_Museum_Section_names[_Index], "Complete", 1)
+					AddTextOption(_Museum_Section_names[_Index], GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]) + " (Complete)", 1)
 				elseif RN_Scan_Registered.GetValue()
 					AddTextOption(_Museum_Section_names[_Index], "Updating...", 1)
 				else
 					if _Index == 8 || _Index == 11
-						Museum_Invalid_Position[_Index] = AddTextOption(_Museum_Section_names[_Index], self.GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
+						Museum_Invalid_Position[_Index] = AddTextOption(_Museum_Section_names[_Index], GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
 					else
-						Museum_Secton_Position[_Index] = AddTextOption(_Museum_Section_names[_Index], self.GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
+						Museum_Secton_Position[_Index] = AddTextOption(_Museum_Section_names[_Index], GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
 					endif
 				endif
 			endif
@@ -589,46 +593,25 @@ Function AddMuseumSetsPage()
 		AddEmptyOption()
 		AddHeaderOption("Museum Displays:")
 
-		if (RN_Museum_Dibella_Statues_Complete.GetValue()) == 1
-			AddTextOption("Dibella Statues:", "Complete", 1)
-		else
-			AddTextOption("Dibella Statues:", self.GetCurrentCount(RN_Museum_Dibella_Statues_Count, RN_Museum_Dibella_Statues_Total), 0)
-		endif	
-
-		if (RN_Exploration_Listener_Complete.GetValue()) == 1
-			AddTextOption("Exploration Displays:", "Complete", 1)
-		else
-			AddTextOption("Exploration Displays:", self.GetCurrentCount(RN_Exploration_Listener_Count, RN_Exploration_Listener_Total), 0)
-		endif
-
-		if (RN_Museum_Paintings_Complete.GetValue()) == 1
-			AddTextOption("Museum Paintings:", "Complete", 1)
-		else
-			AddTextOption("Museum Paintings:", self.GetCurrentCount(RN_Museum_Paintings_Count, RN_Museum_Paintings_Total), 0)
-		endif
-		
-		if (RN_Quest_Listener_Complete.GetValue()) == 1
-			AddTextOption("Quest Displays:", "Complete", 1)
-		else
-			AddTextOption("Quest Displays:", self.GetCurrentCount(RN_Quest_Listener_Count, RN_Quest_Listener_Total), 0)
-		endif			
-
-		if (RN_Skills_Listener_Complete.GetValue()) == 1
-			AddTextOption("Skills Displays:", "Complete", 1)
-		else
-			AddTextOption("Skills Displays:", self.GetCurrentCount(RN_Skills_Listener_Count, RN_Skills_Listener_Total), 0)
-		endif
-
-		if (RN_Thane_Listener_Complete.GetValue()) == 1
-			AddTextOption("Thane of the Holds:", "Complete", 1)
-		else
-			AddTextOption("Thane of the Holds:", self.GetCurrentCount(RN_Thane_Listener_Count, RN_Thane_Listener_Total), 0)
-		endif
+		_Index = 0
+		_Length = RN_Museum_Global_Complete2.length
+		While _Index < _Length			
+				
+			if RN_Museum_Global_Complete2[_Index] != none
+				if RN_Museum_Global_Complete2[_Index].GetValue()
+					AddTextOption(_Museum_Section_names2[_Index], GetCurrentCount(RN_Museum_Global_Count2[_Index] , RN_Museum_Global_Total2[_Index]) + " (Complete)", 1)
+				elseif RN_Scan_Registered.GetValue()
+					AddTextOption(_Museum_Section_names2[_Index], "Updating...", 1)
+				else
+					Museum_Secton_Position2[_Index] = AddTextOption(_Museum_Section_names2[_Index] + " Displays", GetCurrentCount(RN_Museum_Global_Count2[_Index] , RN_Museum_Global_Total2[_Index]), 0)
+				endif
+			endif
+			_Index += 1
+		endWhile
 
 		AddEmptyOption()
 
 		AddHeaderOption("Player Wealth:")
-		AddTextOption("Museum Displays Value:", RN_MuseumValue.GetValue() as Int, 0)
 		AddTextOption("Safehouse Treasury Value:", RN_Treasury_Count.GetValue() as Int, 0)
 		AddTextOption("Deepholme Treasury Value:", RN_Treasury_Count2.GetValue() as Int, 0)
 		AddTextOption("Karagas' Tower Treasury Value:", RN_Treasury_Count3.GetValue() as Int, 0)
@@ -648,22 +631,20 @@ Function AddMuseumSetsPage()
 			AddEmptyOption()
 		endif
 		AddEmptyOption()	
-		AddTextOption("Completed:", GetCurrentDisplayCount() + " Displays", 0)
+		AddTextOption("Collected:", GetCurrentDisplayCount() + " Displays", 0)
 		AddTextOption("Completed:", GetCurrentMuseumCount(SetVal), 0)
 		AddEmptyOption()
 		AddHeaderOption("Display Information:")		
 		AddTextOption("This section of the MCM can be used to keep track of", "", 0)
-		AddTextOption("displays from completing quests, Levelling up skills", "", 0)
-		AddTextOption("exploring the world and finding hidden items such as", "", 0)
-		AddTextOption("paintings and Dibella statues.", "", 0)
+		AddTextOption("displays from quests, exploring, Levelling up skills", "", 0)
+		AddTextOption("and displaying paintings and Dibella statues.", "", 0)
 		AddEmptyOption()
-		AddTextOption("Completed:", self.GetDisplaySectionCount(iDisplaySectionComplete), 0)
+		AddTextOption("Completed:", GetDisplaySectionCount(iDisplaySectionComplete), 0)
 		AddEmptyOption()
 		AddHeaderOption("Wealth Information:")
-		AddTextOption("This section tracks the Museum value as well as the", "", 0)
-		AddTextOption("gold value of the different treasury rooms.", "", 0)
+		AddTextOption("This section tracks the value of all 3 treasury rooms", "", 0)
 		AddEmptyOption()
-		AddTextOptionST("GetMuseumValue", "Total Museum value:", self.GetTotalTreasuryValue(RN_MuseumValue, RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3), 0)
+		AddTextOption("Total Treasury value:", GetTotalTreasuryValue(RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3), 0)
 	endif
 endFunction
 
@@ -682,20 +663,20 @@ Function AddArmorySetsPage()
 		
 		AddHeaderOption("Armory Sets:")
 		SetCursorPosition(1)
-		AddHeaderOption("Completed: " + self.GetCurrentArmoryCount(SetVal) + " Sets")
+		AddHeaderOption("Completed: " + GetCurrentArmoryCount(SetVal) + " Sets")
 		Int PageIdx = 1	
 		Int _Index = 0
 		Int _Length = RN_Armory_Global_Complete.length
 		While _Index < _Length 
 			SetCursorPosition(PageIdx + 1)
 			if RN_Armory_Global_Complete[_Index].GetValue()
-				AddTextOption(_Armory_Section_names[_Index], "Complete", 1)
+				AddTextOption(_Armory_Section_names[_Index], GetCurrentCount(RN_Armory_Global_Count[_Index], RN_Armory_Global_Total[_Index]) + " (Complete)", 1)
 				PageIdx += 1
 			elseif RN_Scan_Registered.GetValue()
 				AddTextOption(_Armory_Section_names[_Index], "Updating...", 1)
 				PageIdx += 1
 			else
-				_Armory_Section_Position[_Index] = AddTextOption(_Armory_Section_names[_Index], self.GetCurrentCount(RN_Armory_Global_Count[_Index], RN_Armory_Global_Total[_Index]), 0)
+				_Armory_Section_Position[_Index] = AddTextOption(_Armory_Section_names[_Index], GetCurrentCount(RN_Armory_Global_Count[_Index], RN_Armory_Global_Total[_Index]), 0)
 				PageIdx += 1
 			endif
 			_Index +=1
@@ -708,7 +689,7 @@ Function AddArmorySetsPage()
 			AddHeaderOption("Immersive Weapons Sets:")
 			PageIdx += 1
 			SetCursorPosition(PageIdx + 1)
-			AddHeaderOption("Completed: " + self.GetCurrentIWCount(SetVal3) + " Sets")
+			AddHeaderOption("Completed: " + GetCurrentIWCount(SetVal3) + " Sets")
 			PageIdx	+= 1
 			_Index = 0
 			_Length = Index_Section2
@@ -716,13 +697,13 @@ Function AddArmorySetsPage()
 				SetCursorPosition(PageIdx + 1)
 				if RN_Section2_Name[_Index] != ""				
 					if RN_Section2_Complete_Array[_Index].GetValue()
-						AddTextOption(RN_Section2_Name[_Index], "Complete", 1)
+						AddTextOption(RN_Section2_Name[_Index], GetCurrentCount(RN_Section2_Count_Array[_Index], RN_Section2_Total_Array[_Index]) + " (Complete)", 1)
 						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
 						AddTextOption(RN_Section2_Name[_Index], "Updating...", 1)
 						PageIdx += 1
 					else
-						RN_Section2_Position_Array[_Index] = AddTextOption(RN_Section2_Name[_Index], self.GetCurrentCount(RN_Section2_Count_Array[_Index], RN_Section2_Total_Array[_Index]), 0)
+						RN_Section2_Position_Array[_Index] = AddTextOption(RN_Section2_Name[_Index], GetCurrentCount(RN_Section2_Count_Array[_Index], RN_Section2_Total_Array[_Index]), 0)
 						PageIdx += 1
 					endif
 				endif
@@ -736,7 +717,7 @@ Function AddArmorySetsPage()
 			AddHeaderOption("Heavy Armory Sets:")
 			PageIdx += 1
 			SetCursorPosition(PageIdx + 1)
-			AddHeaderOption("Completed: " + self.GetCurrentHACount(SetVal2) + " Sets")
+			AddHeaderOption("Completed: " + GetCurrentHACount(SetVal2) + " Sets")
 			PageIdx	+= 1		
 			_Index = 0
 			_Length = Index_Section
@@ -744,13 +725,13 @@ Function AddArmorySetsPage()
 				SetCursorPosition(PageIdx + 1)
 				if RN_Section_Name[_Index] != ""
 					if RN_Section_Complete_Array[_Index].GetValue()
-						AddTextOption(RN_Section_Name[_Index], "Complete", 1)
+						AddTextOption(RN_Section_Name[_Index], GetCurrentCount(RN_Section_Count_Array[_Index], RN_Section_Total_Array[_Index]) + " (Complete)", 1)
 						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
 						AddTextOption(RN_Section_Name[_Index], "Updating...", 1)
 						PageIdx += 1
 					else
-						RN_Section_Position_Array[_Index] = AddTextOption(RN_Section_Name[_Index], self.GetCurrentCount(RN_Section_Count_Array[_Index], RN_Section_Total_Array[_Index]), 0)
+						RN_Section_Position_Array[_Index] = AddTextOption(RN_Section_Name[_Index], GetCurrentCount(RN_Section_Count_Array[_Index], RN_Section_Total_Array[_Index]), 0)
 						PageIdx += 1
 					endif
 				endif
@@ -780,13 +761,13 @@ Function AddCompletedModsPage()
 			SetCursorPosition(PageIdx + 1)
 			if RN_Patches_Name[_Index] != ""
 				if RN_Patches_Complete_Array[_Index].GetValue()
-					AddTextOption(RN_Patches_Name[_Index], "Complete", 1)
+					AddTextOption(RN_Patches_Name[_Index], GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]) + " (Complete)", 1)
 					PageIdx += 1
 				elseif RN_Scan_Registered.GetValue()
 					AddTextOption(RN_Patches_Name[_Index], "Updating...", 1)
 					PageIdx += 1
 				else
-					RN_Patches_Position_Array[_Index] = AddTextOption(RN_Patches_Name[_Index], self.GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]), 0)
+					RN_Patches_Position_Array[_Index] = AddTextOption(RN_Patches_Name[_Index], GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]), 0)
 					PageIdx += 1
 				endif
 			endif
@@ -815,13 +796,13 @@ Function AddCustomModsPage()
 			SetCursorPosition(PageIdx + 1)
 			if RN_Custom_Name[_Index] != ""
 				if RN_Custom_Complete_Array[_Index].GetValue()
-					AddTextOption(RN_Custom_Name[_Index], "Complete", 1)
+					AddTextOption(RN_Custom_Name[_Index], GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]) + " (Complete)", 1)
 					PageIdx += 1
 				elseif RN_Scan_Registered.GetValue()
 					AddTextOption(RN_Custom_Name[_Index], "Updating...", 1)
 					PageIdx += 1
 				else
-					RN_Custom_Position_Array[_Index] = AddTextOption(RN_Custom_Name[_Index], self.GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]), 0)
+					RN_Custom_Position_Array[_Index] = AddTextOption(RN_Custom_Name[_Index], GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]), 0)
 					PageIdx += 1
 				endif
 			endif
@@ -843,7 +824,7 @@ Function AddTrackingPage()
 			return
 		endif
 	
-		SetTitleText(TrackedPatch)
+		SetTitleText(TrackedPatch + " Displays")
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)									
 		AddHeaderOption(TrackedPatch + " Displays", 0)
@@ -887,7 +868,7 @@ Function AddTrackingPage2()
 			return
 		endif
 		
-		SetTitleText(TrackedPatch)
+		SetTitleText(TrackedPatch + " Displays")
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)									
 		AddHeaderOption(TrackedPatch + " Displays", 0)
@@ -931,7 +912,7 @@ Function AddTrackingPage3()
 			return
 		endif
 		
-		SetTitleText(TrackedPatch)
+		SetTitleText(TrackedPatch + " Displays")
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)									
 		AddHeaderOption(TrackedPatch + " Displays", 0)
@@ -975,7 +956,7 @@ Function AddTrackingPage4()
 			return
 		endif
 		
-		SetTitleText(TrackedPatch)
+		SetTitleText(TrackedPatch + " Displays")
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)									
 		AddHeaderOption(TrackedPatch + " Displays", 0)
@@ -1019,7 +1000,7 @@ Function AddTrackingPage5()
 			return
 		endif
 		
-		SetTitleText(TrackedPatch)
+		SetTitleText(TrackedPatch + " Displays")
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)									
 		AddHeaderOption(TrackedPatch + " Displays", 0)
@@ -1147,7 +1128,7 @@ Function AddDebugPage()
 		AddHeaderOption("")
 		AddTextOption("SortWait:", DBM_SortWait.GetValue() As Int, 1)
 		AddTextOption("Scan Registered:", RN_Scan_Registered.GetValue() As Int, 1)
-		AddTextOption("Scan Done:", RN_Scan_Done.GetValue() As Int, 1)		
+		AddTextOption("Scan Done:", RN_Scan_Done.GetValue() As Int, 1)
 	endif
 endFunction
 
@@ -1193,7 +1174,7 @@ state RefreshMCM
 
 	function OnHighlightST()
 
-		SetInfoText("Force refresh Mod list and reload the MCM - use if installed mods don't automatically show up.")
+		SetInfoText("Force refresh Mod list and reload the MCM - use if installed mods don't automatically show up or something doesn't look right in the MCM")
 	endFunction
 endState
 
@@ -1204,7 +1185,8 @@ endState
 state SaveConfig_JSON
 
 	Event OnSelectST()
-	
+		
+		SetTitleText(" === Saving Profile ===") 
 		Begin_Config_Save()
 	EndEvent
 
@@ -1218,6 +1200,7 @@ state LoadConfig_JSON
 
 	Event OnSelectST()
 		
+		SetTitleText(" === Loading Profile ===") 
 		Begin_Config_Load()
 	EndEvent
 
@@ -1265,12 +1248,14 @@ Function Begin_Config_Save()
 		jsonutil.SetPathIntValue("TCC_Config", ".!IndexAttribute", IndexAttribute)
 		jsonutil.SetPathIntValue("TCC_Config", ".!IndexTransfer", IndexTransfer)
 
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017 || SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800	
-			jsonutil.SetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD)
-		endif			
+		jsonutil.SetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD)		
+		jsonutil.SetPathIntValue("TCC_Config", ".!IndexmoreHUDInventory", IndexmoreHUDInventory)		
 		
 		jsonutil.Save("TCC_Config", false)
-		ShowMessage("Preset Saved")
+		if IsInMenuMode()
+			ShowMessage("Configuration settings successfully saved to file")
+			ForcePageReset()
+		endif
 	else
 		ShowMessage("PapyrusUtil Not Installed")
 	endIf
@@ -1327,65 +1312,11 @@ Function Begin_Config_Load()
 			IndexAttribute = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexAttribute", IndexAttribute))
 			IndexTransfer = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexTransfer", IndexTransfer))
 			
-			if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
-				IndexmoreHUD = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD))
-				if IndexmoreHUD == 0
-					RN_moreHUD_Option.SetValue(1)
-					AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-					AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-					AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)						
-				elseif IndexmoreHUD == 1
-					RN_moreHUD_Option.SetValue(2)
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-					AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-				elseif IndexmoreHUD == 2
-					RN_moreHUD_Option.SetValue(3)
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-					AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)					
-				elseif IndexmoreHUD == 3
-					RN_moreHUD_Option.SetValue(4)
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-					AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)	
-				elseif IndexmoreHUD == 4
-					RN_moreHUD_Option.SetValue(5)
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")
-					AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")	
-				endif		
-			endif
 			
-			if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-				IndexmoreHUD = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD))
-				if IndexmoreHUD == 0
-					RN_moreHUD_Option.SetValue(1)
-					AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-					AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-					AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-				elseif IndexmoreHUD == 1
-					RN_moreHUD_Option.SetValue(2)
-					AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-					AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-					AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-				elseif IndexmoreHUD == 2
-					RN_moreHUD_Option.SetValue(3)
-					AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-					AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-					AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-				elseif IndexmoreHUD == 3
-					RN_moreHUD_Option.SetValue(4)
-					AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-					AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-					AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-				elseif IndexmoreHUD == 4
-					RN_moreHUD_Option.SetValue(5)
-					AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-					AhzmoreHUD.UnRegisterIconFormList("dbmDisp")
-					AhzmoreHUD.UnRegisterIconFormList("dbmFound")	
-				endif			
-			endif					
+			IndexmoreHUD = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD))
+			IndexmoreHUDInventory = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUDInventory", IndexmoreHUDInventory))
+			IconScript.SetMainHud(IndexmoreHUD)
+			IconScript.SetInventoryHud(IndexmoreHUDInventory)					
 			
 			jsonutil.Load("TCC_Config")
 			if IsInMenuMode()
@@ -1415,8 +1346,9 @@ EndFunction
 state Config_Default
 
 	Event OnSelectST()
-	
+		
 		 if ShowMessage("This will Restore all MCM options back to default including moreHUD icons... do you want to Restore now?", true, "Restore", "Cancel")
+			SetTitleText(" === Loading Defaults ===") 
 			Begin_Config_Default()
 		endif
 	EndEvent
@@ -1432,8 +1364,9 @@ endState
 state Config_Author
 
 	Event OnSelectST()
-	
+
 		 if ShowMessage("This will set all MCM options to the Developers preferred setup, limited notifications, full moreHUD support and a less invasive but still full featured preset... do you want to configure now?", true, "Configure", "Cancel")
+			SetTitleText(" === Loading Profile ===") 
 			Begin_Config_Author()
 		endif
 	EndEvent
@@ -1464,25 +1397,15 @@ Function Begin_Config_Default()
 	Restricted = True
 	
 	IndexmoreHUD = 0
-	
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-		AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-		AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-		AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-	endif
-	
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017	
-		AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-		AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-		AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-	endif
+	IconScript.SetMainHud(IndexmoreHUD)
+	IconScript.SetInventoryHud(IndexmoreHUDInventory)
 	
 	Token_Vis = True
 	IndexTransfer = 0
 	
 	Ach_Notify = True
 	Ach_Visual = True
-	IndexSounds = 0
+	IndexSounds = 2
 	Ach_Highlight = False
 	Ach_Perks = False
 	IndexAttribute = 0
@@ -1511,25 +1434,16 @@ Function Begin_Config_Author()
 	ShowStartup = True
 	Token_Vis = True
 	IndexTransfer = 0
+	
 	IndexmoreHUD = 0
-	
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-		AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-		AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-		AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-	endif
-	
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017	
-		AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-		AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-		AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-	endif
+	IconScript.SetMainHud(IndexmoreHUD)
+	IconScript.SetInventoryHud(IndexmoreHUDInventory)
 	
 	Restricted = False
 	
 	Ach_Notify = True
 	Ach_Visual = True
-	IndexSounds = 1
+	IndexSounds = 2
 	Ach_Highlight = True
 	Ach_Perks = True
 	IndexAttribute = 4
@@ -1765,7 +1679,7 @@ state iRelicListenerNotifications
 
 	Event OnHighlightST()
 
-		SetInfoText("Enable to show notifications for quest displays, skills displays, exploration displays and unlocked achievements in the Museum.\n Default: On")
+		SetInfoText("Show notifications when quest, exploration and skill displays are enabled\n Default: On")
 	EndEvent
 endState
 
@@ -1781,7 +1695,7 @@ state iRelicSetCompleteNotifications
 
 	Event OnHighlightST()
 
-		SetInfoText("This option will display notifications when the player collects all displayable items from a given Set, collection or Museum Section.\n Default: On")
+		SetInfoText("Show notifications when a collection, set or Museum section is completed\n Default: On")
 	EndEvent
 endState
 
@@ -1846,44 +1760,6 @@ String function GetDefaultEnabled(bool val)
 	return "Enabled"
 endfunction
 
-;;-------------------------------
-
-State ReplicaChecking
-
-	Event OnSelectST()
-		
-		ReplicaTag = !ReplicaTag 
-		
-		if ReplicaTag
-			if showmessage("Would you like to turn on Replica Checking?", true, "Enable", "Cancel")
-				SetTextOptionValueST(GetDefaultEnabled(ReplicaTag), false, "")
-				SetTitleText("=== Please Exit The MCM ===")
-				While IsInMenuMode()
-					Wait(1)
-				endwhile
-				Util.EnableReplica()
-			else
-				ReplicaTag = False
-			endif
-		else
-			if showmessage("Would you like to turn off Replica Checking?", true, "Disable", "Cancel")
-				SetTextOptionValueST(GetDefaultEnabled(ReplicaTag), false, "")
-				SetTitleText("=== Please Exit The MCM ===")
-				While IsInMenuMode()
-					Wait(1)
-				endwhile
-				Util.DisableReplica()
-			else
-				ReplicaTag = True
-			endif
-		endif
-	EndEvent
-
-	Event OnHighlightST()
-
-		SetInfoText("With this option enabled, the mod will automatically attempt to update the icons on Replica's when interacting with / Displaying items.\n NOTE: This is an experimental feature and may cause some script lag when updating icons, it is absolutely mandatory that you NOT use 'Take All' on containers with this option enabled.")
-	EndEvent
-endState
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------------- Storage Options -----------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
@@ -1974,85 +1850,48 @@ state moreHUDOptions
 	event OnMenuAcceptST(int index)
 		IndexmoreHUD = Index
 		SetMenuOptionValueST(moreHUDOptions, moreHUDChoiceList[IndexmoreHUD])
-			
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017
-			if Index == 0
-				RN_moreHUD_Option.SetValue(1)
-				AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-				AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-				AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-				
-			elseif Index == 1
-				RN_moreHUD_Option.SetValue(2)
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-				AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-
-			elseif Index == 2
-				RN_moreHUD_Option.SetValue(3)
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-				
-			elseif Index == 3
-				RN_moreHUD_Option.SetValue(4)
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-				AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)		
-
-			elseif Index == 4
-				RN_moreHUD_Option.SetValue(5)
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")
-				AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")				
-				
-			endif
-		endif
-			
-		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-			if Index == 0
-				RN_moreHUD_Option.SetValue(1)
-				AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-				AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-				AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-				
-			elseif Index == 1
-				RN_moreHUD_Option.SetValue(2)
-				AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-				AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-				AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-
-			elseif Index == 2
-				RN_moreHUD_Option.SetValue(3)
-				AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-				AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-				
-			elseif Index == 3
-				RN_moreHUD_Option.SetValue(4)
-				AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-				AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)		
-
-			elseif Index == 4
-				RN_moreHUD_Option.SetValue(5)
-				AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-				AhzmoreHUD.UnRegisterIconFormList("dbmDisp")
-				AhzmoreHUD.UnRegisterIconFormList("dbmFound")				
-				
-			endif
-		endif
-			
+		IconScript.SetMainHud(IndexmoreHUD)			
+		
 		ForcePageReset()
 	endEvent
 
 	event OnDefaultST()
 		IndexmoreHUD = 0
 		SetMenuOptionValueST(moreHUDChoiceList[IndexmoreHUD])
+		IconScript.SetMainHud(IndexmoreHUD)	
 	endEvent
 
 	event OnHighlightST()
-		SetInfoText("Use this menu to customize which icons are displayed in the UI.\n Default: Show All Icons")
+		SetInfoText("Use this menu to customize which moreHUD icons are displayed on the main HUD.\n Default: Show All Icons")
+	endEvent
+endState
+
+;;-------------------------------
+
+state moreHUDInventoryOptions
+
+	event OnMenuOpenST()
+		SetMenuDialogStartIndex(IndexmoreHUDInventory)
+		SetMenuDialogDefaultIndex(0)
+		SetMenuDialogOptions(moreHUDInventoryChoiceList)
+	endEvent
+
+	event OnMenuAcceptST(int index)
+		IndexmoreHUDInventory = Index
+		SetMenuOptionValueST(moreHUDInventoryOptions, moreHUDInventoryChoiceList[IndexmoreHUDInventory])
+		IconScript.SetInventoryHud(IndexmoreHUDInventory)			
+		
+		ForcePageReset()
+	endEvent
+
+	event OnDefaultST()
+		IndexmoreHUDInventory = 0
+		SetMenuOptionValueST(moreHUDInventoryChoiceList[IndexmoreHUDInventory])
+		IconScript.SetInventoryHud(IndexmoreHUDInventory)	
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("Use this menu to customize which moreHUD icons are displayed in the inventory, crafting and gift menus.\n Default: Show All Icons")
 	endEvent
 endState
 
@@ -2233,12 +2072,9 @@ string function GetCurrentDisplayCount()
 		endif
 		Index += 1
 	endwhile
-	
-	Count += (RN_Museum_Paintings_Count.GetValue() as Int)
-	Total += (RN_Museum_Paintings_Total.GetValue() as Int)
 
-	Count += (RN_Museum_Dibella_Statues_Count.GetValue() as Int)
-	Total += (RN_Museum_Dibella_Statues_Total.GetValue() as Int)
+	Count += (RN_Museum_MiscItems_Count.GetValue() as Int)
+	Total += (RN_Museum_MiscItems_Total.GetValue() as Int)
 	
 	return (Count + " / " + Total)
 endFunction
@@ -2256,7 +2092,7 @@ string function GetDisplaySectionCount(GlobalVariable akVariable)
 	
 	Int Current_Count = (akVariable.GetValue()) as Int	
 	
-	return (Current_Count + "/6 Sections")
+	return (Current_Count + "/5 Sections")
 endFunction
 
 ;;-------------------------------
@@ -2279,28 +2115,18 @@ string function GetCurrentHACount(Int akVariable)
 	
 	return (akVariable + "/19")
 endFunction	
-
-;;-------------------------------
-
-State GetMuseumValue
-
-	Event OnHighlightST()
-		SetInfoText("This is an approximate total value for the Museum including Safehouse Displays and all 3 Treasury Rooms.\n The value will update after using the Prep Station, Display Drop off chest or manually displaying an item.")
-	EndEvent
-endState
 		
 ;;-------------------------------
 
-Int function GetTotalTreasuryValue(GlobalVariable akMuseumVal, GlobalVariable akvariable1, GlobalVariable akvariable2, GlobalVariable akvariable3)
+Int function GetTotalTreasuryValue(GlobalVariable akvariable1, GlobalVariable akvariable2, GlobalVariable akvariable3)
 
-	return ((akMuseumVal.GetValue() as Int) + (akvariable1.GetValue() as Int) + (akvariable2.GetValue() as Int) + (akvariable3.GetValue() as Int))
+	return (akvariable1.GetValue() as Int) + (akvariable2.GetValue() as Int) + (akvariable3.GetValue() as Int)
 endFunction
 	
 ;;-------------------------------
 
 Function SetupPage(Quest _Quest, String _Name, Formlist _Items = none, Formlist _Displays = none)
 
-	SetTitleText("=== Please Wait ===")
 	TrackedNames = new string[128]
 	TrackedNames2 = new string[128]
 	TrackedNames3 = new string[128]
@@ -2325,8 +2151,17 @@ Function SetupPage(Quest _Quest, String _Name, Formlist _Items = none, Formlist 
 		SetTrackerSection(_Items, _Displays)
 	endif
 	
+	SetTitleText("=== Finalizing ===")
+	
 	AddDynamicPagesList()
-	ForcePageReset()	
+	
+	ShowMessage(TrackedPatch + " Display Tracking Ready!", false, "Ok")
+	
+	if Page2 || Page3 || Page4 || Page5
+		SetTitleText("=== please Re-Enter The MCM ===")
+	else
+		SetTitleText(CurrentPage)
+	endif
 endFunction
 
 Event OnOptionSelect(Int _Val)
@@ -2338,6 +2173,13 @@ Event OnOptionSelect(Int _Val)
 		if Index != -1 
 			if ShowMessage("Would you like to start tracking the " + _Museum_Section_names[Index] + "?", true, "Track", "Cancel")
 				SetupPage(none, _Museum_Section_names[Index], Museum_Secton_Items_Tracking.GetAt(Index) as formlist, Museum_Secton_Displays_Tracking.GetAt(Index) as formlist)
+			endif
+		else
+			Index = Museum_Secton_Position2.find(_Val)
+			if Index != -1 
+				if ShowMessage("Would you like to start tracking the " + _Museum_Section_names2[Index] + " Displays?", true, "Track", "Cancel")
+					SetupPage(none, _Museum_Section_names2[Index], Museum_Secton_Items_Tracking2.GetAt(Index) as formlist, Museum_Secton_Displays_Tracking2.GetAt(Index) as formlist)
+				endif
 			endif
 		endif
 		
@@ -2352,7 +2194,7 @@ Event OnOptionSelect(Int _Val)
 	elseif CurrentPage == "Custom Patches"
 		Index = RN_Custom_Position_Array.find(_Val)
 		if Index != -1 
-			if ShowMessage("Would you like to start tracking " + RN_Custom_Name[Index] + "?", true, "Track", "Cancel")
+			if ShowMessage("Would you like to start tracking " + RN_Custom_Name[Index] + "?", true, "Track", "Cancel")	
 				SetupPage(RN_Custom_Quests_Array[Index], RN_Custom_Name[Index])		
 			endif
 		endif
@@ -2392,11 +2234,16 @@ Event OnOptionHighlight(Int _Val)
 		if Index != -1 
 			SetInfoText("Click to track the " + _Museum_Section_names[Index] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from patches.")
 		else
-			Index = Museum_Invalid_Position.find(_Val)
+			Index = Museum_Secton_Position2.find(_Val)
 			if Index != -1 
-				SetInfoText("This Museum room can not be tracked in the Display Tracker.")	
+				SetInfoText("Click to track the " + _Museum_Section_names2[Index] + " Displays in the Display Tracker.\n NOTE: Tracking for this Museum section will not include displays from patches.")
+			else
+				Index = Museum_Invalid_Position.find(_Val)
+				if Index != -1 
+					SetInfoText("This Museum room can not be tracked in the Display Tracker.")	
+				endif			
 			endif
-		endif
+		endif			
 		
 	elseif CurrentPage == "Official Patches"
 		Index = RN_Patches_Position_Array.find(_Val)
@@ -2441,6 +2288,7 @@ EndEvent
 
 Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
 	
+	SetTitleText("=== Loading ===")
 	Int ArrayPos = 0
 	Int FillSection = 0
 	
@@ -2451,21 +2299,25 @@ Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
 	While Index < Dlist.GetSize()		
 
 		if ArrayPos >= 125 && !Page2
+			SetTitleText("=== Building Page 2 ===")
 			FillSection = 2
 			Page2 = True
 			ArrayPos = 0
 
 		elseif ArrayPos >= 125 && !Page3
+			SetTitleText("=== Building Page 3 ===")
 			FillSection = 3
 			Page3 = True
 			ArrayPos = 0
 
 		elseif ArrayPos >= 125 && !Page4
+			SetTitleText("=== Building Page 4 ===")
 			FillSection = 4		
 			Page4 = True
 			ArrayPos = 0
 
 		elseif ArrayPos >= 125 && !Page5
+			SetTitleText("=== Building Page 5 ===")
 			FillSection = 5
 			Page5 = True
 			ArrayPos = 0
@@ -2540,7 +2392,8 @@ endFunction
 
 Function SetTrackerArray()
 	DBMSupportedModScript SupportPatch = (TrackedQuest as DBMSupportedModScript)
-
+	
+	SetTitleText("=== Loading ===")
 	Int ArrayPos = 0
 	Int Index = 0
 	While Index < SupportPatch.NewSectionDisplayRefLists.length
@@ -2552,6 +2405,7 @@ Function SetTrackerArray()
 		While Index2 < Dlist.GetSize()		
 
 			if ArrayPos >= 125 && !Page2
+				SetTitleText("=== Building Page 2 ===")
 				Page2 = True
 				ArrayPos = 0
 			endif
@@ -2662,6 +2516,34 @@ Function Build_Arrays()
 		RN_Museum_Global_Total[_Index] = akvariable
 		_Index += 1
 	endWhile
+
+;;-------------------------------
+
+	RN_Museum_Global_Complete2 = new globalvariable[128]
+	_Index = 0
+	While _Index < _Museum_Global_Complete2.GetSize()
+		globalvariable akvariable = _Museum_Global_Complete2.GetAt(_Index) as globalvariable
+		RN_Museum_Global_Complete2[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+	RN_Museum_Global_Count2 = new globalvariable[128]
+	_Index = 0
+	While _Index < _Museum_Global_Count2.GetSize()
+		globalvariable akvariable = _Museum_Global_Count2.GetAt(_Index) as globalvariable
+		RN_Museum_Global_Count2[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+	RN_Museum_Global_Total2 = new globalvariable[128]
+	_Index = 0
+	While _Index < _Museum_Global_Total2.GetSize()
+		globalvariable akvariable = _Museum_Global_Total2.GetAt(_Index) as globalvariable
+		RN_Museum_Global_Total2[_Index] = akvariable
+		_Index += 1
+	endWhile
+
+;;-------------------------------
 	
 	RN_Ach_Globals = new globalvariable[128]
 	_Index = 0
@@ -2740,6 +2622,14 @@ Function Build_Arrays()
 	_Museum_Section_names[10] = "Natural Science"
 	_Museum_Section_names[11] = "Safehouse"
 	_Museum_Section_names[12] = "Storeroom"
+		
+	Museum_Secton_Position2 = new Int[128]
+	_Museum_Section_names2 = new string[128]
+	_Museum_Section_names2[0] = "Exploration"
+	_Museum_Section_names2[1] = "Misc"
+	_Museum_Section_names2[2] = "Quest"
+	_Museum_Section_names2[3] = "Skill"
+	_Museum_Section_names2[4] = "Thane"
 	
 	RN_Ach_Highlight = new string[128]
 	RN_Ach_Highlight[0] = "Reach a total of 500 displays in the Museum"

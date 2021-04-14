@@ -27,6 +27,12 @@ formlist[] property _DisplaysArray06 auto ;;Misc Rooms
 formlist[] property _DisplaysArray07 auto ;;Armory
 formlist[] property _DisplaysArray08 auto ;;Armory
 
+;;Replica Formlists
+formlist property DBM_ReplicaBaseitems auto		
+formlist property DBM_Replicaitems auto		
+formlist property TCC_ReplicaBaseitems auto		
+formlist property TCC_Replicaitems auto		
+
 ;;Formlists to control item lists. - Merged Formlist 1. (HOH, Lib)
 formlist property TCC_ItemList_Museum_1 auto
 
@@ -90,7 +96,7 @@ endEvent
 Event OnUpdate()
 	
 	if Tracker == 0
-		if Count == 21
+		if Count == 22
 			Count = 0
 			SetupDone = true
 			Util.SetupMainDone = True
@@ -111,7 +117,7 @@ Event OnUpdate()
 			Formlist _List = _itemsArray01[x]
 			_onConsolidateItems(_List, TCC_ItemList_Museum_1, dbmNew, dbmMaster)	
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _itemsArray01", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _itemsArray01")
 		Count += 1
 
 	elseif Tracker == 2
@@ -124,7 +130,7 @@ Event OnUpdate()
 			Formlist _List = _itemsArray01A[x]
 			_onConsolidateItems(_List, TCC_ItemList_Museum_1, dbmNew, dbmMaster)	
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _itemsArray01A", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _itemsArray01A")
 		Count += 1
 		
 	elseif	Tracker == 3
@@ -137,7 +143,7 @@ Event OnUpdate()
 			Formlist _List = _itemsArray02[x]
 			_onConsolidateItems(_List, TCC_ItemList_Museum_1, dbmNew, dbmMaster)		
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _itemsArray02", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _itemsArray02")	
 		Count += 1
 
 	elseif	Tracker == 4
@@ -150,7 +156,7 @@ Event OnUpdate()
 			Formlist _List = _itemsArray02A[x]
 			_onConsolidateItems(_List, TCC_ItemList_Museum_1, dbmNew, dbmMaster)		
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _itemsArray02A", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _itemsArray02A")	
 		Count += 1
 		
 	elseif	Tracker == 5
@@ -163,7 +169,7 @@ Event OnUpdate()
 			Formlist _List = _itemsArray03[x]
 			_onConsolidateItems(_List, TCC_ItemList_Armory, dbmNew, dbmMaster)		
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _itemsArray03", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _itemsArray03")	
 		Count += 1		
 
 	elseif	Tracker == 6
@@ -176,7 +182,7 @@ Event OnUpdate()
 			Formlist _List = _itemsArray03A[x]
 			_onConsolidateItems(_List, TCC_ItemList_Armory, dbmNew, dbmMaster)		
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _itemsArray03A", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _itemsArray03A")	
 		Count += 1	
 		
 	elseif	Tracker == 7
@@ -189,7 +195,7 @@ Event OnUpdate()
 			Formlist _List = _itemsArray04[x]
 			_onConsolidateItems(_List, TCC_ItemList_Museum_2, dbmNew, dbmMaster)		
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _itemsArray04", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _itemsArray04")
 		Count += 1
 
 	elseif	Tracker == 8
@@ -202,7 +208,7 @@ Event OnUpdate()
 			Formlist _List = _itemsArray05[x]
 			_onConsolidateItems(_List, TCC_ItemList_Museum_2, dbmNew, dbmMaster)		
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _itemsArray05", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _itemsArray05")	
 		Count += 1
 
 	elseif	Tracker == 9
@@ -215,7 +221,7 @@ Event OnUpdate()
 			Formlist _List = _DisplaysArray01[x]
 			_onConsolidateDisplaysAll(_List, TCC_DisplayList_Library, TCC_RoomEditCount_Library)				
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray01", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray01")
 		Count += 1
 
 	elseif	Tracker == 10
@@ -228,7 +234,7 @@ Event OnUpdate()
 			Formlist _List = _DisplaysArray02[x]
 			_onConsolidateDisplaysAll(_List, TCC_DisplayList_Library, TCC_RoomEditCount_Library)			
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray02", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray02")
 		Count += 1
 
 	elseif	Tracker == 11
@@ -241,7 +247,7 @@ Event OnUpdate()
 			Formlist _List = _DisplaysArray03[x]
 			_onConsolidateDisplaysAll(_List, TCC_DisplayList_NaturalScience, TCC_RoomEditCount_NaturalScience)							
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray03", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray03")
 		Count += 1
 
 	elseif	Tracker == 12 
@@ -254,7 +260,7 @@ Event OnUpdate()
 			Formlist _List = _DisplaysArray04[x]
 			_onConsolidateDisplaysAll(_List, TCC_DisplayList_HallofHeroes, TCC_RoomEditCount_HallofHeroes)					
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray04", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray04")	
 		Count += 1
 		
 	elseif	Tracker == 13
@@ -267,7 +273,7 @@ Event OnUpdate()
 			Formlist _List = _DisplaysArray05[x]
 			_onConsolidateDisplaysAll(_List, TCC_DisplayList_HallofLostEmpires, TCC_RoomEditCount_HallofLostEmpires)			
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray05", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray05")	
 		Count += 1
 
 	elseif	Tracker == 14
@@ -280,7 +286,7 @@ Event OnUpdate()
 			Formlist _List = _DisplaysArray07[x]
 			_onConsolidateDisplaysAll(_List, TCC_DisplayList_Armory, TCC_RoomEditCount_Armory)
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray07", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray07")	
 		Count += 1
 
 	elseif	Tracker == 15
@@ -293,7 +299,7 @@ Event OnUpdate()
 			Formlist _List = _DisplaysArray08[x]
 			_onConsolidateDisplaysAll(_List, TCC_DisplayList_Armory, TCC_RoomEditCount_Armory)
 		endWhile
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray08", 2)	
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray08")	
 		Count += 1
 		
 	elseif	Tracker == 16
@@ -301,7 +307,7 @@ Event OnUpdate()
 		RegisterForSingleUpdate(0)
 		
 		_onConsolidateDisplaysAll(_DisplaysArray06[0], TCC_DisplayList_DragonbornHall, TCC_RoomEditCount_DragonbornHall)
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray06[0]", 2)			
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray06[0]")			
 		Count += 1
 
 	elseif	Tracker == 17
@@ -309,7 +315,7 @@ Event OnUpdate()
 		RegisterForSingleUpdate(0)
 		
 		_onConsolidateDisplaysAll(_DisplaysArray06[1], TCC_DisplayList_DaedricGallery, TCC_RoomEditCount_DaedricGallery)
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray06[1]", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray06[1]")
 		Count += 1
 		
 	elseif	Tracker == 18
@@ -317,7 +323,7 @@ Event OnUpdate()
 		RegisterForSingleUpdate(0)
 		
 		_onConsolidateDisplaysAll(_DisplaysArray06[2], TCC_DisplayList_HallofOddities, TCC_RoomEditCount_HallofOddities)
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray06[2]", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray06[2]")
 		Count += 1
 
 	elseif	Tracker == 19
@@ -325,7 +331,7 @@ Event OnUpdate()
 		RegisterForSingleUpdate(0)
 		
 		_onConsolidateDisplaysAll(_DisplaysArray06[3], TCC_DisplayList_HallofSecrets, TCC_RoomEditCount_HallofSecrets)
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray06[3]", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray06[3]")
 		Count += 1
 		
 	elseif	Tracker == 20
@@ -333,16 +339,50 @@ Event OnUpdate()
 		RegisterForSingleUpdate(0)
 		
 		_onConsolidateDisplaysAll(_DisplaysArray06[4], TCC_DisplayList_Guildhouse, TCC_RoomEditCount_Guildhouse)
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray06[4]", 2)
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray06[4]")
 		Count += 1
 		
 	elseif	Tracker == 21
-		Tracker = 0
+		Tracker = 22
 		RegisterForSingleUpdate(0)
 	
 		_onConsolidateDisplaysAll(_DisplaysArray06[5], TCC_DisplayList_Storeroom, TCC_RoomEditCount_Storeroom)
-		TCCDebug.Log("Setup Script - Finished Setting up _DisplaysArray06[5]", 2)		
+		TCCDebug.Log("Setup Script - Finished setting up _DisplaysArray06[5]")		
 		Count += 1
+
+	elseif	Tracker == 22
+		Tracker = 0
+		RegisterForSingleUpdate(0)
+		AddReplicas()
+		Count += 1	
 	endif
 endEvent
+
+function AddReplicas()
+	
+	Int OrigIndex
+	Int ReplIndex
+	
+	Int Index = TCC_ReplicaBaseitems.GetSize()
+	While Index 
+		Index -= 1
+		
+		DBM_ReplicaBaseitems.AddForm(TCC_ReplicaBaseitems.GetAt(Index) as Form)
+		DBM_Replicaitems.AddForm(TCC_Replicaitems.GetAt(Index) as Form)
+		
+		OrigIndex = DBM_ReplicaBaseitems.Find(TCC_ReplicaBaseitems.GetAt(Index) as Form)
+		ReplIndex = DBM_Replicaitems.Find(TCC_Replicaitems.GetAt(Index) as Form)
+		
+		if (OrigIndex != ReplIndex)
+			TCCDebug.Log("Setup Script - Failed to add items to replica formlists - retrying...", 2)
+			DBM_ReplicaBaseitems.RemoveAddedForm(TCC_ReplicaBaseitems.GetAt(Index) as Form)
+			DBM_Replicaitems.RemoveAddedForm(TCC_Replicaitems.GetAt(Index) as Form)	
+			Index += 1
+		else
+			TCCDebug.Log("Setup Script - Found " + TCC_ReplicaBaseitems.GetAt(Index).GetName() + " and " + TCC_Replicaitems.GetAt(Index).GetName() + " at positions " +  OrigIndex + " & " + ReplIndex)
+		endif
+	endWhile
+
+	TCCDebug.Log("Setup Script - Finished setting up replica lists")
+endfunction
 		

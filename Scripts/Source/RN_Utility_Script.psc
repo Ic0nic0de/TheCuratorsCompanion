@@ -9,10 +9,10 @@ import AhzMoreHudIE
 
 import utility
 
+RN_PatchAPI property API auto
 RN_Utility_MCM property RN_MCM auto
 RN_Utility_PropManager property Util auto
-RN_PatchAPI property API auto
-RN_Utility_Setup property setupscript auto
+TCC_IconSetScript property IconScript auto
 
 DBM_ReplicaHandler property ReplicaHandler auto
 
@@ -64,8 +64,7 @@ formlist property DBM_ReplicaItems auto
 formlist property DBM_RN_QuestDisplays auto
 formlist property DBM_RN_Quest_Stage_Displays auto
 formlist property DBM_RN_ExplorationDisplays auto
-formlist property TCC_DisplayList_Paintings auto
-formlist property TCC_DisplayList_DibellaStatues auto
+formlist property TCC_DisplayList_MiscItems auto
 
 ;;Custom Storage
 formlist property TCC_TokenList auto
@@ -96,8 +95,7 @@ globalvariable property RN_Scan_Registered auto
 
 globalvariable property RN_Quest_Listener_Total auto
 globalvariable property RN_Exploration_Listener_Total auto
-globalvariable property RN_Museum_Paintings_Total auto
-globalvariable property RN_Museum_Dibella_Statues_Total auto
+globalvariable property RN_Museum_MiscItems_Total auto
 
 globalvariable property GV_SectionHallofHeroes auto
 globalvariable property GV_SectionDaedricGallery auto
@@ -152,7 +150,6 @@ State initialsetup
 			RN_MCM.BuildPatchArray(true, false)
 			API.UpdateArrays()
 			
-
 			RN_MCM.Begin_Config_Load()
 
 			RN_Setup_Start.setvalue(0)
@@ -203,9 +200,7 @@ function CreateMoreHudLists()
 					dbmNew.RemoveAddedForm(_ItemRelic)
 					dbmFound.RemoveAddedForm(_ItemRelic)
 					dbmDisp.AddForm(_ItemRelic)
-					if RN_MCM.ReplicaTag 
-						ProcessReplica(_ItemRelic, true)
-					endif
+					ProcessReplica(_ItemRelic)
 				endIf
 			endWhile
 		endif
@@ -225,54 +220,27 @@ function CreateMoreHudLists()
 				if dbmNew.HasForm(_ItemRelic) && !dbmDisp.HasForm(_ItemRelic)
 					dbmNew.RemoveAddedForm(_ItemRelic)
 					dbmFound.AddForm(_ItemRelic)
-					if RN_MCM.ReplicaTag 
-						ProcessReplica(_ItemRelic, false)
-					endif
 				endIf
 			endWhile
 		endif
 	endWhile			
-		
-	RN_MoreHud_Option.setvalue(1)	
-	
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017	
-		AhzMoreHudIE.RegisterIconFormList("dbmNew", dbmNew)
-		AhzMoreHudIE.RegisterIconFormList("dbmDisp", dbmDisp)
-		AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-	endIf
-	
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
-		AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-		AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-		AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)
-	endIf
 	
 	bMoreHUDListsCreated = true
 	
 	TCCDebug.Log("Utility - moreHUD Lists Updated", 0)
 endFunction
 
-function ProcessReplica(form _ItemRelic, bool Museum)
+function ProcessReplica(form _ItemRelic)
 
 	if DBM_ReplicaBaseItems.HasForm(_ItemRelic)
-		if Museum
-			dbmNew.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
-			dbmFound.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
-			dbmDisp.AddForm(ReplicaHandler.GetReplica(_ItemRelic))
-		else
-			dbmNew.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
-			dbmFound.AddForm(ReplicaHandler.GetReplica(_ItemRelic))		
-		endif
+		dbmNew.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
+		dbmFound.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
+		dbmDisp.AddForm(ReplicaHandler.GetReplica(_ItemRelic))
 			
 	elseif DBM_ReplicaItems.HasForm(_ItemRelic)	
-		if Museum
-			dbmNew.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
-			dbmFound.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
-			dbmDisp.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))
-		else
-			dbmNew.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
-			dbmFound.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))		
-		endif
+		dbmNew.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
+		dbmFound.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
+		dbmDisp.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))
 	endIf
 endFunction
 
@@ -282,15 +250,13 @@ function InitGlobals()
 
 	RN_Quest_Listener_Total.setvalue(0)
 	RN_Exploration_Listener_Total.setvalue(0)
-	RN_Museum_Paintings_Total.setvalue(0)
-	RN_Museum_Dibella_Statues_Total.setvalue(0)
+	RN_Museum_MiscItems_Total.setvalue(0)
 	
 	RN_Quest_Listener_Total.Mod(DBM_RN_QuestDisplays.GetSize())
 	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
 	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
-	RN_Museum_Paintings_Total.Mod(TCC_DisplayList_Paintings.GetSize())
-	RN_Museum_Dibella_Statues_Total.Mod(TCC_DisplayList_DibellaStatues.GetSize())
-
+	RN_Museum_MiscItems_Total.Mod(TCC_DisplayList_MiscItems.GetSize())
+	
 	if (Game.GetModByName("LOTD_TCC_Vigilant.esp") != 255)
 		RN_Quest_Listener_Total.Mod(4)
 	endIf
@@ -306,9 +272,7 @@ function InitGlobals()
 	While _Index < _Length
 		Formlist _DisplayList = _Armory_Formlist_Displays.GetAt(_Index) as Formlist
 		GlobalVariable _Total = _Armory_Global_Total.GetAt(_Index) as GlobalVariable	
-		if _Index == 11 ;; Guard Armor List (Add Helms)
-			_Total.SetValue(_DisplayList.GetSize() + 9)
-		elseif _Index == 19 ;; Remove Thane Weapon Variants
+		if _Index == 19 ;; Remove Thane Weapon Variants
 			_Total.SetValue(_DisplayList.GetSize() - 6)
 		else
 			_Total.SetValue(_DisplayList.GetSize())
@@ -323,7 +287,7 @@ function InitGlobals()
 		GlobalVariable _Total = _Museum_Global_Total.GetAt(_Index) as GlobalVariable	
 		GlobalVariable _Edit = _Museum_Global_Edits.GetAt(_Index) as GlobalVariable
 		if _Index == 0
-			_Total.SetValue((_DisplayList.GetSize() - _Edit.GetValue()) + 3)
+			_Total.SetValue((_DisplayList.GetSize() - _Edit.GetValue()) - 6)
 		else
 			_Total.SetValue(_DisplayList.GetSize() - _Edit.GetValue())
 		endIf
@@ -379,7 +343,8 @@ Event onUpdate()
 	endif
 	
 	ManageLists()
-	InitIcons()
+	IconScript.SetMainHud(RN_MCM.IndexmoreHUD)
+	IconScript.SetInventoryHud(RN_MCM.IndexmoreHUDInventory)
 	
 	RN_Setup_Start.setvalue(0)
 	RN_Setup_Finish.setvalue(1)			
@@ -548,89 +513,6 @@ Function ConfirmIcons()
 	
 	Debug.Notification("The Curators Companion: moreHUD Lists check complete")
 endFunction
-
-;;-- Functions ---------------------------------------
-
-function EnableReplica()
-	Debug.Notification("The Curators Companion: Updating Replica moreHUD Icons...")
-	DBM_SortWait.setvalue(1)
-	CreateMoreHudLists()
-	DBM_SortWait.setvalue(0)
-	Debug.Notification("The Curators Companion: Replica moreHUD Icons Updated")
-endfunction
-
-;;-- Functions ---------------------------------------
-
-function DisableReplica()
-	Debug.Notification("The Curators Companion: Updating Replica moreHUD Icons...")
-	DBM_SortWait.setvalue(1)
-	RebuildLists()
-	DBM_SortWait.setvalue(0)
-	Debug.Notification("The Curators Companion: Replica moreHUD Icons Updated")
-endfunction
-
-;;-- Functions ---------------------------------------
-
-function InitIcons()
-
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") >= 10017		
-		if (RN_MoreHud_Option.GetValue()) == 1				
-			AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-			AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)
-		
-		elseif (RN_MoreHud_Option.GetValue()) == 2			
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-			AhzmoreHUDIE.RegisterIconFormList("dbmNew", dbmNew)
-				
-		elseif (RN_MoreHud_Option.GetValue()) == 3		
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")		
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUDIE.RegisterIconFormList("dbmFound", dbmFound)		
-
-		elseif (RN_MoreHud_Option.GetValue()) == 4			
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")
-			AhzmoreHUDIE.RegisterIconFormList("dbmDisp", dbmDisp)
-		
-		elseif (RN_MoreHud_Option.GetValue()) == 5				
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmDisp")
-			AhzmoreHUDIE.UnRegisterIconFormList("dbmFound")	
-				
-		endIf
-	endIf	
-
-	if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800	
-		if (RN_MoreHud_Option.GetValue()) == 1	
-			AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-			AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-			AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)	
-		
-		elseif (RN_MoreHud_Option.GetValue()) == 2
-			AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-			AhzmoreHUD.RegisterIconFormList("dbmNew", dbmNew)
-				
-		elseif (RN_MoreHud_Option.GetValue()) == 3
-			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")		
-			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUD.RegisterIconFormList("dbmFound", dbmFound)	
-
-		elseif (RN_MoreHud_Option.GetValue()) == 4
-			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUD.UnRegisterIconFormList("dbmFound")
-			AhzmoreHUD.RegisterIconFormList("dbmDisp", dbmDisp)
-		
-		elseif (RN_MoreHud_Option.GetValue()) == 5
-			AhzmoreHUD.UnRegisterIconFormList("dbmNew")
-			AhzmoreHUD.UnRegisterIconFormList("dbmDisp")
-			AhzmoreHUD.UnRegisterIconFormList("dbmFound")	
-				
-		endIf
-	endIf
-endfunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
