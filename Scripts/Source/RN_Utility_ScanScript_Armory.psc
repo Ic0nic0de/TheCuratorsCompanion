@@ -26,6 +26,8 @@ GlobalVariable _Complete
 GlobalVariable _Count
 GlobalVariable _Total
 Message _Notification
+
+bool bNotified
 	
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,31 +52,30 @@ endEvent
 ;;-- Events ---------------------------------------	
 
 Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
+		
+	ObjectReference Disp = DisplayRef as ObjectReference
+	
+	if _DisplayList.HasForm(Disp)
 
-	if !_Complete.GetValue()
-		ObjectReference Disp = DisplayRef as ObjectReference
-		if _DisplayList.HasForm(Disp)
-			if EnableState
-				_EnabledList.AddForm(Disp)
-				if MCM.advdebug
-					TCCDebug.Log("Armory Scan Script [" + _RoomName  + "] - Updated display " + Disp.GetName() + Disp, 0)
-				endif
-				_Count.Mod(1)
-			else
-				if _EnabledList.HasForm(Disp)
-					_EnabledList.RemoveAddedForm(Disp)
-					if MCM.advdebug
-						TCCDebug.Log("Armory Scan Script [" + _RoomName  + "] - Removed display " + Disp.GetName() + Disp, 0)
-					endif
-					_Count.Mod(-1)
-				endIf
-			endIf
-		endif
+		if EnableState
+			_EnabledList.AddForm(Disp)
+			
+			TCCDebug.Log("Updated [" + _RoomName  + "] display " + Disp.GetName() + Disp, 0)
 
-		if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
-			_Notification.Show()
-		endif
-	endIf
+			_Count.Mod(1)
+		else
+			_EnabledList.RemoveAddedForm(Disp)
+
+			TCCDebug.Log("Removed [" + _RoomName  + "] display " + Disp.GetName() + Disp, 0)
+
+			_Count.Mod(-1)
+		endIf
+	endif
+
+	if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
+		_Notification.Show()
+		bNotified = True
+	endif
 endEvent
 	
 ;;-- Events ---------------------------------------	
@@ -82,24 +83,19 @@ endEvent
 Event _onScan(string eventName, string strArg, float numArg, Form sender)
 
 	RN_Scan_Registered.Mod(1)
+
+	TCCDebug.Log("Scan Event Received for: " + _RoomName)
 	
-	if MCM.advdebug
-		TCCDebug.Log("Scan Event Received for: " + _RoomName)
-	endif
 	
-	if !_Complete.GetValue()
-	
-		_onDisplayCheck(_DisplayList, _EnabledList, _Count)
+	_onDisplayCheck(_DisplayList, _EnabledList, _Count)
 		
-		if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
-			_Notification.Show()
-		endif
-	endIf
+	if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
+		_Notification.Show()
+		bNotified = True
+	endif
 	
 	RN_Scan_Done.Mod(1)
-	if MCM.advdebug
-		TCCDebug.Log("Scan Event Completed for: " + _RoomName)
-	endif
+	TCCDebug.Log("Scan Event Completed for: " + _RoomName)
 endEvent
 
 Function Setup()

@@ -63,6 +63,7 @@ formlist property DBM_ReplicaItems auto
 ;;Listeners
 formlist property DBM_RN_QuestDisplays auto
 formlist property DBM_RN_Quest_Stage_Displays auto
+formlist property DBM_RN_Quest_StagePassed_Displays auto
 formlist property DBM_RN_ExplorationDisplays auto
 formlist property TCC_DisplayList_MiscItems auto
 
@@ -101,7 +102,8 @@ globalvariable property GV_SectionHallofHeroes auto
 globalvariable property GV_SectionDaedricGallery auto
 globalvariable property GV_SectionHOLE auto
 
-bool property SetupMainDone auto hidden
+bool property SetupDone auto hidden
+bool property SetupDone2 auto hidden
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,7 +114,7 @@ bool property SetupMainDone auto hidden
 Event OnInit()
 
 	GoToState("initialsetup")
-	RegisterForSingleUpdate(2)
+	RegisterForSingleUpdate(0)
 endEvent
 	
 ;;-- Events ---------------------------------------
@@ -120,6 +122,8 @@ endEvent
 State initialsetup
 
 	Event OnUpdate()
+		
+		float ftimeStart = Utility.GetCurrentRealTime()
 		
 		LItemSpellTomes00AllSpells.AddForm(RN_RSC_SpellTome, 1 , 1)
 		LItemSpellTomes00AllSpells.AddForm(RN_TransferContainer_SpellTome, 1 , 1)
@@ -131,27 +135,24 @@ State initialsetup
 			DBM_SortWait.setvalue(1)
 			RN_Setup_Start.setvalue(1)
 			
-			Wait(10)
+			Wait(5)
 			
 			API.CheckPatches()
-			while !SetupMainDone
-				Wait(2)
+			RN_MCM.Build_Arrays()
+			while !SetupDone || !SetupDone2
+				Wait(1)
 			endWhile
 			
-			RN_MCM.Build_Arrays()
 			ManageLists()
-
+			
 			CreateMoreHudLists()
-			InitGlobals()
-					
+			InitGlobals()			
+			
 			SendModEvent("FireScripts")
 			
-			API.UpdateCounts()
-			RN_MCM.BuildPatchArray(true, false)
-			API.UpdateArrays()
+			RN_MCM.BuildPatchArray(true, true, false)	
+			RN_MCM.AutoLoadConfig()
 			
-			RN_MCM.Begin_Config_Load()
-
 			RN_Setup_Start.setvalue(0)
 			RN_Setup_Finish.setvalue(1)		
 			DBM_SortWait.setvalue(0)				
@@ -164,8 +165,10 @@ State initialsetup
 
 		TCCDebug.Log("Utility - Initial Mod Setup Finished", 0)
 		
-		ModConfigFinished.Show(API.SupportedModHandlers.Find(none))
+		float ftimeEnd = Utility.GetCurrentRealTime()
+		TCCDebug.Log("Utility - Setup function completed in " + (ftimeEnd - ftimeStart) + " seconds.")
 		
+		ModConfigFinished.Show(API.SupportedModHandlers.Find(none))
 		GoToState("Running")
 	endevent
 endstate
@@ -254,17 +257,23 @@ function InitGlobals()
 	
 	RN_Quest_Listener_Total.Mod(DBM_RN_QuestDisplays.GetSize())
 	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
+	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_StagePassed_Displays.GetSize())
+	
 	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
 	RN_Museum_MiscItems_Total.Mod(TCC_DisplayList_MiscItems.GetSize())
+
+	if (Game.GetModByName("LOTD_TCC_TFC.esp") != 255)
+		RN_Quest_Listener_Total.Mod(1)
+	endIf
+
+	if (Game.GetModByName("LOTD_TCC_SpellKnightArmor.esp") != 255)
+		RN_Quest_Listener_Total.Mod(1)
+	endIf
 	
 	if (Game.GetModByName("LOTD_TCC_Vigilant.esp") != 255)
 		RN_Quest_Listener_Total.Mod(4)
 	endIf
 	
-	if (Game.GetModByName("LOTD_TCC_TFC.esp") != 255)
-		RN_Quest_Listener_Total.Mod(1)
-	endIf
-
 	RN_Quest_Listener_Total.Mod(2) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood]
 	
 	Int _Index = 0
@@ -337,7 +346,7 @@ Event onUpdate()
 		API.UpdateCounts()
 		InitGlobals()
 		CreateMoreHudLists()
-		RN_MCM.BuildPatchArray(true, true)
+		RN_MCM.BuildPatchArray(true, true, true)
 		API.UnregisteredPatch = False
 		ModConfigFinished.Show(API.SupportedModHandlers.Find(none))
 	endif

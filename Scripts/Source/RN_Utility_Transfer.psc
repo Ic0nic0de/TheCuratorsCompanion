@@ -6,6 +6,7 @@ RN_Utility_MCM property MCM auto
 referencealias property FoundAlias auto
 message property TCC_TransferContainer auto
 message property TCC_TransferComplete auto
+message property TransferCompleteNoItems auto
 message property TCC_RetrievalComplete auto
 
 message property TransferComplete auto
@@ -123,36 +124,40 @@ Function DisplayFunc()
 		TCCDebug.Log("Display - Started Displaying Tranfered Items...")
 	endif
 	
-	Int Index = TransferComplete.Show(_Transfered as Int)
-	
-	if Index == 0
-	
-		_OldDisplayCount = DBM_DisplayCount.GetValue() as Int		
-		(DBM_PrepStation.Activate(DBM_AutoSortDropOff))
+	if _Transfered > 0
+		Int Index = TransferComplete.Show(_Transfered as Int)
 		
-		If !Utility.IsInMenuMode()
-			TransferDisplayWait.Show()
+		if Index == 0
+		
+			_OldDisplayCount = DBM_DisplayCount.GetValue() as Int		
+			(DBM_PrepStation.Activate(DBM_AutoSortDropOff))
+			
+			If !Utility.IsInMenuMode()
+				TransferDisplayWait.Show()
+			endIf
+			
+			Index = 0
+			
+			While DBM_SortWait.GetValue()
+				Utility.Wait(1)
+				Index += 1
+				if Index == 20 
+					if !Utility.IsInMenuMode()
+						TransferDisplayWait.Show()
+					endIf
+					Index = 0
+				endIF
+			endWhile
+			
+			_Transfered = (DBM_DisplayCount.GetValue() as Int - _OldDisplayCount)
+			
+			TransferDisplayDone.Show(_Transfered as Int)
+		else
+			Return
 		endIf
-		
-		Index = 0
-		
-		While DBM_SortWait.GetValue()
-			Utility.Wait(1)
-			Index += 1
-			if Index == 20 
-				if !Utility.IsInMenuMode()
-					TransferDisplayWait.Show()
-				endIf
-				Index = 0
-			endIF
-		endWhile
-		
-		_Transfered = (DBM_DisplayCount.GetValue() as Int - _OldDisplayCount)
-		
-		TransferDisplayDone.Show(_Transfered as Int)
 	else
-		Return
-	endIf
+		TransferCompleteNoItems.Show(_Transfered as Int)
+	endIF
 	
 	if MCM.advdebug
 		TCCDebug.Log("Display - Finished Displaying Tranfered Items")

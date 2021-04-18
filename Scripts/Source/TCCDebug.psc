@@ -5,6 +5,10 @@ Import Utility
 
 RN_Utility_MCM property MCM auto
 
+Event OnInit()
+	EnableLogging()
+endEvent
+
 ;;-- Functions ---------------------------------------
 
 Function EnableLogging() Global 
@@ -29,7 +33,7 @@ endFunction
 ;;-- Functions ---------------------------------------
 
 Function Log(String asMessage, Int aiLevel = 0, Bool bTrace = False) Global
-
+	
 	TraceUser("TheCuratorsCompanion", asMessage, aiLevel)
 	if bTrace || aiLevel == 2
 		Trace("The Curators Companion - " + asMessage, aiLevel)

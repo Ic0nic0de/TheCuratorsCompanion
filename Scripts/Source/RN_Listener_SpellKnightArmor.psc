@@ -1,17 +1,12 @@
-scriptName RN_Listener_TFC extends Quest
+scriptName RN_Listener_SpellKnightArmor extends Quest
 
-Import RN_Utility_Global
+import Debug
 
-Import Debug
-
-;;Property to obtain values from MCM Script.
-RN_Utility_MCM Property MCM Auto
-
-Quest Property FCQuest02 Auto
-Actor Property FCMetellus Auto
-
+quest property ccEDHSSE002_Quest auto
 GlobalVariable Property RN_Quest_Listener_Count Auto
+
 Bool FirstRun = True
+Bool Complete
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
@@ -26,15 +21,15 @@ endEvent
 			
 Event OnUpdate()	
 	
-	if (FCQuest02.GetStage() == 6000) || (FCMetellus.IsDead())
-		if (MCM.ShowListenerVal) && !FirstRun
-			Notification("Museum Display Added: The Forgotten City")
+	if !Complete
+		if (ccEDHSSE002_Quest.GetStageDone(1500)) || (ccEDHSSE002_Quest.GetStageDone(2000))
+			Complete = True
+			RN_Quest_Listener_Count.Mod(1)
+			Notification("Museum Display Added: Crypt of the Heart Display")
+		else
+			RegisterForSingleUpdate(5)
 		endif
 		
-		RN_Quest_Listener_Count.Mod(1)	
-	else
-		RegisterForSingleUpdate(1)
+		FirstRun = False
 	endif
-	
-	FirstRun = False
 endEvent

@@ -10,7 +10,6 @@ RN_Utility_MCM Property MCM Auto
 ;;Global to control activation
 GlobalVariable Property RN_Exploration_Listener_Count Auto
 GlobalVariable Property RN_Exploration_Listener_Complete Auto
-GlobalVariable Property iDisplaySectionComplete Auto
 
 ;;Formlists to contol the displays
 Formlist Property DBM_RN_ExplorationDisplays Auto
@@ -96,8 +95,7 @@ State Running
 
 		if Exploration_Complete && SpiritDone
 					
-			RN_Exploration_Listener_Complete.SetValue(1)
-			iDisplaySectionComplete.Mod(1)
+			RN_Exploration_Listener_Complete.SetValue(999)
 			TCC_SectionComplete_Exploration.Show()
 			Done = true
 		else

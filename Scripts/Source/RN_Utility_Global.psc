@@ -144,8 +144,18 @@ EndFunction
 
 ;;-- Functions ---------------------------------------
 
-Bool Function CheckQuestStageComplete (Int akStage, Quest akQuest) global
-	if (akQuest.Getstage() >= akStage) || (akQuest.IsCompleted())
+Bool Function CheckQuestStageDone (Int akStage, Quest akQuest) global
+	if (akQuest.GetStageDone(akStage))
+		return true
+	endif
+  
+  return false
+EndFunction 
+
+;;-- Functions ---------------------------------------
+
+Bool Function CheckQuestStagePassed (Int akStage, Quest akQuest) global
+	if (akQuest.GetStage() >= (akStage)) || (akQuest.IsCompleted())
 		return true
 	endif
   
@@ -354,99 +364,102 @@ Int Function GetArrayPos(String _ModName) global
 	
 	elseif (_ModName == "Project AHO")
 		Return 62
-	
-	elseif (_ModName == "Rare Curios")
+
+	elseif (_ModName == "Relic Hunter - Guildmaster")
 		Return 63
-	
-	elseif (_ModName == "Reliquary of Myth")
+		
+	elseif (_ModName == "Rare Curios")
 		Return 64
 	
-	elseif (_ModName == "Royal Armory")
+	elseif (_ModName == "Reliquary of Myth")
 		Return 65
 	
-	elseif (_ModName == "Ruin's Edge")
+	elseif (_ModName == "Royal Armory")
 		Return 66
+	
+	elseif (_ModName == "Ruin's Edge")
+		Return 67
 
 	elseif (_ModName == "Saints & Seducers")
-		Return 67
-	
-	elseif (_ModName == "Saturalia Holiday Pack")
 		Return 68
 	
-	elseif (_ModName == "Shadowrend")
+	elseif (_ModName == "Saturalia Holiday Pack")
 		Return 69
 	
-	elseif (_ModName == "Skyrim Sewers")
+	elseif (_ModName == "Shadowrend")
 		Return 70
 	
-	elseif (_ModName == "Skyrim Underground")
+	elseif (_ModName == "Skyrim Sewers")
 		Return 71
 	
-	elseif (_ModName == "Skyrim Unique Treasures")
+	elseif (_ModName == "Skyrim Underground")
 		Return 72
 	
-	elseif (_ModName == "Spell Knight Armor")
+	elseif (_ModName == "Skyrim Unique Treasures")
 		Return 73
+	
+	elseif (_ModName == "Spell Knight Armor")
+		Return 74
 
 	elseif (_ModName == "Staff of Hasedoki")
-		Return 74
-	
-	elseif (_ModName == "Staff of Sheogorath")
 		Return 75
 	
-	elseif (_ModName == "Stendarr's Hammer")
+	elseif (_ModName == "Staff of Sheogorath")
 		Return 76
+	
+	elseif (_ModName == "Stendarr's Hammer")
+		Return 77
 
 	elseif (_ModName == "The Curators Companion")
-		Return 77
+		Return 78
 		
 	elseif (_ModName == "Teldryn Serious")
-		Return 78
-	
-	elseif (_ModName == "The Forgotten City")
 		Return 79
 	
-	elseif (_ModName == "The Gray Cowl Of Nocturnal")
+	elseif (_ModName == "The Forgotten City")
 		Return 80
 	
-	elseif (_ModName == "The Gray Cowl Returns!")
+	elseif (_ModName == "The Gray Cowl Of Nocturnal")
 		Return 81
+	
+	elseif (_ModName == "The Gray Cowl Returns!")
+		Return 82
 
 	elseif (_ModName == "The Wheels Of Lull")
-		Return 82
-	
-	elseif (_ModName == "Tools of Kagrenac")
 		Return 83
 	
-	elseif (_ModName == "Treasure Hunter")
+	elseif (_ModName == "Tools of Kagrenac")
 		Return 84
 	
-	elseif (_ModName == "Umbra")
+	elseif (_ModName == "Treasure Hunter")
 		Return 85
 	
-	elseif (_ModName == "Undeath")
+	elseif (_ModName == "Umbra")
 		Return 86
 	
-	elseif (_ModName == "Vigil Enforcer Armor Set")
+	elseif (_ModName == "Undeath")
 		Return 87
 	
-	elseif (_ModName == "Vigilant.")
+	elseif (_ModName == "Vigil Enforcer Armor Set")
 		Return 88
+	
+	elseif (_ModName == "Vigilant.")
+		Return 89
 
 	elseif (_ModName == "Volkihar Knight")
-		Return 89
-	
-	elseif (_ModName == "Wild Horses")
 		Return 90
 	
-	elseif (_ModName == "Wintersun")
+	elseif (_ModName == "Wild Horses")
 		Return 91
 	
-	elseif (_ModName == "Wyrmstooth")
+	elseif (_ModName == "Wintersun")
 		Return 92
 	
-	elseif (_ModName == "Zim's Thane Weapons")
+	elseif (_ModName == "Wyrmstooth")
 		Return 93
+	
+	elseif (_ModName == "Zim's Thane Weapons")
+		Return 94
 	endIf
 		
 	return 999

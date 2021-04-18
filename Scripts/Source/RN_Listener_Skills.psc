@@ -11,7 +11,6 @@ RN_Utility_MCM Property MCM Auto
 ;; Global to control activation
 GlobalVariable Property RN_Skills_Listener_Count Auto
 Globalvariable Property RN_Skills_Listener_Complete Auto
-GlobalVariable Property iDisplaySectionComplete Auto
 
 message property TCC_SectionComplete_Skill auto
 
@@ -248,8 +247,7 @@ State Running
 
 		if (WarriorCount >= 3) && (MageCount >= 3) && (StealthCount >= 3) && DBM_RN_Smithing && DBM_RN_Enchanting && DBM_RN_Alchemy	
 
-			RN_Skills_Listener_Complete.SetValue(1)
-			iDisplaySectionComplete.Mod(1)
+			RN_Skills_Listener_Complete.SetValue(999)
 			TCC_SectionComplete_Skill.Show()
 			Done = True
 		else

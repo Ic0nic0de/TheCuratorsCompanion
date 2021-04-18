@@ -28,7 +28,7 @@ GlobalVariable _Count
 GlobalVariable _Total
 Message _Notification
 
-Bool bExclude
+Bool bNotified
 	
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,39 +53,36 @@ endEvent
 ;;-- Events ---------------------------------------	
 
 Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
-
-	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue()
-		bExclude = True
-	else
-		bExclude = False
-	endIf	
 	
-	if !bExclude
-		if !_Complete.GetValue()
-			ObjectReference Disp = DisplayRef as ObjectReference
-			if _DisplayList.HasForm(Disp)
-				if EnableState
-					_EnabledList.AddForm(Disp)
-					if MCM.advdebug
-						TCCDebug.Log("Scan Script [" + _RoomName  + "] - Updated display " + Disp.GetName() + Disp, 0)
-					endif
-					_Count.Mod(1)
-				elseif !EnableState
-					if _EnabledList.HasForm(Disp)
-						_EnabledList.RemoveAddedForm(Disp)
-						if MCM.advdebug
-							TCCDebug.Log("Scan Script [" + _RoomName  + "] - Removed display " + Disp.GetName() + Disp, 0)
-						endif
-						_Count.Mod(-1)
-					endIf
-				endIf
-			endif
+	ObjectReference Disp = DisplayRef as ObjectReference
+	
+	if _DisplayList.HasForm(Disp)
+	
+		if _RoomName == "Hall of Wonders" && !RN_CreationClubContent_Installed.Getvalue()
+			TCCDebug.Log("Display Event Not Run For: " + _RoomName + " as RN_CreationClubContent_Installed is set to " + RN_CreationClubContent_Installed.Getvalue() as Int)
+	
+		else
+			if (EnableState)
+				_EnabledList.AddForm(Disp)
+				
+				TCCDebug.Log("Updated [" + _RoomName  + "] display " + Disp.GetName() + Disp, 0)
+				
+				_Count.Mod(1)
+				
+			else
+				_EnabledList.RemoveAddedForm(Disp)
+				
+				TCCDebug.Log("Removed [" + _RoomName  + "] display " + Disp.GetName() + Disp, 0)
+				
+				_Count.Mod(-1)
+			endIf
 
-			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
+			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
 				_Notification.Show()
+				bNotified = True
 			endif
-		endIf
-	endIf
+		endif
+	endif
 endEvent
 	
 ;;-- Events ---------------------------------------	
@@ -94,36 +91,27 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
 	
-	if MCM.advdebug
-		TCCDebug.Log("Scan Event Received for: " + _RoomName)
-	endif
-
-;;----------	
-	If _SectionToScan == 8 && !RN_CreationClubContent_Installed.Getvalue()
-		
+	TCCDebug.Log("Scan Event Received for: " + _RoomName)
+	
+	If _RoomName == "Hall of Wonders" && !RN_CreationClubContent_Installed.Getvalue()
+		TCCDebug.Log("Scan Event Not Run For: " + _RoomName + " as RN_CreationClubContent_Installed is set to " + RN_CreationClubContent_Installed.Getvalue() as Int)
 		RN_Scan_Done.Mod(1)
-		if MCM.advdebug
-			TCCDebug.Log("Scan Event Not Run For: " + _RoomName)
-		endif
-		
 	else
 		
-		if !_Complete.GetValue()
-		
-			_onDisplayCheck(_DisplayList, _EnabledList, _Count)
+		_onDisplayCheck(_DisplayList, _EnabledList, _Count)
 			
-			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal)) 
-				_Notification.Show()
-			endif
-		endIf
+		if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
+			_Notification.Show()
+			bNotified = True
+		endif
 		
 		RN_Scan_Done.Mod(1)
-		if MCM.advdebug
-			TCCDebug.Log("Scan Event Completed for: " + _RoomName)
-		endif
+		
+		TCCDebug.Log("Scan Event Completed for: " + _RoomName)
 	endIf
 endEvent
 
+;;-- Events ---------------------------------------	
 
 Function Setup()
 

@@ -10,7 +10,6 @@ RN_Utility_MCM Property MCM Auto
 ;;Global to control activation
 GlobalVariable Property RN_Thane_Listener_Count Auto
 GlobalVariable Property RN_Thane_Listener_Complete Auto
-GlobalVariable Property iDisplaySectionComplete Auto
 
 message property TCC_SectionComplete_Thane auto
 
@@ -164,8 +163,7 @@ State Running
 
 		If AllThane == 9
 
-			RN_Thane_Listener_Complete.SetValue(1)
-			iDisplaySectionComplete.Mod(1)
+			RN_Thane_Listener_Complete.SetValue(999)
 			TCC_SectionComplete_Thane.Show()
 			Done = True
 		else
