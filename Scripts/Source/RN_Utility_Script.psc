@@ -135,16 +135,14 @@ State initialsetup
 			DBM_SortWait.setvalue(1)
 			RN_Setup_Start.setvalue(1)
 			
-			Wait(5)
-			
-			API.CheckPatches()
 			RN_MCM.Build_Arrays()
 			while !SetupDone || !SetupDone2
-				Wait(1)
+				Wait(2)
 			endWhile
 			
-			ManageLists()
+			API.CheckPatches()
 			
+			ManageLists()
 			CreateMoreHudLists()
 			InitGlobals()			
 			

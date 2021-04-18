@@ -226,36 +226,33 @@ Event OnUpdate()
 		
 	elseif	Tracker == 22
 		Tracker = 0
-		RegisterForSingleUpdate(0)
-		AddReplicas()
+		
+		Int OrigIndex
+		Int ReplIndex
+		
+		Int Index = TCC_ReplicaBaseitems.GetSize()
+		While Index 
+			Index -= 1
+			
+			DBM_ReplicaBaseitems.AddForm(TCC_ReplicaBaseitems.GetAt(Index) as Form)
+			DBM_Replicaitems.AddForm(TCC_Replicaitems.GetAt(Index) as Form)
+			
+			OrigIndex = DBM_ReplicaBaseitems.Find(TCC_ReplicaBaseitems.GetAt(Index) as Form)
+			ReplIndex = DBM_Replicaitems.Find(TCC_Replicaitems.GetAt(Index) as Form)
+			
+			if (OrigIndex != ReplIndex)
+				TCCDebug.Log("Setup Script 2 - Failed to add items to replica formlists - retrying...", 2)
+				DBM_ReplicaBaseitems.RemoveAddedForm(TCC_ReplicaBaseitems.GetAt(Index) as Form)
+				DBM_Replicaitems.RemoveAddedForm(TCC_Replicaitems.GetAt(Index) as Form)	
+				Index += 1
+			else
+				TCCDebug.Log("Setup Script 2 - Found " + TCC_ReplicaBaseitems.GetAt(Index).GetName() + " and " + TCC_Replicaitems.GetAt(Index).GetName() + " at positions " +  OrigIndex + " & " + ReplIndex)
+			endif
+		endWhile
+
+		TCCDebug.Log("Setup Script 2 - Finished setting up replica lists")		
+
 		Count += 1	
+		RegisterForSingleUpdate(0)
 	endif
 endEvent
-
-function AddReplicas()
-	
-	Int OrigIndex
-	Int ReplIndex
-	
-	Int Index = TCC_ReplicaBaseitems.GetSize()
-	While Index 
-		Index -= 1
-		
-		DBM_ReplicaBaseitems.AddForm(TCC_ReplicaBaseitems.GetAt(Index) as Form)
-		DBM_Replicaitems.AddForm(TCC_Replicaitems.GetAt(Index) as Form)
-		
-		OrigIndex = DBM_ReplicaBaseitems.Find(TCC_ReplicaBaseitems.GetAt(Index) as Form)
-		ReplIndex = DBM_Replicaitems.Find(TCC_Replicaitems.GetAt(Index) as Form)
-		
-		if (OrigIndex != ReplIndex)
-			TCCDebug.Log("Setup Script 2 - Failed to add items to replica formlists - retrying...", 2)
-			DBM_ReplicaBaseitems.RemoveAddedForm(TCC_ReplicaBaseitems.GetAt(Index) as Form)
-			DBM_Replicaitems.RemoveAddedForm(TCC_Replicaitems.GetAt(Index) as Form)	
-			Index += 1
-		else
-			TCCDebug.Log("Setup Script 2 - Found " + TCC_ReplicaBaseitems.GetAt(Index).GetName() + " and " + TCC_Replicaitems.GetAt(Index).GetName() + " at positions " +  OrigIndex + " & " + ReplIndex)
-		endif
-	endWhile
-
-	TCCDebug.Log("Setup Script 2 - Finished setting up replica lists")
-endfunction

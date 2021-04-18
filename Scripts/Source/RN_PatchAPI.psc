@@ -123,20 +123,7 @@ Bool Function RegisterQuestDisplayList(String sName, Formlist DisplayList = None
 			else
 				TCCDebug.Log("Patch API - Failed to add " + sName + " quest display support. Array sizes are: \n QuestDisplayRefs = " + Ref + "\n QuestDisplayNames = "+ Index)
 				Return False
-			endif
-			
-		else
-			
-			Int Index2 = DisplayList.GetSize()
-			While Index2
-				Index2 -= 1
-				
-				ObjectReference _Disp = DisplayList.GetAt(Index2) as ObjectReference
-				Form _item = ItemList.GetAt(Index2) as Form
-				QuestDisplayRefs[Index].AddForm(_Disp)
-				QuestDisplayNames[Index].AddForm(_item)
-			endWhile
-					
+			endif				
 		endif
 	endif
 EndFunction
@@ -299,7 +286,7 @@ function CheckPatches()
 			endif
 
 			While _Wait
-				if (smCurrent && smCurrent._setupDone) || (cmCurrent && cmCurrent._setupDone)
+				if (smCurrent) && (smCurrent._setupDone) || (cmCurrent) && (cmCurrent._setupDone)
 					_Wait = false
 					TCCDebug.Log("Patch API - Finished setting up support for " + _Name)
 				endif
