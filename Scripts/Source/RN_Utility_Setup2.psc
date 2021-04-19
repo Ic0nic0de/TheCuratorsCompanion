@@ -53,7 +53,7 @@ Event OnUpdate()
 			Util.SetupDone2 = True		
 			GoToState("SetupDone")
 		else
-			RegisterForSingleUpdate(0)
+			RegisterForSingleUpdate(2)
 		endif
 	
 	elseif Tracker == 1
@@ -226,6 +226,7 @@ Event OnUpdate()
 		
 	elseif	Tracker == 22
 		Tracker = 0
+		RegisterForSingleUpdate(0)
 		
 		Int OrigIndex
 		Int ReplIndex
@@ -253,6 +254,5 @@ Event OnUpdate()
 		TCCDebug.Log("Setup Script 2 - Finished setting up replica lists")		
 
 		Count += 1	
-		RegisterForSingleUpdate(0)
 	endif
 endEvent

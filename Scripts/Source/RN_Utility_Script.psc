@@ -136,19 +136,19 @@ State initialsetup
 			RN_Setup_Start.setvalue(1)
 			
 			RN_MCM.Build_Arrays()
+			
 			while !SetupDone || !SetupDone2
 				Wait(2)
 			endWhile
 			
 			API.CheckPatches()
-			
 			ManageLists()
 			CreateMoreHudLists()
 			InitGlobals()			
 			
 			SendModEvent("FireScripts")
 			
-			RN_MCM.BuildPatchArray(true, true, false)	
+			RN_MCM.BuildPatchArray(true, true, false, false)	
 			RN_MCM.AutoLoadConfig()
 			
 			RN_Setup_Start.setvalue(0)
@@ -344,7 +344,7 @@ Event onUpdate()
 		API.UpdateCounts()
 		InitGlobals()
 		CreateMoreHudLists()
-		RN_MCM.BuildPatchArray(true, true, true)
+		RN_MCM.BuildPatchArray(true, true, true, false)
 		API.UnregisteredPatch = False
 		ModConfigFinished.Show(API.SupportedModHandlers.Find(none))
 	endif

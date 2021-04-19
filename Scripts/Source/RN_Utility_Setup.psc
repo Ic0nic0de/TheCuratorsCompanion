@@ -86,7 +86,7 @@ Event OnUpdate()
 			Util.SetupDone = True		
 			GoToState("SetupDone")
 		else
-			RegisterForSingleUpdate(0)
+			RegisterForSingleUpdate(2)
 		endif
 		
 	elseif	Tracker == 1

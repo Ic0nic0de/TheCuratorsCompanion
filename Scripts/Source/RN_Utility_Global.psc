@@ -457,9 +457,12 @@ Int Function GetArrayPos(String _ModName) global
 	
 	elseif (_ModName == "Wyrmstooth")
 		Return 93
-	
-	elseif (_ModName == "Zim's Thane Weapons")
+
+	elseif (_ModName == "Your Choices Matter")
 		Return 94
+		
+	elseif (_ModName == "Zim's Thane Weapons")
+		Return 95
 	endIf
 		
 	return 999

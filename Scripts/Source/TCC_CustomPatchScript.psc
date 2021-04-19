@@ -29,9 +29,9 @@ formlist property TCC_ItemList_Patches auto
 formlist property dbmNew auto
 formlist property dbmMaster auto
 
-formlist property DBM_RN_QuestDisplays auto ;; Quest Complete
-formlist property DBM_RN_Quest_Stage_Displays auto ;; Quest Complete based on GetStageDone()
-formlist property DBM_RN_Quest_StagePassed_Displays auto;; Quest Passed a setstage ( >= akStage)
+formlist property DBM_RN_QuestDisplays auto 
+formlist property DBM_RN_Quest_Stage_Displays auto
+formlist property DBM_RN_Quest_StagePassed_Displays auto
 
 Formlist property DBM_RN_ExplorationDisplays auto
 
@@ -51,26 +51,21 @@ globalvariable property _GlobalTotal auto
 Formlist Property _questDisplays auto
 Formlist property _questNames auto
 
-Formlist property _questDisplaysStage auto
-Formlist property _questNamesStage auto
-
-Formlist property _questDisplaysStagePassed auto
-Formlist property _questNamesStagePassed auto
-
 Formlist property _explorationDisplays auto
 Formlist property _explorationNames auto
 
-Formlist property _SafehouseDisplays auto
-Formlist property _SafehouseNames auto
-
-Formlist property _HallofWondersDisplays auto
-Formlist property _HallofWondersNames auto
-
 Int _ReturnInt
 
+float ftimeStart
+float ftimeEnd
+
+Int Tracker
+Int SectionDone
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 Event OnInit()
 
@@ -80,7 +75,7 @@ Event OnInit()
 	endIf
 	
 	APIScript.UnregisteredPatch = True
-	RegisterForSingleUpdate(Utility.RandomInt(1,5))	
+	RegisterForSingleUpdate(1)	
 EndEvent
 
 ;;-- Events ---------------------------------------		
@@ -88,17 +83,195 @@ EndEvent
 Event OnUpdate()
 	
 	UnregisterForUpdate()
-		
-	if bConfigured
-		RegisterModEvents()
-	else
-		
+	
+	if !bConfigured
 		bConfigured = (APIScript.RegisterSupportedMod(DBM.sSupportedModName, None, Self))
 		RegisterModEvents()
-		RegisterDisplays()
-		RunSetup()
+		GoToState("SettingUp")
 	endif
 EndEvent
+
+;;-- State ---------------------------------------	
+
+State SetupDone
+	
+	Event OnUpdate()
+		
+		UnregisterForUpdate()
+		
+		RegisterModEvents()
+	EndEvent
+endState
+
+;;-- State ---------------------------------------		
+
+State SettingUp
+	
+	Event OnBeginState()
+		
+		if (!_setupDone)
+			
+			ftimeStart = Utility.GetCurrentRealTime()
+			
+			Tracker = 1
+			RegisterForSingleUpdate(0)	
+		else
+			UnregisterForUpdate()
+			GoToState("SetupDone")
+		endIf
+	endEvent
+	
+	Event OnUpdate()
+		
+		Int _Index
+		
+		if Tracker == 999
+			if SectionDone == 5
+				SectionDone = 0
+				
+				UpdateCounts()
+				_setupDone = true
+				
+				ftimeEnd = Utility.GetCurrentRealTime()
+				TCCDebug.Log("TCC_CustomPatchScript - Setup function completed for " + DBM.sSupportedModName + " in " + (ftimeEnd - ftimeStart) + " seconds.")	
+				
+				GoToState("SetupDone")
+			else
+				RegisterForSingleUpdate(2)
+			endif
+			
+		elseif	Tracker == 1
+			Tracker = 2
+			RegisterForSingleUpdate(0)				
+				
+;;-----------------------------------------------------------------
+				
+			_Index = DBM.NewSectionItemLists.length		
+			While _Index
+				_Index -= 1
+				if DBM.NewSectionItemLists[_Index] != none
+					_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)	
+				endIf
+			endWhile
+			
+			SectionDone += 1
+
+;;-----------------------------------------------------------------
+
+		elseif	Tracker == 2
+			Tracker = 3
+			RegisterForSingleUpdate(0)
+			
+			_Index = DBM.NewSectionItemAltLists.length		
+			While _Index
+				_Index -= 1
+				if DBM.NewSectionItemAltLists[_Index] != none
+					_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)
+				endIf
+			endWhile
+			
+			SectionDone += 1
+
+;;-----------------------------------------------------------------
+			
+		elseif	Tracker == 3
+			Tracker = 4
+			RegisterForSingleUpdate(0)
+			
+			_Index = DBM.NewSectionDisplayRefLists.length		
+			While _Index
+				_Index -= 1
+				if DBM.NewSectionDisplayRefLists[_Index] != none 
+					_ReturnInt += _onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
+					_onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], Util._getDisplayRoom(DBM.NewSectionRoomNames[_Index]), Util._getDisplayTotal(DBM.NewSectionRoomNames[_Index]))
+					
+					if DBM.NewSectionRoomNames[_Index] == "Safehouse"
+						bRegisterSafeHouse = (APIScript.RegisterDisplayList("Safehouse", DBM.sSupportedModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
+					endIf
+						
+					if DBM.NewSectionRoomNames[_Index] == "Hall of Wonders"
+						bRegisterHallofWonders = (APIScript.RegisterDisplayList("Hall of Wonders", DBM.sSupportedModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
+					endif				
+				endIf
+			endWhile
+			
+			SectionDone += 1
+
+;;-----------------------------------------------------------------
+
+		elseif	Tracker == 4
+			Tracker = 5
+			RegisterForSingleUpdate(0)
+			
+			if (_explorationDisplays && _explorationDisplays.GetSize() > 0) && (_explorationNames && _explorationNames.GetSize() > 0)
+				_Index = 0
+				while _Index < _explorationDisplays.GetSize()
+					ObjectReference _Ref = _explorationDisplays.GetAt(_Index) as ObjectReference		
+					DBM_RN_ExplorationDisplays.AddForm(_Ref)
+					_Index += 1
+				EndWhile
+				
+				bRegisterExploration = (APIScript.RegisterExplorationDisplayList(DBM.sSupportedModName, _explorationDisplays, _explorationNames))
+			endif
+			
+			SectionDone += 1
+
+;;-----------------------------------------------------------------
+			
+		elseif	Tracker == 5
+			Tracker = 999
+			RegisterForSingleUpdate(0)
+			
+			if (_questDisplays && _questDisplays.GetSize() > 0) && (_questNames && _questNames.GetSize() > 0)
+				_Index = 0
+				while _Index < _questDisplays.GetSize()
+					ObjectReference _Ref = _questDisplays.GetAt(_Index) as ObjectReference	
+					DBM_RN_QuestDisplay smQuest = _Ref as DBM_RN_QuestDisplay
+					DBM_RN_QuestDisplayStage smQuest2 = _Ref as DBM_RN_QuestDisplayStage
+					DBM_RN_QuestDisplayStagePassed smQuest3 = _Ref as DBM_RN_QuestDisplayStagePassed	
+
+					if (smQuest)
+						DBM_RN_QuestDisplays.AddForm(_Ref)
+					elseif (smQuest2)
+						DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
+					elseif (smQuest3)
+						DBM_RN_Quest_StagePassed_Displays.AddForm(_Ref)					
+					endif
+
+					_Index += 1
+				EndWhile
+				bRegisterQuests = (APIScript.RegisterQuestDisplayList(DBM.sSupportedModName, _questDisplays, _questNames))
+			endIf
+			
+			SectionDone += 1
+		endif
+	endEvent
+endState
+
+;;-- functions ---------------------------------------
+
+Function ResetTracking()
+
+	Int _Index = DBM.NewSectionRoomNames.length		
+	While _Index
+		_Index -= 1
+		if DBM.NewSectionRoomNames[_Index] == "Safehouse"
+			bRegisterSafeHouse = (APIScript.RegisterDisplayList("Safehouse", DBM.sSupportedModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
+		endIf
+		
+		if DBM.NewSectionRoomNames[_Index] == "Hall of Wonders"
+			bRegisterHallofWonders = (APIScript.RegisterDisplayList("Hall of Wonders", DBM.sSupportedModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
+		endif				
+	endWhile
+	
+	if (_questDisplays && _questDisplays.GetSize() > 0) && (_questNames && _questNames.GetSize() > 0)
+		bRegisterQuests = (APIScript.RegisterQuestDisplayList(DBM.sSupportedModName, _questDisplays, _questNames))
+	endif
+	
+	if (_explorationDisplays && _explorationDisplays.GetSize() > 0) && (_explorationNames && _explorationNames.GetSize() > 0)
+		bRegisterExploration = (APIScript.RegisterExplorationDisplayList(DBM.sSupportedModName, _explorationDisplays, _explorationNames))
+	endif
+endFunction
 
 ;;-- Events ---------------------------------------		
 
@@ -107,90 +280,6 @@ Function RegisterModEvents()
 	RegisterForModEvent("TCCScan", "_onScan")
 	RegisterForModEvent("DBM DisplayEvent", "_OnDisplayEventReceived")
 endFunction
-
-;;-- Events ---------------------------------------		
-
-function RunSetup()
-	
-	if (!_setupDone)
-		
-		float ftimeStart = Utility.GetCurrentRealTime()
-		
-;;------------ Item and Display lists (Consolidation Code used to prep room counts and apply moreHUD Icons)
-	
-		Int _Index = DBM.NewSectionItemLists.length		
-		While _Index
-			_Index -= 1
-			if DBM.NewSectionItemLists[_Index] != none
-				_onConsolidateItems(DBM.NewSectionItemLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)	
-			endIf		
-		endWhile
-
-		_Index = DBM.NewSectionItemAltLists.length		
-		While _Index
-			_Index -= 1
-			if DBM.NewSectionItemAltLists[_Index] != none
-				_onConsolidateItems(DBM.NewSectionItemAltLists[_Index], TCC_ItemList_Patches, dbmNew, dbmMaster)
-			endIf			
-		endWhile
-
-		_Index = DBM.NewSectionDisplayRefLists.length		
-		While _Index
-			_Index -= 1
-			if DBM.NewSectionDisplayRefLists[_Index] != none 
-				_ReturnInt += _onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
-				_onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], Util._getDisplayRoom(DBM.NewSectionRoomNames[_Index]), Util._getDisplayTotal(DBM.NewSectionRoomNames[_Index]))
-			endIf
-		endWhile
-		
-;;------------ Quest / Exploration Listeners (For Notifications & Display Tracking)
-
-		if (_explorationDisplays)
-
-			_Index = 0
-			while _Index < _explorationDisplays.GetSize()
-				ObjectReference _Ref = _ExplorationDisplays.GetAt(_Index) as ObjectReference		
-				DBM_RN_ExplorationDisplays.AddForm(_Ref)
-				_Index += 1
-			EndWhile
-		endIf
-
-		if (_questDisplays)
-
-			_Index = 0
-			while _Index < _questDisplays.GetSize()
-				ObjectReference _Ref = _questDisplays.GetAt(_Index) as ObjectReference		
-				DBM_RN_QuestDisplays.AddForm(_Ref)
-				_Index += 1
-			EndWhile
-		endIf
-
-		if (_questDisplaysStage)
-
-			_Index = 0
-			while _Index < _questDisplaysStage.GetSize()
-				ObjectReference _Ref = _questDisplaysStage.GetAt(_Index) as ObjectReference		
-				DBM_RN_Quest_Stage_Displays.AddForm(_Ref)
-				_Index += 1
-			EndWhile	
-		endIf
-
-		if (_questDisplaysStagePassed)
-			_Index = 0
-			while _Index < _questDisplaysStagePassed.GetSize()
-				ObjectReference _Ref = _questDisplaysStagePassed.GetAt(_Index) as ObjectReference		
-				DBM_RN_Quest_StagePassed_Displays.AddForm(_Ref)
-				_Index += 1
-			EndWhile	
-		endIf
-		
-		UpdateCounts()
-		float ftimeEnd = Utility.GetCurrentRealTime()
-		TCCDebug.Log("TCC_CustomPatchScript - Setup function completed for " + DBM.sSupportedModName + " in " + (ftimeEnd - ftimeStart) + " seconds.")	
-	endif
-
-	_setupDone = True
-endfunction
 
 ;;-- Events ---------------------------------------	
 
@@ -230,35 +319,6 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	
 	TCCDebug.Log("Custom Patch [" + DBM.sSupportedModName  + "] - Scan Event Completed", 0)
 endEvent	
-
-;;-- Events ---------------------------------------	
-
-Function RegisterDisplays()
-
-	if (_SafehouseDisplays && _SafehouseNames)
-		bRegisterSafeHouse = (APIScript.RegisterSafehouseDisplayList(DBM.sSupportedModName, _SafehouseDisplays, _SafehouseNames))
-	endIf
-	
-	if (_HallofWondersDisplays && _HallofWondersNames)
-		bRegisterHallofWonders = (APIScript.RegisterHallofWondersDisplayList(DBM.sSupportedModName, _HallofWondersDisplays, _HallofWondersNames))
-	endIf
-	
-	if (_explorationDisplays && _explorationNames)
-		bRegisterExploration = (APIScript.RegisterExplorationDisplayList(DBM.sSupportedModName, _explorationDisplays, _explorationNames))
-	endIf
-	
-	if (_questDisplays && _questNames)
-		bRegisterQuests = (APIScript.RegisterQuestDisplayList(DBM.sSupportedModName, _questDisplays, _questNames))
-	endIf		
-
-	if (_questDisplaysStage && _questNamesStage)
-		bRegisterQuestStage = (APIScript.RegisterQuestDisplayList(DBM.sSupportedModName, _questDisplaysStage, _questNamesStage))
-	endIf	
-
-	if (_questDisplaysStagePassed && _questNamesStagePassed)
-		bRegisterQuestStagePassed = (APIScript.RegisterQuestDisplayList(DBM.sSupportedModName, _questDisplaysStagePassed, _questNamesStagePassed))
-	endIf
-endFunction
 
 ;;-- Events ---------------------------------------	
 

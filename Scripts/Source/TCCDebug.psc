@@ -6,6 +6,7 @@ Import Utility
 RN_Utility_MCM property MCM auto
 
 Event OnInit()
+
 	EnableLogging()
 endEvent
 
@@ -39,3 +40,30 @@ Function Log(String asMessage, Int aiLevel = 0, Bool bTrace = False) Global
 		Trace("The Curators Companion - " + asMessage, aiLevel)
 	endif
 EndFunction
+
+Function PrintStringArray (String[] ArrayToPrint) Global
+
+	Int Index = 0
+	While Index < ArrayToPrint.length
+		Log(Index + " " + ArrayToPrint[Index])
+		Index += 1
+	endWhile
+endFunction
+
+Function PrintFormArray (Form[] ArrayToPrint) Global
+
+	Int Index = 0
+	While Index < ArrayToPrint.length
+		Log(Index + " " + ArrayToPrint[Index] + " " + ArrayToPrint[Index].GetName())
+		Index += 1
+	endWhile
+endFunction
+
+Function PrintObjectReferenceArray (ObjectReference[] ArrayToPrint) Global
+
+	Int Index = 0
+	While Index < ArrayToPrint.length
+		Log(Index + " " + ArrayToPrint[Index] + " " + ArrayToPrint[Index].GetBaseObject().GetName())
+		Index += 1
+	endWhile
+endFunction

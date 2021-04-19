@@ -112,8 +112,6 @@ globalvariable property RN_Museum_MiscItems_Count auto
 Formlist property _Museum_Global_Complete auto
 Formlist property _Museum_Global_Count auto
 Formlist property _Museum_Global_Total auto
-Formlist property Museum_Secton_Items_Tracking auto
-Formlist property Museum_Secton_Displays_Tracking auto
 GlobalVariable[] RN_Museum_Global_Complete 
 GlobalVariable[] RN_Museum_Global_Count 
 GlobalVariable[] RN_Museum_Global_Total 
@@ -123,8 +121,6 @@ String[] _Museum_Section_States
 Formlist property _Museum_Global_Complete2 auto
 Formlist property _Museum_Global_Count2 auto
 Formlist property _Museum_Global_Total2 auto
-Formlist property Museum_Secton_Items_Tracking2 auto
-Formlist property Museum_Secton_Displays_Tracking2 auto
 GlobalVariable[] RN_Museum_Global_Complete2 
 GlobalVariable[] RN_Museum_Global_Count2
 GlobalVariable[] RN_Museum_Global_Total2 
@@ -207,6 +203,8 @@ String[] TrackedNames3
 String[] TrackedNames4
 String[] TrackedNames5
 
+String PageOverFlow
+
 ObjectReference TCC_HEADER_TO_REPLACE
 Bool HEADERSREQUIRED
 
@@ -249,6 +247,10 @@ Event AddDynamicPagesList()
 
 	Q = PagesList.Find("")	
 		PagesList[Q] = " "
+	x += 1	
+
+	Q = PagesList.Find("")	
+		PagesList[Q] = "~~ Display Tracking ~~"
 	x += 1	
 	
 	Q = PagesList.Find("")	
@@ -408,7 +410,7 @@ Function AddSettingsPage()
 		AddTextOption("Please read the information on the Nexus page", "", 0)
 		AddTextOption("to get familiar with all the features.", "", 0)
 		AddEmptyOption()
-		AddTextOption("", "Developed By [Ic0n]Ic0de - Version 6.0.0", 0)
+		AddTextOption("", "Developed By [Ic0n]Ic0de - Version 6.0.1", 0)
 		
 		AddEmptyOption()
 		AddHeaderOption("Profile Settings:")
@@ -845,36 +847,50 @@ Function AddTrackingPage()
 			SetCursorFillMode(TOP_TO_BOTTOM)
 			SetCursorPosition(0)										
 
-			Int _Index = 0
-			Int _PGPos = 0
+			Int Index = 0
+			Int PGPos = 0
 			
-			While _Index < TrackedDisplays.length
+			While Index < TrackedDisplays.length
 				
-				if (TrackedNames[_Index] != "")
-					if (TrackedDisplays[_Index] == TCC_HEADER_TO_REPLACE)
-						AddHeaderOption(TrackedNames[_Index], 0)
-						_PGPos += 2
-					else
-						if (TrackedDisplays[_Index].IsEnabled())
-							AddToggleOption(TrackedNames[_Index], TrackedDisplays[_Index].IsEnabled(), 1)
-							_PGPos += 2
+				if (TrackedNames[Index] != "")
+					if (TrackedDisplays[Index] == TCC_HEADER_TO_REPLACE)
+						if (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(TrackedNames[Index], 0)	
+							PGPos += 1
 						else
-							AddToggleOption(TrackedNames[_Index], TrackedDisplays[_Index].IsEnabled())
-							_PGPos += 2
+							if PGPos != 0
+								AddEmptyOption()
+							endif
+							
+							AddHeaderOption(TrackedNames[Index], 0)
+							PageOverflow = TrackedNames[Index]
+							PGPos += 2
+						endif
+					else
+						if (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1
+						endif
+						
+						if (TrackedDisplays[Index].IsEnabled())
+							AddToggleOption(TrackedNames[Index], TrackedDisplays[Index].IsEnabled(), 1)
+							PGPos += 1
+						else
+							AddToggleOption(TrackedNames[Index], TrackedDisplays[Index].IsEnabled())
+							PGPos += 1
 						endif
 					endif
 				endif
 				
-				if (_PGPos == 126)
-					SetCursorPosition(1)
-				endif
-				
-				_Index +=1
+				Index +=1
 			endWhile
 			
 			if Page2
-				AddTextOption("Continue on Page 2...", "", 1)
-			endif
+				AddTextOption("Continue on Page 2...", "", 1) 
+			endif	
+			
 		else
 			SetTitleText(TrackedPatch + " Displays")
 			SetCursorFillMode(TOP_TO_BOTTOM)
@@ -925,31 +941,49 @@ Function AddTrackingPage2()
 			SetCursorFillMode(TOP_TO_BOTTOM)
 			SetCursorPosition(0)										
 
-			Int _Index = 0
-			Int _PGPos = 0
-			
-			While _Index < TrackedDisplays2.length
+			Int Index = 0
+			Int PGPos = 0
+
+			While Index < TrackedDisplays2.length
 				
-				if (TrackedNames2[_Index] != "")
-					if (TrackedDisplays2[_Index] == TCC_HEADER_TO_REPLACE)
-						AddHeaderOption(TrackedNames2[_Index], 0)
-						_PGPos += 2
-					else
-						if (TrackedDisplays2[_Index].IsEnabled())
-							AddToggleOption(TrackedNames2[_Index], TrackedDisplays2[_Index].IsEnabled(), 1)
-							_PGPos += 2
+				if (TrackedNames2[Index] != "")
+					if (TrackedDisplays2[Index] == TCC_HEADER_TO_REPLACE)
+						if (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(TrackedNames2[Index], 0)	
+							PGPos += 1
 						else
-							AddToggleOption(TrackedNames2[_Index], TrackedDisplays2[_Index].IsEnabled())
-							_PGPos += 2
+							if PGPos != 0
+								AddEmptyOption()
+							endif
+							
+							AddHeaderOption(TrackedNames2[Index], 0)
+							PageOverflow = TrackedNames2[Index]
+							PGPos += 2
+						endif
+						
+					else
+						if (PGPos == 0)
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1	
+							
+						elseif (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1
+						endif
+						
+						if (TrackedDisplays2[Index].IsEnabled())
+							AddToggleOption(TrackedNames2[Index], TrackedDisplays2[Index].IsEnabled(), 1)
+							PGPos += 1
+						else
+							AddToggleOption(TrackedNames2[Index], TrackedDisplays2[Index].IsEnabled())
+							PGPos += 1
 						endif
 					endif
 				endif
 				
-				if (_PGPos == 126)
-					SetCursorPosition(1)
-				endif
-				
-				_Index +=1
+				Index +=1
 			endWhile
 			
 			if Page3
@@ -1005,31 +1039,49 @@ Function AddTrackingPage3()
 			SetCursorFillMode(TOP_TO_BOTTOM)
 			SetCursorPosition(0)										
 
-			Int _Index = 0
-			Int _PGPos = 0
-			
-			While _Index < TrackedDisplays3.length
+			Int Index = 0
+			Int PGPos = 0
+
+			While Index < TrackedDisplays3.length
 				
-				if (TrackedNames3[_Index] != "")
-					if (TrackedDisplays3[_Index] == TCC_HEADER_TO_REPLACE)
-						AddHeaderOption(TrackedNames3[_Index], 0)
-						_PGPos += 2
-					else
-						if (TrackedDisplays3[_Index].IsEnabled())
-							AddToggleOption(TrackedNames3[_Index], TrackedDisplays3[_Index].IsEnabled(), 1)
-							_PGPos += 2
+				if (TrackedNames3[Index] != "")
+					if (TrackedDisplays3[Index] == TCC_HEADER_TO_REPLACE)
+						if (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(TrackedNames3[Index], 0)	
+							PGPos += 1
 						else
-							AddToggleOption(TrackedNames3[_Index], TrackedDisplays3[_Index].IsEnabled())
-							_PGPos += 2
+							if PGPos != 0
+								AddEmptyOption()
+							endif
+							
+							AddHeaderOption(TrackedNames3[Index], 0)
+							PageOverflow = TrackedNames3[Index]
+							PGPos += 2
+						endif
+						
+					else
+						if (PGPos == 0) 
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1	
+							
+						elseif (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1
+						endif
+						
+						if (TrackedDisplays3[Index].IsEnabled())
+							AddToggleOption(TrackedNames3[Index], TrackedDisplays3[Index].IsEnabled(), 1)
+							PGPos += 1
+						else
+							AddToggleOption(TrackedNames3[Index], TrackedDisplays3[Index].IsEnabled())
+							PGPos += 1
 						endif
 					endif
 				endif
 				
-				if (_PGPos == 126)
-					SetCursorPosition(1)
-				endif
-				
-				_Index +=1
+				Index +=1
 			endWhile
 			
 			if Page4
@@ -1085,31 +1137,49 @@ Function AddTrackingPage4()
 			SetCursorFillMode(TOP_TO_BOTTOM)
 			SetCursorPosition(0)										
 
-			Int _Index = 0
-			Int _PGPos = 0
-			
-			While _Index < TrackedDisplays4.length
+			Int Index = 0
+			Int PGPos = 0
+
+			While Index < TrackedDisplays4.length
 				
-				if (TrackedNames4[_Index] != "")
-					if (TrackedDisplays4[_Index] == TCC_HEADER_TO_REPLACE)
-						AddHeaderOption(TrackedNames4[_Index], 0)
-						_PGPos += 2
-					else
-						if (TrackedDisplays4[_Index].IsEnabled())
-							AddToggleOption(TrackedNames4[_Index], TrackedDisplays4[_Index].IsEnabled(), 1)
-							_PGPos += 2
+				if (TrackedNames4[Index] != "")
+					if (TrackedDisplays4[Index] == TCC_HEADER_TO_REPLACE)
+						if (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(TrackedNames4[Index], 0)	
+							PGPos += 1
 						else
-							AddToggleOption(TrackedNames4[_Index], TrackedDisplays4[_Index].IsEnabled())
-							_PGPos += 2
+							if PGPos != 0
+								AddEmptyOption()
+							endif
+							
+							AddHeaderOption(TrackedNames4[Index], 0)
+							PageOverflow = TrackedNames4[Index]
+							PGPos += 2
+						endif
+						
+					else
+						if (PGPos == 0) 
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1	
+							
+						elseif (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1
+						endif
+						
+						if (TrackedDisplays4[Index].IsEnabled())
+							AddToggleOption(TrackedNames4[Index], TrackedDisplays4[Index].IsEnabled(), 1)
+							PGPos += 1
+						else
+							AddToggleOption(TrackedNames4[Index], TrackedDisplays4[Index].IsEnabled())
+							PGPos += 1
 						endif
 					endif
 				endif
 				
-				if (_PGPos == 126)
-					SetCursorPosition(1)
-				endif
-				
-				_Index +=1
+				Index +=1
 			endWhile
 			
 			if Page5
@@ -1163,34 +1233,53 @@ Function AddTrackingPage5()
 		if HEADERSREQUIRED
 			SetTitleText(TrackedPatch + " Displays")
 			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)										
+			SetCursorPosition(0)			
 
-			Int _Index = 0
-			Int _PGPos = 0
+			Int Index = 0
+			Int PGPos = 0
 			
-			While _Index < TrackedDisplays5.length
+			While Index < TrackedDisplays5.length
 				
-				if (TrackedNames5[_Index] != "")
-					if (TrackedDisplays5[_Index] == TCC_HEADER_TO_REPLACE)
-						AddHeaderOption(TrackedNames5[_Index], 0)
-						_PGPos += 2
-					else
-						if (TrackedDisplays5[_Index].IsEnabled())
-							AddToggleOption(TrackedNames5[_Index], TrackedDisplays5[_Index].IsEnabled(), 1)
-							_PGPos += 2
+				if (TrackedNames5[Index] != "")
+					if (TrackedDisplays5[Index] == TCC_HEADER_TO_REPLACE)
+						if (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(TrackedNames5[Index], 0)	
+							PGPos += 1
 						else
-							AddToggleOption(TrackedNames5[_Index], TrackedDisplays5[_Index].IsEnabled())
-							_PGPos += 2
+							if PGPos != 0
+								AddEmptyOption()
+							endif
+							
+							AddHeaderOption(TrackedNames5[Index], 0)
+							PageOverflow = TrackedNames5[Index]
+							PGPos += 2
+						endif
+						
+					else
+						if (PGPos == 0) 
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1	
+							
+						elseif (PGPos == 62)
+							SetCursorPosition(1)
+							AddHeaderOption(PageOverflow + " (Continued)", 0)
+							PGPos += 1
+						endif
+						
+						if (TrackedDisplays5[Index].IsEnabled())
+							AddToggleOption(TrackedNames5[Index], TrackedDisplays5[Index].IsEnabled(), 1)
+							PGPos += 1
+						else
+							AddToggleOption(TrackedNames5[Index], TrackedDisplays5[Index].IsEnabled())
+							PGPos += 1
 						endif
 					endif
 				endif
 				
-				if (_PGPos == 126)
-					SetCursorPosition(1)
-				endif
-				
-				_Index +=1
+				Index +=1
 			endWhile
+
 		else
 			SetTitleText(TrackedPatch + " Displays")
 			SetCursorFillMode(TOP_TO_BOTTOM)
@@ -1356,7 +1445,7 @@ state RefreshMCM
 				Page4 = False
 				Page5 = False
 				Build_Arrays()
-				BuildPatchArray(true, true, true)
+				BuildPatchArray(true, true, true, true)
 				
 				AddDynamicPagesList()		
 				bRefresh = false
@@ -2268,7 +2357,7 @@ endState
 state MiscTracking
 
 	Event OnSelectST()
-		SetupPage(None, _Museum_Section_names2[1], Museum_Secton_Items_Tracking2.GetAt(1) as formlist, Museum_Secton_Displays_Tracking2.GetAt(1) as formlist)	
+		SetupAPIPage(_Museum_Section_names2[3], API.MiscDisplayRefs, API.MiscDisplayNames, API.MiscDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2294,7 +2383,7 @@ endState
 state SkillTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names2[3], Museum_Secton_Items_Tracking2.GetAt(3) as formlist, Museum_Secton_Displays_Tracking2.GetAt(3) as formlist)	
+		SetupAPIPage(_Museum_Section_names2[3], API.SkillDisplayRefs, API.SkillDisplayNames, API.SkillDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2307,7 +2396,7 @@ endState
 state ThaneTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names2[4], Museum_Secton_Items_Tracking2.GetAt(4) as formlist, Museum_Secton_Displays_Tracking2.GetAt(4) as formlist)	
+		SetupAPIPage(_Museum_Section_names2[4], API.ThaneBannerDisplayRefs, API.ThaneBannerDisplayNames, API.ThaneBannerDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2320,7 +2409,7 @@ endState
 state ArmoryTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[0], Museum_Secton_Items_Tracking.GetAt(0) as formlist, Museum_Secton_Displays_Tracking.GetAt(0) as formlist)
+		SetupAPIPage(_Museum_Section_names[0], API.ArmoryDisplayRefs, API.ArmoryDisplayNames, API.ArmoryDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2333,7 +2422,7 @@ endState
 state DaedricGalleryTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[1], Museum_Secton_Items_Tracking.GetAt(1) as formlist, Museum_Secton_Displays_Tracking.GetAt(1) as formlist)
+		SetupAPIPage(_Museum_Section_names[1], API.DaedricGalleryDisplayRefs, API.DaedricGalleryDisplayNames, API.DaedricGalleryDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2346,7 +2435,7 @@ endState
 state DragonbornHallTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[2], Museum_Secton_Items_Tracking.GetAt(2) as formlist, Museum_Secton_Displays_Tracking.GetAt(2) as formlist)
+		SetupAPIPage(_Museum_Section_names[2], API.DragonbornHallDisplayRefs, API.DragonbornHallDisplayNames, API.DragonbornHallDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2359,7 +2448,7 @@ endState
 state GuildhouseTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[3], Museum_Secton_Items_Tracking.GetAt(3) as formlist, Museum_Secton_Displays_Tracking.GetAt(3) as formlist)
+		SetupAPIPage(_Museum_Section_names[3], API.GuildhouseDisplayRefs, API.GuildhouseDisplayNames, API.GuildhouseDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2372,7 +2461,7 @@ endState
 state HallofHeroesTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[4], Museum_Secton_Items_Tracking.GetAt(4) as formlist, Museum_Secton_Displays_Tracking.GetAt(4) as formlist)
+		SetupAPIPage(_Museum_Section_names[4], API.HallofHeroesDisplayRefs, API.HallofHeroesDisplayNames, API.HallofHeroesDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2385,7 +2474,7 @@ endState
 state HallofLostEmpiresTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[5], Museum_Secton_Items_Tracking.GetAt(5) as formlist, Museum_Secton_Displays_Tracking.GetAt(5) as formlist)
+		SetupAPIPage(_Museum_Section_names[4], API.HallofLostEmpiresDisplayRefs, API.HallofLostEmpiresDisplayNames, API.HallofLostEmpiresDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2398,7 +2487,7 @@ endState
 state HallofOdditiesTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[6], Museum_Secton_Items_Tracking.GetAt(6) as formlist, Museum_Secton_Displays_Tracking.GetAt(6) as formlist)
+		SetupAPIPage(_Museum_Section_names[6], API.HallofOdditiesDisplayRefs, API.HallofOdditiesDisplayNames, API.HallofOdditiesDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2411,7 +2500,7 @@ endState
 state HallofSecretsTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[7], Museum_Secton_Items_Tracking.GetAt(7) as formlist, Museum_Secton_Displays_Tracking.GetAt(7) as formlist)
+		SetupAPIPage(_Museum_Section_names[7], API.HallofSecretsDisplayRefs, API.HallofSecretsDisplayNames, API.HallofSecretsDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2438,7 +2527,7 @@ endState
 state LibraryTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[9], Museum_Secton_Items_Tracking.GetAt(9) as formlist, Museum_Secton_Displays_Tracking.GetAt(9) as formlist)
+		SetupAPIPage(_Museum_Section_names[9], API.LibraryDisplayRefs, API.LibraryDisplayNames, API.LibraryDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2451,7 +2540,7 @@ endState
 state NaturalScienceTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[10], Museum_Secton_Items_Tracking.GetAt(10) as formlist, Museum_Secton_Displays_Tracking.GetAt(10) as formlist)
+		SetupAPIPage(_Museum_Section_names[10], API.NaturalScienceDisplayRefs, API.NaturalScienceDisplayNames, API.NaturalScienceDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2477,7 +2566,7 @@ endState
 state StoreroomTracking
 
 	Event OnSelectST()
-		SetupPage(none, _Museum_Section_names[12], Museum_Secton_Items_Tracking.GetAt(12) as formlist, Museum_Secton_Displays_Tracking.GetAt(12) as formlist)
+		SetupAPIPage(_Museum_Section_names[12], API.StoreroomDisplayRefs, API.StoreroomDisplayNames, API.StoreroomDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2632,7 +2721,6 @@ Function SetupPage(Quest Patch, String _Name, Formlist _Items = None, Formlist _
 endFunction
 
 ;;-------------------------------
-String[] TrackedHeader 
 
 Function SetupAPIPage(String _Name = "", Formlist[] DisplayList, Formlist[] ItemList, String[] Header)
 
@@ -2882,27 +2970,27 @@ Function SetTrackerQuestDisplays(Formlist[] QuestDisp = None, FormList[] QuestIt
 			if FillSection == 5
 				TrackedNames5[ArrayPos] = Header[Array]
 				TrackedDisplays5[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1	
+				ArrayPos += 2	
 				
 			elseif FillSection == 4
 				TrackedNames4[ArrayPos] = Header[Array]
 				TrackedDisplays4[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1	
+				ArrayPos += 2	
 				
 			elseif FillSection == 3
 				TrackedNames3[ArrayPos] = Header[Array]
 				TrackedDisplays3[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1	
+				ArrayPos += 2	
 				
 			elseif FillSection == 2
 				TrackedNames2[ArrayPos] = Header[Array]
 				TrackedDisplays2[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1	
+				ArrayPos += 2
 				
 			else
 				TrackedNames[ArrayPos] = Header[Array]
 				TrackedDisplays[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1			
+				ArrayPos += 2			
 			endif
 				
 			Formlist flist = QuestItems[Array] as Formlist
@@ -2911,25 +2999,25 @@ Function SetTrackerQuestDisplays(Formlist[] QuestDisp = None, FormList[] QuestIt
 			Int Index = 0
 			While Index < Dlist.GetSize()		
 
-				if ArrayPos >= 125 && !Page2
+				if ArrayPos >= 120 && !Page2
 					SetTitleText("=== Building Page 2 ===")
 					FillSection = 2
 					Page2 = True
 					ArrayPos = 0
 
-				elseif ArrayPos >= 125 && !Page3
+				elseif ArrayPos >= 120 && !Page3
 					SetTitleText("=== Building Page 3 ===")
 					FillSection = 3
 					Page3 = True
 					ArrayPos = 0
 
-				elseif ArrayPos >= 125 && !Page4
+				elseif ArrayPos >= 120 && !Page4
 					SetTitleText("=== Building Page 4 ===")
 					FillSection = 4		
 					Page4 = True
 					ArrayPos = 0
 
-				elseif ArrayPos >= 125 && !Page5
+				elseif ArrayPos >= 120 && !Page5
 					SetTitleText("=== Building Page 5 ===")
 					FillSection = 5
 					Page5 = True
@@ -3016,7 +3104,7 @@ Function SetTrackerArray()
 			
 		Formlist flist = SupportPatch.NewSectionItemLists[Index] as Formlist
 		Formlist Dlist = SupportPatch.NewSectionDisplayRefLists[Index] as Formlist					
-			
+
 		Int Index2 = 0
 		While Index2 < Dlist.GetSize()		
 
@@ -3469,7 +3557,7 @@ endFunction
 
 ;;-------------------------------
 
-Function BuildPatchArray(bool CreateArrays, bool UpdateRegistrations, bool UpdateCounts)
+Function BuildPatchArray(bool CreateArrays, bool UpdateRegistrations, bool UpdateCounts, bool UpdateTracking)
 	
 	if CreateArrays
 		TCCDebug.Log("MCM - Building Patch Array", 0)
@@ -3508,7 +3596,11 @@ Function BuildPatchArray(bool CreateArrays, bool UpdateRegistrations, bool Updat
 	if UpdateCounts
 		API.UpdateCounts()
 		Util.InitGlobals()
-	endif	
+	endif
+
+	if UpdateTracking
+		API.UpdateTracking()
+	endif
 endFunction
 			
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
