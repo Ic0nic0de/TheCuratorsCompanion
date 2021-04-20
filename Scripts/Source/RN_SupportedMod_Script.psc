@@ -318,9 +318,7 @@ Function ResetTracking()
 	endWhile
 	
 	if (_questDisplays && _questDisplays.GetSize() > 0) && (_questNames && _questNames.GetSize() > 0)
-		if (_ModName != "The Forgotten City") && (_ModName != "Vigilant.") && (_ModName != "Spell Knight Armor")	
-			bRegisterQuests = (APIScript.RegisterQuestDisplayList(_ModName, _questDisplays, _questNames))
-		endIf
+		bRegisterQuests = (APIScript.RegisterQuestDisplayList(_ModName, _questDisplays, _questNames))
 	endif
 	
 	if (_explorationDisplays && _explorationDisplays.GetSize() > 0) && (_explorationNames && _explorationNames.GetSize() > 0)

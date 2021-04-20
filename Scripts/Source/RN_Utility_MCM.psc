@@ -2357,7 +2357,7 @@ endState
 state MiscTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names2[3], API.MiscDisplayRefs, API.MiscDisplayNames, API.MiscDisplaySection)
+		SetupAPIPage(_Museum_Section_names2[1], API.MiscDisplayRefs, API.MiscDisplayNames, API.MiscDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
@@ -2474,7 +2474,7 @@ endState
 state HallofLostEmpiresTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[4], API.HallofLostEmpiresDisplayRefs, API.HallofLostEmpiresDisplayNames, API.HallofLostEmpiresDisplaySection)
+		SetupAPIPage(_Museum_Section_names[5], API.HallofLostEmpiresDisplayRefs, API.HallofLostEmpiresDisplayNames, API.HallofLostEmpiresDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
