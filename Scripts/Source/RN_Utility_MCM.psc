@@ -203,9 +203,9 @@ String[] TrackedNames3
 String[] TrackedNames4
 String[] TrackedNames5
 
-String PageOverFlow
-
 ObjectReference TCC_HEADER_TO_REPLACE
+ObjectReference TCC_END_OF_PAGE
+
 Bool HEADERSREQUIRED
 
 Int SetVal
@@ -846,50 +846,45 @@ Function AddTrackingPage()
 			SetTitleText(TrackedPatch + " Displays")
 			SetCursorFillMode(TOP_TO_BOTTOM)
 			SetCursorPosition(0)										
-
+		
 			Int Index = 0
 			Int PGPos = 0
+			Bool Moved = False
 			
 			While Index < TrackedDisplays.length
 				
 				if (TrackedNames[Index] != "")
+
+					While (PGPos > 63) && (!Moved)
+						SetCursorPosition(1)
+						PGPos = 1
+						Moved = True
+					endwhile
+				
 					if (TrackedDisplays[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(TrackedNames[Index], 0)	
+						if (PGPos != 0) && (PGPos != 1)
+							AddEmptyOption()
 							PGPos += 1
-						else
-							if PGPos != 0
-								AddEmptyOption()
-							endif
-							
-							AddHeaderOption(TrackedNames[Index], 0)
-							PageOverflow = TrackedNames[Index]
-							PGPos += 2
-						endif
+						endif				
+						AddHeaderOption(TrackedNames[Index], 0)	
+						PGPos += 1
 					else
-						if (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1
-						endif
-						
-						if (TrackedDisplays[Index].IsEnabled())
-							AddToggleOption(TrackedNames[Index], TrackedDisplays[Index].IsEnabled(), 1)
+						if (!TrackedDisplays[Index].IsDisabled())
+							AddToggleOption(TrackedNames[Index], !TrackedDisplays[Index].IsDisabled(), 1)
 							PGPos += 1
 						else
-							AddToggleOption(TrackedNames[Index], TrackedDisplays[Index].IsEnabled())
+							AddToggleOption(TrackedNames[Index], !TrackedDisplays[Index].IsDisabled())
 							PGPos += 1
 						endif
 					endif
 				endif
-				
+					
 				Index +=1
 			endWhile
 			
 			if Page2
-				AddTextOption("Continue on Page 2...", "", 1) 
-			endif	
+				AddTextOption("Continue on Page 2...", "", 1)
+			endif
 			
 		else
 			SetTitleText(TrackedPatch + " Displays")
@@ -943,46 +938,36 @@ Function AddTrackingPage2()
 
 			Int Index = 0
 			Int PGPos = 0
-
+			Bool Moved = False
+			
 			While Index < TrackedDisplays2.length
 				
 				if (TrackedNames2[Index] != "")
+
+					While (PGPos > 63) && (!Moved)
+						SetCursorPosition(1)
+						PGPos = 1
+						Moved = True
+					endwhile
+				
 					if (TrackedDisplays2[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(TrackedNames2[Index], 0)	
+						if (PGPos != 0) && (PGPos != 1)
+							AddEmptyOption()
 							PGPos += 1
-						else
-							if PGPos != 0
-								AddEmptyOption()
-							endif
-							
-							AddHeaderOption(TrackedNames2[Index], 0)
-							PageOverflow = TrackedNames2[Index]
-							PGPos += 2
-						endif
-						
+						endif				
+						AddHeaderOption(TrackedNames2[Index], 0)	
+						PGPos += 1
 					else
-						if (PGPos == 0)
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1	
-							
-						elseif (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1
-						endif
-						
-						if (TrackedDisplays2[Index].IsEnabled())
-							AddToggleOption(TrackedNames2[Index], TrackedDisplays2[Index].IsEnabled(), 1)
+						if (!TrackedDisplays2[Index].IsDisabled())
+							AddToggleOption(TrackedNames2[Index], !TrackedDisplays2[Index].IsDisabled(), 1)
 							PGPos += 1
 						else
-							AddToggleOption(TrackedNames2[Index], TrackedDisplays2[Index].IsEnabled())
+							AddToggleOption(TrackedNames2[Index], !TrackedDisplays2[Index].IsDisabled())
 							PGPos += 1
 						endif
 					endif
 				endif
-				
+					
 				Index +=1
 			endWhile
 			
@@ -1041,46 +1026,36 @@ Function AddTrackingPage3()
 
 			Int Index = 0
 			Int PGPos = 0
-
+			Bool Moved = False
+			
 			While Index < TrackedDisplays3.length
 				
 				if (TrackedNames3[Index] != "")
+
+					While (PGPos > 63) && (!Moved)
+						SetCursorPosition(1)
+						PGPos = 1
+						Moved = True
+					endwhile
+				
 					if (TrackedDisplays3[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(TrackedNames3[Index], 0)	
+						if (PGPos != 0) && (PGPos != 1)
+							AddEmptyOption()
 							PGPos += 1
-						else
-							if PGPos != 0
-								AddEmptyOption()
-							endif
-							
-							AddHeaderOption(TrackedNames3[Index], 0)
-							PageOverflow = TrackedNames3[Index]
-							PGPos += 2
-						endif
-						
+						endif				
+						AddHeaderOption(TrackedNames3[Index], 0)	
+						PGPos += 1
 					else
-						if (PGPos == 0) 
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1	
-							
-						elseif (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1
-						endif
-						
-						if (TrackedDisplays3[Index].IsEnabled())
-							AddToggleOption(TrackedNames3[Index], TrackedDisplays3[Index].IsEnabled(), 1)
+						if (!TrackedDisplays3[Index].IsDisabled())
+							AddToggleOption(TrackedNames3[Index], !TrackedDisplays3[Index].IsDisabled(), 1)
 							PGPos += 1
 						else
-							AddToggleOption(TrackedNames3[Index], TrackedDisplays3[Index].IsEnabled())
+							AddToggleOption(TrackedNames3[Index], !TrackedDisplays3[Index].IsDisabled())
 							PGPos += 1
 						endif
 					endif
 				endif
-				
+					
 				Index +=1
 			endWhile
 			
@@ -1139,46 +1114,36 @@ Function AddTrackingPage4()
 
 			Int Index = 0
 			Int PGPos = 0
-
+			Bool Moved = False
+			
 			While Index < TrackedDisplays4.length
 				
 				if (TrackedNames4[Index] != "")
+
+					While (PGPos > 63) && (!Moved)
+						SetCursorPosition(1)
+						PGPos = 1
+						Moved = True
+					endwhile
+				
 					if (TrackedDisplays4[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(TrackedNames4[Index], 0)	
+						if (PGPos != 0) && (PGPos != 1)
+							AddEmptyOption()
 							PGPos += 1
-						else
-							if PGPos != 0
-								AddEmptyOption()
-							endif
-							
-							AddHeaderOption(TrackedNames4[Index], 0)
-							PageOverflow = TrackedNames4[Index]
-							PGPos += 2
-						endif
-						
+						endif				
+						AddHeaderOption(TrackedNames4[Index], 0)	
+						PGPos += 1
 					else
-						if (PGPos == 0) 
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1	
-							
-						elseif (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1
-						endif
-						
-						if (TrackedDisplays4[Index].IsEnabled())
-							AddToggleOption(TrackedNames4[Index], TrackedDisplays4[Index].IsEnabled(), 1)
+						if (!TrackedDisplays4[Index].IsDisabled())
+							AddToggleOption(TrackedNames4[Index], !TrackedDisplays4[Index].IsDisabled(), 1)
 							PGPos += 1
 						else
-							AddToggleOption(TrackedNames4[Index], TrackedDisplays4[Index].IsEnabled())
+							AddToggleOption(TrackedNames4[Index], !TrackedDisplays4[Index].IsDisabled())
 							PGPos += 1
 						endif
 					endif
 				endif
-				
+					
 				Index +=1
 			endWhile
 			
@@ -1237,46 +1202,36 @@ Function AddTrackingPage5()
 
 			Int Index = 0
 			Int PGPos = 0
+			Bool Moved = False
 			
 			While Index < TrackedDisplays5.length
 				
 				if (TrackedNames5[Index] != "")
+
+					While (PGPos > 63) && (!Moved)
+						SetCursorPosition(1)
+						PGPos = 1
+						Moved = True
+					endwhile
+				
 					if (TrackedDisplays5[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(TrackedNames5[Index], 0)	
+						if (PGPos != 0) && (PGPos != 1)
+							AddEmptyOption()
 							PGPos += 1
-						else
-							if PGPos != 0
-								AddEmptyOption()
-							endif
-							
-							AddHeaderOption(TrackedNames5[Index], 0)
-							PageOverflow = TrackedNames5[Index]
-							PGPos += 2
-						endif
-						
+						endif				
+						AddHeaderOption(TrackedNames5[Index], 0)	
+						PGPos += 1
 					else
-						if (PGPos == 0) 
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1	
-							
-						elseif (PGPos == 62)
-							SetCursorPosition(1)
-							AddHeaderOption(PageOverflow + " (Continued)", 0)
-							PGPos += 1
-						endif
-						
-						if (TrackedDisplays5[Index].IsEnabled())
-							AddToggleOption(TrackedNames5[Index], TrackedDisplays5[Index].IsEnabled(), 1)
+						if (!TrackedDisplays5[Index].IsDisabled())
+							AddToggleOption(TrackedNames5[Index], !TrackedDisplays5[Index].IsDisabled(), 1)
 							PGPos += 1
 						else
-							AddToggleOption(TrackedNames5[Index], TrackedDisplays5[Index].IsEnabled())
+							AddToggleOption(TrackedNames5[Index], !TrackedDisplays5[Index].IsDisabled())
 							PGPos += 1
 						endif
 					endif
 				endif
-				
+					
 				Index +=1
 			endWhile
 
@@ -2965,59 +2920,79 @@ Function SetTrackerQuestDisplays(Formlist[] QuestDisp = None, FormList[] QuestIt
 	
 	Int Array = 0
 	While Array < QuestDisp.Length
-		if QuestDisp[Array] != None		
-
+		if QuestDisp[Array] != None	
+			
 			if FillSection == 5
+				if ArrayPos	!= 0
+					ArrayPos += 1
+				endif
+				
 				TrackedNames5[ArrayPos] = Header[Array]
 				TrackedDisplays5[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 2	
+				ArrayPos += 1
 				
 			elseif FillSection == 4
+				if ArrayPos	!= 0
+					ArrayPos += 1
+				endif
+				
 				TrackedNames4[ArrayPos] = Header[Array]
 				TrackedDisplays4[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 2	
+				ArrayPos += 1
 				
 			elseif FillSection == 3
+				if ArrayPos	!= 0
+					ArrayPos += 1
+				endif
+				
 				TrackedNames3[ArrayPos] = Header[Array]
 				TrackedDisplays3[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 2	
+				ArrayPos += 1	
 				
 			elseif FillSection == 2
+				if ArrayPos	!= 0
+					ArrayPos += 1
+				endif
+				
 				TrackedNames2[ArrayPos] = Header[Array]
 				TrackedDisplays2[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 2
+				ArrayPos += 1
 				
 			else
+				if ArrayPos	!= 0
+					ArrayPos += 1
+				endif
+				
 				TrackedNames[ArrayPos] = Header[Array]
 				TrackedDisplays[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 2			
-			endif
-				
+				ArrayPos += 1				
+			endif		
+			
 			Formlist flist = QuestItems[Array] as Formlist
 			Formlist Dlist = QuestDisp[Array] as Formlist		
 				
 			Int Index = 0
 			While Index < Dlist.GetSize()		
 
-				if ArrayPos >= 120 && !Page2
+				if ArrayPos >= 127 && !Page2
 					SetTitleText("=== Building Page 2 ===")
 					FillSection = 2
 					Page2 = True
 					ArrayPos = 0
 
-				elseif ArrayPos >= 120 && !Page3
+				elseif ArrayPos >= 127 && !Page3
 					SetTitleText("=== Building Page 3 ===")
 					FillSection = 3
 					Page3 = True
 					ArrayPos = 0
 
-				elseif ArrayPos >= 120 && !Page4
+				elseif ArrayPos >= 127 && !Page4					
 					SetTitleText("=== Building Page 4 ===")
 					FillSection = 4		
 					Page4 = True
 					ArrayPos = 0
 
-				elseif ArrayPos >= 120 && !Page5
+				elseif ArrayPos >= 127 && !Page5
 					SetTitleText("=== Building Page 5 ===")
 					FillSection = 5
 					Page5 = True
@@ -3058,7 +3033,7 @@ Function SetTrackerQuestDisplays(Formlist[] QuestDisp = None, FormList[] QuestIt
 				else
 					DispName = "!Error"
 				endif
-					
+				
 				if FillSection == 5
 					TrackedNames5[ArrayPos] = DispName
 					TrackedDisplays5[ArrayPos] = DispRef
@@ -3081,13 +3056,14 @@ Function SetTrackerQuestDisplays(Formlist[] QuestDisp = None, FormList[] QuestIt
 					
 				else
 					TrackedNames[ArrayPos] = DispName
-					TrackedDisplays[ArrayPos] = DispRef
-					ArrayPos += 1				
+					TrackedDisplays[ArrayPos] = DispRef	
+					ArrayPos += 1
 				endif
 					
 				Index += 1
 			endwhile
 		endif
+			
 		Array += 1
 	endWhile
 endFunction

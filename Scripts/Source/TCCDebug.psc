@@ -7,7 +7,7 @@ RN_Utility_MCM property MCM auto
 
 Event OnInit()
 
-	EnableLogging()
+	;EnableLogging()
 endEvent
 
 ;;-- Functions ---------------------------------------
