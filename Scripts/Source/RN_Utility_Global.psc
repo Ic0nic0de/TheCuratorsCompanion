@@ -155,7 +155,7 @@ EndFunction
 ;;-- Functions ---------------------------------------
 
 Bool Function CheckQuestStagePassed (Int akStage, Quest akQuest) global
-	if (akQuest.GetStage() >= (akStage)) || (akQuest.IsCompleted())
+	if (akQuest.GetStage() >= (akStage))
 		return true
 	endif
   

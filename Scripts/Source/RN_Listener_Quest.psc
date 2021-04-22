@@ -26,22 +26,15 @@ Actor Property GeneralTulliusREF Auto
 
 ;;Formlists to contol the displays
 Formlist Property DBM_RN_QuestDisplays Auto
-Formlist Property DBM_RN_QuestDisplays_Enabled Auto
-
 Formlist Property DBM_RN_Quest_Stage_Displays Auto
-Formlist Property DBM_RN_Quest_Stage_Displays_Enabled Auto
-
 Formlist Property DBM_RN_Quest_StagePassed_Displays Auto
-Formlist Property DBM_RN_Quest_StagePassed_Displays_Enabled Auto
-
-;;Global to control activation
-GlobalVariable Property RN_Quest_Listener_Count Auto
-GlobalVariable Property RN_Quest_Listener_Complete Auto
 
 Bool FirstRun = True
 Bool Done
 
-message property TCC_SectionComplete_Quest auto
+Formlist Property TCC_QuestNotifications_Enabled Auto
+
+Int Count
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
@@ -82,77 +75,92 @@ State Running
 		form Display
 		ObjectReference Quest_Display
 
-		if !CheckQuests		
+		Count = 0
+		
+		if !CheckQuests
 			Index = DBM_RN_QuestDisplays.GetSize()
 			while Index
 				index -=1
-				Display = DBM_RN_QuestDisplays.GetAt(Index) As Form
-						
+				Display = DBM_RN_QuestDisplays.GetAt(Index) As Form	
 				if (Display As ObjectReference)
 					Quest_Display = Display As ObjectReference
-					
-					if Quest_Display && (!DBM_RN_QuestDisplays_Enabled.HasForm(Quest_Display))
-						if (CheckQuestComplete((Quest_Display as DBM_RN_QuestDisplay).sQuestName))
-							DBM_RN_QuestDisplays_Enabled.AddForm(Quest_Display)
-							RN_Quest_Listener_Count.Mod(1)
-							if (MCM.ShowListenerVal) && !FirstRun
-								Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplay).sDisplayName)
-							endIf										
-						endIf
+					if (Quest_Display) 
+						if (!TCC_QuestNotifications_Enabled.HasForm(Quest_Display))
+							if (CheckQuestComplete((Quest_Display as DBM_RN_QuestDisplay).sQuestName))
+								TCC_QuestNotifications_Enabled.AddForm(Quest_Display)
+								if (MCM.ShowListenerVal) && !FirstRun
+									Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplay).sDisplayName)
+								endIf										
+							endIf
+						endif
+						
+						if !Quest_Display.IsDisabled()
+							Count += 1
+						endif						
 					endIf				
-				endIf
+				endif
 			endWhile
-			if (DBM_RN_QuestDisplays_Enabled.GetSize() >= DBM_RN_QuestDisplays.GetSize())
-				CheckQuests = TRUE
+			if (Count >= DBM_RN_QuestDisplays.GetSize())
+				CheckStageDone = TRUE
 			endIf
 		endIf
-			
+		
+		Count = 0
+		
 		if !CheckStageDone
 			Index = DBM_RN_Quest_Stage_Displays.GetSize()
 			while Index
 				index -=1
 				Display = DBM_RN_Quest_Stage_Displays.GetAt(Index) As Form
-				
 				if (Display As ObjectReference)
 					Quest_Display = Display As ObjectReference
-					
-					if Quest_Display && (!DBM_RN_Quest_Stage_Displays_Enabled.HasForm(Quest_Display))
-						if (CheckQuestStageDone((Quest_Display as DBM_RN_QuestDisplayStage).sQuestStage, (Quest_Display as DBM_RN_QuestDisplayStage).sQuestName))
-							DBM_RN_Quest_Stage_Displays_Enabled.AddForm(Quest_Display)
-							RN_Quest_Listener_Count.Mod(1)
-							if (MCM.ShowListenerVal) && !FirstRun
-								Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplayStage).sDisplayName)
-							endIf	
-						endIf
+					if Quest_Display 
+						if (!TCC_QuestNotifications_Enabled.HasForm(Quest_Display))
+							if (CheckQuestStageDone((Quest_Display as DBM_RN_QuestDisplayStage).sQuestStage, (Quest_Display as DBM_RN_QuestDisplayStage).sQuestName))
+								TCC_QuestNotifications_Enabled.AddForm(Quest_Display)
+								if (MCM.ShowListenerVal) && !FirstRun
+									Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplayStage).sDisplayName)
+								endIf	
+							endIf
+						endif
+						
+						if !Quest_Display.IsDisabled()
+							Count += 1
+						endif	
 					endIf				
 				endIf
 			endWhile
-			if (DBM_RN_Quest_Stage_Displays_Enabled.GetSize() >= DBM_RN_Quest_Stage_Displays.GetSize())
+			if (Count >= DBM_RN_Quest_Stage_Displays.GetSize())
 				CheckStageDone = TRUE
 			endIf
 		endIf
 
+		Count = 0
+		
 		if !CheckStagePassed
 			Index = DBM_RN_Quest_StagePassed_Displays.GetSize()
 			while Index
 				index -=1
 				Display = DBM_RN_Quest_StagePassed_Displays.GetAt(Index) As Form
-				
 				if (Display As ObjectReference)
 					Quest_Display = Display As ObjectReference
-					
-					if Quest_Display && (!DBM_RN_Quest_StagePassed_Displays_Enabled.HasForm(Quest_Display))
-						if (CheckQuestStagePassed((Quest_Display as DBM_RN_QuestDisplayStagePassed).sQuestStage, (Quest_Display as DBM_RN_QuestDisplayStagePassed).sQuestName))
-							DBM_RN_Quest_StagePassed_Displays_Enabled.AddForm(Quest_Display)
-							RN_Quest_Listener_Count.Mod(1)
-							if (MCM.ShowListenerVal) && !FirstRun
-								Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplayStagePassed).sDisplayName)
-							endIf	
-						endIf
+					if Quest_Display 
+						if (!TCC_QuestNotifications_Enabled.HasForm(Quest_Display))
+							if (CheckQuestStagePassed((Quest_Display as DBM_RN_QuestDisplayStagePassed).sQuestStage, (Quest_Display as DBM_RN_QuestDisplayStagePassed).sQuestName))
+								TCC_QuestNotifications_Enabled.AddForm(Quest_Display)
+								if (MCM.ShowListenerVal) && !FirstRun
+									Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplayStagePassed).sDisplayName)
+								endIf	
+							endIf
+						endif
+						
+						if !Quest_Display.IsDisabled()
+							Count += 1
+						endif	
 					endIf				
 				endIf
 			endWhile
-			if (DBM_RN_Quest_StagePassed_Displays_Enabled.GetSize() >= DBM_RN_Quest_StagePassed_Displays.GetSize())
+			if (Count >= DBM_RN_Quest_StagePassed_Displays.GetSize())
 				CheckStagePassed = TRUE
 			endIf
 		endIf
@@ -161,13 +169,11 @@ State Running
 			Actor JarlMetelusRef = Game.GetFormFromFile(0x031A96, "ForgottenCity.esp") as Actor
 			
 			if Quest.GetQuest("000FCQuest02").GetStage() >= 6000 
-				RN_Quest_Listener_Count.Mod(1)
 				CheckTFC = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notification("Museum Display Added: The Forgotten City")
 				endif
 			elseif JarlMetelusRef.IsDead()
-				RN_Quest_Listener_Count.Mod(1)
 				CheckTFC = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notification("Museum Display Added: The Forgotten City")
@@ -177,13 +183,11 @@ State Running
 		
 		if !CheckDawnguard
 			if DLC1VQ08.IsCompleted()
-				RN_Quest_Listener_Count.Mod(1)
 				CheckDawnguard = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notification("Museum Display Added: Dawnguard - Vampire Victory")
 				endif
 			elseif DLC1FeranRef.IsDead()
-				RN_Quest_Listener_Count.Mod(1)
 				CheckDawnguard = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notification("Museum Display Added: Dawnguard - Dawnguard Victory")
@@ -193,13 +197,11 @@ State Running
 
 		if !CheckCivilWar
 			if UlfricRef.IsDead()
-				RN_Quest_Listener_Count.Mod(1)
 				CheckCivilWar = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notification("Museum Display Added: Civil War - Imperial Victory")
 				endif
 			elseif GeneralTulliusREF.IsDead()
-				RN_Quest_Listener_Count.Mod(1)
 				CheckCivilWar = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notification("Museum Display Added: Civil War - Stormcloak Victory")
@@ -209,7 +211,6 @@ State Running
 
 		if !CheckBards
 			if Bards[0].IsCompleted() && Bards[1].IsCompleted() && Bards[2].IsCompleted()
-				RN_Quest_Listener_Count.Mod(1)
 				CheckBards = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notification("Museum Display Added: The Bards College")
@@ -217,10 +218,7 @@ State Running
 			endIf
 		endIf
 
-		if CheckStageDone && CheckQuests && CheckBards && CheckCivilWar && CheckDawnguard && CheckTFC && CheckStagePassed
-			
-			RN_Quest_Listener_Complete.SetValue(999)
-			TCC_SectionComplete_Quest.Show()
+		if ((CheckStageDone) && (CheckQuests) && (CheckBards) && (CheckCivilWar) && (CheckDawnguard) && (CheckTFC) && (CheckStagePassed))
 			Done = True
 		else
 			RegisterForSingleUpdate(1)
