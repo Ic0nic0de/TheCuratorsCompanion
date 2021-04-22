@@ -368,7 +368,7 @@ endfunction
 
 ;;-- Events ---------------------------------------
 
-Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Automatic Call from (RN_Utility_Script)
+Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
 	
@@ -377,7 +377,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender) ;;Auto
 	Int Index = DBM.NewSectionDisplayRefLists.length
 	While Index
 		Index -= 1
-		_onDisplayCheck(DBM.NewSectionDisplayRefLists[Index], _EnabledList, _GlobalCount)
+		_onDisplayCheck(DBM.NewSectionDisplayRefLists[Index], _EnabledList, _GlobalCount, _ModName)
 	endWhile
 	
 	if (CheckValueCount1(_GlobalCount, _GlobalTotal, _GlobalComplete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
@@ -397,14 +397,17 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 	ObjectReference Disp = DisplayRef as ObjectReference
 	
 	if (_DisplayList.HasForm(Disp))
-		if (EnableState)
+	
+		if (EnableState) && (!_EnabledList.HasForm(Disp))
+		
 			_EnabledList.AddForm(Disp)
 			
 			TCCDebug.Log("Official Patch [" + _ModName  + "] - Updated display " + Disp.GetName() + Disp, 0)
 			
 			_GlobalCount.Mod(1)
 			
-		else
+		elseif (!EnableState) && (_EnabledList.HasForm(Disp))
+		
 			_EnabledList.RemoveAddedForm(Disp)
 			
 			TCCDebug.Log("Official Patch [" + _ModName  + "] - Removed display " + Disp.GetName() + Disp, 0)

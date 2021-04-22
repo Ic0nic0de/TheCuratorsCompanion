@@ -52,29 +52,32 @@ endEvent
 ;;-- Events ---------------------------------------	
 
 Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
-		
-	ObjectReference Disp = DisplayRef as ObjectReference
 	
-	if _DisplayList.HasForm(Disp)
+	ObjectReference Disp = DisplayRef as ObjectReference
 
-		if EnableState
+	if (_DisplayList.HasForm(Disp))
+		
+		if (EnableState) && (!_EnabledList.HasForm(Disp))
+		
 			_EnabledList.AddForm(Disp)
 			
 			TCCDebug.Log("Updated [" + _RoomName  + "] display " + Disp.GetName() + Disp, 0)
-
+			
 			_Count.Mod(1)
-		else
+			
+		elseif (!EnableState) && (_EnabledList.HasForm(Disp))
+		
 			_EnabledList.RemoveAddedForm(Disp)
-
+			
 			TCCDebug.Log("Removed [" + _RoomName  + "] display " + Disp.GetName() + Disp, 0)
-
+			
 			_Count.Mod(-1)
 		endIf
-	endif
-
-	if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
-		_Notification.Show()
-		bNotified = True
+	
+		if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
+			_Notification.Show()
+			bNotified = True
+		endif
 	endif
 endEvent
 	
@@ -86,8 +89,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 
 	TCCDebug.Log("Scan Event Received for: " + _RoomName)
 	
-	
-	_onDisplayCheck(_DisplayList, _EnabledList, _Count)
+	_onDisplayCheck(_DisplayList, _EnabledList, _Count, _RoomName)
 		
 	if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
 		_Notification.Show()
@@ -99,7 +101,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 endEvent
 
 Function Setup()
-
+	
 	_DisplayList = _Armory_Formlist_Displays.GetAt(_SectionToScan) as Formlist
 	_EnabledList = _Armory_Formlist_Enabled.GetAt(_SectionToScan) as Formlist
 	_Complete = _Armory_Global_Complete.GetAt(_SectionToScan) as GlobalVariable

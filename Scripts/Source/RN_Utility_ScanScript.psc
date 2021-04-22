@@ -29,7 +29,7 @@ GlobalVariable _Total
 Message _Notification
 
 Bool bNotified
-	
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -56,33 +56,36 @@ Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool 
 	
 	ObjectReference Disp = DisplayRef as ObjectReference
 	
-	if _DisplayList.HasForm(Disp)
-	
+	if (_DisplayList.HasForm(Disp))
+
 		if _RoomName == "Hall of Wonders" && !RN_CreationClubContent_Installed.Getvalue()
 			TCCDebug.Log("Display Event Not Run For: " + _RoomName + " as RN_CreationClubContent_Installed is set to " + RN_CreationClubContent_Installed.Getvalue() as Int)
-	
+		
 		else
-			if (EnableState)
+		
+			if (EnableState) && (!_EnabledList.HasForm(Disp))
+			
 				_EnabledList.AddForm(Disp)
 				
 				TCCDebug.Log("Updated [" + _RoomName  + "] display " + Disp.GetName() + Disp, 0)
 				
 				_Count.Mod(1)
 				
-			else
+			elseif (!EnableState) && (_EnabledList.HasForm(Disp))
+			
 				_EnabledList.RemoveAddedForm(Disp)
 				
 				TCCDebug.Log("Removed [" + _RoomName  + "] display " + Disp.GetName() + Disp, 0)
 				
 				_Count.Mod(-1)
 			endIf
-
+		
 			if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
 				_Notification.Show()
 				bNotified = True
 			endif
 		endif
-	endif
+	endIf
 endEvent
 	
 ;;-- Events ---------------------------------------	
@@ -98,7 +101,7 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 		RN_Scan_Done.Mod(1)
 	else
 		
-		_onDisplayCheck(_DisplayList, _EnabledList, _Count)
+		_onDisplayCheck(_DisplayList, _EnabledList, _Count, _RoomName)
 			
 		if (CheckValueCount1(_Count, _Total, _Complete) && (MCM.ShowSetCompleteVal) && (!bNotified))  
 			_Notification.Show()

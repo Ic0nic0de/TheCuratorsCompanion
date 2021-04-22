@@ -88,7 +88,7 @@ endFunction
 
 ;;-- Functions ---------------------------------------
 
-Utility function _onDisplayCheck (Formlist afListA, Formlist afListB, GlobalVariable akVariable) global
+Utility function _onDisplayCheck (Formlist afListA, Formlist afListB, GlobalVariable akVariable, String RoomName) global
 	
 	Int Index = afListA.GetSize()
 	while Index
@@ -101,9 +101,11 @@ Utility function _onDisplayCheck (Formlist afListA, Formlist afListB, GlobalVari
 				Index2 -= 1
 				ObjectReference DisplayRef = nestedList.GetAt(Index2) as ObjectReference	
 				if !afListB.HasForm(DisplayRef) && !DisplayRef.IsDisabled()
-					afListB.AddForm(DisplayRef)				
+					afListB.AddForm(DisplayRef)	
+					TCCDebug.Log("Scan Script Updated " + RoomName + " display " + DisplayRef.GetName() + DisplayRef, 0)
 				elseif aflistB.HasForm(DisplayRef) && DisplayRef.IsDisabled()
 					afListB.RemoveAddedForm(DisplayRef)
+					TCCDebug.Log("Scan Script Removed " + RoomName + " display " + DisplayRef.GetName() + DisplayRef, 0)
 				endIf
 			EndWhile
 				
@@ -111,15 +113,17 @@ Utility function _onDisplayCheck (Formlist afListA, Formlist afListB, GlobalVari
 			ObjectReference DisplayRef = formToProcess As ObjectReference
 			if !afListB.HasForm(DisplayRef) && !DisplayRef.IsDisabled()
 				afListB.AddForm(DisplayRef)			
+				TCCDebug.Log("Scan Script Updated " + RoomName + " display " + DisplayRef.GetName() + DisplayRef, 0)
 			elseif aflistB.HasForm(DisplayRef) && DisplayRef.IsDisabled()
 				afListB.RemoveAddedForm(DisplayRef)
+				TCCDebug.Log("Scan Script Removed " + RoomName + " display " + DisplayRef.GetName() + DisplayRef, 0)
 			endIf
 
 			akVariable.Setvalue(afListB.GetSize())
 		endIf
 	endWhile
 endFunction
-	
+
 ;;-- Functions ---------------------------------------
 
 Bool Function CheckValueCount1(GlobalVariable aKVariable_Count, GlobalVariable aKVariable_Total, GlobalVariable akVariable) global

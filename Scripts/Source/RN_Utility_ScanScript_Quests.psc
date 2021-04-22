@@ -44,29 +44,32 @@ endEvent
 ;;-- Events ---------------------------------------	
 
 Event _OnDisplayEventReceived(Form fSender, Form DisplayRef, Form ItemRef, Bool EnableState)
-		
+	
 	ObjectReference Disp = DisplayRef as ObjectReference
 	
-	if DBM_RN_QuestDisplays.HasForm(Disp) || DBM_RN_Quest_Stage_Displays.HasForm(Disp) || DBM_RN_Quest_StagePassed_Displays.HasForm(Disp)
-
-		if EnableState
+	if (DBM_RN_QuestDisplays.HasForm(Disp)) || (DBM_RN_Quest_Stage_Displays.HasForm(Disp)) || (DBM_RN_Quest_StagePassed_Displays.HasForm(Disp))
+		
+		if (EnableState) && (!DBM_RN_QuestDisplays_Enabled.HasForm(Disp))
+		
 			DBM_RN_QuestDisplays_Enabled.AddForm(Disp)
 			
 			TCCDebug.Log("Updated quest display " + Disp.GetName() + Disp, 0)
-
+			
 			RN_Quest_Listener_Count.Mod(1)
-		else
+			
+		elseif (!EnableState) && (DBM_RN_QuestDisplays_Enabled.HasForm(Disp))
+		
 			DBM_RN_QuestDisplays_Enabled.RemoveAddedForm(Disp)
 			
 			TCCDebug.Log("Removed quest display " + Disp.GetName() + Disp, 0)
-
+			
 			RN_Quest_Listener_Count.Mod(-1)
 		endIf
-	endif
-
-	if (CheckValueCount1(RN_Quest_Listener_Count, RN_Quest_Listener_Total, RN_Quest_Listener_Complete) && (MCM.ShowSetCompleteVal) && (!bNotified)) 
-		TCC_SectionComplete_Quest.Show()
-		bNotified = True	
+	
+		if (CheckValueCount1(RN_Quest_Listener_Count, RN_Quest_Listener_Total, RN_Quest_Listener_Complete) && (MCM.ShowSetCompleteVal) && (!bNotified)) 
+			TCC_SectionComplete_Quest.Show()
+			bNotified = True	
+		endif
 	endif
 endEvent
 
@@ -75,12 +78,12 @@ endEvent
 Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	
 	RN_Scan_Registered.Mod(1)
-	TCCDebug.Log("Scan Event Received for: Quest Displays")
-
 	
-	_onDisplayCheck(DBM_RN_QuestDisplays, DBM_RN_QuestDisplays_Enabled, RN_Quest_Listener_Count)
-	_onDisplayCheck(DBM_RN_Quest_Stage_Displays, DBM_RN_QuestDisplays_Enabled, RN_Quest_Listener_Count)
-	_onDisplayCheck(DBM_RN_Quest_StagePassed_Displays, DBM_RN_QuestDisplays_Enabled, RN_Quest_Listener_Count)
+	TCCDebug.Log("Scan Event Received for: Quest Displays")
+	
+	_onDisplayCheck(DBM_RN_QuestDisplays, DBM_RN_QuestDisplays_Enabled, RN_Quest_Listener_Count, "Quest")
+	_onDisplayCheck(DBM_RN_Quest_Stage_Displays, DBM_RN_QuestDisplays_Enabled, RN_Quest_Listener_Count, "Quest")
+	_onDisplayCheck(DBM_RN_Quest_StagePassed_Displays, DBM_RN_QuestDisplays_Enabled, RN_Quest_Listener_Count, "Quest")
 
 	if (CheckValueCount1(RN_Quest_Listener_Count, RN_Quest_Listener_Total, RN_Quest_Listener_Complete) && (MCM.ShowSetCompleteVal) && (!bNotified)) 
 		TCC_SectionComplete_Quest.Show()
@@ -88,5 +91,6 @@ Event _onScan(string eventName, string strArg, float numArg, Form sender)
 	endif
 	
 	RN_Scan_Done.Mod(1)
+	
 	TCCDebug.Log("Scan Event Completed for: Quest Displays")
 endEvent
