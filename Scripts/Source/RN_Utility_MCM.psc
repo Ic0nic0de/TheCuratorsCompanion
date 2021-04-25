@@ -51,7 +51,6 @@ formlist property dbmNew auto
 formlist property dbmDisp auto
 formlist property dbmFound auto
 formlist property dbmMaster auto
-formlist property TCC_TokenList_NoShipmentCrates auto
 
 string[] moreHUDChoiceList 
 int property IndexmoreHUD auto hidden
@@ -89,7 +88,7 @@ globalvariable property AchHealth auto
 globalvariable property AchStamina auto
 globalvariable property AchMagicka auto
 globalvariable property AchSpeech auto
-
+globalvariable property TokenRefList_NoShipmentSize auto
 ;; Globals for Complete Set Listings.
 
 globalvariable property RN_SupportedModCount auto
@@ -454,23 +453,26 @@ Function AddAdvancedPage()
 		AddMenuOptionST("TransferListOptions", "Transfer Station:", TransferList[IndexTransfer])
 		
 		SetCursorPosition(1)
-		AddHeaderOption("Custom Storage Containers: (" + TCC_TokenList_NoShipmentCrates.GetSize() as Int + "/6)")
-		ObjectReference _Container
-		String _ContainerLocation
+		AddHeaderOption("Custom Storage Containers: (" +  TokenRefList_NoShipmentSize.GetValue() as Int + "/6)")
+		ObjectReference RefToShow
+		String RefToShowlocation
 		
-		Int _Index = TCC_TokenList_NoShipmentCrates.GetSize()
-		While _Index
-			_Index -= 1
-			_Container = TCC_TokenList_NoShipmentCrates.GetAt(_Index) as ObjectReference				
-			_ContainerLocation = _Container.GetCurrentLocation().GetName()
-			if !_ContainerLocation
-				_ContainerLocation = _Container.GetparentCell().GetName()
-				if !_ContainerLocation
-					_ContainerLocation = "Unknown Location"
+		Int Index = 0 
+		While Index < API.TokenRefList_NoShipment.length
+			RefToShow = API.TokenRefList_NoShipment[Index] as ObjectReference	
+			if RefToShow
+				RefToShowlocation = RefToShow.GetCurrentLocation().GetName()
+				if !RefToShowlocation
+					RefToShowlocation = RefToShow.GetparentCell().GetName()
+					if !RefToShowlocation
+						RefToShowlocation = "Unknown Location"
+					endif
 				endif
+				
+				AddTextOption(RefToShow.GetDisplayName(), RefToShowlocation, 0)
 			endif
-
-			AddTextOption(_Container.GetDisplayName(), _ContainerLocation, 0)
+			
+			Index += 1
 		endWhile
 		
 		AddEmptyOption()
@@ -616,7 +618,7 @@ Function AddMuseumSetsPage()
 	
 		SetCursorPosition(1)
 		AddHeaderOption("Page Information:")
-		AddTextOption("This page lists all completable Museum sections.", "", 0)
+		AddTextOption("This page lists all completable Museum rooms.", "", 0)
 		AddEmptyOption()
 		AddTextOption("As items are collected and displayed, this page will", "", 0)
 		AddTextOption("keep track of your progess and display counts.", "", 0)
@@ -1270,10 +1272,10 @@ endFunction
 string function GetIconStatus()
 	
 	if ((dbmNew.GetSize()) + (dbmFound.GetSize()) + (dbmDisp.GetSize())) == (dbmMaster.GetSize())
-		return "No Errors Detected"
+		return "No Icon Errors Detected"
 	endif
 	
-	return "Rebuild Suggested"
+	return "Rebuild Advised"
 endfunction
 
 string function GetStatusString()
@@ -2575,7 +2577,7 @@ string function GetCurrentMuseumCount(Int val)
 		Total_Room += 1
 	endif
 	
-	return (val + "/" + Total_Room + " Sections")
+	return (val + "/" + Total_Room + " Rooms")
 endFunction
 
 ;;-------------------------------

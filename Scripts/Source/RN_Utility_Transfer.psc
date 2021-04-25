@@ -1,4 +1,6 @@
 Scriptname RN_Utility_Transfer extends Quest 
+
+RN_PatchAPI property API auto
  
 RN_Utility_MCM property MCM auto
 
@@ -20,7 +22,6 @@ objectreference property DBM_AutoSortDropOff auto
 objectreference property DBM_PrepStation auto
 objectreference property PlayerRef auto
 
-formlist property TCC_TokenList auto
 formlist property dbmMaster auto
 formlist property dbmDisp auto
 formlist property RN_ExcludedItems_Generic auto
@@ -37,11 +38,11 @@ Function RunCustomTransfer()
 	
 	_Transfered = 0
 	
-	Int Index = TCC_TokenList.GetSize()
+	Int Index = API.TokenRefList.length
 	Bool Transferable
 	While Index
 		Index -= 1
-		ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference
+		ObjectReference _Container = API.TokenRefList[Index] as ObjectReference
 		if _Container && _Container != PlayerRef
 			Int Index2 = _Container.GetNumItems()
 			While Index2
@@ -70,11 +71,11 @@ Function RunAllTransfer()
 
 	_Transfered = 0
 
-	Int Index = TCC_TokenList.GetSize()
+	Int Index = API.TokenRefList.length
 	Bool Transferable
 	While Index
 		Index -= 1
-		ObjectReference _Container = TCC_TokenList.GetAt(Index) as ObjectReference	
+		ObjectReference _Container = API.TokenRefList[Index] as ObjectReference	
 		if _Container
 			Int Index2 = _Container.GetNumItems()
 			While Index2

@@ -67,9 +67,6 @@ formlist property DBM_RN_Quest_StagePassed_Displays auto
 formlist property DBM_RN_ExplorationDisplays auto
 formlist property TCC_DisplayList_MiscItems auto
 
-;;Custom Storage
-formlist property TCC_TokenList auto
-
 ;;Main Storage
 formlist property _MuseumContainerList auto
 formlist property _MuseumContainerList_WP auto
@@ -175,7 +172,6 @@ endstate
 
 function ManageLists()
 
-	TCC_TokenList.AddForm(PlayerRef)
 	_MuseumContainerList_WP.AddForm(PlayerRef)
 		
 	SendModEvent("Update_TokenArray", "Updating Token Array")
@@ -207,10 +203,10 @@ function CreateMoreHudLists()
 		endif
 	endWhile
 			
-	_Index = TCC_TokenList.GetSize() ;; Check player and custom storage for found items.
+	_Index = API.TokenRefList.length ;; Check player and custom storage for found items.
 	While _Index
 		_Index -= 1
-		ObjectReference _Container = TCC_TokenList.GetAt(_Index) as ObjectReference		
+		ObjectReference _Container = API.TokenRefList[_Index] as ObjectReference		
 		if _Container
 			TCCDebug.Log("Utility - Updating items in [" + _Container.GetBaseObject().GetName() + "]" + _Container, 0)
 

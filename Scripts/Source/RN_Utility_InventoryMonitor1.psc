@@ -1,25 +1,21 @@
 ScriptName RN_Utility_InventoryMonitor1 extends ReferenceAlias
 
+RN_PatchAPI property API auto
 RN_Utility_MCM property RN_MCM auto
 
 formlist property dbmNew auto
 formlist property dbmFound auto
 formlist property dbmDisp auto
 
-formlist property TCC_TokenList auto
-
 formlist property TCC_ItemList_Museum_1 auto
 
 ;;Museum storage containers to check within several events.
 formlist property _MuseumContainerList_WP auto
 
-objectreference[] TokenList
-
 ;-- Events --------------------------------
 
 Event onInit()
 	
-	RegisterForModEvent("Update_TokenArray", "_Update")
 	RegisterForModEvent("FireScripts", "_OnFireScripts")
 endEvent
 
@@ -27,7 +23,6 @@ endEvent
 
 Event OnPlayerLoadGame()
 	
-	RegisterForModEvent("Update_TokenArray", "_Update")
 	RegisterForModEvent("FireScripts", "_OnFireScripts")
 endEvent
 
@@ -58,14 +53,14 @@ State Running
 	Event onItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
 		
 		if dbmFound.HasForm(akBaseItem)	
-			if !akDestContainer || (!_MuseumContainerList_WP.HasForm(akDestContainer) && TokenList.find(akDestContainer) == -1)
+			if !akDestContainer || (!_MuseumContainerList_WP.HasForm(akDestContainer) && API.TokenRefList.find(akDestContainer) == -1)
 
 				Bool bDuplicate
-				Int Index = TokenList.length
+				Int Index = API.TokenRefList.length
 				while Index && !bDuplicate
 					Index -=1
-					if TokenList[Index] != none
-						bDuplicate = TokenList[Index].GetitemCount(akBaseItem)
+					if API.TokenRefList[Index] != none
+						bDuplicate = API.TokenRefList[Index].GetitemCount(akBaseItem)
 					endif
 				endWhile
 				
@@ -77,21 +72,6 @@ State Running
 		endIf
 	endEvent
 endState
-
-;-- Events --------------------------------
-
-Event _Update(string eventName, string strArg, float numArg, Form sender)
-	
-	;Debug.Notification(strArg)
-	
-	TokenList = new objectreference[128]
-	Int _Index = 0
-	While _Index < TCC_TokenList.GetSize()
-		objectreference _Ref = TCC_TokenList.GetAt(_Index) as objectreference
-		TokenList[_Index] = _Ref
-		_Index += 1
-	endWhile
-endEvent
 
 ;-- Events --------------------------------
 

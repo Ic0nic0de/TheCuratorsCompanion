@@ -91,6 +91,10 @@ globalvariable property RN_SupportedModCount auto
 globalvariable property RN_CustomModCount auto
 bool property UnregisteredPatch auto hidden
 
+ObjectReference[] Property TokenRefList auto
+ObjectReference[] Property TokenRefList_NoShipment auto
+GlobalVariable Property TokenRefList_NoShipmentSize auto
+
 ;;-- Functions ---------------------------------------
 
 Event OnInit()
@@ -365,6 +369,49 @@ function CheckPatches()
 	endwhile
 	TCCDebug.Log("Patch API - Finished registering " +  SupportedModHandlers.Find(none) + " Patches")
 endFunction	
+
+;;-- Functions ---------------------------------------
+
+Bool function AddToTokenRefList(ObjectReference RefToAdd, Bool NoShipment)
+	
+	Int Index = TokenRefList.Find(RefToAdd)
+	if Index == -1
+		Index = TokenRefList.Find(None)
+		
+		TokenRefList[Index] = RefToAdd
+		if NoShipment
+			TokenRefList_NoShipment[Index] = RefToAdd
+			TokenRefList_NoShipmentSize.Mod(1)
+			TCCDebug.Log("Patch API - Added [" + RefToAdd.GetBaseObject().GetName() + "] " + RefToAdd + " to TokenRefList_NoShipment")
+		endif
+		TCCDebug.Log("Patch API - Added [" + RefToAdd.GetBaseObject().GetName() + "] " + RefToAdd + " to TokenRefList")
+		Return True
+	else
+		TCCDebug.Log("Patch API - Unable to add [" + RefToAdd.GetBaseObject().GetName() + "] " + RefToAdd + " to TokenRefList as the array already holds this reference")
+		Return False
+	endif				
+endfunction
+
+;;-- Functions ---------------------------------------
+
+Bool function RemoveFromTokenRefList(ObjectReference RefToRemove, Bool NoShipment)
+	
+	Int Index = TokenRefList.Find(RefToRemove)
+	if Index == -1
+		TCCDebug.Log("Patch API - Unable to remove [" + RefToRemove.GetBaseObject().GetName() + "] " + RefToRemove + " from TokenRefList as the array does not hold this reference")
+		Return False
+	else
+		
+		TokenRefList[Index] = None
+		if NoShipment
+			TokenRefList_NoShipment[Index] = None
+			TokenRefList_NoShipmentSize.Mod(-1)
+			TCCDebug.Log("Patch API - Removed [" + RefToRemove.GetBaseObject().GetName() + "] " + RefToRemove + " from TokenRefList_NoShipment")
+		endif
+		TCCDebug.Log("Patch API - Removed [" + RefToRemove.GetBaseObject().GetName() + "] " + RefToRemove + " from TokenRefList")	
+		Return True
+	endif				
+endfunction
 
 ;;-- Functions ---------------------------------------
 

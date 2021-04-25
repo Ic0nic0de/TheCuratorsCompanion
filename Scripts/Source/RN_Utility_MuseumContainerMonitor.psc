@@ -1,5 +1,6 @@
 ScriptName RN_Utility_MuseumContainerMonitor extends ObjectReference
 
+RN_PatchAPI property API auto
 RN_Utility_MCM property RN_MCM auto
 RN_Utility_Script property RN_Utility auto
 
@@ -11,8 +12,6 @@ formlist property DBM_ReplicaItems auto
 formlist property dbmNew auto
 formlist property dbmFound auto
 formlist property dbmDisp auto
-
-formlist property TCC_TokenList auto
 
 objectreference property DISPLAYCHEST auto
 
@@ -60,7 +59,7 @@ function updateFormlists(form akBaseItem, bool added, ObjectReference akContaine
 		dbmNew.RemoveAddedForm(akBaseItem)		
 	else
 		dbmDisp.RemoveAddedForm(akBaseItem)
-		if !TCC_TokenList.HasForm(akContainer)
+		if (API.TokenRefList.Find(akContainer) == -1)
 			dbmNew.AddForm(akBaseItem)
 		else
 			dbmFound.AddForm(akBaseItem)
@@ -85,7 +84,7 @@ function ProcessReplica(form akBaseItem, bool added, ObjectReference akContainer
 	else
 		if DBM_ReplicaBaseItems.HasForm(akBaseitem)		
 			dbmDisp.RemoveAddedForm(ReplicaHandler.GetReplica(akBaseItem))
-			if !TCC_TokenList.HasForm(akContainer)
+			if (API.TokenRefList.Find(akContainer) == -1)
 				dbmNew.AddForm(ReplicaHandler.GetReplica(akBaseItem))
 			else
 				dbmFound.AddForm(ReplicaHandler.GetReplica(akBaseItem))
@@ -93,7 +92,7 @@ function ProcessReplica(form akBaseItem, bool added, ObjectReference akContainer
 			
 		elseif DBM_ReplicaItems.HasForm(akBaseitem)
 			dbmDisp.RemoveAddedForm(ReplicaHandler.GetOriginal(akBaseItem))
-			if !TCC_TokenList.HasForm(akContainer)
+			if (API.TokenRefList.Find(akContainer) == -1)
 				dbmNew.AddForm(ReplicaHandler.GetOriginal(akBaseItem))
 			else
 				dbmFound.AddForm(ReplicaHandler.GetOriginal(akBaseItem))
