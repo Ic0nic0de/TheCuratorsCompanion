@@ -30,46 +30,51 @@ formlist property DBM_ProtectedItems auto
 globalvariable property DBM_SortWait auto
 globalvariable property DBM_DisplayCount auto
 
-int _Transfered
-int _PlayerTransfered
-int _OldDisplayCount
+int Transfered
+int PlayerTransfered
+int OldDisplayCount
+
+Bool Property SilentTransfer auto hidden
 
 Function RunCustomTransfer()
 	
-	_Transfered = 0
+	DBM_SortWait.SetValue(1)
+	Transfered = 0
 	
-	Int Index = API.TokenRefList.length
+	Int Index = API.TokenRefList_NoShipment.length
 	Bool Transferable
 	While Index
 		Index -= 1
-		ObjectReference _Container = API.TokenRefList[Index] as ObjectReference
-		if _Container && _Container != PlayerRef
-			Int Index2 = _Container.GetNumItems()
+		if (API.TokenRefList_NoShipment[Index])
+			SendModEvent("_StartTimer", "Transfering Items")
+			Int Index2 = API.TokenRefList_NoShipment[Index].GetNumItems()
 			While Index2
 				Index2 -= 1
-				Form ItemRelic = _Container.GetNthForm(Index2)
+				Form ItemRelic = API.TokenRefList_NoShipment[Index].GetNthForm(Index2)
 				if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic)
-					if _Container as Actor
-						Actor _Actor = _Container as Actor
+					if API.TokenRefList_NoShipment[Index] as Actor
+						Actor _Actor = API.TokenRefList_NoShipment[Index] as Actor
 						Transferable = !_Actor.IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
 					else
-						Transferable = !Game.GetPlayer().IsEquipped(ItemRelic) && !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
+						Transferable = !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
 					endIF
 					
 					if Transferable
-						_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
-						_Transfered += 1
+						API.TokenRefList_NoShipment[Index].RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
+						Transfered += 1
 					endIf
 				endIf
 			endWhile
 		endIf
 	endWhile
+	DBM_SortWait.SetValue(0)
 	DisplayFunc()
 endFunction
 
 Function RunAllTransfer()
-
-	_Transfered = 0
+	
+	DBM_SortWait.SetValue(1)
+	Transfered = 0
 
 	Int Index = API.TokenRefList.length
 	Bool Transferable
@@ -77,6 +82,7 @@ Function RunAllTransfer()
 		Index -= 1
 		ObjectReference _Container = API.TokenRefList[Index] as ObjectReference	
 		if _Container
+			SendModEvent("_StartTimer", "Transfering Items")
 			Int Index2 = _Container.GetNumItems()
 			While Index2
 				Index2 -= 1
@@ -91,49 +97,51 @@ Function RunAllTransfer()
 					
 					if Transferable
 						_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
-						_Transfered += 1
+						Transfered += 1
 					endIf
 				endIf
 			endWhile
 		endif
 	endWhile
+	DBM_SortWait.SetValue(0)
 	DisplayFunc()
 endFunction
 
 Function RunRelicTransfer()
-
-	_Transfered = 0
 	
+	DBM_SortWait.SetValue(1)
+	Transfered = 0
+	
+	SendModEvent("_StartTimer", "Transfering Items")
 	Int Index = RN_Storage_Container.GetNumItems()
 	While Index
 		Index -= 1
 		Form ItemRelic = RN_Storage_Container.GetNthForm(Index)
 		if dbmMaster.HasForm(ItemRelic) && !dbmDisp.HasForm(ItemRelic)
-			Bool Transferable = !Game.IsObjectFavorited(ItemRelic) && !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
+			Bool Transferable = !RN_ExcludedItems_Generic.HasForm(ItemRelic) && !DBM_ProtectedItems.HasForm(ItemRelic)
 			if Transferable
 				RN_Storage_Container.RemoveItem(ItemRelic, 1, true, DBM_AutoSortDropOff)
-				_Transfered += 1
+				Transfered += 1
 			endIf
 		endIf
 	endWhile
+	DBM_SortWait.SetValue(0)
 	DisplayFunc()
 endFunction
 
 Function DisplayFunc()
 	
-	if MCM.advdebug
-		TCCDebug.Log("Display - Started Displaying Tranfered Items...")
-	endif
+	TCCDebug.Log("Display - Started Displaying Tranfered Items...")
 	
-	if _Transfered > 0
-		Int Index = TransferComplete.Show(_Transfered as Int)
+	if (Transfered > 0)
+		Int Index = TransferComplete.Show(Transfered as Int)
 		
-		if Index == 0
+		if (Index == 0)
 		
-			_OldDisplayCount = DBM_DisplayCount.GetValue() as Int		
-			(DBM_PrepStation.Activate(DBM_AutoSortDropOff))
+			OldDisplayCount = DBM_DisplayCount.GetValue() as Int		
+			DBM_PrepStation.Activate(DBM_AutoSortDropOff)
 			
-			If !Utility.IsInMenuMode()
+			If (!Utility.IsInMenuMode())
 				TransferDisplayWait.Show()
 			endIf
 			
@@ -142,70 +150,75 @@ Function DisplayFunc()
 			While DBM_SortWait.GetValue()
 				Utility.Wait(1)
 				Index += 1
-				if Index == 20 
-					if !Utility.IsInMenuMode()
+				if (Index == 20)
+					if (!Utility.IsInMenuMode())
 						TransferDisplayWait.Show()
 					endIf
 					Index = 0
 				endIF
 			endWhile
 			
-			_Transfered = (DBM_DisplayCount.GetValue() as Int - _OldDisplayCount)
+			Transfered = (DBM_DisplayCount.GetValue() as Int - OldDisplayCount)
 			
-			TransferDisplayDone.Show(_Transfered as Int)
+			TransferDisplayDone.Show(Transfered as Int)
 		else
 			Return
 		endIf
 	else
-		TransferCompleteNoItems.Show(_Transfered as Int)
+		TransferCompleteNoItems.Show(Transfered as Int)
 	endIF
 	
-	if MCM.advdebug
-		TCCDebug.Log("Display - Finished Displaying Tranfered Items")
-	endif
+	TCCDebug.Log("Display - Finished Displaying Tranfered Items")
 endFunction
 
 Function TransferRelics(ObjectReference ref)
 	
-	_PlayerTransfered = 0
+	Bool Transferable
+	PlayerTransfered = 0
 	
 	if (ref) && (ref.GetBaseObject().GetType() == 28)
-		if !DBM_SortWait.GetValue()
+		if (!DBM_SortWait.GetValue())
 			FoundAlias.ForceRefTo(ref)
-			Int _MenuButton = TCC_TransferContainer.Show()
-			if _MenuButton == 0	
+			Int MenuButton = TCC_TransferContainer.Show()
+			if (MenuButton == 0)	
+				SilentTransfer = True
 				DBM_SortWait.SetValue(1)
 				SendModEvent("_StartTimer", "Transfering Items")
 				Int _Index = PlayerRef.GetNumItems()
 				while _Index
 					_Index -= 1		
-					Form _ItemRelic = PlayerRef.GetNthForm(_Index)
-					if dbmMaster.HasForm(_ItemRelic)
-						Bool Transferable = !Game.GetPlayer().IsEquipped(_ItemRelic) && !Game.IsObjectFavorited(_ItemRelic) && !RN_ExcludedItems_Generic.HasForm(_ItemRelic) && !DBM_ProtectedItems.HasForm(_ItemRelic)
-						if Transferable
-							PlayerRef.RemoveItem(_ItemRelic, PlayerRef.GetItemCount(_ItemRelic), true, ref)
-							_PlayerTransfered += 1
-						endIf
+					Form ItemRelic = PlayerRef.GetNthForm(_Index)
+					if (MCM.Restricted) && (ref == RN_Storage_Container)
+						Transferable = (dbmMaster.HasForm(ItemRelic)) && (!dbmDisp.HasForm(ItemRelic)) && (!Game.GetPlayer().IsEquipped(ItemRelic)) && (!Game.IsObjectFavorited(ItemRelic)) && (!RN_ExcludedItems_Generic.HasForm(ItemRelic)) && (!DBM_ProtectedItems.HasForm(ItemRelic))
+					else
+						Transferable = (dbmMaster.HasForm(ItemRelic)) && (!Game.GetPlayer().IsEquipped(ItemRelic)) && (!Game.IsObjectFavorited(ItemRelic)) && (!RN_ExcludedItems_Generic.HasForm(ItemRelic)) && (!DBM_ProtectedItems.HasForm(ItemRelic))
+					endif
+					
+					if (Transferable)
+						PlayerRef.RemoveItem(ItemRelic, PlayerRef.GetItemCount(ItemRelic), true, ref)
+						PlayerTransfered += 1
 					endIf
 				endWhile
+				SilentTransfer = False
 				DBM_SortWait.SetValue(0)
-				TCC_TransferComplete.show(_PlayerTransfered)
+				TCC_TransferComplete.show(PlayerTransfered)
 				
-			elseif _MenuButton == 1
+			elseif (MenuButton == 1)
 				DBM_SortWait.SetValue(1)
 				SendModEvent("_StartTimer", "Retrieving Items")
 				Int _Index = ref.GetNumItems()
 				while _Index
 					_Index -= 1		
-					Form _ItemRelic = ref.GetNthForm(_Index)
-					if dbmMaster.HasForm(_ItemRelic)
-						ref.RemoveItem(_ItemRelic, ref.GetItemCount(_ItemRelic), true, PlayerRef)
-						_PlayerTransfered += 1
+					Form ItemRelic = ref.GetNthForm(_Index)
+					if (dbmMaster.HasForm(ItemRelic))
+						ref.RemoveItem(ItemRelic, ref.GetItemCount(ItemRelic), true, PlayerRef)
+						PlayerTransfered += 1
 					endIf
 				endWhile
 				DBM_SortWait.SetValue(0)
-				TCC_RetrievalComplete.show(_PlayerTransfered)
-			elseif _MenuButton == 2
+				TCC_RetrievalComplete.show(PlayerTransfered)
+			
+			elseif (MenuButton == 2)
 				FoundAlias.Clear()
 				return
 			endif

@@ -6,6 +6,9 @@ RN_Utility_MCM property MCM auto
 RN_Utility_Script property Util auto
 RN_Utility_PropManager property Prop auto
 
+ObjectReference Property PlayerRef Auto
+Formlist Property dbmMaster Auto
+
 string[] property SupportedModNames auto hidden
 form[] property SupportedModHandlers auto hidden
 
@@ -372,14 +375,14 @@ endFunction
 
 ;;-- Functions ---------------------------------------
 
-Bool function AddToTokenRefList(ObjectReference RefToAdd, Bool NoShipment)
+Bool function AddToTokenRefList(ObjectReference RefToAdd, Bool CustomContainer)
 	
 	Int Index = TokenRefList.Find(RefToAdd)
 	if Index == -1
 		Index = TokenRefList.Find(None)
 		
 		TokenRefList[Index] = RefToAdd
-		if NoShipment
+		if CustomContainer
 			TokenRefList_NoShipment[Index] = RefToAdd
 			TokenRefList_NoShipmentSize.Mod(1)
 			TCCDebug.Log("Patch API - Added [" + RefToAdd.GetBaseObject().GetName() + "] " + RefToAdd + " to TokenRefList_NoShipment")
@@ -394,16 +397,17 @@ endfunction
 
 ;;-- Functions ---------------------------------------
 
-Bool function RemoveFromTokenRefList(ObjectReference RefToRemove, Bool NoShipment)
+Bool function RemoveFromTokenRefList(ObjectReference RefToRemove, Bool CustomContainer)
 	
 	Int Index = TokenRefList.Find(RefToRemove)
 	if Index == -1
 		TCCDebug.Log("Patch API - Unable to remove [" + RefToRemove.GetBaseObject().GetName() + "] " + RefToRemove + " from TokenRefList as the array does not hold this reference")
 		Return False
+	
 	else
-		
+	
 		TokenRefList[Index] = None
-		if NoShipment
+		if CustomContainer
 			TokenRefList_NoShipment[Index] = None
 			TokenRefList_NoShipmentSize.Mod(-1)
 			TCCDebug.Log("Patch API - Removed [" + RefToRemove.GetBaseObject().GetName() + "] " + RefToRemove + " from TokenRefList_NoShipment")
@@ -413,6 +417,20 @@ Bool function RemoveFromTokenRefList(ObjectReference RefToRemove, Bool NoShipmen
 	endif				
 endfunction
 
+;;-- Functions ---------------------------------------
+
+function EmptyContainerToPlayer(ObjectReference ContainerRef)
+
+	Int Index = ContainerRef.GetNumItems() 
+	While Index
+		Index -= 1
+		Form akBaseItem = ContainerRef.GetNthForm(Index)		
+		if (dbmMaster.HasForm(akBaseItem))
+			ContainerRef.RemoveItem(akBaseItem, ContainerRef.GetitemCount(akBaseItem), false, PlayerRef)
+		endIf
+	endWhile
+endFunction
+	
 ;;-- Functions ---------------------------------------
 
 function ResetArrays()

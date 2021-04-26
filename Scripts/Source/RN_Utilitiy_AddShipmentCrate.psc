@@ -13,7 +13,7 @@ Event OnCellDetach()
 		API.RemoveFromTokenRefList(Self, False)
 	endif
 endEvent
-
+		
 Event OnUpdateGameTime()
 	
 	Utility.Wait(5.0)

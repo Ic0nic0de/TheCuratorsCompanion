@@ -1,7 +1,8 @@
 ScriptName RN_Storage_Restrict extends objectreference
 
 ;Property to obtain values from MCM Script.
-RN_Utility_MCM Property MCM Auto
+RN_Utility_MCM property MCM auto
+RN_Utility_Transfer property TransferUTIL auto
 
 formlist property dbmMaster auto 
 formlist property dbmDisp auto 	;; Items that are on display
@@ -20,18 +21,21 @@ Function OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRef
 		return
 	endif
 	
-	if MCM.Restricted
+	if (MCM.Restricted)
 	
-		if !dbmMaster.HasForm(akBaseItem)	;; If the item is not a displayable relic, return the item to the player.
+		if (!dbmMaster.HasForm(akBaseItem))	;; If the item is not a displayable relic, return the item to the player.
 			
 			RemoveItem(akBaseItem, aiItemCount, TRUE, akSourceContainer)
-			Debug.MessageBox(akBaseItem.GetName() + " is not displayable at the Museum")
+			if (!TransferUTIL.SilentTransfer)
+				Debug.MessageBox(akBaseItem.GetName() + " is not displayable at the Museum")
+			endif
 			
 		elseif dbmDisp.HasForm(akBaseItem) 			;; if the item is displayed, return the item to the player.
 			
 			RemoveItem(akBaseItem, aiItemCount, TRUE, akSourceContainer)
-			Debug.MessageBox(akBaseItem.GetName() + "  is already on display at the Museum")	
-		
+			if (!TransferUTIL.SilentTransfer)
+				Debug.MessageBox(akBaseItem.GetName() + "  is already on display at the Museum")
+			endif
 		endif
 	endIf
 endFunction

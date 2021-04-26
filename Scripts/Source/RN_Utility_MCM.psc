@@ -202,6 +202,9 @@ String[] TrackedNames3
 String[] TrackedNames4
 String[] TrackedNames5
 
+ObjectReference[] CustomContainerRef
+Int[] CustomContainerPos
+
 ObjectReference TCC_HEADER_TO_REPLACE
 ObjectReference TCC_END_OF_PAGE
 
@@ -426,6 +429,7 @@ endFunction
 Function AddAdvancedPage()
 
 	if CurrentPage == "Advanced Settings"
+		
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
 		
@@ -453,14 +457,19 @@ Function AddAdvancedPage()
 		AddMenuOptionST("TransferListOptions", "Transfer Station:", TransferList[IndexTransfer])
 		
 		SetCursorPosition(1)
-		AddHeaderOption("Custom Storage Containers: (" +  TokenRefList_NoShipmentSize.GetValue() as Int + "/6)")
+		AddHeaderOption("Custom Storage Containers: (" +  TokenRefList_NoShipmentSize.GetValue() as Int + "/7)")
+		
+		CustomContainerRef = new ObjectReference[128]
+		CustomContainerPos = new Int[128]
 		ObjectReference RefToShow
 		String RefToShowlocation
-		
 		Int Index = 0 
+		Int Count = 0
+		
 		While Index < API.TokenRefList_NoShipment.length
 			RefToShow = API.TokenRefList_NoShipment[Index] as ObjectReference	
 			if RefToShow
+				CustomContainerRef[Index] = RefToShow
 				RefToShowlocation = RefToShow.GetCurrentLocation().GetName()
 				if !RefToShowlocation
 					RefToShowlocation = RefToShow.GetparentCell().GetName()
@@ -469,19 +478,19 @@ Function AddAdvancedPage()
 					endif
 				endif
 				
-				AddTextOption(RefToShow.GetDisplayName(), RefToShowlocation, 0)
+				CustomContainerPos[Index] = AddTextOption("<font color='#070091'>" + RefToShow.GetDisplayName()+ "</font>", RefToShowlocation, 0)
+				Count += 1
 			endif
 			
 			Index += 1
 		endWhile
 		
-		AddEmptyOption()
-		AddEmptyOption()
-		AddHeaderOption("Custom Storage Containers Information:")
-		AddTextOptionST("ShowCustomContainerInfo", "Click to Show Information", "", 0)		
+		if (Count == 0)
+			AddTextOption("No Custom Containers Found", "", 1)
+		endif
 	endif
 endFunction
-
+	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Settings Page ------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2093,18 +2102,8 @@ state TransferListOptions
 	endEvent
 
 	event OnHighlightST()
-		SetInfoText("Choose which container(s) to check for displayable items when using the 'Transfer Relics' option at the Prep station.\n All Storage: Player Inventory, Relic Storage Container, All custom storage containers added via token.\n Relic Storage Container: Relic Storage Container Only.\n Custom Storage Only: Only containers added via token.")
+		SetInfoText("Choose which container(s) to check for displayable items when using the 'Transfer Relics' option at the Transfer station.\n All Storage: Player Inventory, Relic Storage Container, All custom storage containers added via token.\n Relic Storage Container: Relic Storage Container Only.\n Custom Storage Only: Only containers added via token.")
 	endEvent
-endState
-
-;;-------------------------------
-
-state ShowCustomContainerInfo ;;Storage Transfer
-	
-	Event OnSelectST()
-		
-		ShowMessage("Custom Storage Info" + "\n" + "\n The 'Curators Storage Token' can be crafted from any of the forges located around Skyrim, drop the token into any container or follower(non merchant) to add them to the custom storage list, any displayable items will automatically have their icons updated to the correct display status." + "\n" + "\nDrop another token into the container or follower to remove them from the list, doing this will automatically transfer all displayable items to the player.", false, "Ok")
-	EndEvent
 endState
 
 ;;-------------------------------
@@ -2738,6 +2737,16 @@ Event OnOptionSelect(Int _Val)
 				SetupPage(RN_Custom_Quests_Array[Index], RN_Custom_Name[Index])		
 			endif
 		endif
+
+	elseif CurrentPage == "Advanced Settings"
+		Index = CustomContainerPos.find(_Val)
+		if (Index != -1)
+			if ShowMessage("Would you like to remove " + CustomContainerRef[Index].GetDisplayName() + " from the custom storage list?", true, "Remove", "Cancel")	
+				API.EmptyContainerToPlayer(CustomContainerRef[Index])
+				API.RemoveFromTokenRefList(CustomContainerRef[Index], True)
+				ForcePageReset()
+			endif
+		endif
 		
 	elseif CurrentPage == "Armory Sections"
 		Index = _Armory_Section_Position.find(_Val)
@@ -2778,6 +2787,12 @@ Event OnOptionHighlight(Int _Val)
 		Index = RN_Custom_Position_Array.find(_Val)
 		if Index != -1 
 			SetInfoText("Click to track " + RN_Custom_Name[Index] + " in the Display Tracker.")
+		endif
+	
+	elseif CurrentPage == "Advanced Settings"
+		Index = CustomContainerPos.find(_Val)
+		if Index != -1
+			SetInfoText("Click to remove " + CustomContainerRef[Index].GetDisplayName() + " from the custom storage list and transfer all displayable items back to player inventory.")
 		endif
 		
 	elseif CurrentPage == "Armory Sections"

@@ -3,7 +3,6 @@ ScriptName RN_Utility_Token extends ObjectReference
 RN_PatchAPI property API auto
 RN_Utility_MCM property MCM auto
 
-message property TCC_TokenRemoval auto
 message property TCC_TokenAdded auto
 message property TCC_TokenUpdated auto
 message property TCC_TokenExisting auto
@@ -14,14 +13,12 @@ message property TCC_TokenShipmentCrate auto
 Formlist property TCC_TokenList_ExcludedItems auto
 
 ObjectReference property PlayerRef auto
-ObjectReference property RN_Storage_Container auto
 
 globalvariable property TokenRefList_NoShipmentSize auto
 
-formlist property dbmNew auto 						;; Items available to be displayed
-formlist property dbmFound auto 					;; Items that are in inventory or storage
-formlist property dbmDisp auto 						;; Items that are on display
-formlist property dbmMaster auto					;; Total items list
+formlist property dbmNew auto
+formlist property dbmFound auto
+formlist property dbmDisp auto
 
 Container Property DBMMuseumShipmentsCrateIncoming auto
 Container Property DBMMuseumShipmentsCrateOutgoing auto
@@ -29,16 +26,16 @@ Container Property DBMMuseumShipmentsCrateOutgoing auto
 MiscObject property TCCToken auto
 
 Faction property JobMerchantFaction auto
+Faction property JobInnkeeperFaction auto
 
 Bool TokenAdded
-Bool TokenRemoved
 
 ;;Alias to force the base item into.
 ReferenceAlias property FoundAlias auto
 
 Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldContainer)
 	
-	if akNewContainer.GetBaseObject() == DBMMuseumShipmentsCrateOutgoing || akNewContainer.GetBaseObject() == DBMMuseumShipmentsCrateIncoming
+	if (akNewContainer.GetBaseObject() == DBMMuseumShipmentsCrateOutgoing) || (akNewContainer.GetBaseObject() == DBMMuseumShipmentsCrateIncoming)
 		akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
 		TCCDebug.Log("Token - Unable to add [" + akNewContainer.GetBaseObject().GetName() + "] " + akNewContainer + " to TokenRefList or TokenRefList_NoShipment as shipment crates are handled seperately")
 		TCC_TokenShipmentCrate.Show()
@@ -47,7 +44,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 		
 	if akOldContainer == PlayerRef && akNewContainer && API.TokenRefList.Find(akNewContainer) == -1 && !TCC_TokenList_ExcludedItems.HasForm(akNewContainer)
 		
-		if TokenRefList_NoShipmentSize.GetValue() == 6               
+		if TokenRefList_NoShipmentSize.GetValue() == 7              
 			
 			FoundAlias.ForceRefTo(akNewContainer)
 			
@@ -62,23 +59,14 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 		else
 		
 			if akNewContainer as Actor
-			
-				Actor _o = akNewContainer as Actor
-				
-				if _o.IsInFaction(JobMerchantFaction)
-				
-					FoundAlias.ForceRefTo(_o)
-					
+				Actor NPC = akNewContainer as Actor
+				if (NPC.IsInFaction(JobMerchantFaction)) || (NPC.IsInFaction(JobInnkeeperFaction))
+					FoundAlias.ForceRefTo(NPC)
 					TCC_TokenVendor.Show()
-					
 					FoundAlias.Clear()
-					
 					akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
-					
 					Return
-					
 				endIf
-				
 			endIf
 		
 			FoundAlias.ForceRefTo(akNewContainer)
@@ -116,49 +104,13 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 		
 	elseIf akOldContainer == PlayerRef && akNewContainer && API.TokenRefList.Find(akNewContainer) != -1 && !TCC_TokenList_ExcludedItems.HasForm(akNewContainer)
 		
-		if akNewContainer != RN_Storage_Container
+		FoundAlias.ForceRefTo(akNewContainer)
 		
-			FoundAlias.ForceRefTo(akNewContainer)
-
-			Int _MenuButton = TCC_TokenRemoval.Show()
-			
-			if _MenuButton == 0	
-			
-				akNewContainer.RemoveItem(TCCToken, 1, false)
+		akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
 		
-				Int Index = akNewContainer.GetNumItems() 
-				While Index
-					Index -= 1
-					Form akBaseItem = akNewContainer.GetNthForm(Index)		
-					if dbmMaster.HasForm(akBaseItem)
-						akNewContainer.RemoveItem(akBaseItem, akNewContainer.GetitemCount(akBaseItem), false, PlayerRef)
-					endIf
-				endWhile
-				
-				TokenRemoved = API.RemoveFromTokenRefList(akNewContainer, True)
-				
-				FoundAlias.Clear()
-				
-				if TokenRemoved
-					TCC_TokenUpdated.Show()
-				endif
-				
-			elseif _MenuButton == 1
-			
-				akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
-			
-			endIf
+		TCC_TokenExisting.Show()
 		
-		else
-			
-			FoundAlias.ForceRefTo(akNewContainer)
-			
-			TCC_TokenExisting.Show()
-			
-			FoundAlias.Clear()
-			
-			akNewContainer.RemoveItem(TCCToken, 1, false, PlayerRef)
-		endIf
+		FoundAlias.Clear()	
 	endIf		
 endEvent
 
