@@ -2,6 +2,8 @@ scriptName RN_Listener_Skills extends referencealias
 
 Import Debug
 
+Import RN_Utility_Global
+
 ;; Game.GetPlayer() Ref
 Actor Property PlayerRef Auto
 
@@ -82,7 +84,7 @@ State Running
 				RN_Skills_Listener_Count.Mod(1)	
 				DBM_RN_Smithing = TRUE	
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Skill Mastery: Smithing")
+					Notify("Museum Display Added: Skill Mastery: Smithing", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -92,7 +94,7 @@ State Running
 				RN_Skills_Listener_Count.Mod(1)
 				DBM_RN_Enchanting = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Skill Mastery: Enchanting")
+					Notify("Museum Display Added: Skill Mastery: Enchanting", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -102,7 +104,7 @@ State Running
 				RN_Skills_Listener_Count.Mod(1)
 				DBM_RN_Alchemy = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Skill Mastery: Alchemy")
+					Notify("Museum Display Added: Skill Mastery: Alchemy", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -148,7 +150,7 @@ State Running
 			if WarriorCount >= 3
 				RN_Skills_Listener_Count.Mod(1)
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Skill Mastery: Warrior")
+					Notify("Museum Display Added: Skill Mastery: Warrior", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -194,7 +196,7 @@ State Running
 			if MageCount >= 3
 				RN_Skills_Listener_Count.Mod(1)
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Skill Mastery: Mage")
+					Notify("Museum Display Added: Skill Mastery: Mage", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -240,7 +242,7 @@ State Running
 			if StealthCount >= 3
 				RN_Skills_Listener_Count.Mod(1)
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Skill Mastery: Thief")
+					Notify("Museum Display Added: Skill Mastery: Thief", MCM.ColourString)
 				endIf
 			endIf
 		endIf

@@ -25,7 +25,6 @@ Message property DBM_NonIconMessage auto
 
 ;;Item Notifications.
 Message property DBM_FoundRelicNotification auto
-Message property DBM_FoundRelicNotification_SH auto
 
 ;;Alias to force the item into for messages / notifications.
 ReferenceAlias Property FoundAlias auto

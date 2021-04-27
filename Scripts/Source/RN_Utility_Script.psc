@@ -6,7 +6,7 @@ scriptname RN_Utility_Script extends quest
 
 import AhzMoreHud
 import AhzMoreHudIE
-
+import RN_Utility_Global
 import utility
 
 RN_PatchAPI property API auto
@@ -23,10 +23,8 @@ DBM_ReplicaHandler property ReplicaHandler auto
 ;;Message Properties
 message property DBM_ScanMuseum_Message auto
 message property DBM_ScanMuseum_Finished_Message auto
-
 message property ModStartup auto
 message property ModStartupDone auto
-
 message property ModStartup_UpdatingLists auto
 Message property ModConfigFinished auto
 
@@ -164,6 +162,7 @@ State initialsetup
 		TCCDebug.Log("Utility - Setup function completed in " + (ftimeEnd - ftimeStart) + " seconds.")
 		
 		ModConfigFinished.Show(API.SupportedModHandlers.Find(none))
+	
 		GoToState("Running")
 	endevent
 endstate
@@ -324,8 +323,10 @@ Event onUpdate()
 	float ftimeStart = Utility.GetCurrentRealTime()
 
 	Maintaining = true
-	
-	if RN_MCM.ShowStartup 
+
+	RN_MCM.NotificationColour.GetBaseObject().SetName(RN_MCM.ColourString)
+			
+	if (RN_MCM.ShowStartup) 
 		ModStartup.Show()
 	endIf
 	
@@ -376,6 +377,7 @@ function ScanMuseum()
 	While IsInMenuMode()
 		Wait(1)
 	endWhile
+
 	DBM_ScanMuseum_Message.Show()
 	
 	bScanning = True
@@ -400,6 +402,7 @@ function FinishScan(Int _Wait)
 			While IsInMenuMode()
 				Wait(1)
 			endWhile
+			
 			DBM_ScanMuseum_Finished_Message.Show()
 		endIf		
 	endWhile
@@ -419,8 +422,8 @@ Function RebuildLists()
 
 	TCCDebug.Log("Utility - Rebuild moreHUD Lists Request Received...", 0)
 	
-	Debug.Notification("The Curators Companion: Rebuilding moreHUD Lists...")
-	Debug.Notification("The Curators Companion: Do not add / remove any items from inventory")
+	Notify("The Curators Companion: Rebuilding moreHUD Lists...", RN_MCM.ColourString)
+	Notify("The Curators Companion: Do not add / remove any items from inventory", RN_MCM.ColourString)
 	
 	DBM_SortWait.SetValue(1)
 	
@@ -435,7 +438,7 @@ Function RebuildLists()
 		dbmNew.AddForm(_item)
 
 		if (_Index % 500 == 0) 
-			Debug.Notification("The Curators Companion: Rebuilding moreHUD lists... (" + _Index + " / " + _Total + ")")
+			Notify("The Curators Companion: Rebuilding moreHUD lists... (" + _Index + " / " + _Total + ")", RN_MCM.ColourString)
 		endIf
 		_Index += 1
 	endWhile
@@ -444,7 +447,7 @@ Function RebuildLists()
 
 	DBM_SortWait.SetValue(0)
 	
-	Debug.Notification("The Curators Companion: moreHUD Lists Rebuilt & Ready")
+	Notify("The Curators Companion: moreHUD Lists Rebuilt & Ready", RN_MCM.ColourString)
 	TCCDebug.Log("Utility - Rebuild moreHUD Lists Request Completed", 0)
 	TCCDebug.Log("Utility - dbmNew = " + dbmNew.GetSize() as Int, 0)
 	TCCDebug.Log("Utility - dbmFound = " + dbmFound.GetSize() as Int, 0)
@@ -458,8 +461,8 @@ Function ConfirmIcons()
 	
 	TCCDebug.Log("Utility - Checking moreHUD Lists for duplicate forms...", 0)
 	
-	Debug.Notification("The Curators Companion: Checking moreHUD Lists...")
-	Debug.Notification("The Curators Companion: Do not add / remove any items from inventory")
+	Notify("The Curators Companion: Checking moreHUD Lists...", RN_MCM.ColourString)
+	Notify("The Curators Companion: Do not add / remove any items from inventory", RN_MCM.ColourString)
 	
 	DBM_SortWait.SetValue(1)
 	Int Index = 0
@@ -474,7 +477,7 @@ Function ConfirmIcons()
 		endif
 			
 		if (Index % 250 == 0) 
-			Debug.Notification("The Curators Companion: Checking dbmNew moreHUD list (" + Index + " / " + dbmNew.GetSize() + ")")
+			Notify("The Curators Companion: Checking dbmNew moreHUD list (" + Index + " / " + dbmNew.GetSize() + ")", RN_MCM.ColourString)
 		endIf	
 		Index += 1
 	endWhile
@@ -491,7 +494,7 @@ Function ConfirmIcons()
 		endif
 			
 		if (Index % 250 == 0) 
-			Debug.Notification("The Curators Companion: Checking dbmFound moreHUD list (" + Index + " / " + dbmFound.GetSize() + ")")
+			Notify("The Curators Companion: Checking dbmFound moreHUD list (" + Index + " / " + dbmFound.GetSize() + ")", RN_MCM.ColourString)
 		endIf	
 		Index += 1
 	endWhile
@@ -508,13 +511,13 @@ Function ConfirmIcons()
 		endif
 			
 		if (Index % 250 == 0) 
-			Debug.Notification("The Curators Companion: Checking dbmDisp moreHUD list (" + Index + " / " + dbmDisp.GetSize() + ")")
+			Notify("The Curators Companion: Checking dbmDisp moreHUD list (" + Index + " / " + dbmDisp.GetSize() + ")", RN_MCM.ColourString)
 		endIf	
 		Index += 1
 	endWhile
 	DBM_SortWait.SetValue(0)
 	
-	Debug.Notification("The Curators Companion: moreHUD Lists check complete")
+	Notify("The Curators Companion: moreHUD Lists check complete", RN_MCM.ColourString)
 endFunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

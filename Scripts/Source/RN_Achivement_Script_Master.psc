@@ -1,5 +1,6 @@
 Scriptname RN_Achivement_Script_Master extends ObjectReference
 
+Import RN_Utility_Global
 Import Debug
 
 ;Property to obtain values from MCM Script.
@@ -60,8 +61,8 @@ Event onCellAttach()
 	endIf
 	
 	if !RN_Achievements_Listener_Complete.GetValue() && !RN_ComAchievements_Listener_Complete.GetValue()
-		if (RN_Achievements_Listener_Count.GetValue() == RN_Achievement_Globals.GetSize()) && (RN_ComAchievements_Listener_Count.GetValue() == RN_ComAchievement_Globals.GetSize())
-			Notification("The Curators Companion: All " + (RN_Achievement_Globals.GetSize() AS Int + RN_ComAchievement_Globals.GetSize() AS Int) + " Achievements Unlocked")
+		if (RN_Achievements_Listener_Count.GetValue() == RN_Achievement_Globals.GetSize()) && (RN_ComAchievements_Listener_Count.GetValue() == RN_ComAchievement_Globals.GetSize())	
+			RN_Utility_Global.Notify("The Curators Companion: All " + (RN_Achievement_Globals.GetSize() AS Int + RN_ComAchievement_Globals.GetSize() AS Int) + " Achievements Unlocked", MCM.ColourString)
 			TCCDebug.Log("Achievements Master - All Available Achievements Completed", 0)
 			RN_Achievements_Listener_Complete.SetValue(1)
 			RN_ComAchievements_Listener_Complete.SetValue(1)
@@ -90,7 +91,7 @@ function preview()
 	endIf
 	
 	if (MCM.Ach_Notify)
-		Notification("Achievement Unlocked! (Achievement!)")
+		RN_Utility_Global.Notify("Achievement Unlocked! (Achievement!)", MCM.ColourString)
 	endIf	
 	
 	PlayFX(MCM.IndexSounds)
@@ -109,7 +110,7 @@ function Notify(String _Message)
 	endIf
 	
 	if (MCM.Ach_Notify)
-		Notification("Achievement Unlocked! (" + _Message + ")")
+		RN_Utility_Global.Notify("Achievement Unlocked! (" + _Message + ")", MCM.ColourString)
 		TCCDebug.Log("Achievements Master - Achievement complete: " + _Message, 0)
 	endIf
 	

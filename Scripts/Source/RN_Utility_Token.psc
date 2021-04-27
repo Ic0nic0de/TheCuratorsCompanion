@@ -44,7 +44,7 @@ Event OnContainerChanged(ObjectReference akNewContainer, ObjectReference akOldCo
 		
 	if akOldContainer == PlayerRef && akNewContainer && API.TokenRefList.Find(akNewContainer) == -1 && !TCC_TokenList_ExcludedItems.HasForm(akNewContainer)
 		
-		if TokenRefList_NoShipmentSize.GetValue() == 7              
+		if TokenRefList_NoShipmentSize.GetValue() == 10              
 			
 			FoundAlias.ForceRefTo(akNewContainer)
 			

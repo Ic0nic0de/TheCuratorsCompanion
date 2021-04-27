@@ -2,6 +2,8 @@ scriptName RN_Listener_Thane extends referencealias
 
 Import Debug 
 
+Import RN_Utility_Global
+
 FavorJarlsMakeFriendsScript Property ThaneScript Auto
 
 ;;Property to obtain values from MCM Script.
@@ -67,7 +69,7 @@ State Running
 				Reach = TRUE
 				AllThane += 1	
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of The Reach")
+					Notify("Museum Display Added: Thane Of The Reach", MCM.ColourString)
 				endif
 			endIf
 		endIf
@@ -78,7 +80,7 @@ State Running
 				Rift = TRUE
 				AllThane += 1	
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of The Rift")
+					Notify("Museum Display Added: Thane Of The Rift", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -89,7 +91,7 @@ State Running
 				Haafingar = TRUE
 				AllThane += 1	
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of Haafingar")
+					Notify("Museum Display Added: Thane Of Haafingar", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -100,7 +102,7 @@ State Running
 				Whiterun = TRUE
 				AllThane += 1
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of Whiterun")
+					Notify("Museum Display Added: Thane Of Whiterun", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -111,7 +113,7 @@ State Running
 				Eastmarch = TRUE
 				AllThane += 1
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of Eastmarch")
+					Notify("Museum Display Added: Thane Of Eastmarch", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -123,7 +125,7 @@ State Running
 				Hjaalmarch = TRUE
 				AllThane += 1
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of Hjaalmarch")
+					Notify("Museum Display Added: Thane Of Hjaalmarch", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -134,7 +136,7 @@ State Running
 				Pale = TRUE
 				AllThane += 1
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of The Pale")
+					Notify("Museum Display Added: Thane Of The Pale", MCM.ColourString)
 				endIf	
 			endIf
 		endIf
@@ -145,7 +147,7 @@ State Running
 				Winterhold = TRUE
 				AllThane += 1
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of Winterhold")
+					Notify("Museum Display Added: Thane Of Winterhold", MCM.ColourString)
 				endIf
 			endIf
 		endIf
@@ -156,7 +158,7 @@ State Running
 				Falkreath = TRUE
 				AllThane += 1
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Thane Of Falkreath")
+					Notify("Museum Display Added: Thane Of Falkreath", MCM.ColourString)
 				endIf
 			endIf
 		endIf

@@ -1,5 +1,7 @@
 Scriptname RN_Utility_Transfer extends Quest 
 
+Import RN_Utility_Global
+
 RN_PatchAPI property API auto
  
 RN_Utility_MCM property MCM auto
@@ -46,7 +48,7 @@ Function RunCustomTransfer()
 	While Index
 		Index -= 1
 		if (API.TokenRefList_NoShipment[Index])
-			SendModEvent("_StartTimer", "Transfering Items")
+			Notify("The Curators Companion: Transfering Items...", MCM.ColourString)
 			Int Index2 = API.TokenRefList_NoShipment[Index].GetNumItems()
 			While Index2
 				Index2 -= 1
@@ -82,7 +84,7 @@ Function RunAllTransfer()
 		Index -= 1
 		ObjectReference _Container = API.TokenRefList[Index] as ObjectReference	
 		if _Container
-			SendModEvent("_StartTimer", "Transfering Items")
+			Notify("The Curators Companion: Transfering Items...", MCM.ColourString)
 			Int Index2 = _Container.GetNumItems()
 			While Index2
 				Index2 -= 1
@@ -112,7 +114,7 @@ Function RunRelicTransfer()
 	DBM_SortWait.SetValue(1)
 	Transfered = 0
 	
-	SendModEvent("_StartTimer", "Transfering Items")
+	Notify("The Curators Companion: Transfering Items...", MCM.ColourString)
 	Int Index = RN_Storage_Container.GetNumItems()
 	While Index
 		Index -= 1
@@ -183,7 +185,7 @@ Function TransferRelics(ObjectReference ref)
 			if (MenuButton == 0)	
 				SilentTransfer = True
 				DBM_SortWait.SetValue(1)
-				SendModEvent("_StartTimer", "Transfering Items")
+				Notify("The Curators Companion: Transfering Items...", MCM.ColourString)
 				Int _Index = PlayerRef.GetNumItems()
 				while _Index
 					_Index -= 1		
@@ -205,7 +207,7 @@ Function TransferRelics(ObjectReference ref)
 				
 			elseif (MenuButton == 1)
 				DBM_SortWait.SetValue(1)
-				SendModEvent("_StartTimer", "Retrieving Items")
+				Notify("The Curators Companion: Retrieving Items...", MCM.ColourString)
 				Int _Index = ref.GetNumItems()
 				while _Index
 					_Index -= 1		
@@ -228,7 +230,7 @@ Function TransferRelics(ObjectReference ref)
 			DBM_SortError.Show()
 		endIf
 	else
-		Debug.Notification("This spell can only be used on containers")
+		Notify("This spell can only be used on containers", MCM.ColourString)
 	endif
 endFunction
 

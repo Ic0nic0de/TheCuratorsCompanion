@@ -2,10 +2,11 @@ scriptName RN_Listener_Explore extends referencealias
 
 Import Debug
 
-Bool Exploration_Complete
+Import RN_Utility_Global
 
-;;Property to obtain values from MCM Script.
-RN_Utility_MCM Property MCM Auto
+RN_Utility_MCM property MCM auto
+
+Bool Exploration_Complete
 
 ;;Global to control activation
 GlobalVariable Property RN_Exploration_Listener_Count Auto
@@ -73,7 +74,7 @@ State Running
 							DBM_RN_ExplorationDisplays_Enabled.AddForm(Exploration_Display)
 							RN_Exploration_Listener_Count.Mod(1)
 							if (MCM.ShowListenerVal) && !FirstRun
-								Notification("Museum Display Added: " + (Exploration_Display as DBM_RN_ExplorationDisplay).sDisplayName)
+								Notify("Museum Display Added: " + (Exploration_Display as DBM_RN_ExplorationDisplay).sDisplayName, MCM.ColourString)
 							endIf
 						endIf
 					endIf				
@@ -88,7 +89,7 @@ State Running
 			if (DBM_DisplayCount.GetValue() as Int) >= 550
 				SpiritDone = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: The Spoils of Adventure")
+					Notify("Museum Display Added: The Spoils of Adventure", MCM.ColourString)
 				endIf
 			endIf
 		endIf

@@ -6,6 +6,13 @@ Import Debug
 ;;----------------------------------------------------------------------------- Script Start --------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+Utility function Notify(String MessageAsString = "", String Colour) Global
+
+	if (MessageAsString)	
+		Debug.Notification("<font color='#" + Colour + "'>"+ MessageAsString + "</font>")
+	endif
+endFunction
+	
 ;;-- Functions ---------------------------------------
 
 Utility function _onConsolidateItems (Formlist afListA, Formlist afListB, Formlist afListC, Formlist afListD = None) global
@@ -192,6 +199,51 @@ Bool Function CheckDeadActor (Actor akActor) global
   
   return false
 EndFunction 
+
+;;-- Functions ---------------------------------------
+
+String function GetHexValue(String[] HexDigits, Int m, String sAdd = "", Bool bAdd = False) global
+ 
+    if m >= 0 
+        string s
+        int v = 0x10000000
+            While (v > 0)
+                int j = m / v
+                s += HexDigits[j]
+                m = m % v
+                if (v > 1)
+                    v = v / 16
+                else
+                    v = 0
+                endif
+            endWhile
+        if (bAdd)
+            return (s + sAdd)
+        endif
+
+        return (sAdd + s)
+    else
+        m += 1
+        string s
+        int v = 0x10000000
+            While (v > 0)
+                int k = m / v
+                int j = 15 - (k - (k * 2))
+                s += HexDigits[j]
+                m = m % v
+                if (v > 1)
+                    v = v / 16
+                else
+                    v = 0
+                endif
+            endWhile
+        if (bAdd) 
+            return (s + sAdd)
+        endif
+
+        return (sAdd + s)
+    endif 
+endFunction	
 
 ;;-- Functions ---------------------------------------
 

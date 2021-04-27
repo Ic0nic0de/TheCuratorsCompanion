@@ -72,6 +72,12 @@ string[] TransferList
 int property IndexTransfer auto hidden
 int TransferListOptions
 
+objectreference property NotificationColour Auto
+referenceAlias Property ColourAlias auto
+int property IndexColour = 16777215 auto hidden
+string property ColourString = "00FFFFFF" auto hidden
+string[] HexDigits
+
 ;; bool Properties
 bool property ShowMuseumVal = true auto hidden
 bool property ShowArmoryVal = true auto hidden
@@ -220,7 +226,7 @@ Int SetVal3
 
 Event OnConfigInit()
 
-	AddDynamicPagesList()
+	AddDynamicPagesList()	
 EndEvent
 
 ;-- Events --------------------------------
@@ -234,8 +240,8 @@ Event AddDynamicPagesList()
 	PagesList[2] = "Achievements"
 	PagesList[3] = " "
 	PagesList[4] = "~~ Completion ~~"
-	PagesList[5] = "Museum Sections"
-	PagesList[6] = "Armory Sections"
+	PagesList[5] = "Museum Rooms"
+	PagesList[6] = "Armoury Sets"
 	PagesList[7] = "Official Patches"		
 
 	Int Q = 0
@@ -394,7 +400,7 @@ Function AddSettingsPage()
 		AddHeaderOption("Notification Settings:")
 		
 		AddTextOptionST("iRelicMuseumNotifications", "Museum Items:", GetDefaultOnOff(ShowMuseumVal), 0)
-		AddTextOptionST("iRelicArmoryNotifications", "Armory Items:", GetDefaultOnOff(ShowArmoryVal), 0)	
+		AddTextOptionST("iRelicArmoryNotifications", "Armoury Items:", GetDefaultOnOff(ShowArmoryVal), 0)	
 		AddTextOptionST("iRelicModsNotifications", "Patch(es) Items:", GetDefaultOnOff(ShowModsVal), 0)
 		AddTextOptionST("iRelicListenerNotifications", "Listeners:", GetDefaultOnOff(ShowListenerVal), 0)
 		AddTextOptionST("iRelicSetCompleteNotifications", "Set Completion:", GetDefaultOnOff(ShowSetCompleteVal), 0)
@@ -433,6 +439,11 @@ Function AddAdvancedPage()
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
 		
+		AddHeaderOption("General Notification Colours:")
+		
+		AddColorOptionST("NotificationColourOptions", "Set Notification Colour:", IndexColour, 0)
+		AddEmptyOption()
+		
 		AddHeaderOption("moreHUD Settings:")
 		
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") >= 30800
@@ -457,7 +468,7 @@ Function AddAdvancedPage()
 		AddMenuOptionST("TransferListOptions", "Transfer Station:", TransferList[IndexTransfer])
 		
 		SetCursorPosition(1)
-		AddHeaderOption("Custom Storage Containers: (" +  TokenRefList_NoShipmentSize.GetValue() as Int + "/7)")
+		AddHeaderOption("Custom Storage Containers: (" +  TokenRefList_NoShipmentSize.GetValue() as Int + "/10)")
 		
 		CustomContainerRef = new ObjectReference[128]
 		CustomContainerPos = new Int[128]
@@ -490,7 +501,7 @@ Function AddAdvancedPage()
 		endif
 	endif
 endFunction
-	
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Settings Page ------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -523,10 +534,10 @@ Function AddAchievementsPage()
 			if RN_Ach_Globals[_Index] != none
 				if RN_Ach_Globals[_Index].GetValue()
 					if _Index == 29
-						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Awarded", 0)
+						RN_Ach_Position[_Index] = AddTextOption("<font color='#070091'>" + (RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName()) + "</font>", "Awarded", 0)
 						PageIdx += 1
 					else
-						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index], "Awarded", 0)
+						RN_Ach_Position[_Index] = AddTextOption("<font color='#070091'>" + RN_Ach_AchName[_Index] + "</font>", "Awarded", 0)
 						PageIdx += 1
 					endif
 				else
@@ -553,7 +564,7 @@ Function AddAchievementsPage()
 			SetCursorPosition(PageIdx + 1)
 			if RN_ComAch_Globals[_Index] != none
 				if RN_ComAch_Globals[_Index].GetValue()
-					RN_ComAch_Position[_Index] = AddTextOption(RN_ComAch_AchName[_Index], "Awarded", 0)
+					RN_ComAch_Position[_Index] = AddTextOption("<font color='#070091'>" + RN_ComAch_AchName[_Index] + "</font>", "Awarded", 0)
 					PageIdx += 1
 				else
 					RN_ComAch_Position[_Index] = AddTextOption(RN_ComAch_AchName[_Index], "Locked", 1)
@@ -571,7 +582,7 @@ endFunction
 
 Function AddMuseumSetsPage()
 
-	if CurrentPage == "Museum Sections"
+	if CurrentPage == "Museum Rooms"
 		RN_Thane_Listener_Total.SetValue(9)
 		RN_Skills_Listener_Total.SetValue(6)
 		SetVal = BuildTotalsArray(SetVal, RN_Museum_Global_Complete)
@@ -678,19 +689,19 @@ string function GetCurrentDisplayCount()
 endFunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;------------------------------------------------------------------------------ Armory Page -------------------------------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------ Armoury Page ------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Function AddArmorySetsPage()
 
-	if CurrentPage == "Armory Sections"
+	if CurrentPage == "Armoury Sets"
 		SetVal = BuildTotalsArray(SetVal, RN_Armory_Global_Complete)
 		SetVal2 = BuildTotalsArray(SetVal2, RN_Section_Complete_Array)
 		SetVal3 = BuildTotalsArray(SetVal3, RN_Section2_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
 		
-		AddHeaderOption("Armory Sets:")
+		AddHeaderOption("Armoury Sets:")
 		SetCursorPosition(1)
 		AddHeaderOption("Completed: " + GetCurrentArmoryCount(SetVal) + " Sets")
 		Int PageIdx = 1	
@@ -743,7 +754,7 @@ Function AddArmorySetsPage()
 		endif
 		
 		if (Game.GetModByName("LOTD_TCC_HeavyArm.esp") != 255)
-			AddHeaderOption("Heavy Armory Sets:")
+			AddHeaderOption("Heavy Armoury Sets:")
 			PageIdx += 1
 			SetCursorPosition(PageIdx + 1)
 			AddHeaderOption("Completed: " + GetCurrentHACount(SetVal2) + " Sets")
@@ -780,9 +791,9 @@ Function AddCompletedModsPage()
 		SetVal = BuildTotalsArray(SetVal, RN_Patches_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)				
-		AddHeaderOption(GetCurrentCountInt(SetVal, RN_SupportedModCount) + " Official Patch(es) Completed", 0)
+		AddHeaderOption("Official Patch(es)")
 		SetCursorPosition(1)
-		AddHeaderOption("", 0)
+		AddHeaderOption("Completed: " + GetCurrentCountInt(SetVal, RN_SupportedModCount) + " Official Patch(es)")
 		
 		Int PageIdx = 1	
 		Int _Index = 0
@@ -814,10 +825,11 @@ Function AddCustomModsPage()
 	if CurrentPage == "Custom Patches"
 		SetVal = BuildTotalsArray(SetVal, RN_Custom_Complete_Array)
 		SetCursorFillMode(TOP_TO_BOTTOM)
-		SetCursorPosition(0)									
-		AddHeaderOption(GetCurrentCountInt(SetVal, RN_CustomModCount) + " Custom Patch(es) Completed", 0)
+		SetCursorPosition(0)
+	
+		AddHeaderOption("Custom Patch(es)")
 		SetCursorPosition(1)
-		AddHeaderOption("", 0)
+		AddHeaderOption("Completed: " + GetCurrentCountInt(SetVal, RN_CustomModCount) + " Custom Patch(es)")	
 		
 		Int PageIdx = 1
 		Int _Index = 0
@@ -1336,19 +1348,19 @@ Function AddDebugPage()
 		AddHeaderOption("Mod Requirements:")
 
 		if papyrusutil.GetVersion() > 31
-			AddTextOption("PapyrusUtil:", "<font color='#2b6320'>Installed</font>" + " [" + papyrusutil.GetVersion() + "]", 0)
+			AddTextOption("PapyrusUtil:", "<font color='#070091'>Installed</font>" + " [" + papyrusutil.GetVersion() + "]", 0)
 		else
 			AddTextOption("PapyrusUtil:", "<font color='#750e0e'>Invalid / Missing</font>", 0)
 		endif
 
 		if SKSE.GetVersion() > 0			
-			AddTextOption("SKSE:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetVersion()+"."+SKSE.GetVersionMinor()+"."+SKSE.GetVersionBeta() + "]", 0)
+			AddTextOption("SKSE:", "<font color='#070091'>Installed</font>" + " [" + SKSE.GetVersion()+"."+SKSE.GetVersionMinor()+"."+SKSE.GetVersionBeta() + "]", 0)
 		else
 			AddTextOption("SKSE:", "<font color='#750e0e'>Not Found</font>", 0)	
 		endif
 
 		if (Game.GetModByName("SkyUI_SE.esp") != 255)
-			AddTextOption("SkyUI:", "<font color='#2b6320'>Installed</font>" + " [5.2SE]", 0)
+			AddTextOption("SkyUI:", "<font color='#070091'>Installed</font>" + " [5.2SE]", 0)
 		else
 			AddTextOption("SkyUI:", "<font color='#750e0e'>Not Found</font>", 0)
 		endif	
@@ -1361,13 +1373,13 @@ Function AddDebugPage()
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Plugin") < 30800
 			AddTextOption("moreHUD:", "<font color='#750e0e'>Invalid / Missing</font>", 0)
 		else
-			AddTextOption("moreHUD:", "<font color='#2b6320'>Installed</font>" + " [" + GetVersionString() + "]", 0)
+			AddTextOption("moreHUD:", "<font color='#070091'>Installed</font>" + " [" + GetVersionString() + "]", 0)
 		endif
 
 		if SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") < 10017
 			AddTextOption("moreHUD Inventory Edition:", "<font color='#750e0e'>Invalid / Missing</font>", 0)
 		else
-			AddTextOption("moreHUD Inventory Edition:", "<font color='#2b6320'>Installed</font>" + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") + "]", 0)
+			AddTextOption("moreHUD Inventory Edition:", "<font color='#070091'>Installed</font>" + " [" + SKSE.GetPluginVersion("Ahzaab's moreHUD Inventory Plugin") + "]", 0)
 		endif
 		AddEmptyOption()
 		AddTextOptionST("RebuildLists", "moreHUD Icons Reset:", "Rebuild", 0)
@@ -1415,7 +1427,7 @@ state RefreshMCM
 				
 				AddDynamicPagesList()		
 				bRefresh = false
-				Debug.Notification("The Curators Companion: MCM Rebuilt")
+				Notify("The Curators Companion: MCM Rebuilt", ColourString)
 			endif
 		endWhile
 	endEvent
@@ -1499,6 +1511,9 @@ Function Begin_Config_Save()
 		jsonutil.SetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD)		
 		jsonutil.SetPathIntValue("TCC_Config", ".!IndexmoreHUDInventory", IndexmoreHUDInventory)		
 		
+		jsonutil.SetPathIntValue("TCC_Config", ".!IndexColour", IndexColour)
+		jsonutil.SetPathStringValue("TCC_Config", ".!ColourString", ColourString)	
+		
 		jsonutil.Save("TCC_Config", false)
 		if IsInMenuMode()
 			ShowMessage("Configuration settings successfully saved to file")
@@ -1519,7 +1534,7 @@ Function Begin_Config_Load()
 					ShowMessage("The config file appears to be damaged or does not meet the requirements\n{}{" + jsonutil.GetErrors("TCC_Config") + "}", false, "Ok", "Cancel")
 					return
 				else
-					Notification("The Curators Companion: Corrupt profile found - restoring defaults")
+					Notify("The Curators Companion: Corrupt profile found - restoring defaults", ColourString)
 					Begin_Config_Default()
 					return 
 				endif
@@ -1561,7 +1576,10 @@ Function Begin_Config_Load()
 			IndexAttribute = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexAttribute", IndexAttribute))
 			IndexTransfer = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexTransfer", IndexTransfer))
 			
-			
+			IndexColour = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexColour", IndexColour))
+			ColourString = (jsonutil.GetPathStringValue("TCC_Config", ".!ColourString", ColourString))
+			SetColour()
+		
 			IndexmoreHUD = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD))
 			IndexmoreHUDInventory = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUDInventory", IndexmoreHUDInventory))
 			IconScript.SetMainHud(IndexmoreHUD)
@@ -1572,13 +1590,13 @@ Function Begin_Config_Load()
 				ShowMessage("Configuration settings successfully loaded from file")
 				ForcePageReset()
 			else
-				Notification("The Curators Companion: Configuration profile loaded")
+				Notify("The Curators Companion: Configuration profile loaded", ColourString)
 			endif
 		else
 			if IsInMenuMode()
 				ShowMessage("No Profile Found")
 			else
-				Notification("The Curators Companion: No profile found - restoring defaults")
+				Notify("The Curators Companion: No profile found - restoring defaults", ColourString)
 				Begin_Config_Default()
 			endif
 		endif
@@ -1589,54 +1607,71 @@ Function Begin_Config_Load()
 	endIf
 EndFunction	
 
+
 function AutoLoadConfig()
 
-	if papyrusutil.GetVersion() > 31 && jsonutil.JsonExists("TCC_Config") && jsonutil.IsGood("TCC_Config")
-		ShowMuseumVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowMuseumVal", ShowMuseumVal as Int))
-		if ShowMuseumVal
-			_AddItemMain_1.GoToState("Notify")
-			_AddItemMain_2.GoToState("Notify")
-		else
-			_AddItemMain_1.GoToState("Silent")
-			_AddItemMain_2.GoToState("Silent")
-		endif				
+	if papyrusutil.GetVersion() > 31
+		if jsonutil.JsonExists("TCC_Config")
+			if jsonutil.IsGood("TCC_Config")
+				ShowMuseumVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowMuseumVal", ShowMuseumVal as Int))
+				if ShowMuseumVal
+					_AddItemMain_1.GoToState("Notify")
+					_AddItemMain_2.GoToState("Notify")
+				else
+					_AddItemMain_1.GoToState("Silent")
+					_AddItemMain_2.GoToState("Silent")
+				endif				
 
-		ShowArmoryVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowArmoryVal", ShowArmoryVal as Int))
-		if ShowArmoryVal
-			_AddItemArmory.GoToState("Notify")
-		else
-			_AddItemArmory.GoToState("Silent")
-		endif
+				ShowArmoryVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowArmoryVal", ShowArmoryVal as Int))
+				if ShowArmoryVal
+					_AddItemArmory.GoToState("Notify")
+				else
+					_AddItemArmory.GoToState("Silent")
+				endif
 
-		ShowModsVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowModsVal", ShowModsVal as Int))
-		if ShowModsVal
-			_AddItemPatches.GoToState("Notify")
+				ShowModsVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowModsVal", ShowModsVal as Int))
+				if ShowModsVal
+					_AddItemPatches.GoToState("Notify")
+				else
+					_AddItemPatches.GoToState("Silent")
+				endif
+				
+				ShowSetCompleteVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowSetCompleteVal", ShowSetCompleteVal as Int))
+				ShowListenerVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowListenerVal", ShowListenerVal as Int))
+				ShowStartup = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowStartup", ShowStartup as Int))
+				Restricted = (jsonutil.GetPathIntValue("TCC_Config", ".!Restricted", Restricted as Int))
+				Token_Vis = (jsonutil.GetPathIntValue("TCC_Config", ".!Token_Vis", Token_Vis as Int))
+				Ach_Notify = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Notify", Ach_Notify as Int))
+				Ach_Visual = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Visual", Ach_Visual as Int))
+				Ach_Perks = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Perks", Ach_Perks as Int))				
+				
+				IndexSounds = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexSounds", IndexSounds))
+				IndexAttribute = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexAttribute", IndexAttribute))
+				IndexTransfer = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexTransfer", IndexTransfer))
+				
+				IndexColour = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexColour", IndexColour))
+				ColourString = (jsonutil.GetPathStringValue("TCC_Config", ".!ColourString", ColourString))
+				SetColour()
+			
+				IndexmoreHUD = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD))
+				IndexmoreHUDInventory = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUDInventory", IndexmoreHUDInventory))
+				IconScript.SetMainHud(IndexmoreHUD)
+				IconScript.SetInventoryHud(IndexmoreHUDInventory)					
+				jsonutil.Load("TCC_Config")
+				Notify("The Curators Companion - Profile successfully loaded from file", ColourString)
+			else			
+				Notify("The Curators Companion - Profile corrupt, Loading defaults", ColourString)
+				Begin_Config_Default()
+			endif
 		else
-			_AddItemPatches.GoToState("Silent")
+			Notify("The Curators Companion - No profile found, Loading defaults", ColourString)
+			Begin_Config_Default()
 		endif
-		
-		ShowSetCompleteVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowSetCompleteVal", ShowSetCompleteVal as Int))
-		ShowListenerVal = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowListenerVal", ShowListenerVal as Int))
-		ShowStartup = (jsonutil.GetPathIntValue("TCC_Config", ".!ShowStartup", ShowStartup as Int))
-		Restricted = (jsonutil.GetPathIntValue("TCC_Config", ".!Restricted", Restricted as Int))
-		Token_Vis = (jsonutil.GetPathIntValue("TCC_Config", ".!Token_Vis", Token_Vis as Int))
-		Ach_Notify = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Notify", Ach_Notify as Int))
-		Ach_Visual = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Visual", Ach_Visual as Int))
-		Ach_Perks = (jsonutil.GetPathIntValue("TCC_Config", ".!Ach_Perks", Ach_Perks as Int))				
-		
-		IndexSounds = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexSounds", IndexSounds))
-		IndexAttribute = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexAttribute", IndexAttribute))
-		IndexTransfer = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexTransfer", IndexTransfer))
-		
-		
-		IndexmoreHUD = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUD", IndexmoreHUD))
-		IndexmoreHUDInventory = (jsonutil.GetPathIntValue("TCC_Config", ".!IndexmoreHUDInventory", IndexmoreHUDInventory))
-		IconScript.SetMainHud(IndexmoreHUD)
-		IconScript.SetInventoryHud(IndexmoreHUDInventory)					
-		jsonutil.Load("TCC_Config")
 	else
+		Notify("The Curators Companion - PapyrusUTIL out of date, Loading defaults", ColourString)
 		Begin_Config_Default()
-	endIf
+	endif
+		
 endFunction
 ;-- Load States / Function --------------------------------
 
@@ -1693,6 +1728,10 @@ Function Begin_Config_Default()
 	ShowStartup = True
 	Restricted = True
 	
+	IndexColour = 16777215
+	ColourString = GetHexValue(HexDigits, IndexColour)
+	SetColour()
+
 	IndexmoreHUD = 0
 	IconScript.SetMainHud(IndexmoreHUD)
 	IconScript.SetInventoryHud(IndexmoreHUDInventory)
@@ -1736,6 +1775,10 @@ Function Begin_Config_Author()
 	IconScript.SetMainHud(IndexmoreHUD)
 	IconScript.SetInventoryHud(IndexmoreHUDInventory)
 	
+	IndexColour = 9202896
+	ColourString = GetHexValue(HexDigits, IndexColour)
+	SetColour()
+	
 	Restricted = False
 	
 	Ach_Notify = True
@@ -1767,7 +1810,7 @@ state ScanMuseum
 
 	Event OnHighlightST()
 
-		SetInfoText("Selecting this option will scan the Museum & Armory for all displayed items and update the listings within this mod.")
+		SetInfoText("Selecting this option will scan the Museum & Armoury for all displayed items and update the listings within this mod.")
 	endEvent
 endState
 
@@ -1896,6 +1939,44 @@ endState
 ;;----------------------------------------------------------------------------- Notifications Options -----------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+state NotificationColourOptions
+	
+	event OnColorOpenST()
+	
+		SetColorDialogStartColor(IndexColour)
+		SetColorDialogDefaultColor(16777215)
+	endEvent
+	
+	event OnColorAcceptST(Int Index)
+	
+		IndexColour = Index
+		ColourString = GetHexValue(HexDigits, IndexColour)
+		SetColour()
+		SetColorOptionValueST(IndexColour, false)
+	endEvent
+
+	event OnDefaultST()
+	
+		IndexColour = 16777215
+		ColourString = GetHexValue(HexDigits, IndexColour)
+		SetColour()
+		SetColorOptionValueST(IndexColour, false)
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("Use this menu to customize the colour of The Curators Companion Notifications\n Default: White")
+	endEvent
+endState
+
+;;-------------------------------
+
+function SetColour()
+
+	ColourAlias.Clear()
+	NotificationColour.GetBaseObject().SetName(ColourString)
+	ColourAlias.ForceRefTo(NotificationColour)
+endfunction
+		
 ;;-------------------------------
 
 state iRelicMuseumNotifications
@@ -1938,7 +2019,7 @@ state iRelicArmoryNotifications
 
 	Event OnHighlightST()
 
-		SetInfoText("Show Notifications when picking up a displayable item for the Armory.\n Default: Off")
+		SetInfoText("Show Notifications when picking up a displayable item for the Armoury.\n Default: Off")
 	EndEvent
 endState
 
@@ -2078,8 +2159,6 @@ endState
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------------- Storage Transfer Options ---------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
-
-;;-------------------------------
 		
 state TransferListOptions
 
@@ -2748,7 +2827,7 @@ Event OnOptionSelect(Int _Val)
 			endif
 		endif
 		
-	elseif CurrentPage == "Armory Sections"
+	elseif CurrentPage == "Armoury Sets"
 		Index = _Armory_Section_Position.find(_Val)
 		if Index != -1 
 			if ShowMessage("Would you like to start tracking the " + _Armory_Section_names[Index] + "?", true, "Track", "Cancel")
@@ -2757,8 +2836,8 @@ Event OnOptionSelect(Int _Val)
 		else
 			Index = RN_Section_Position_Array.find(_Val)
 			if Index != -1 
-				if ShowMessage("Would you like to start tracking the Heavy Armory " + RN_Section_Name[Index] + "?", true, "Track", "Cancel")
-					SetupPage(None, "Heavy Armory - " + RN_Section_Name[Index], RN_Section_ItemsList.GetAt(Index) as formlist, RN_Section_DisplaysList.GetAt(Index) as formlist)
+				if ShowMessage("Would you like to start tracking the Heavy Armoury " + RN_Section_Name[Index] + "?", true, "Track", "Cancel")
+					SetupPage(None, "Heavy Armoury - " + RN_Section_Name[Index], RN_Section_ItemsList.GetAt(Index) as formlist, RN_Section_DisplaysList.GetAt(Index) as formlist)
 				endif
 			else
 				Index = RN_Section2_Position_Array.find(_Val)
@@ -2795,14 +2874,14 @@ Event OnOptionHighlight(Int _Val)
 			SetInfoText("Click to remove " + CustomContainerRef[Index].GetDisplayName() + " from the custom storage list and transfer all displayable items back to player inventory.")
 		endif
 		
-	elseif CurrentPage == "Armory Sections"
+	elseif CurrentPage == "Armoury Sets"
 		Index = _Armory_Section_Position.find(_Val)
 		if Index != -1 
 			SetInfoText("Click to track the " + _Armory_Section_names[Index] + " in the Display Tracker.")
 		else
 			Index = RN_Section_Position_Array.find(_Val)
 			if Index != -1 
-				SetInfoText("Click to track the Heavy Armory - " + RN_Section_Name[Index] + " in the Display Tracker.")
+				SetInfoText("Click to track the Heavy Armoury - " + RN_Section_Name[Index] + " in the Display Tracker.")
 			else
 				Index = RN_Section2_Position_Array.find(_Val)
 				if Index != -1 
@@ -3304,7 +3383,7 @@ Function Build_Arrays()
 	_Armory_Section_names[19] = "Thane Weapons Set"
 
 	_Museum_Section_names = new string[128]
-	_Museum_Section_names[0] = "Armory"
+	_Museum_Section_names[0] = "Armoury"
 	_Museum_Section_names[1] = "Daedric Gallery"
 	_Museum_Section_names[2] = "Dragonborn Hall"
 	_Museum_Section_names[3] = "Guildhouse"
@@ -3366,7 +3445,7 @@ Function Build_Arrays()
 	RN_Ach_Highlight[15] = "Find and display all the pieces from the Arms of the Crusader set in the Hall of Heroes"
 	RN_Ach_Highlight[16] = "Visit Solitude and complete the Legacy starting quest to open the Museum"
 	RN_Ach_Highlight[17] = "Find and display all the Black Books in the Daedric Gallery"
-	RN_Ach_Highlight[18] = "Fill the Armory and reach a Smithing level of 100, this achievement does not count items from supported mods"
+	RN_Ach_Highlight[18] = "Fill the Armoury and reach a Smithing level of 100, this achievement does not count items from supported mods"
 	RN_Ach_Highlight[19] = "Build all creature displays in the Gallery of Natural Science"
 	RN_Ach_Highlight[20] = "Locate and interact with the 9 Shrines of the Divines around Skyrim"
 	RN_Ach_Highlight[21] = "Locate or craft all Dwemer artifacts in the Reception Hall"
@@ -3456,6 +3535,24 @@ Function Build_Arrays()
 	RN_ComAch_Highlight[9] = "Display the Elder Scrolls\n Achievement idea by: NGIS"
 	RN_ComAch_Highlight[10] = "Find and display all treasure maps in the library\n Achievement idea by: WillowWisp"
 	RN_ComAch_Highlight[11] = "Discover all the culture displays for the Hall of Heroes\n Achievement idea by: Kriana"
+
+    HexDigits = New String[16]
+    HexDigits[0] = "0"
+    HexDigits[1] = "1"
+    HexDigits[2] = "2"
+    HexDigits[3] = "3"
+    HexDigits[4] = "4"
+    HexDigits[5] = "5"
+    HexDigits[6] = "6"
+    HexDigits[7] = "7"
+    HexDigits[8] = "8"
+    HexDigits[9] = "9"
+    HexDigits[10] = "a"
+    HexDigits[11] = "b"
+    HexDigits[12] = "c"
+    HexDigits[13] = "d"
+    HexDigits[14] = "e"
+    HexDigits[15] = "f"
 endFunction
 		
 ;;-------------------------------
@@ -3514,7 +3611,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 	
 	Int Index
 	
-	if _ModName == "Heavy Armory"
+	if _ModName == "Heavy Armoury"
 		
 		Index = _SectionName.length
 		Index_Section = Index
@@ -3524,7 +3621,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
 			RN_Section_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
-			TCCDebug.Log("MCM Registered Heavy Armory Section [" + _SectionName[Index] + "] at position " + Index, 0)
+			TCCDebug.Log("MCM Registered Heavy Armoury Section [" + _SectionName[Index] + "] at position " + Index, 0)
 		endWhile
 
 		RN_Section_ItemsList = ItemsList
@@ -3595,7 +3692,6 @@ Function BuildPatchArray(bool CreateArrays, bool UpdateRegistrations, bool Updat
 		API.UpdateTracking()
 	endif
 endFunction
-			
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script End ------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

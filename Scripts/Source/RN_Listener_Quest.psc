@@ -89,7 +89,7 @@ State Running
 							if (CheckQuestComplete((Quest_Display as DBM_RN_QuestDisplay).sQuestName))
 								TCC_QuestNotifications_Enabled.AddForm(Quest_Display)
 								if (MCM.ShowListenerVal) && !FirstRun
-									Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplay).sDisplayName)
+									Notify("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplay).sDisplayName, MCM.ColourString)
 								endIf										
 							endIf
 						endif
@@ -119,7 +119,7 @@ State Running
 							if (CheckQuestStageDone((Quest_Display as DBM_RN_QuestDisplayStage).sQuestStage, (Quest_Display as DBM_RN_QuestDisplayStage).sQuestName))
 								TCC_QuestNotifications_Enabled.AddForm(Quest_Display)
 								if (MCM.ShowListenerVal) && !FirstRun
-									Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplayStage).sDisplayName)
+									Notify("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplayStage).sDisplayName, MCM.ColourString)
 								endIf	
 							endIf
 						endif
@@ -149,7 +149,7 @@ State Running
 							if (CheckQuestStagePassed((Quest_Display as DBM_RN_QuestDisplayStagePassed).sQuestStage, (Quest_Display as DBM_RN_QuestDisplayStagePassed).sQuestName))
 								TCC_QuestNotifications_Enabled.AddForm(Quest_Display)
 								if (MCM.ShowListenerVal) && !FirstRun
-									Notification("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplayStagePassed).sDisplayName)
+									Notify("Museum Display Added: " + (Quest_Display as DBM_RN_QuestDisplayStagePassed).sDisplayName, MCM.ColourString)
 								endIf	
 							endIf
 						endif
@@ -171,12 +171,12 @@ State Running
 			if Quest.GetQuest("000FCQuest02").GetStage() >= 6000 
 				CheckTFC = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: The Forgotten City")
+					Notify("Museum Display Added: The Forgotten City", MCM.ColourString)
 				endif
 			elseif JarlMetelusRef.IsDead()
 				CheckTFC = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: The Forgotten City")
+					Notify("Museum Display Added: The Forgotten City", MCM.ColourString)
 				endif
 			endif		
 		endif
@@ -185,12 +185,12 @@ State Running
 			if DLC1VQ08.IsCompleted()
 				CheckDawnguard = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Dawnguard - Vampire Victory")
+					Notify("Museum Display Added: Dawnguard - Vampire Victory", MCM.ColourString)
 				endif
 			elseif DLC1FeranRef.IsDead()
 				CheckDawnguard = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Dawnguard - Dawnguard Victory")
+					Notify("Museum Display Added: Dawnguard - Dawnguard Victory", MCM.ColourString)
 				endif
 			endif
 		endif
@@ -199,12 +199,12 @@ State Running
 			if UlfricRef.IsDead()
 				CheckCivilWar = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Civil War - Imperial Victory")
+					Notify("Museum Display Added: Civil War - Imperial Victory", MCM.ColourString)
 				endif
 			elseif GeneralTulliusREF.IsDead()
 				CheckCivilWar = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: Civil War - Stormcloak Victory")
+					Notify("Museum Display Added: Civil War - Stormcloak Victory", MCM.ColourString)
 				endif
 			endif
 		endif
@@ -213,7 +213,7 @@ State Running
 			if Bards[0].IsCompleted() && Bards[1].IsCompleted() && Bards[2].IsCompleted()
 				CheckBards = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
-					Notification("Museum Display Added: The Bards College")
+					Notify("Museum Display Added: The Bards College", MCM.ColourString)
 				endIf				
 			endIf
 		endIf
