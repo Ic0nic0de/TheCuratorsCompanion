@@ -8,10 +8,6 @@ RN_Utility_MCM property MCM auto
 
 Bool Exploration_Complete
 
-;;Global to control activation
-GlobalVariable Property RN_Exploration_Listener_Count Auto
-GlobalVariable Property RN_Exploration_Listener_Complete Auto
-
 ;;Formlists to contol the displays
 Formlist Property DBM_RN_ExplorationDisplays Auto
 Formlist Property DBM_RN_ExplorationDisplays_Enabled Auto
@@ -22,8 +18,6 @@ Bool SpiritDone
 Bool Done
 
 GlobalVariable Property DBM_DisplayCount Auto
-
-message property TCC_SectionComplete_Exploration auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
@@ -72,7 +66,6 @@ State Running
 					if Exploration_Display && (!DBM_RN_ExplorationDisplays_Enabled.HasForm(Exploration_Display))
 						if (!Exploration_Display.IsDisabled())
 							DBM_RN_ExplorationDisplays_Enabled.AddForm(Exploration_Display)
-							RN_Exploration_Listener_Count.Mod(1)
 							if (MCM.ShowListenerVal) && !FirstRun
 								Notify("Museum Display Added: " + (Exploration_Display as DBM_RN_ExplorationDisplay).sDisplayName, MCM.ColourString)
 							endIf
@@ -95,9 +88,6 @@ State Running
 		endIf
 
 		if Exploration_Complete && SpiritDone
-					
-			RN_Exploration_Listener_Complete.SetValue(999)
-			TCC_SectionComplete_Exploration.Show()
 			Done = true
 		else
 			RegisterForSingleUpdate(1)

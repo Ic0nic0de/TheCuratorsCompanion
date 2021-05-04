@@ -58,13 +58,6 @@ formlist property dbmMaster auto
 formlist property DBM_ReplicaBaseItems auto
 formlist property DBM_ReplicaItems auto
 
-;;Listeners
-formlist property DBM_RN_QuestDisplays auto
-formlist property DBM_RN_Quest_Stage_Displays auto
-formlist property DBM_RN_Quest_StagePassed_Displays auto
-formlist property DBM_RN_ExplorationDisplays auto
-formlist property TCC_DisplayList_MiscItems auto
-
 ;;Main Storage
 formlist property _MuseumContainerList auto
 formlist property _MuseumContainerList_WP auto
@@ -89,22 +82,10 @@ globalvariable property RN_Setup_Finish auto
 globalvariable property RN_Scan_Done auto
 globalvariable property RN_Scan_Registered auto
 
-globalvariable property RN_Quest_Listener_Total auto
-globalvariable property RN_Exploration_Listener_Total auto
-globalvariable property RN_Museum_MiscItems_Total auto
-
-globalvariable property GV_SectionHallofHeroes auto
-globalvariable property GV_SectionDaedricGallery auto
-globalvariable property GV_SectionHOLE auto
-
 bool property SetupDone auto hidden
 bool property SetupDone2 auto hidden
 
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------- Start of Script -----------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;-- Events ---------------------------------------
 		
 Event OnInit()
 
@@ -162,7 +143,6 @@ State initialsetup
 		TCCDebug.Log("Utility - Setup function completed in " + (ftimeEnd - ftimeStart) + " seconds.")
 		
 		ModConfigFinished.Show(API.SupportedModHandlers.Find(none))
-	
 		GoToState("Running")
 	endevent
 endstate
@@ -243,31 +223,6 @@ endFunction
 ;;-- Events ---------------------------------------
 
 function InitGlobals()
-
-	RN_Quest_Listener_Total.setvalue(0)
-	RN_Exploration_Listener_Total.setvalue(0)
-	RN_Museum_MiscItems_Total.setvalue(0)
-	
-	RN_Quest_Listener_Total.Mod(DBM_RN_QuestDisplays.GetSize())
-	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_Stage_Displays.GetSize())
-	RN_Quest_Listener_Total.Mod(DBM_RN_Quest_StagePassed_Displays.GetSize())
-	
-	RN_Exploration_Listener_Total.Mod(DBM_RN_ExplorationDisplays.GetSize())
-	RN_Museum_MiscItems_Total.Mod(TCC_DisplayList_MiscItems.GetSize())
-
-	if (Game.GetModByName("LOTD_TCC_TFC.esp") != 255)
-		RN_Quest_Listener_Total.Mod(1)
-	endIf
-
-	if (Game.GetModByName("LOTD_TCC_SpellKnightArmor.esp") != 255)
-		RN_Quest_Listener_Total.Mod(1)
-	endIf
-	
-	if (Game.GetModByName("LOTD_TCC_Vigilant.esp") != 255)
-		RN_Quest_Listener_Total.Mod(4)
-	endIf
-	
-	RN_Quest_Listener_Total.Mod(2) ;;[+1 Civil War] [+1 Dawnguard] [+1 The Bards] [-1 Dark Brotherhood]
 	
 	Int _Index = 0
 	Int _Length = _Armory_Global_Total.GetSize()
@@ -298,16 +253,10 @@ function InitGlobals()
 	
 	if (Game.GetModByName("LOTD_TCC_Cloaks.esp") != 255)
 		DBM_CloaksStorage = Game.GetFormFromFile(2122, "DBM_CloaksofSkyrim_Patch.esp") as objectreference
-
 		TCCDebug.Log("Utility - Found Cloaks Storage - " + DBM_CloaksStorage.GetBaseObject().GetName(), 0)
 	endif
 endfunction
 	
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;------------------------------------------------------------------------------ Load Game Funcions ------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		
 Function Maintenance()
 	
@@ -317,6 +266,8 @@ Function Maintenance()
 		RegisterForSingleUpdate(1)
 	endif
 endFunction
+
+;;-- Functions ---------------------------------------
 
 Event onUpdate()
 	
@@ -365,11 +316,7 @@ Event onUpdate()
 	TCCDebug.Log("Util - Maintenance function completed in " + (ftimeEnd - ftimeStart) + " seconds.")
 endEvent
 
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;------------------------------------------------------------------------------ Scan Functions ----------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;-- Functions ---------------------------------------
 
 function ScanMuseum()
 	
@@ -409,12 +356,6 @@ function FinishScan(Int _Wait)
 	
 	TCCDebug.Log("Utility - Museum Scan Finished", 0)
 endFunction
-
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------- Update Functions ----------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
 
 ;;-- Functions ---------------------------------------
 
@@ -525,5 +466,3 @@ endFunction
 ;;------------------------------------------------------------------------------ End of Main Script ------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-

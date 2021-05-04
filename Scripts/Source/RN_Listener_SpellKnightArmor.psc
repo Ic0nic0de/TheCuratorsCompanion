@@ -7,7 +7,6 @@ Import RN_Utility_Global
 RN_Utility_MCM property MCM auto
 
 quest property ccEDHSSE002_Quest auto
-GlobalVariable Property RN_Quest_Listener_Count Auto
 
 Bool FirstRun = True
 Bool Complete
@@ -28,7 +27,6 @@ Event OnUpdate()
 	if !Complete
 		if (ccEDHSSE002_Quest.GetStageDone(1500)) || (ccEDHSSE002_Quest.GetStageDone(2000))
 			Complete = True
-			RN_Quest_Listener_Count.Mod(1)
 			Notify("Museum Display Added: Crypt of the Heart Display", MCM.ColourString)
 		else
 			RegisterForSingleUpdate(5)

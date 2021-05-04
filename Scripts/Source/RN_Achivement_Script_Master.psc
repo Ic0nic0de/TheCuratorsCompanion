@@ -48,40 +48,72 @@ VisualEffect Property TCC_AchievementFX Auto
 objectreference property TCC_Achievements_Container auto
 MiscObject Property Gold001 Auto
 
-;;-- Functions ---------------------------------------
+Bool Notified
 
-Event onCellAttach()
-	
-	if RN_Achievements_Listener_Complete.GetValue() && RN_Achievements_Listener_Total.GetValue() != RN_Achievements_Listener_Count.GetValue()
-		RN_Achievements_Listener_Complete.SetValue(0)
-	endIf
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	if RN_ComAchievements_Listener_Complete.GetValue() && RN_ComAchievements_Listener_Total.GetValue() != RN_ComAchievements_Listener_Count.GetValue()
-		RN_ComAchievements_Listener_Complete.SetValue(0)
-	endIf
-	
-	if !RN_Achievements_Listener_Complete.GetValue() && !RN_ComAchievements_Listener_Complete.GetValue()
-		if (RN_Achievements_Listener_Count.GetValue() == RN_Achievement_Globals.GetSize()) && (RN_ComAchievements_Listener_Count.GetValue() == RN_ComAchievement_Globals.GetSize())	
-			RN_Utility_Global.Notify("The Curators Companion: All " + (RN_Achievement_Globals.GetSize() AS Int + RN_ComAchievement_Globals.GetSize() AS Int) + " Achievements Unlocked", MCM.ColourString)
-			TCCDebug.Log("Achievements Master - All Available Achievements Completed", 0)
-			RN_Achievements_Listener_Complete.SetValue(1)
-			RN_ComAchievements_Listener_Complete.SetValue(1)
-		else
-			RN_Achievements_Listener_Complete.SetValue(0)
-			RN_ComAchievements_Listener_Complete.SetValue(0)
-		endIf		
-	endIf
-	
-	Achievement01.RegisterForSingleUpdate(0)
-	Achievement02.RegisterForSingleUpdate(0)
-	Achievement03.RegisterForSingleUpdate(0)
-	Achievement04.RegisterForSingleUpdate(0)
-	Achievement05.RegisterForSingleUpdate(0)
-	Achievement06.RegisterForSingleUpdate(0)
-	Achievement07.RegisterForSingleUpdate(0)
-	Achievement08.RegisterForSingleUpdate(0)
+Event onInit()
+
+	RegisterForModEvent("FireScripts", "_OnFireScripts")
 endEvent
 
+;;-- Functions ---------------------------------------
+
+Event _OnFireScripts (string eventName, string strArg, float numArg, Form sender)
+
+	GoToState("Running")
+endEvent	
+
+;;-- Functions ---------------------------------------
+
+State Running	
+	
+	Event OnBeginState()
+		RegisterForSingleUpdate(5)
+	endEvent	
+	
+	Event OnUpdate()
+
+		if RN_Achievements_Listener_Complete.GetValue() && RN_Achievements_Listener_Total.GetValue() != RN_Achievements_Listener_Count.GetValue()
+			RN_Achievements_Listener_Complete.SetValue(0)
+		endIf
+
+		if RN_ComAchievements_Listener_Complete.GetValue() && RN_ComAchievements_Listener_Total.GetValue() != RN_ComAchievements_Listener_Count.GetValue()
+			RN_ComAchievements_Listener_Complete.SetValue(0)
+		endIf
+		
+		if RN_Achievements_Listener_Complete.GetValue() && RN_ComAchievements_Listener_Complete.GetValue()
+			if !Notified
+				RN_Utility_Global.Notify("The Curators Companion: All " + (RN_Achievement_Globals.GetSize() AS Int + RN_ComAchievement_Globals.GetSize() AS Int) + " Achievements Unlocked", MCM.ColourString)
+				Notified = True
+				TCCDebug.Log("Achievements Master - All Available Achievements Completed", 0)
+			endif
+		
+		else
+
+			Achievement01.RegisterForSingleUpdate(0)
+			Achievement02.RegisterForSingleUpdate(0)
+			Achievement03.RegisterForSingleUpdate(0)
+			Achievement04.RegisterForSingleUpdate(0)
+			Achievement05.RegisterForSingleUpdate(0)
+			Achievement06.RegisterForSingleUpdate(0)
+			Achievement07.RegisterForSingleUpdate(0)
+			Achievement08.RegisterForSingleUpdate(0)		
+			RegisterForSingleUpdate(20)
+		endIf
+	endEvent
+endState
+
+;;-- Functions ---------------------------------------
+
+auto state Disabled
+
+	Event OnUpdate()
+	endEvent
+endState
+	
 ;;-- Functions ---------------------------------------
 
 function preview()

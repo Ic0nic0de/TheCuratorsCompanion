@@ -59,7 +59,7 @@ Event OnUpdate()
 				endIf
 			endWhile
 			
-			if _Count >= RN_Ach_List_18.GetSize() && Game.GetPlayer().GetActorValue("Smithing") == 100
+			if _Count >= RN_Ach_List_18.GetSize() && Game.GetPlayer().GetActorValue("Smithing") >= 100
 				Ach18 = True
 				RN_Achievements_Listener_Count.Mod(1)
 				RN_Ach18Complete.SetValue(1)

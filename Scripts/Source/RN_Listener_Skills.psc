@@ -10,12 +10,6 @@ Actor Property PlayerRef Auto
 ;;Property to obtain values from MCM Script.
 RN_Utility_MCM Property MCM Auto
 
-;; Global to control activation
-GlobalVariable Property RN_Skills_Listener_Count Auto
-Globalvariable Property RN_Skills_Listener_Complete Auto
-
-message property TCC_SectionComplete_Skill auto
-
 ;; Skill Mastery Values
 Bool DBM_RN_Smithing = false
 Bool DBM_RN_Enchanting = false
@@ -44,6 +38,7 @@ Bool Stealth_Speechcraft = false
 
 Bool FirstRun = True
 Bool Done
+
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,7 +76,6 @@ State Running
 
 		if !DBM_RN_Smithing
 			if (PlayerRef.GetActorValue("Smithing") >= 100) ;;Smithing
-				RN_Skills_Listener_Count.Mod(1)	
 				DBM_RN_Smithing = TRUE	
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notify("Museum Display Added: Skill Mastery: Smithing", MCM.ColourString)
@@ -91,7 +85,6 @@ State Running
 
 		if !DBM_RN_Enchanting
 			if (PlayerRef.GetActorValue("Enchanting") >= 100) ;;Enchanting
-				RN_Skills_Listener_Count.Mod(1)
 				DBM_RN_Enchanting = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notify("Museum Display Added: Skill Mastery: Enchanting", MCM.ColourString)
@@ -101,7 +94,6 @@ State Running
 
 		if !DBM_RN_Alchemy
 			if (PlayerRef.GetActorValue("Alchemy") >= 100) ;;Alchemy
-				RN_Skills_Listener_Count.Mod(1)
 				DBM_RN_Alchemy = TRUE
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notify("Museum Display Added: Skill Mastery: Alchemy", MCM.ColourString)
@@ -148,7 +140,6 @@ State Running
 			endIf
 			
 			if WarriorCount >= 3
-				RN_Skills_Listener_Count.Mod(1)
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notify("Museum Display Added: Skill Mastery: Warrior", MCM.ColourString)
 				endIf
@@ -194,7 +185,6 @@ State Running
 			endIf
 			
 			if MageCount >= 3
-				RN_Skills_Listener_Count.Mod(1)
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notify("Museum Display Added: Skill Mastery: Mage", MCM.ColourString)
 				endIf
@@ -240,7 +230,6 @@ State Running
 			endIf
 			
 			if StealthCount >= 3
-				RN_Skills_Listener_Count.Mod(1)
 				if (MCM.ShowListenerVal) && !FirstRun
 					Notify("Museum Display Added: Skill Mastery: Thief", MCM.ColourString)
 				endIf
@@ -248,9 +237,6 @@ State Running
 		endIf
 
 		if (WarriorCount >= 3) && (MageCount >= 3) && (StealthCount >= 3) && DBM_RN_Smithing && DBM_RN_Enchanting && DBM_RN_Alchemy	
-
-			RN_Skills_Listener_Complete.SetValue(999)
-			TCC_SectionComplete_Skill.Show()
 			Done = True
 		else
 			RegisterForSingleUpdate(1)

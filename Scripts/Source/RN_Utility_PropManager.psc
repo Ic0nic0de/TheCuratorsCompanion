@@ -1,5 +1,7 @@
 scriptname RN_Utility_PropManager extends quest 
 
+RN_Utility_MCM property MCM auto
+
 bool property UpdateReq auto hidden
 
 globalvariable property TCC_RoomEditCount_None auto
@@ -86,43 +88,56 @@ endFunction
 Formlist Function _getDisplayRoom(String _RoomName)
 	
 	if (_RoomName == "Armory")
+		MCM.CacheArmory
 		return TCC_DisplayList_Armory
 	
 	elseif (_RoomName == "Daedric Gallery")
+		MCM.CacheDaedricGallery
 		return TCC_DisplayList_DaedricGallery
 		
 	elseif (_RoomName == "Dragonborn Hall")
+		MCM.CacheDragonbornhall
 		return TCC_DisplayList_DragonbornHall
 
 	elseif (_RoomName == "Guildhouse")
+		MCM.CacheGuildhouse
 		return TCC_DisplayList_Guildhouse
 
 	elseif (_RoomName == "Hall of Heroes")
+		MCM.CacheHallofHeroes
 		return TCC_DisplayList_HallofHeroes
 
 	elseif (_RoomName == "Hall of Lost Empires")
+		MCM.CacheHallofLostEmpires
 		return TCC_DisplayList_HallofLostEmpires
 
 	elseif (_RoomName == "Hall of Oddities")
+		MCM.CacheHallofOddities
 		return TCC_DisplayList_HallofOddities
 
 	elseif (_RoomName == "Hall of Secrets")
+		MCM.CacheHallofSecrets
 		return TCC_DisplayList_HallofSecrets
 
 	elseif (_RoomName == "Hall of Wonders")
+		MCM.CacheHallofWonders
 		RN_CreationClubContent_Installed.setvalue(1)
 		return TCC_DisplayList_HallofWonders
 
 	elseif (_RoomName == "Gallery Library")
+		MCM.CacheLibrary
 		return TCC_DisplayList_Library
 
 	elseif (_RoomName == "Natural Science")
+		MCM.CacheNaturalScience
 		return TCC_DisplayList_NaturalScience
 
 	elseif (_RoomName == "Safehouse")
+		MCM.CacheSafehouse
 		return TCC_DisplayList_Safehouse
 
 	elseif (_RoomName == "Museum Storeroom")
+		MCM.CacheStoreroom
 		return TCC_DisplayList_Storeroom
 	endif
 	

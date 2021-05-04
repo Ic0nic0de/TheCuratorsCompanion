@@ -2,10 +2,10 @@ scriptname RN_Utility_MCM extends SKI_ConfigBase Conditional
 
 import AhzmoreHUD
 import AhzmoreHUDIE
+import RN_Utility_Global
 
 import utility
 import debug
-import RN_Utility_Global
 
 RN_Utility_Script property Util auto
 RN_Main_Armory property _AddItemArmory auto
@@ -15,6 +15,7 @@ RN_Main_SupportedMods property _AddItemPatches auto
 RN_Achivement_Script_Master property AchMaster auto
 RN_PatchAPI property API auto
 TCC_IconSetScript property IconScript auto
+RN_Utility_Cache property MCMCache auto
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General Properties -------------------------------------------------------------------------------------------------
@@ -34,6 +35,11 @@ Bool Page2
 Bool Page3
 Bool Page4
 Bool Page5
+Bool Page6
+Bool Page7
+Bool Page8
+Bool Page9
+Bool Page10
 
 ;; General Globals
 globalvariable property DBM_SortWait auto
@@ -72,6 +78,10 @@ string[] TransferList
 int property IndexTransfer auto hidden
 int TransferListOptions
 
+string[] CacheList
+int IndexCache = 0
+int CacheListOptions
+
 objectreference property NotificationColour Auto
 referenceAlias Property ColourAlias auto
 int property IndexColour = 16777215 auto hidden
@@ -95,8 +105,8 @@ globalvariable property AchStamina auto
 globalvariable property AchMagicka auto
 globalvariable property AchSpeech auto
 globalvariable property TokenRefList_NoShipmentSize auto
-;; Globals for Complete Set Listings.
 
+;; Globals for Complete Set Listings.
 globalvariable property RN_SupportedModCount auto
 globalvariable property RN_CustomModCount auto
 globalvariable property RN_CreationClubContent_Installed auto
@@ -106,14 +116,6 @@ globalvariable property RN_Treasury_Count auto
 globalvariable property RN_Treasury_Count2 auto
 globalvariable property RN_Treasury_Count3 auto
 
-;;Globals for Display Listener
-
-globalvariable property RN_Thane_Listener_Total auto
-globalvariable property RN_Skills_Listener_Total auto
-
-globalvariable property RN_Museum_MiscItems_Total auto
-globalvariable property RN_Museum_MiscItems_Count auto
-
 Formlist property _Museum_Global_Complete auto
 Formlist property _Museum_Global_Count auto
 Formlist property _Museum_Global_Total auto
@@ -122,15 +124,6 @@ GlobalVariable[] RN_Museum_Global_Count
 GlobalVariable[] RN_Museum_Global_Total 
 String[] _Museum_Section_names
 String[] _Museum_Section_States
-
-Formlist property _Museum_Global_Complete2 auto
-Formlist property _Museum_Global_Count2 auto
-Formlist property _Museum_Global_Total2 auto
-GlobalVariable[] RN_Museum_Global_Complete2 
-GlobalVariable[] RN_Museum_Global_Count2
-GlobalVariable[] RN_Museum_Global_Total2 
-String[] _Museum_Section_names2
-String[] _Museum_Section_States2
 
 Formlist property _Armory_Global_Complete auto
 Formlist property _Armory_Global_Count auto
@@ -197,16 +190,57 @@ Int Index_Section2
 Quest TrackedQuest
 String TrackedPatch
 
-ObjectReference[] TrackedDisplays
-ObjectReference[] TrackedDisplays2
-ObjectReference[] TrackedDisplays3
-ObjectReference[] TrackedDisplays4
-ObjectReference[] TrackedDisplays5
-String[] TrackedNames
-String[] TrackedNames2
-String[] TrackedNames3
-String[] TrackedNames4
-String[] TrackedNames5
+Bool property CacheArmory auto hidden
+Bool property CacheDaedricGallery auto hidden
+Bool property CacheDragonbornhall auto hidden
+Bool property CacheGuildhouse auto hidden
+Bool property CacheHallofHeroes auto hidden
+Bool property CacheHallofLostEmpires auto hidden
+Bool property CacheHallofOddities auto hidden
+Bool property CacheHallofSecrets auto hidden
+Bool property CacheHallofWonders auto hidden
+Bool property CacheLibrary auto hidden
+Bool property CacheMisc auto hidden
+Bool property CacheNaturalScience auto hidden
+Bool property CacheSafehouse auto hidden
+Bool property CacheStoreroom auto hidden
+
+Int CacheArmoryPages
+Int CacheDaedricGalleryPages
+Int CacheDragonbornhallPages
+Int CacheGuildhousePages
+Int CacheHallofHeroesPages
+Int CacheHallofLostEmpiresPages
+Int CacheHallofOdditiesPages
+Int CacheHallofSecretsPages
+Int CacheHallofWondersPages
+Int CacheLibraryPages
+Int CacheMiscPages
+Int CacheNaturalSciencePages
+Int CacheSafehousePages
+Int CacheStoreroomPages
+
+ObjectReference[] Property TrackedDisplays Auto Hidden
+ObjectReference[] Property  TrackedDisplays2 Auto Hidden
+ObjectReference[] Property  TrackedDisplays3 Auto Hidden
+ObjectReference[] Property  TrackedDisplays4 Auto Hidden
+ObjectReference[] Property  TrackedDisplays5 Auto Hidden
+ObjectReference[] Property  TrackedDisplays6 Auto Hidden
+ObjectReference[] Property  TrackedDisplays7 Auto Hidden
+ObjectReference[] Property  TrackedDisplays8 Auto Hidden
+ObjectReference[] Property  TrackedDisplays9 Auto Hidden
+ObjectReference[] Property  TrackedDisplays10 Auto Hidden
+
+String[] Property  TrackedNames Auto Hidden
+String[] Property  TrackedNames2 Auto Hidden
+String[] Property  TrackedNames3 Auto Hidden
+String[] Property  TrackedNames4 Auto Hidden
+String[] Property  TrackedNames5 Auto Hidden
+String[] Property  TrackedNames6 Auto Hidden
+String[] Property  TrackedNames7 Auto Hidden
+String[] Property  TrackedNames8 Auto Hidden
+String[] Property  TrackedNames9 Auto Hidden
+String[] Property  TrackedNames10 Auto Hidden
 
 ObjectReference[] CustomContainerRef
 Int[] CustomContainerPos
@@ -215,11 +249,12 @@ ObjectReference TCC_HEADER_TO_REPLACE
 ObjectReference TCC_END_OF_PAGE
 
 Bool HEADERSREQUIRED
+Int PagesRequired
 
 Int SetVal
 Int SetVal2
 Int SetVal3
-		
+	
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script Start ---------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -240,7 +275,7 @@ Event AddDynamicPagesList()
 	PagesList[2] = "Achievements"
 	PagesList[3] = " "
 	PagesList[4] = "~~ Completion ~~"
-	PagesList[5] = "Museum Rooms"
+	PagesList[5] = "Museum Sections"
 	PagesList[6] = "Armoury Sets"
 	PagesList[7] = "Official Patches"		
 
@@ -288,7 +323,37 @@ Event AddDynamicPagesList()
 			PagesList[Q] = "Display Tracker (5)"
 		x += 1
 	endif
+
+	if Page6
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (6)"
+		x += 1
+	endif
+
+	if Page7
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (7)"
+		x += 1
+	endif
 	
+	if Page8
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (8)"
+		x += 1
+	endif
+	
+	if Page9
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (9)"
+		x += 1
+	endif
+	
+	if Page10
+		Q = PagesList.Find("")	
+			PagesList[Q] = "Display Tracker (10)"
+		x += 1
+	endif
+
 	Q = PagesList.Find("")	
 		PagesList[Q] = " "
 	x += 1	
@@ -329,10 +394,16 @@ Event OnPageReset(string page)
 	AddTrackingPage3()
 	AddTrackingPage4()
 	AddTrackingPage5()
+	AddTrackingPage6()
+	AddTrackingPage7()
+	AddTrackingPage8()
+	AddTrackingPage9()
+	AddTrackingPage10()
 	InitmoreHUDChoiceList()
 	InitAchievementSoundList()
 	InitAttributeList()
 	InitTransferList()
+	InitCacheList()
 EndEvent
 
 ;-- Events --------------------------------
@@ -385,6 +456,28 @@ Function InitTransferList()
 	TransferList[0] = "All Storage"
 	TransferList[1] = "Relic Storage Container"
 	TransferList[2] = "Custom Storage Only"
+EndFunction
+
+;-- Events --------------------------------
+
+Function InitCacheList()
+
+	CacheList = new string[15]
+	CacheList[0] = " "
+	CacheList[1] = "Armoury"
+	CacheList[2] = "Daedric Gallery"
+	CacheList[3] = "Dragonborn Hall"
+	CacheList[4] = "Guildhouse"
+	CacheList[5] = "Hall of Heroes"
+	CacheList[6] = "Hall of Lost Empires"
+	CacheList[7] = "Hall of Oddities"
+	CacheList[8] = "Hall of Secrets"
+	CacheList[9] = "Hall of Wonders"
+	CacheList[10] = "Library"
+	CacheList[11] = "Natural Science"
+	CacheList[12] = "Safehouse"
+	CacheList[13] = "Storeroom"
+	CacheList[14] = "Miscellaneous"
 EndFunction
 		
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -528,29 +621,29 @@ Function AddAchievementsPage()
 		AddHeaderOption("Awarded: " + GetCurrentAchievementCount(RN_Achievements_Listener_Count, RN_Achievement_Globals) + " Achievements")
 		
 		Int PageIdx = 9			
-		Int _Index = 0
-		While _Index < RN_Ach_Globals.length
+		Int Index = 0
+		While Index < RN_Ach_Globals.length
 			SetCursorPosition(PageIdx + 1)
-			if RN_Ach_Globals[_Index] != none
-				if RN_Ach_Globals[_Index].GetValue()
-					if _Index == 29
-						RN_Ach_Position[_Index] = AddTextOption("<font color='#070091'>" + (RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName()) + "</font>", "Awarded", 0)
+			if RN_Ach_Globals[Index] != none
+				if RN_Ach_Globals[Index].GetValue()
+					if Index == 29
+						RN_Ach_Position[Index] = AddTextOption("<font color='#070091'>" + (RN_Ach_AchName[Index] + PlayerRef.GetBaseObject().GetName()) + "</font>", "<font color='#070091'>Awarded</font>", 0)
 						PageIdx += 1
 					else
-						RN_Ach_Position[_Index] = AddTextOption("<font color='#070091'>" + RN_Ach_AchName[_Index] + "</font>", "Awarded", 0)
+						RN_Ach_Position[Index] = AddTextOption("<font color='#070091'>" + RN_Ach_AchName[Index] + "</font>", "<font color='#070091'>Awarded</font>", 0)
 						PageIdx += 1
 					endif
 				else
-					if _Index == 29
-						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index] + PlayerRef.GetBaseObject().GetName(), "Locked", 1)
+					if Index == 29
+						RN_Ach_Position[Index] = AddTextOption(RN_Ach_AchName[Index] + PlayerRef.GetBaseObject().GetName(), "Locked", 1)
 						PageIdx += 1
 					else
-						RN_Ach_Position[_Index] = AddTextOption(RN_Ach_AchName[_Index], "Locked", 1)
+						RN_Ach_Position[Index] = AddTextOption(RN_Ach_AchName[Index], "Locked", 1)
 						PageIdx += 1
 					endif					
 				endif
 			endif
-			_Index +=1		
+			Index +=1		
 		endWhile
 		
 		SetCursorPosition(PageIdx + 1)
@@ -559,19 +652,19 @@ Function AddAchievementsPage()
 		SetCursorPosition(PageIdx + 1) 
 		AddHeaderOption("Awarded: " + GetCurrentAchievementCount(RN_ComAchievements_Listener_Count, RN_ComAchievement_Globals) + " Community Achievements")
 		PageIdx += 1
-		_Index = 0
-		While _Index < RN_ComAch_Globals.length
+		Index = 0
+		While Index < RN_ComAch_Globals.length
 			SetCursorPosition(PageIdx + 1)
-			if RN_ComAch_Globals[_Index] != none
-				if RN_ComAch_Globals[_Index].GetValue()
-					RN_ComAch_Position[_Index] = AddTextOption("<font color='#070091'>" + RN_ComAch_AchName[_Index] + "</font>", "Awarded", 0)
+			if RN_ComAch_Globals[Index] != none
+				if RN_ComAch_Globals[Index].GetValue()
+					RN_ComAch_Position[Index] = AddTextOption("<font color='#070091'>" + RN_ComAch_AchName[Index] + "</font>", "<font color='#070091'>Awarded</font>", 0)
 					PageIdx += 1
 				else
-					RN_ComAch_Position[_Index] = AddTextOption(RN_ComAch_AchName[_Index], "Locked", 1)
+					RN_ComAch_Position[Index] = AddTextOption(RN_ComAch_AchName[Index], "Locked", 1)
 					PageIdx += 1				
 				endif
 			endif
-			_Index +=1		
+			Index +=1		
 		endWhile
 	endif
 endFunction
@@ -579,113 +672,59 @@ endFunction
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Museum Page -------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+	
 Function AddMuseumSetsPage()
 
-	if CurrentPage == "Museum Rooms"
-		RN_Thane_Listener_Total.SetValue(9)
-		RN_Skills_Listener_Total.SetValue(6)
-		SetVal = BuildTotalsArray(SetVal, RN_Museum_Global_Complete)
+	if CurrentPage == "Museum Sections"
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)	
-		AddHeaderOption("Museum Rooms:")	
-				
-		Int _Index = 0
-		Int _Length = RN_Museum_Global_Complete.length
-		While _Index < _Length			
-				
-			if RN_Museum_Global_Complete[_Index] != none
-				if RN_Museum_Global_Complete[_Index].GetValue()
-					AddTextOption(_Museum_Section_names[_Index], GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]) + " (Complete)", 1)
-				elseif RN_Scan_Registered.GetValue()
-					AddTextOption(_Museum_Section_names[_Index], "Updating...", 1)
-				else
-					AddTextOptionST(_Museum_Section_States[_Index], _Museum_Section_names[_Index], GetCurrentCount(RN_Museum_Global_Count[_Index] , RN_Museum_Global_Total[_Index]), 0)
-				endif
-			endif
-			_Index += 1
-			
-			if _Index == 8 && !RN_CreationClubContent_Installed.GetValue()
-				_Index += 1
-			endif
-		endWhile
-			
-		AddEmptyOption()
-		AddHeaderOption("Museum Displays:")
-
-		_Index = 0
-		_Length = RN_Museum_Global_Complete2.length
-		While _Index < _Length			
-				
-			if RN_Museum_Global_Complete2[_Index] != none
-				if RN_Museum_Global_Complete2[_Index].GetValue()
-					AddTextOption(_Museum_Section_names2[_Index], GetCurrentCount(RN_Museum_Global_Count2[_Index] , RN_Museum_Global_Total2[_Index]) + " (Complete)", 1)
-				elseif RN_Scan_Registered.GetValue()
-					AddTextOption(_Museum_Section_names2[_Index], "Updating...", 1)
-				else
-					AddTextOptionST(_Museum_Section_States2[_Index], _Museum_Section_names2[_Index] + " Displays", GetCurrentCount(RN_Museum_Global_Count2[_Index] , RN_Museum_Global_Total2[_Index]), 0)
-				endif
-			endif
-			_Index += 1
-		endWhile
-
-		AddEmptyOption()
-
-		AddHeaderOption("Player Wealth:")
-		AddTextOption("Safehouse Treasury Value:", RN_Treasury_Count.GetValue() as Int, 0)
-		AddTextOption("Deepholme Treasury Value:", RN_Treasury_Count2.GetValue() as Int, 0)
-		AddTextOption("Karagas' Tower Treasury Value:", RN_Treasury_Count3.GetValue() as Int, 0)
-	
+		AddHeaderOption("Museum Sections:")	
 		SetCursorPosition(1)
-		AddHeaderOption("Page Information:")
-		AddTextOption("This page lists all completable Museum rooms.", "", 0)
+		AddHeaderOption("Displayed: " + (GetPrimaryDisplayCount()))
+		Int PageIdx = 1	
+		
+		Int Index = 0
+		Int ArraySize = RN_Museum_Global_Complete.length
+		While Index < ArraySize			
+			SetCursorPosition(PageIdx + 1)
+			if RN_Museum_Global_Complete[Index] != none
+				if Index == 8 && !RN_CreationClubContent_Installed.GetValue()
+					AddTextOption(_Museum_Section_names[Index], "No Creations Installed", 1)
+					PageIdx += 1
+				elseif RN_Museum_Global_Complete[Index].GetValue()
+					AddTextOption(_Museum_Section_names[Index], GetCurrentCount(RN_Museum_Global_Count[Index] , RN_Museum_Global_Total[Index]) + " (Complete)", 1)
+					PageIdx += 1
+				elseif RN_Scan_Registered.GetValue()
+					AddTextOption(_Museum_Section_names[Index], "Updating...", 1)
+					PageIdx += 1
+				else
+					AddTextOptionST(_Museum_Section_States[Index], _Museum_Section_names[Index], GetCurrentCount(RN_Museum_Global_Count[Index] , RN_Museum_Global_Total[Index]), 0)
+					PageIdx += 1
+				endif
+			endif
+			Index += 1
+		endWhile
+		
+		SetCursorPosition(16)
 		AddEmptyOption()
-		AddTextOption("As items are collected and displayed, this page will", "", 0)
-		AddTextOption("keep track of your progess and display counts.", "", 0)
-		AddEmptyOption()
-		AddTextOption("The figures on this page will update automatically", "", 0)
-		AddTextOption("when displaying items in the Museum, of course it", "", 0)
-		AddTextOption("may take a moment to update those numbers so run", "", 0)
-		AddTextOption("the Museum scan if you feel the numbers seem off ;)", "", 0)
-		if RN_CreationClubContent_Installed.GetValue()
-			AddEmptyOption()
-		endif
-		AddEmptyOption()
-		AddTextOption("Displayed:", GetCurrentDisplayCount() + " Displays", 0)	
-		AddTextOption("Completed:", GetCurrentMuseumCount(SetVal), 0)
-		AddEmptyOption()
-		AddHeaderOption("Display Information:")		
-		AddTextOption("This section of the MCM can be used to keep track of", "", 0)
-		AddTextOption("displays from quests, exploring, Levelling up skills", "", 0)
-		AddTextOption("and displaying paintings and Dibella statues.", "", 0)
-		AddEmptyOption()
-		AddTextOption("Completed:", GetDisplaySectionCount(), 0)
-		AddEmptyOption()
-		AddHeaderOption("Wealth Information:")
-		AddTextOption("This section tracks the value of all 3 treasury rooms", "", 0)
-		AddEmptyOption()
-		AddTextOption("Total Treasury value:", GetTotalTreasuryValue(RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3), 0)
+		SetCursorPosition(18)
+		AddHeaderOption("Treasury Value:")
+		SetCursorPosition(19)
+		AddHeaderOption("")
+		PageIdx = 19
+		
+		SetCursorPosition(PageIdx + 1)
+		AddTextOption("Safehouse Treasury Value:", RN_Treasury_Count.GetValue() as Int, 0)
+		PageIdx += 1
+		SetCursorPosition(PageIdx + 1)
+		AddTextOption("Deepholme Treasury Value:", RN_Treasury_Count2.GetValue() as Int, 0)
+		PageIdx += 1
+		SetCursorPosition(PageIdx + 1)
+		AddTextOption("Karagas' Tower Treasury Value:", RN_Treasury_Count3.GetValue() as Int, 0)
+		PageIdx += 1
+		SetCursorPosition(PageIdx + 1)
+		AddTextOption("<font color='#070091'>Total Value:", GetTotalTreasuryValue(RN_Treasury_Count, RN_Treasury_Count2, RN_Treasury_Count3) + "</font>", 0)
 	endif
-endFunction
-
-string function GetCurrentDisplayCount()
-	
-	Int Count = 0
-	Int Total = 0
-	Int Index = 0 
-	
-	While Index < RN_Museum_Global_Count.Length
-		if RN_Museum_Global_Count[Index] != none
-			Count += (RN_Museum_Global_Count[Index].GetValue() as Int)
-			Total += (RN_Museum_Global_Total[Index].GetValue() as Int)
-		endif
-		Index += 1
-	endwhile
-
-	Count += (RN_Museum_MiscItems_Count.GetValue() as Int)
-	Total += (RN_Museum_MiscItems_Total.GetValue() as Int)
-	
-	return (Count + " / " + Total)
 endFunction
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -705,21 +744,21 @@ Function AddArmorySetsPage()
 		SetCursorPosition(1)
 		AddHeaderOption("Completed: " + GetCurrentArmoryCount(SetVal) + " Sets")
 		Int PageIdx = 1	
-		Int _Index = 0
-		Int _Length = RN_Armory_Global_Complete.length
-		While _Index < _Length 
+		Int Index = 0
+		Int ArraySize = RN_Armory_Global_Complete.length
+		While Index < ArraySize 
 			SetCursorPosition(PageIdx + 1)
-			if RN_Armory_Global_Complete[_Index].GetValue()
-				AddTextOption(_Armory_Section_names[_Index], GetCurrentCount(RN_Armory_Global_Count[_Index], RN_Armory_Global_Total[_Index]) + " (Complete)", 1)
+			if RN_Armory_Global_Complete[Index].GetValue()
+				AddTextOption(_Armory_Section_names[Index], GetCurrentCount(RN_Armory_Global_Count[Index], RN_Armory_Global_Total[Index]) + " (Complete)", 1)
 				PageIdx += 1
 			elseif RN_Scan_Registered.GetValue()
-				AddTextOption(_Armory_Section_names[_Index], "Updating...", 1)
+				AddTextOption(_Armory_Section_names[Index], "Updating...", 1)
 				PageIdx += 1
 			else
-				_Armory_Section_Position[_Index] = AddTextOption(_Armory_Section_names[_Index], GetCurrentCount(RN_Armory_Global_Count[_Index], RN_Armory_Global_Total[_Index]), 0)
+				_Armory_Section_Position[Index] = AddTextOption(_Armory_Section_names[Index], GetCurrentCount(RN_Armory_Global_Count[Index], RN_Armory_Global_Total[Index]), 0)
 				PageIdx += 1
 			endif
-			_Index +=1
+			Index +=1
 		endWhile
 		
 		PageIdx += 2
@@ -731,23 +770,23 @@ Function AddArmorySetsPage()
 			SetCursorPosition(PageIdx + 1)
 			AddHeaderOption("Completed: " + GetCurrentIWCount(SetVal3) + " Sets")
 			PageIdx	+= 1
-			_Index = 0
-			_Length = Index_Section2
-			While _Index < _Length 
+			Index = 0
+			ArraySize = Index_Section2
+			While Index < ArraySize 
 				SetCursorPosition(PageIdx + 1)
-				if RN_Section2_Name[_Index] != ""				
-					if RN_Section2_Complete_Array[_Index].GetValue()
-						AddTextOption(RN_Section2_Name[_Index], GetCurrentCount(RN_Section2_Count_Array[_Index], RN_Section2_Total_Array[_Index]) + " (Complete)", 1)
+				if RN_Section2_Name[Index] != ""				
+					if RN_Section2_Complete_Array[Index].GetValue()
+						AddTextOption(RN_Section2_Name[Index], GetCurrentCount(RN_Section2_Count_Array[Index], RN_Section2_Total_Array[Index]) + " (Complete)", 1)
 						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
-						AddTextOption(RN_Section2_Name[_Index], "Updating...", 1)
+						AddTextOption(RN_Section2_Name[Index], "Updating...", 1)
 						PageIdx += 1
 					else
-						RN_Section2_Position_Array[_Index] = AddTextOption(RN_Section2_Name[_Index], GetCurrentCount(RN_Section2_Count_Array[_Index], RN_Section2_Total_Array[_Index]), 0)
+						RN_Section2_Position_Array[Index] = AddTextOption(RN_Section2_Name[Index], GetCurrentCount(RN_Section2_Count_Array[Index], RN_Section2_Total_Array[Index]), 0)
 						PageIdx += 1
 					endif
 				endif
-				_Index +=1
+				Index +=1
 			endWhile
 			PageIdx += 2
 			SetCursorPosition(PageIdx + 1)
@@ -759,23 +798,23 @@ Function AddArmorySetsPage()
 			SetCursorPosition(PageIdx + 1)
 			AddHeaderOption("Completed: " + GetCurrentHACount(SetVal2) + " Sets")
 			PageIdx	+= 1		
-			_Index = 0
-			_Length = Index_Section
-			While _Index < _Length 
+			Index = 0
+			ArraySize = Index_Section
+			While Index < ArraySize 
 				SetCursorPosition(PageIdx + 1)
-				if RN_Section_Name[_Index] != ""
-					if RN_Section_Complete_Array[_Index].GetValue()
-						AddTextOption(RN_Section_Name[_Index], GetCurrentCount(RN_Section_Count_Array[_Index], RN_Section_Total_Array[_Index]) + " (Complete)", 1)
+				if RN_Section_Name[Index] != ""
+					if RN_Section_Complete_Array[Index].GetValue()
+						AddTextOption(RN_Section_Name[Index], GetCurrentCount(RN_Section_Count_Array[Index], RN_Section_Total_Array[Index]) + " (Complete)", 1)
 						PageIdx += 1
 					elseif RN_Scan_Registered.GetValue()
-						AddTextOption(RN_Section_Name[_Index], "Updating...", 1)
+						AddTextOption(RN_Section_Name[Index], "Updating...", 1)
 						PageIdx += 1
 					else
-						RN_Section_Position_Array[_Index] = AddTextOption(RN_Section_Name[_Index], GetCurrentCount(RN_Section_Count_Array[_Index], RN_Section_Total_Array[_Index]), 0)
+						RN_Section_Position_Array[Index] = AddTextOption(RN_Section_Name[Index], GetCurrentCount(RN_Section_Count_Array[Index], RN_Section_Total_Array[Index]), 0)
 						PageIdx += 1
 					endif
 				endif
-				_Index +=1
+				Index +=1
 			endWhile
 		endif
 	endif
@@ -796,22 +835,22 @@ Function AddCompletedModsPage()
 		AddHeaderOption("Completed: " + GetCurrentCountInt(SetVal, RN_SupportedModCount) + " Official Patch(es)")
 		
 		Int PageIdx = 1	
-		Int _Index = 0
-		While _Index < RN_Patches_Name.length			
+		Int Index = 0
+		While Index < RN_Patches_Name.length			
 			SetCursorPosition(PageIdx + 1)
-			if RN_Patches_Name[_Index] != ""
-				if RN_Patches_Complete_Array[_Index].GetValue()
-					AddTextOption(RN_Patches_Name[_Index], GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]) + " (Complete)", 1)
+			if RN_Patches_Name[Index] != ""
+				if RN_Patches_Complete_Array[Index].GetValue()
+					AddTextOption(RN_Patches_Name[Index], GetCurrentCount(RN_Patches_Count_Array[Index], RN_Patches_Total_Array[Index]) + " (Complete)", 1)
 					PageIdx += 1
 				elseif RN_Scan_Registered.GetValue()
-					AddTextOption(RN_Patches_Name[_Index], "Updating...", 1)
+					AddTextOption(RN_Patches_Name[Index], "Updating...", 1)
 					PageIdx += 1
 				else
-					RN_Patches_Position_Array[_Index] = AddTextOption(RN_Patches_Name[_Index], GetCurrentCount(RN_Patches_Count_Array[_Index], RN_Patches_Total_Array[_Index]), 0)
+					RN_Patches_Position_Array[Index] = AddTextOption(RN_Patches_Name[Index], GetCurrentCount(RN_Patches_Count_Array[Index], RN_Patches_Total_Array[Index]), 0)
 					PageIdx += 1
 				endif
 			endif
-			_Index +=1
+			Index +=1
 		endWhile
 	endif
 endFunction
@@ -832,491 +871,195 @@ Function AddCustomModsPage()
 		AddHeaderOption("Completed: " + GetCurrentCountInt(SetVal, RN_CustomModCount) + " Custom Patch(es)")	
 		
 		Int PageIdx = 1
-		Int _Index = 0
-		While _Index < RN_Custom_Name.length
+		Int Index = 0
+		While Index < RN_Custom_Name.length
 			SetCursorPosition(PageIdx + 1)
-			if RN_Custom_Name[_Index] != ""
-				if RN_Custom_Complete_Array[_Index].GetValue()
-					AddTextOption(RN_Custom_Name[_Index], GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]) + " (Complete)", 1)
+			if RN_Custom_Name[Index] != ""
+				if RN_Custom_Complete_Array[Index].GetValue()
+					AddTextOption(RN_Custom_Name[Index], GetCurrentCount(RN_Custom_Count_Array[Index], RN_Custom_Total_Array[Index]) + " (Complete)", 1)
 					PageIdx += 1
 				elseif RN_Scan_Registered.GetValue()
-					AddTextOption(RN_Custom_Name[_Index], "Updating...", 1)
+					AddTextOption(RN_Custom_Name[Index], "Updating...", 1)
 					PageIdx += 1
 				else
-					RN_Custom_Position_Array[_Index] = AddTextOption(RN_Custom_Name[_Index], GetCurrentCount(RN_Custom_Count_Array[_Index], RN_Custom_Total_Array[_Index]), 0)
+					RN_Custom_Position_Array[Index] = AddTextOption(RN_Custom_Name[Index], GetCurrentCount(RN_Custom_Count_Array[Index], RN_Custom_Total_Array[Index]), 0)
 					PageIdx += 1
 				endif
 			endif
-			_Index +=1			
+			Index +=1			
 		endWhile	
 	endif
-endFunction
+endFunction	
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Patch Tracking Page 1 --------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------- Patch Tracking Pages -------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Function AddTrackingPage()
 	
 	if CurrentPage == "Display Tracker (1)"
-		
-		if !Page1
-			AddTextOption("No Tracking Data To Display...", "", 1)
-			return
-		endif
-		
-		if HEADERSREQUIRED
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)										
-		
-			Int Index = 0
-			Int PGPos = 0
-			Bool Moved = False
-			
-			While Index < TrackedDisplays.length
-				
-				if (TrackedNames[Index] != "")
-
-					While (PGPos > 63) && (!Moved)
-						SetCursorPosition(1)
-						PGPos = 1
-						Moved = True
-					endwhile
-				
-					if (TrackedDisplays[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos != 0) && (PGPos != 1)
-							AddEmptyOption()
-							PGPos += 1
-						endif				
-						AddHeaderOption(TrackedNames[Index], 0)	
-						PGPos += 1
-					else
-						if (!TrackedDisplays[Index].IsDisabled())
-							AddToggleOption(TrackedNames[Index], !TrackedDisplays[Index].IsDisabled(), 1)
-							PGPos += 1
-						else
-							AddToggleOption(TrackedNames[Index], !TrackedDisplays[Index].IsDisabled())
-							PGPos += 1
-						endif
-					endif
-				endif
-					
-				Index +=1
-			endWhile
-			
-			if Page2
-				AddTextOption("Continue on Page 2...", "", 1)
-			endif
-			
-		else
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)									
-			AddHeaderOption(TrackedPatch + " Displays", 0)
-			SetCursorPosition(1)
-			AddHeaderOption("", 0)
-		
-			Int PageIdx = 1
-			Int _Index = 0
-			While _Index < TrackedDisplays.length
-				SetCursorPosition(PageIdx + 1)
-				
-				if (TrackedNames[_Index] != "")
-					if (TrackedDisplays[_Index].IsEnabled())
-						AddToggleOption(TrackedNames[_Index], TrackedDisplays[_Index].IsEnabled(), 1)
-						PageIdx += 1
-					else
-						AddToggleOption(TrackedNames[_Index], TrackedDisplays[_Index].IsEnabled())
-						PageIdx += 1
-					endif
-				endif
-				_Index +=1			
-			endWhile
-			
-			if Page2
-				AddTextOption("Continue on Page 2...", "", 1)
-			endif
-		endif	
+		BuildTrackingPage(Page1, Page2, TrackedDisplays, TrackedNames)
 	endif
-endFunction
+endFunction	
 
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Patch Tracking Page 2 --------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------
 
 Function AddTrackingPage2()
-
+	
 	if CurrentPage == "Display Tracker (2)"
-		
-		if !Page2
-			AddTextOption("No Tracking Data To Display...", "", 1)
-			return
-		endif
-		
-		if HEADERSREQUIRED
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)										
-
-			Int Index = 0
-			Int PGPos = 0
-			Bool Moved = False
-			
-			While Index < TrackedDisplays2.length
-				
-				if (TrackedNames2[Index] != "")
-
-					While (PGPos > 63) && (!Moved)
-						SetCursorPosition(1)
-						PGPos = 1
-						Moved = True
-					endwhile
-				
-					if (TrackedDisplays2[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos != 0) && (PGPos != 1)
-							AddEmptyOption()
-							PGPos += 1
-						endif				
-						AddHeaderOption(TrackedNames2[Index], 0)	
-						PGPos += 1
-					else
-						if (!TrackedDisplays2[Index].IsDisabled())
-							AddToggleOption(TrackedNames2[Index], !TrackedDisplays2[Index].IsDisabled(), 1)
-							PGPos += 1
-						else
-							AddToggleOption(TrackedNames2[Index], !TrackedDisplays2[Index].IsDisabled())
-							PGPos += 1
-						endif
-					endif
-				endif
-					
-				Index +=1
-			endWhile
-			
-			if Page3
-				AddTextOption("Continue on Page 3...", "", 1)
-			endif
-		else
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)									
-			AddHeaderOption(TrackedPatch + " Displays", 0)
-			SetCursorPosition(1)
-			AddHeaderOption("", 0)
-		
-			Int PageIdx = 1
-			Int _Index = 0
-			While _Index < TrackedDisplays2.length
-				SetCursorPosition(PageIdx + 1)
-				
-				if (TrackedNames2[_Index] != "")
-					if (TrackedDisplays2[_Index].IsEnabled())
-						AddToggleOption(TrackedNames2[_Index], TrackedDisplays2[_Index].IsEnabled(), 1)
-						PageIdx += 1
-					else
-						AddToggleOption(TrackedNames2[_Index], TrackedDisplays2[_Index].IsEnabled())
-						PageIdx += 1
-					endif
-				endif
-				_Index +=1			
-			endWhile
-			
-			if Page3
-				AddTextOption("Continue on Page 3...", "", 1)
-			endif
-		endif	
+		BuildTrackingPage(Page2, Page3, TrackedDisplays2, TrackedNames2)
 	endif
-endFunction
+endFunction	
 
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Patch Tracking Page 3 --------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------
 
 Function AddTrackingPage3()
-
+	
 	if CurrentPage == "Display Tracker (3)"
-		
-		if !Page3
-			AddTextOption("No Tracking Data To Display...", "", 1)
-			return
-		endif
-		
-		if HEADERSREQUIRED
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)										
-
-			Int Index = 0
-			Int PGPos = 0
-			Bool Moved = False
-			
-			While Index < TrackedDisplays3.length
-				
-				if (TrackedNames3[Index] != "")
-
-					While (PGPos > 63) && (!Moved)
-						SetCursorPosition(1)
-						PGPos = 1
-						Moved = True
-					endwhile
-				
-					if (TrackedDisplays3[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos != 0) && (PGPos != 1)
-							AddEmptyOption()
-							PGPos += 1
-						endif				
-						AddHeaderOption(TrackedNames3[Index], 0)	
-						PGPos += 1
-					else
-						if (!TrackedDisplays3[Index].IsDisabled())
-							AddToggleOption(TrackedNames3[Index], !TrackedDisplays3[Index].IsDisabled(), 1)
-							PGPos += 1
-						else
-							AddToggleOption(TrackedNames3[Index], !TrackedDisplays3[Index].IsDisabled())
-							PGPos += 1
-						endif
-					endif
-				endif
-					
-				Index +=1
-			endWhile
-			
-			if Page4
-				AddTextOption("Continue on Page 4...", "", 1)
-			endif
-		else
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)									
-			AddHeaderOption(TrackedPatch + " Displays", 0)
-			SetCursorPosition(1)
-			AddHeaderOption("", 0)
-		
-			Int PageIdx = 1
-			Int _Index = 0
-			While _Index < TrackedDisplays3.length
-				SetCursorPosition(PageIdx + 1)
-				
-				if (TrackedNames3[_Index] != "")
-					if (TrackedDisplays3[_Index].IsEnabled())
-						AddToggleOption(TrackedNames3[_Index], TrackedDisplays3[_Index].IsEnabled(), 1)
-						PageIdx += 1
-					else
-						AddToggleOption(TrackedNames3[_Index], TrackedDisplays3[_Index].IsEnabled())
-						PageIdx += 1
-					endif
-				endif
-				_Index +=1			
-			endWhile
-			
-			if Page4
-				AddTextOption("Continue on Page 4...", "", 1)
-			endif
-		endif	
+		BuildTrackingPage(Page3, Page4, TrackedDisplays3, TrackedNames3)
 	endif
 endFunction	
 
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Patch Tracking Page 4 --------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------
 
 Function AddTrackingPage4()
-
+	
 	if CurrentPage == "Display Tracker (4)"
-		
-		if !Page4
-			AddTextOption("No Tracking Data To Display...", "", 1)
-			return
-		endif
-		
-		if HEADERSREQUIRED
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)										
-
-			Int Index = 0
-			Int PGPos = 0
-			Bool Moved = False
-			
-			While Index < TrackedDisplays4.length
-				
-				if (TrackedNames4[Index] != "")
-
-					While (PGPos > 63) && (!Moved)
-						SetCursorPosition(1)
-						PGPos = 1
-						Moved = True
-					endwhile
-				
-					if (TrackedDisplays4[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos != 0) && (PGPos != 1)
-							AddEmptyOption()
-							PGPos += 1
-						endif				
-						AddHeaderOption(TrackedNames4[Index], 0)	
-						PGPos += 1
-					else
-						if (!TrackedDisplays4[Index].IsDisabled())
-							AddToggleOption(TrackedNames4[Index], !TrackedDisplays4[Index].IsDisabled(), 1)
-							PGPos += 1
-						else
-							AddToggleOption(TrackedNames4[Index], !TrackedDisplays4[Index].IsDisabled())
-							PGPos += 1
-						endif
-					endif
-				endif
-					
-				Index +=1
-			endWhile
-			
-			if Page5
-				AddTextOption("Continue on Page 5...", "", 1)
-			endif
-		else
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)									
-			AddHeaderOption(TrackedPatch + " Displays", 0)
-			SetCursorPosition(1)
-			AddHeaderOption("", 0)
-		
-			Int PageIdx = 1
-			Int _Index = 0
-			While _Index < TrackedDisplays4.length
-				SetCursorPosition(PageIdx + 1)
-				
-				if (TrackedNames4[_Index] != "")
-					if (TrackedDisplays4[_Index].IsEnabled())
-						AddToggleOption(TrackedNames4[_Index], TrackedDisplays4[_Index].IsEnabled(), 1)
-						PageIdx += 1
-					else
-						AddToggleOption(TrackedNames4[_Index], TrackedDisplays4[_Index].IsEnabled())
-						PageIdx += 1
-					endif
-				endif
-				_Index +=1			
-			endWhile
-			
-			if Page5
-				AddTextOption("Continue on Page 5...", "", 1)
-			endif
-		endif	
+		BuildTrackingPage(Page4, Page5, TrackedDisplays4, TrackedNames4)
 	endif
 endFunction	
 
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Patch Tracking Page 5 --------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------
 
 Function AddTrackingPage5()
-
+	
 	if CurrentPage == "Display Tracker (5)"
-		
-		if !Page5
-			AddTextOption("No Tracking Data To Display...", "", 1)
-			return
-		endif
-		
-		if HEADERSREQUIRED
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)			
+		BuildTrackingPage(Page5, Page6, TrackedDisplays5, TrackedNames5)
+	endif
+endFunction	
 
-			Int Index = 0
-			Int PGPos = 0
-			Bool Moved = False
-			
-			While Index < TrackedDisplays5.length
-				
-				if (TrackedNames5[Index] != "")
+;;---------------------------------------------------
 
-					While (PGPos > 63) && (!Moved)
-						SetCursorPosition(1)
-						PGPos = 1
-						Moved = True
-					endwhile
-				
-					if (TrackedDisplays5[Index] == TCC_HEADER_TO_REPLACE)
-						if (PGPos != 0) && (PGPos != 1)
-							AddEmptyOption()
-							PGPos += 1
-						endif				
-						AddHeaderOption(TrackedNames5[Index], 0)	
+Function AddTrackingPage6()
+
+	if CurrentPage == "Display Tracker (6)"
+		BuildTrackingPage(Page6, Page7, TrackedDisplays6, TrackedNames6)
+	endif
+endFunction	
+
+;;---------------------------------------------------
+
+Function AddTrackingPage7()
+
+	if CurrentPage == "Display Tracker (7)"
+		BuildTrackingPage(Page7, Page8, TrackedDisplays7, TrackedNames7)
+	endif
+endFunction	
+
+;;---------------------------------------------------
+
+Function AddTrackingPage8()
+
+	if CurrentPage == "Display Tracker (8)"
+		BuildTrackingPage(Page8, Page9, TrackedDisplays8, TrackedNames8)
+	endif
+endFunction	
+
+;;---------------------------------------------------
+
+Function AddTrackingPage9()
+
+	if CurrentPage == "Display Tracker (9)"
+		BuildTrackingPage(Page9, Page10, TrackedDisplays9, TrackedNames9)
+	endif
+endFunction	
+
+;;---------------------------------------------------
+
+Function AddTrackingPage10()
+
+	if CurrentPage == "Display Tracker (10)"
+		BuildTrackingPage(Page10, False, TrackedDisplays10, TrackedNames10)
+	endif
+endFunction	
+
+;;---------------------------------------------------
+
+Function BuildTrackingPage(Bool ThisPage, Bool NextPage, ObjectReference[] DisplayArray, String[] NamesArray)
+		
+	if !ThisPage
+		AddTextOption("No Tracking Data To Display...", "", 1)
+		return
+	endif
+	
+	if HEADERSREQUIRED
+		SetTitleText(TrackedPatch + " Displays")
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		SetCursorPosition(0)			
+
+		Int Index = 0
+		Int PGPos = 0
+		Bool Moved = False
+		While Index < DisplayArray.length
+			if (NamesArray[Index] != "")
+				While (PGPos > 63) && (!Moved)
+					SetCursorPosition(1)
+					PGPos = 1
+					Moved = True
+				endwhile
+				if (DisplayArray[Index] == TCC_HEADER_TO_REPLACE)
+					if (PGPos != 0) && (PGPos != 1)
+						AddEmptyOption()
+						PGPos += 1
+					endif				
+					AddHeaderOption(NamesArray[Index], 0)	
+					PGPos += 1
+				else
+					if (!DisplayArray[Index].IsDisabled())
+						AddToggleOption(NamesArray[Index], !DisplayArray[Index].IsDisabled(), 1)
 						PGPos += 1
 					else
-						if (!TrackedDisplays5[Index].IsDisabled())
-							AddToggleOption(TrackedNames5[Index], !TrackedDisplays5[Index].IsDisabled(), 1)
-							PGPos += 1
-						else
-							AddToggleOption(TrackedNames5[Index], !TrackedDisplays5[Index].IsDisabled())
-							PGPos += 1
-						endif
+						AddToggleOption(NamesArray[Index], !DisplayArray[Index].IsDisabled())
+						PGPos += 1
 					endif
 				endif
-					
-				Index +=1
-			endWhile
-
-		else
-			SetTitleText(TrackedPatch + " Displays")
-			SetCursorFillMode(TOP_TO_BOTTOM)
-			SetCursorPosition(0)									
-			AddHeaderOption(TrackedPatch + " Displays", 0)
-			SetCursorPosition(1)
-			AddHeaderOption("", 0)
-		
-			Int PageIdx = 1
-			Int _Index = 0
-			While _Index < TrackedDisplays5.length
-				SetCursorPosition(PageIdx + 1)
-				
-				if (TrackedNames5[_Index] != "")
-					if (TrackedDisplays5[_Index].IsEnabled())
-						AddToggleOption(TrackedNames5[_Index], TrackedDisplays5[_Index].IsEnabled(), 1)
-						PageIdx += 1
-					else
-						AddToggleOption(TrackedNames5[_Index], TrackedDisplays5[_Index].IsEnabled())
-						PageIdx += 1
-					endif
+			endif
+			Index +=1
+		endWhile
+		if NextPage
+			AddTextOption("Continue on the next page...", "", 1)
+		endif
+	else
+		SetTitleText(TrackedPatch)
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		SetCursorPosition(0)									
+		AddHeaderOption(TrackedPatch, 0)
+		SetCursorPosition(1)
+		AddHeaderOption("", 0)
+		Int PageIdx = 1
+		Int Index = 0
+		While Index < DisplayArray.length
+			SetCursorPosition(PageIdx + 1)
+			if (NamesArray[Index] != "")
+				if (DisplayArray[Index].IsEnabled())
+					AddToggleOption(NamesArray[Index], DisplayArray[Index].IsEnabled(), 1)
+					PageIdx += 1
+				else
+					AddToggleOption(NamesArray[Index], DisplayArray[Index].IsEnabled())
+					PageIdx += 1
 				endif
-				_Index +=1			
-			endWhile
-		endif	
-	endif
+			endif
+			Index +=1			
+		endWhile
+		if NextPage
+			AddTextOption("Continue on the next page...", "", 1)
+		endif
+	endif	
 endFunction	
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;-------------------------------------------------------------------------------- Debug Page ------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-string function GetIconStatus()
-	
-	if ((dbmNew.GetSize()) + (dbmFound.GetSize()) + (dbmDisp.GetSize())) == (dbmMaster.GetSize())
-		return "No Icon Errors Detected"
-	endif
-	
-	return "Rebuild Advised"
-endfunction
-
-string function GetStatusString()
-
-	if RN_Scan_Done.GetValue() > RN_Scan_Registered.GetValue()
-		return "Scan Error"
-	endIf
-	
-	if RN_Setup_Start.GetValue()
-		return "Setting Up"
-		
-	elseif RN_Scan_Registered.GetValue()
-		return "Scanning"
-	
-	elseif DBM_SortWait.getValue()
-		return "Busy"
-	endIf
-	
-	return "No Errors Detected"
-endfunction
 
 Function AddDebugPage()
 
@@ -1329,7 +1072,7 @@ Function AddDebugPage()
 		AddTextOptionST("AchPreview", "Preview Achievement FX", "Preview", 0)
 		AddTextOptionST("ScanMuseum", "Confirm Museum Counts", "Update", 0)
 		AddTextOptionST("AdvancedDebugging", "Enable Debugging", GetDefaultEnabled(advdebug))
-		AddEmptyOption()
+		AddMenuOptionST("CacheListOptions", "Clear Cached Data:", CacheList[IndexCache])
 		AddEmptyOption()
 		AddHeaderOption("moreHUD Debug:")
 		AddTextOption("moreHUD new count:", dbmNew.GetSize() As Int, 1)
@@ -1392,20 +1135,6 @@ Function AddDebugPage()
 	endif
 endFunction
 
-String Function GetVersionString()
-    int iVersion = AhzMoreHud.GetVersion()
-    int iMajor = iVersion / 1000000
-    int iMinor = (iVersion / 10000) % 100
-    int iBug = (iVersion / 100) % 100
-    int iBeta = iVersion % 100
-    string aVersion = iMajor + "." + iMinor + "." + iBug
-
-    if (iBeta > 0)
-        aVersion += " Beta " + iBeta
-    endif
-    return aVersion
-EndFunction
-
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- General States------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1422,6 +1151,27 @@ state RefreshMCM
 				Page3 = False
 				Page4 = False
 				Page5 = False
+				Page6 = False
+				Page7 = False
+				Page8 = False
+				Page9 = False
+				Page10 = False
+				
+				CacheArmory = False
+				CacheDaedricGallery = False
+				CacheDragonbornhall = False
+				CacheGuildhouse = False
+				CacheHallofHeroes = False
+				CacheHallofLostEmpires = False
+				CacheHallofOddities = False
+				CacheHallofSecrets = False
+				CacheHallofWonders = False
+				CacheLibrary = False
+				CacheMisc = False
+				CacheNaturalScience = False
+				CacheSafehouse = False
+				CacheStoreroom = False
+				
 				Build_Arrays()
 				BuildPatchArray(true, true, true, true)
 				
@@ -1935,6 +1685,96 @@ state ConfirmIcons
 	EndEvent
 endState
 
+;;-------------------------------
+
+String Function GetVersionString()
+    int iVersion = AhzMoreHud.GetVersion()
+    int iMajor = iVersion / 1000000
+    int iMinor = (iVersion / 10000) % 100
+    int iBug = (iVersion / 100) % 100
+    int iBeta = iVersion % 100
+    string aVersion = iMajor + "." + iMinor + "." + iBug
+
+    if (iBeta > 0)
+        aVersion += " Beta " + iBeta
+    endif
+    return aVersion
+EndFunction
+
+;;-------------------------------
+
+string function GetIconStatus()
+	
+	if ((dbmNew.GetSize()) + (dbmFound.GetSize()) + (dbmDisp.GetSize())) == (dbmMaster.GetSize())
+		return "No Icon Errors Detected"
+	endif
+	
+	return "Rebuild Advised"
+endfunction
+
+;;-------------------------------
+
+string function GetStatusString()
+
+	if RN_Scan_Done.GetValue() > RN_Scan_Registered.GetValue()
+		return "Scan Error"
+	endIf
+	
+	if RN_Setup_Start.GetValue()
+		return "Setting Up"
+		
+	elseif RN_Scan_Registered.GetValue()
+		return "Scanning"
+	
+	elseif DBM_SortWait.getValue()
+		return "Busy"
+	endIf
+	
+	return "No Errors Detected"
+endfunction
+
+;;-------------------------------
+
+state CacheListOptions
+
+	event OnMenuOpenST()
+		SetMenuDialogStartIndex(IndexCache)
+		SetMenuDialogDefaultIndex(0)
+		SetMenuDialogOptions(CacheList)
+	endEvent
+
+	event OnMenuAcceptST(int index)
+		IndexCache = Index
+		SetMenuOptionValueST(CacheListOptions, CacheList[IndexCache])
+		DeleteCache(IndexCache)
+		ForcePageReset()
+	endEvent
+
+	event OnDefaultST()
+		IndexCache = 0
+		SetMenuOptionValueST(CacheList[IndexCache])
+		ForcePageReset()
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("Clear cached data used by the Display Tracker")
+	endEvent
+endState
+
+function DeleteCache(Int Index)
+	
+	if (Index != 0)
+		ClearCachedData(IndexCache)
+		ShowMessage(_Museum_Section_names[IndexCache - 1] + " cache deleted")
+		IndexCache = 0
+		SetMenuOptionValueST(CacheListOptions, CacheList[IndexCache])
+	else
+		IndexCache = 0
+		SetMenuOptionValueST(CacheListOptions, CacheList[IndexCache])		
+	endif
+endFunction
+
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Notifications Options -----------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2136,6 +1976,17 @@ String function GetDefaultEnabled(bool val)
 	endif
 	
 	return "Enabled"
+endfunction
+
+;;-------------------------------
+			
+String function GetDefaultCache(bool val)
+
+	if !val		
+		return "No cached data found"
+	endif
+	
+	return "Display Tracker will use cached data"
 endfunction
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2373,82 +2224,17 @@ state AchievementSet02
 		SetInfoText("Enable this to turn on the visual effect when an achievement is awarded.\n Default: Enabled")
 	EndEvent
 endState
-
-;;-------------------------------
-
-state ExplorationTracking
-
-	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names2[0], API.ExplorationDisplayRefs, API.ExplorationDisplayNames, API.ExplorationDisplaySection)
-	EndEvent
-
-	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names2[0] + " Displays in the Display Tracker.\n NOTE: Tracking for this Museum section will also include exploration displays from supported mods.")
-	EndEvent
-endState
-
-;;-------------------------------
-
-state MiscTracking
-
-	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names2[1], API.MiscDisplayRefs, API.MiscDisplayNames, API.MiscDisplaySection)
-	EndEvent
-
-	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names2[1] + " Displays in the Display Tracker.")
-	EndEvent
-endState
-
-;;-------------------------------
-
-state QuestTracking
-
-	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names2[2], API.QuestDisplayRefs, API.QuestDisplayNames, API.QuestDisplaySection)
-	EndEvent
-
-	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names2[2] + " Displays in the Display Tracker.\n NOTE: Tracking for this Museum section will also include quest displays from supported mods.")
-	EndEvent
-endState	
-
-;;-------------------------------
-		
-state SkillTracking
-
-	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names2[3], API.SkillDisplayRefs, API.SkillDisplayNames, API.SkillDisplaySection)
-	EndEvent
-
-	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names2[3] + " Displays in the Display Tracker.")
-	EndEvent
-endState	
-
-;;-------------------------------
-
-state ThaneTracking
-
-	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names2[4], API.ThaneBannerDisplayRefs, API.ThaneBannerDisplayNames, API.ThaneBannerDisplaySection)
-	EndEvent
-
-	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names2[4] + " Displays in the Display Tracker.")
-	EndEvent
-endState
-
+	
 ;;-------------------------------
 
 state ArmoryTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[0], API.ArmoryDisplayRefs, API.ArmoryDisplayNames, API.ArmoryDisplaySection)
+		SetupAPIPage(_Museum_Section_names[0], API._ArmoryDisplayRefs, API._ArmoryDisplayNames, API._ArmoryDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[0] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[0] + " in the Display Tracker\n" + GetDefaultCache(CacheArmory))
 	EndEvent
 endState
 
@@ -2457,11 +2243,11 @@ endState
 state DaedricGalleryTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[1], API.DaedricGalleryDisplayRefs, API.DaedricGalleryDisplayNames, API.DaedricGalleryDisplaySection)
+			SetupAPIPage(_Museum_Section_names[1], API._DaedricGalleryDisplayRefs, API._DaedricGalleryDisplayNames, API._DaedricGalleryDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[1] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[1] + " in the Display Tracker\n" + GetDefaultCache(CacheDaedricGallery))
 	EndEvent
 endState
 
@@ -2470,11 +2256,11 @@ endState
 state DragonbornHallTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[2], API.DragonbornHallDisplayRefs, API.DragonbornHallDisplayNames, API.DragonbornHallDisplaySection)
+		SetupAPIPage(_Museum_Section_names[2], API._DragonbornHallDisplayRefs, API._DragonbornHallDisplayNames, API._DragonbornHallDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[2] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[2] + " in the Display Tracker\n" + GetDefaultCache(CacheDragonbornhall))
 	EndEvent
 endState	
 
@@ -2483,11 +2269,11 @@ endState
 state GuildhouseTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[3], API.GuildhouseDisplayRefs, API.GuildhouseDisplayNames, API.GuildhouseDisplaySection)
+		SetupAPIPage(_Museum_Section_names[3], API._GuildhouseDisplayRefs, API._GuildhouseDisplayNames, API._GuildhouseDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[3] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[3] + " in the Display Tracker\n" + GetDefaultCache(CacheGuildhouse))
 	EndEvent
 endState
 
@@ -2496,11 +2282,11 @@ endState
 state HallofHeroesTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[4], API.HallofHeroesDisplayRefs, API.HallofHeroesDisplayNames, API.HallofHeroesDisplaySection)
+		SetupAPIPage(_Museum_Section_names[4], API._HallofHeroesDisplayRefs, API._HallofHeroesDisplayNames, API._HallofHeroesDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[4] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[4] + " in the Display Tracker\n" + GetDefaultCache(CacheHallofHeroes))
 	EndEvent
 endState
 
@@ -2509,11 +2295,11 @@ endState
 state HallofLostEmpiresTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[5], API.HallofLostEmpiresDisplayRefs, API.HallofLostEmpiresDisplayNames, API.HallofLostEmpiresDisplaySection)
+		SetupAPIPage(_Museum_Section_names[5], API._HallofLostEmpiresDisplayRefs, API._HallofLostEmpiresDisplayNames, API._HallofLostEmpiresDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[5] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[5] + " in the Display Tracker\n" + GetDefaultCache(CacheHallofLostEmpires))
 	EndEvent
 endState
 
@@ -2522,11 +2308,11 @@ endState
 state HallofOdditiesTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[6], API.HallofOdditiesDisplayRefs, API.HallofOdditiesDisplayNames, API.HallofOdditiesDisplaySection)
+		SetupAPIPage(_Museum_Section_names[6], API._HallofOdditiesDisplayRefs, API._HallofOdditiesDisplayNames, API._HallofOdditiesDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[6] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[6] + " in the Display Tracker\n" + GetDefaultCache(CacheHallofOddities))
 	EndEvent
 endState
 
@@ -2535,11 +2321,11 @@ endState
 state HallofSecretsTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[7], API.HallofSecretsDisplayRefs, API.HallofSecretsDisplayNames, API.HallofSecretsDisplaySection)
+		SetupAPIPage(_Museum_Section_names[7], API._HallofSecretsDisplayRefs, API._HallofSecretsDisplayNames, API._HallofSecretsDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[7] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[7] + " in the Display Tracker\n" + GetDefaultCache(CacheHallofSecrets))
 	EndEvent
 endState
 
@@ -2549,11 +2335,11 @@ state HallofWondersTracking
 
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[8], API.HallofWondersDisplayRefs, API.HallofWondersDisplayNames, API.HallofWondersDisplaySection)
+		SetupAPIPage(_Museum_Section_names[8], API._HallofWondersDisplayRefs, API._HallofWondersDisplayNames, API._HallofWondersDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[8] + " in the Display Tracker.\n NOTE: As there are no standard displays, tracking for this room will only include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[8] + " in the Display Tracker\n" + GetDefaultCache(CacheHallofWonders))
 	EndEvent
 endState
 
@@ -2562,11 +2348,11 @@ endState
 state LibraryTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[9], API.LibraryDisplayRefs, API.LibraryDisplayNames, API.LibraryDisplaySection)
+		SetupAPIPage(_Museum_Section_names[9], API._LibraryDisplayRefs, API._LibraryDisplayNames, API._LibraryDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[9] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[9] + " in the Display Tracker\n" + GetDefaultCache(CacheLibrary))
 	EndEvent
 endState
 
@@ -2575,11 +2361,11 @@ endState
 state NaturalScienceTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[10], API.NaturalScienceDisplayRefs, API.NaturalScienceDisplayNames, API.NaturalScienceDisplaySection)
+		SetupAPIPage(_Museum_Section_names[10], API._NaturalScienceDisplayRefs, API._NaturalScienceDisplayNames, API._NaturalScienceDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[10] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[10] + " in the Display Tracker\n" + GetDefaultCache(CacheNaturalScience))
 	EndEvent
 endState
 
@@ -2588,11 +2374,11 @@ endState
 state SafehouseTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[11], API.SafehouseDisplayRefs, API.SafehouseDisplayNames, API.SafehouseDisplaySection)
+		SetupAPIPage(_Museum_Section_names[11], API._SafehouseDisplayRefs, API._SafehouseDisplayNames, API._SafehouseDisplaySection)
 	EndEvent
 	
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[11] + " in the Display Tracker.\n NOTE: As there are no standard displays, tracking for this room will only include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[11] + " in the Display Tracker\n" + GetDefaultCache(CacheSafehouse))
 	EndEvent
 endState
 
@@ -2601,17 +2387,49 @@ endState
 state StoreroomTracking
 
 	Event OnSelectST()
-		SetupAPIPage(_Museum_Section_names[12], API.StoreroomDisplayRefs, API.StoreroomDisplayNames, API.StoreroomDisplaySection)
+		SetupAPIPage(_Museum_Section_names[12], API._StoreroomDisplayRefs, API._StoreroomDisplayNames, API._StoreroomDisplaySection)
 	EndEvent
 
 	Event OnHighlightST()
-		SetInfoText("Click to track the " + _Museum_Section_names[12] + " in the Display Tracker.\n NOTE: Tracking for this room will not include displays from supported mods... if you would like to track supported mods separately you can do so from the 'Official Patches' & 'Custom Patches' pages.")
+		SetInfoText("Click to track the " + _Museum_Section_names[12] + " in the Display Tracker\n" + GetDefaultCache(CacheStoreroom))
+	EndEvent
+endState
+
+;;-------------------------------
+
+state MiscTracking
+
+	Event OnSelectST()
+		SetupAPIPage(_Museum_Section_names[13], API._MiscDisplayRefs, API._MiscDisplayNames, API._MiscDisplaySection)
+	EndEvent
+
+	Event OnHighlightST()
+		SetInfoText("Click to track the Museum " + _Museum_Section_names[13] + " Displays in the Display Tracker\n" + GetDefaultCache(CacheMisc))
 	EndEvent
 endState
 
 ;;--------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Return Strings -------------------------------------
 ;;--------------------------------------------------------------------------------------------------------------------------------------
+
+string function GetPrimaryDisplayCount()
+	
+	Int Count = 0
+	Int Total = 0
+	Int Index = 0 
+	
+	While Index < RN_Museum_Global_Count.Length
+		if RN_Museum_Global_Count[Index] != none
+			Count += (RN_Museum_Global_Count[Index].GetValue() as Int)
+			Total += (RN_Museum_Global_Total[Index].GetValue() as Int)
+		endif
+		Index += 1
+	endwhile
+
+	return (Count + " / " + Total + " Displays")
+endFunction
+
+;;-------------------------------
 
 string function GetCurrentCountInt(Int akVariable, GlobalVariable akVariableB)
 	
@@ -2633,11 +2451,11 @@ endFunction
 Int Function BuildTotalsArray(Int val, Globalvariable[] _array)
 	
 	val = 0
-	Int _Index = _array.length
-	while _Index
-		_Index -= 1
-		if _array[_Index] != None
-			if _array[_Index].GetValue()
+	Int Index = _array.length
+	while Index
+		Index -= 1
+		if _array[Index] != None
+			if _array[Index].GetValue()
 				val += 1
 			endif
 		endif
@@ -2648,40 +2466,9 @@ endFunction
 
 ;;-------------------------------
 
-string function GetCurrentMuseumCount(Int val)
-
-	Int Total_Room = 12
-	if RN_CreationClubContent_Installed.GetValue()
-		Total_Room += 1
-	endif
-	
-	return (val + "/" + Total_Room + " Rooms")
-endFunction
-
-;;-------------------------------
-
 string function GetCurrentAchievementCount(GlobalVariable akVariable, formlist akTotal)
 
 	return (akVariable.GetValue() as Int + "/" + akTotal.GetSIze() as Int)
-endFunction
-
-;;-------------------------------
-
-string function GetDisplaySectionCount()
-	
-	Int Current_Count = 0
-	
-	Int Index = RN_Museum_Global_Complete2.Length
-	While Index
-		Index -= 1
-		if RN_Museum_Global_Complete2[Index] != None
-			if RN_Museum_Global_Complete2[Index].GetValue()
-				Current_Count += 1
-			endif
-		endif
-	endWhile
-	
-	return (Current_Count + "/5 Sections")
 endFunction
 
 ;;-------------------------------
@@ -2707,92 +2494,9 @@ endFunction
 		
 ;;-------------------------------
 
-Int function GetTotalTreasuryValue(GlobalVariable akvariable1, GlobalVariable akvariable2, GlobalVariable akvariable3)
+String function GetTotalTreasuryValue(GlobalVariable akvariable1, GlobalVariable akvariable2, GlobalVariable akvariable3)
 
-	return (akvariable1.GetValue() as Int) + (akvariable2.GetValue() as Int) + (akvariable3.GetValue() as Int)
-endFunction
-	
-;;-------------------------------
-
-Function SetupPage(Quest Patch, String _Name, Formlist _Items = None, Formlist _Displays = None)
-	
-	TrackedNames = new string[128]
-	TrackedNames2 = new string[128]
-	TrackedNames3 = new string[128]
-	TrackedNames4 = new string[128]
-	TrackedNames5 = new string[128]
-	TrackedDisplays = new objectreference[128]
-	TrackedDisplays2 = new objectreference[128]
-	TrackedDisplays3 = new objectreference[128]
-	TrackedDisplays4 = new objectreference[128]
-	TrackedDisplays5 = new objectreference[128]
-	TrackedQuest = Patch
-	TrackedPatch = _Name
-	Page1 = True
-	Page2 = False
-	Page3 = False
-	Page4 = False
-	Page5 = False
-	
-	HEADERSREQUIRED = False
-	
-	if (Patch)
-		SetTrackerArray()
-	else
-		SetTrackerSection(_Items, _Displays)
-	endif
-
-	SetTitleText("=== Finalizing ===")
-	
-	AddDynamicPagesList()
-	
-	ShowMessage(TrackedPatch + " Display Tracking Ready!", false, "Ok")
-	
-	if Page2 || Page3 || Page4 || Page5
-		SetTitleText("=== please Re-Enter The MCM ===")
-	else
-		SetTitleText(CurrentPage)
-	endif
-endFunction
-
-;;-------------------------------
-
-Function SetupAPIPage(String _Name = "", Formlist[] DisplayList, Formlist[] ItemList, String[] Header)
-
-	TrackedNames = new string[128]
-	TrackedNames2 = new string[128]
-	TrackedNames3 = new string[128]
-	TrackedNames4 = new string[128]
-	TrackedNames5 = new string[128]
-	TrackedDisplays = new objectreference[128]
-	TrackedDisplays2 = new objectreference[128]
-	TrackedDisplays3 = new objectreference[128]
-	TrackedDisplays4 = new objectreference[128]
-	TrackedDisplays5 = new objectreference[128]
-	TrackedQuest = None
-	TrackedPatch = _Name
-	
-	Page1 = True
-	Page2 = False
-	Page3 = False
-	Page4 = False
-	Page5 = False
-	
-	HEADERSREQUIRED = True
-
-	SetTrackerQuestDisplays(DisplayList, ItemList, Header)
-
-	SetTitleText("=== Finalizing ===")
-	
-	AddDynamicPagesList()
-	
-	ShowMessage(TrackedPatch + " Display Tracking Ready!", false, "Ok")
-	
-	if Page2 || Page3 || Page4 || Page5
-		SetTitleText("=== please Re-Enter The MCM ===")
-	else
-		SetTitleText(CurrentPage)
-	endif
+	return ("<font color='#070091'>" + ((akvariable1.GetValue() as Int) + (akvariable2.GetValue() as Int) + (akvariable3.GetValue() as Int)) + "</font>")
 endFunction
 
 ;;-------------------------------
@@ -2904,459 +2608,75 @@ EndEvent
 
 ;;-------------------------------
 
-Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
-	
-	SetTitleText("=== Loading ===")
-	Int ArrayPos = 0
-	Int FillSection = 0
-	
-	Formlist flist = AfListA as Formlist
-	Formlist Dlist = afListB as Formlist					
-		
-	Int Index = 0
-	While Index < Dlist.GetSize()		
-
-		if ArrayPos >= 125 && !Page2
-			SetTitleText("=== Building Page 2 ===")
-			FillSection = 2
-			Page2 = True
-			ArrayPos = 0
-
-		elseif ArrayPos >= 125 && !Page3
-			SetTitleText("=== Building Page 3 ===")
-			FillSection = 3
-			Page3 = True
-			ArrayPos = 0
-
-		elseif ArrayPos >= 125 && !Page4
-			SetTitleText("=== Building Page 4 ===")
-			FillSection = 4		
-			Page4 = True
-			ArrayPos = 0
-
-		elseif ArrayPos >= 125 && !Page5
-			SetTitleText("=== Building Page 5 ===")
-			FillSection = 5
-			Page5 = True
-			ArrayPos = 0
-		endif
-		
-		Form fDisp = Dlist.GetAt(Index)
-		Form fItem = flist.GetAt(Index)
-		ObjectReference DispRef = None	
-	
-		if fDisp as FormList
-			FormList NestedList = fDisp as FormList
-			int Index3 = NestedList.GetSize()
-			while Index3 && !DispRef
-				Index3 -= 1
-				ObjectReference TDisp = NestedList.GetAt(Index3) as ObjectReference
-				if TDisp && TDisp.IsEnabled()
-					DispRef = TDisp
-					if fItem as FormList
-						fItem = (fItem as Formlist).GetAt(Index3)
-					endif
-				endif
-			endwhile
-			if !DispRef
-				DispRef = (NestedList.GetAt(0) as ObjectReference)
-			endif
-		elseif fDisp 
-			DispRef = fDisp as ObjectReference
-		endif
-
-		String DispName
-		if fItem
-			if fItem as FormList
-				DispName = (fItem as FormList).GetAt(0).GetName()
-			else
-				DispName = fItem.GetName()
-			endif
-		else
-			DispName = "!Error"
-		endif
-			
-		if FillSection == 5
-			TrackedNames5[ArrayPos] = DispName
-			TrackedDisplays5[ArrayPos] = DispRef
-			ArrayPos += 1
-			
-		elseif FillSection == 4
-			TrackedNames4[ArrayPos] = DispName
-			TrackedDisplays4[ArrayPos] = DispRef
-			ArrayPos += 1
-			
-		elseif FillSection == 3
-			TrackedNames3[ArrayPos] = DispName
-			TrackedDisplays3[ArrayPos] = DispRef
-			ArrayPos += 1
-			
-		elseif FillSection == 2
-			TrackedNames2[ArrayPos] = DispName
-			TrackedDisplays2[ArrayPos] = DispRef
-			ArrayPos += 1	
-			
-		else
-			TrackedNames[ArrayPos] = DispName
-			TrackedDisplays[ArrayPos] = DispRef
-			ArrayPos += 1				
-		endif
-			
-		Index += 1
-	endwhile
-endFunction
-
-;;-------------------------------
-
-Function SetTrackerQuestDisplays(Formlist[] QuestDisp = None, FormList[] QuestItems = None, String[] Header = None)
-	
-	SetTitleText("=== Loading ===")
-	Int ArrayPos = 0
-	Int FillSection = 0
-	
-	Int Array = 0
-	While Array < QuestDisp.Length
-		if QuestDisp[Array] != None	
-			
-			if FillSection == 5
-				if ArrayPos	!= 0
-					ArrayPos += 1
-				endif
-				
-				TrackedNames5[ArrayPos] = Header[Array]
-				TrackedDisplays5[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1
-				
-			elseif FillSection == 4
-				if ArrayPos	!= 0
-					ArrayPos += 1
-				endif
-				
-				TrackedNames4[ArrayPos] = Header[Array]
-				TrackedDisplays4[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1
-				
-			elseif FillSection == 3
-				if ArrayPos	!= 0
-					ArrayPos += 1
-				endif
-				
-				TrackedNames3[ArrayPos] = Header[Array]
-				TrackedDisplays3[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1	
-				
-			elseif FillSection == 2
-				if ArrayPos	!= 0
-					ArrayPos += 1
-				endif
-				
-				TrackedNames2[ArrayPos] = Header[Array]
-				TrackedDisplays2[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1
-				
-			else
-				if ArrayPos	!= 0
-					ArrayPos += 1
-				endif
-				
-				TrackedNames[ArrayPos] = Header[Array]
-				TrackedDisplays[ArrayPos] = TCC_HEADER_TO_REPLACE
-				ArrayPos += 1				
-			endif		
-			
-			Formlist flist = QuestItems[Array] as Formlist
-			Formlist Dlist = QuestDisp[Array] as Formlist		
-				
-			Int Index = 0
-			While Index < Dlist.GetSize()		
-
-				if ArrayPos >= 127 && !Page2
-					SetTitleText("=== Building Page 2 ===")
-					FillSection = 2
-					Page2 = True
-					ArrayPos = 0
-
-				elseif ArrayPos >= 127 && !Page3
-					SetTitleText("=== Building Page 3 ===")
-					FillSection = 3
-					Page3 = True
-					ArrayPos = 0
-
-				elseif ArrayPos >= 127 && !Page4					
-					SetTitleText("=== Building Page 4 ===")
-					FillSection = 4		
-					Page4 = True
-					ArrayPos = 0
-
-				elseif ArrayPos >= 127 && !Page5
-					SetTitleText("=== Building Page 5 ===")
-					FillSection = 5
-					Page5 = True
-					ArrayPos = 0
-				endif
-				
-				Form fDisp = Dlist.GetAt(Index)
-				Form fItem = flist.GetAt(Index)
-				ObjectReference DispRef = None	
-			
-				if fDisp as FormList
-					FormList NestedList = fDisp as FormList
-					int Index3 = NestedList.GetSize()
-					while Index3 && !DispRef
-						Index3 -= 1
-						ObjectReference TDisp = NestedList.GetAt(Index3) as ObjectReference
-						if TDisp && TDisp.IsEnabled()
-							DispRef = TDisp
-							if fItem as FormList
-								fItem = (fItem as Formlist).GetAt(Index3)
-							endif
-						endif
-					endwhile
-					if !DispRef
-						DispRef = (NestedList.GetAt(0) as ObjectReference)
-					endif
-				elseif fDisp 
-					DispRef = fDisp as ObjectReference
-				endif
-
-				String DispName
-				if fItem
-					if fItem as FormList
-						DispName = (fItem as FormList).GetAt(0).GetName()
-					else
-						DispName = fItem.GetName()
-					endif
-				else
-					DispName = "!Error"
-				endif
-				
-				if FillSection == 5
-					TrackedNames5[ArrayPos] = DispName
-					TrackedDisplays5[ArrayPos] = DispRef
-					ArrayPos += 1
-					
-				elseif FillSection == 4
-					TrackedNames4[ArrayPos] = DispName
-					TrackedDisplays4[ArrayPos] = DispRef
-					ArrayPos += 1
-					
-				elseif FillSection == 3
-					TrackedNames3[ArrayPos] = DispName
-					TrackedDisplays3[ArrayPos] = DispRef
-					ArrayPos += 1
-					
-				elseif FillSection == 2
-					TrackedNames2[ArrayPos] = DispName
-					TrackedDisplays2[ArrayPos] = DispRef
-					ArrayPos += 1	
-					
-				else
-					TrackedNames[ArrayPos] = DispName
-					TrackedDisplays[ArrayPos] = DispRef	
-					ArrayPos += 1
-				endif
-					
-				Index += 1
-			endwhile
-		endif
-			
-		Array += 1
-	endWhile
-endFunction
-
-;;-------------------------------
-
-Function SetTrackerArray()
-	DBMSupportedModScript SupportPatch = (TrackedQuest as DBMSupportedModScript)
-	
-	SetTitleText("=== Loading ===")
-	Int ArrayPos = 0
-	Int Index = 0
-	While Index < SupportPatch.NewSectionDisplayRefLists.length
-			
-		Formlist flist = SupportPatch.NewSectionItemLists[Index] as Formlist
-		Formlist Dlist = SupportPatch.NewSectionDisplayRefLists[Index] as Formlist					
-
-		Int Index2 = 0
-		While Index2 < Dlist.GetSize()		
-
-			if ArrayPos >= 125 && !Page2
-				SetTitleText("=== Building Page 2 ===")
-				Page2 = True
-				ArrayPos = 0
-			endif
-				
-			Form fDisp = Dlist.GetAt(Index2)
-			Form fItem = flist.GetAt(Index2)
-			ObjectReference DispRef = None	
-		
-			if fDisp as FormList
-				FormList NestedList = fDisp as FormList
-				int Index3 = NestedList.GetSize()
-				while Index3 && !DispRef
-					Index3 -= 1
-					ObjectReference TDisp = NestedList.GetAt(Index3) as ObjectReference
-					if TDisp && TDisp.IsEnabled()
-						DispRef = TDisp
-						if fItem as FormList
-							fItem = (fItem as Formlist).GetAt(Index3)
-						endif
-					endif
-				endwhile
-				if !DispRef
-					DispRef = (NestedList.GetAt(0) as ObjectReference)
-				endif
-			elseif fDisp 
-				DispRef = fDisp as ObjectReference
-			endif
-
-			String DispName
-			if fItem
-				if fItem as FormList
-					DispName = (fItem as FormList).GetAt(0).GetName()
-				else
-					DispName = fItem.GetName()
-				endif
-			else
-				DispName = "!Error"
-			endif
-				
-				if !Page2
-					TrackedNames[ArrayPos] = DispName
-					TrackedDisplays[ArrayPos] = DispRef
-					ArrayPos += 1
-				else
-					TrackedNames2[ArrayPos] = DispName
-					TrackedDisplays2[ArrayPos] = DispRef
-					ArrayPos += 1				
-				endif
-				
-				Index2 += 1
-			endwhile
-		Index += 1
-	endWhile
-endFunction
-
-;;-------------------------------
-
 Function Build_Arrays()	
 	
-	Int _Index	
+	Int Index	
 	
 	RN_Armory_Global_Count = new globalvariable[20]
-	_Index = 0
-	While _Index < _Armory_Global_Count.GetSize()
-		globalvariable akvariable = _Armory_Global_Count.GetAt(_Index) as globalvariable
-		RN_Armory_Global_Count[_Index] = akvariable
-		_Index += 1
+	Index = 0
+	While Index < _Armory_Global_Count.GetSize()
+		globalvariable akvariable = _Armory_Global_Count.GetAt(Index) as globalvariable
+		RN_Armory_Global_Count[Index] = akvariable
+		Index += 1
 	endWhile
 
 	RN_Armory_Global_Complete = new globalvariable[20]
-	_Index = 0
-	While _Index < _Armory_Global_Complete.GetSize()
-		globalvariable akvariable = _Armory_Global_Complete.GetAt(_Index) as globalvariable
-		RN_Armory_Global_Complete[_Index] = akvariable
-		_Index += 1
+	Index = 0
+	While Index < _Armory_Global_Complete.GetSize()
+		globalvariable akvariable = _Armory_Global_Complete.GetAt(Index) as globalvariable
+		RN_Armory_Global_Complete[Index] = akvariable
+		Index += 1
 	endWhile
 
 	RN_Armory_Global_Total = new globalvariable[20]
-	_Index = 0
-	While _Index < _Armory_Global_Total.GetSize()
-		globalvariable akvariable = _Armory_Global_Total.GetAt(_Index) as globalvariable
-		RN_Armory_Global_Total[_Index] = akvariable
-		_Index += 1
+	Index = 0
+	While Index < _Armory_Global_Total.GetSize()
+		globalvariable akvariable = _Armory_Global_Total.GetAt(Index) as globalvariable
+		RN_Armory_Global_Total[Index] = akvariable
+		Index += 1
 	endWhile
 
 ;;-------------------------------
 
 	RN_Museum_Global_Complete = new globalvariable[128]
-	_Index = 0
-	While _Index < _Museum_Global_Complete.GetSize()
-		globalvariable akvariable = _Museum_Global_Complete.GetAt(_Index) as globalvariable
-		RN_Museum_Global_Complete[_Index] = akvariable
-		_Index += 1
+	Index = 0
+	While Index < _Museum_Global_Complete.GetSize()
+		globalvariable akvariable = _Museum_Global_Complete.GetAt(Index) as globalvariable
+		RN_Museum_Global_Complete[Index] = akvariable
+		Index += 1
 	endWhile
 
 	RN_Museum_Global_Count = new globalvariable[128]
-	_Index = 0
-	While _Index < _Museum_Global_Count.GetSize()
-		globalvariable akvariable = _Museum_Global_Count.GetAt(_Index) as globalvariable
-		RN_Museum_Global_Count[_Index] = akvariable
-		_Index += 1
+	Index = 0
+	While Index < _Museum_Global_Count.GetSize()
+		globalvariable akvariable = _Museum_Global_Count.GetAt(Index) as globalvariable
+		RN_Museum_Global_Count[Index] = akvariable
+		Index += 1
 	endWhile
 
 	RN_Museum_Global_Total = new globalvariable[128]
-	_Index = 0
-	While _Index < _Museum_Global_Total.GetSize()
-		globalvariable akvariable = _Museum_Global_Total.GetAt(_Index) as globalvariable
-		RN_Museum_Global_Total[_Index] = akvariable
-		_Index += 1
+	Index = 0
+	While Index < _Museum_Global_Total.GetSize()
+		globalvariable akvariable = _Museum_Global_Total.GetAt(Index) as globalvariable
+		RN_Museum_Global_Total[Index] = akvariable
+		Index += 1
 	endWhile
-
-;;-------------------------------
-
-	RN_Museum_Global_Complete2 = new globalvariable[128]
-	_Index = 0
-	While _Index < _Museum_Global_Complete2.GetSize()
-		globalvariable akvariable = _Museum_Global_Complete2.GetAt(_Index) as globalvariable
-		RN_Museum_Global_Complete2[_Index] = akvariable
-		_Index += 1
-	endWhile
-
-	RN_Museum_Global_Count2 = new globalvariable[128]
-	_Index = 0
-	While _Index < _Museum_Global_Count2.GetSize()
-		globalvariable akvariable = _Museum_Global_Count2.GetAt(_Index) as globalvariable
-		RN_Museum_Global_Count2[_Index] = akvariable
-		_Index += 1
-	endWhile
-
-	RN_Museum_Global_Total2 = new globalvariable[128]
-	_Index = 0
-	While _Index < _Museum_Global_Total2.GetSize()
-		globalvariable akvariable = _Museum_Global_Total2.GetAt(_Index) as globalvariable
-		RN_Museum_Global_Total2[_Index] = akvariable
-		_Index += 1
-	endWhile
-
-;;-------------------------------
 	
 	RN_Ach_Globals = new globalvariable[128]
-	_Index = 0
-	While _Index < RN_Achievement_Globals.GetSize()
-		globalvariable akvariable = RN_Achievement_Globals.GetAt(_Index) as globalvariable
-		RN_Ach_Globals[_Index] = akvariable
-		_Index += 1
+	Index = 0
+	While Index < RN_Achievement_Globals.GetSize()
+		globalvariable akvariable = RN_Achievement_Globals.GetAt(Index) as globalvariable
+		RN_Ach_Globals[Index] = akvariable
+		Index += 1
 	endWhile	
 
 	RN_ComAch_Globals = new globalvariable[128]
-	_Index = 0
-	While _Index < RN_ComAchievement_Globals.GetSize()
-		globalvariable akvariable = RN_ComAchievement_Globals.GetAt(_Index) as globalvariable
-		RN_ComAch_Globals[_Index] = akvariable
-		_Index += 1
+	Index = 0
+	While Index < RN_ComAchievement_Globals.GetSize()
+		globalvariable akvariable = RN_ComAchievement_Globals.GetAt(Index) as globalvariable
+		RN_ComAch_Globals[Index] = akvariable
+		Index += 1
 	endWhile
-
-	TrackedNames = new string[128]
-	TrackedNames2 = new string[128]
-	TrackedNames3 = new string[128]
-	TrackedNames4 = new string[128]
-	TrackedNames5 = new string[128]
-	
-	TrackedDisplays = new objectreference[128]
-	TrackedDisplays2 = new objectreference[128]
-	TrackedDisplays3 = new objectreference[128]
-	TrackedDisplays4 = new objectreference[128]
-	TrackedDisplays5 = new objectreference[128]
-	
-	TrackedQuest = none
-	TrackedPatch = ""
-	
-	Page1 = False
-	Page2 = False
-	Page3 = False
-	Page4 = False
-	Page5 = False
 
 ;;-------------------------------
 	_Armory_Section_Position = new Int[128]
@@ -3396,7 +2716,8 @@ Function Build_Arrays()
 	_Museum_Section_names[10] = "Natural Science"
 	_Museum_Section_names[11] = "Safehouse"
 	_Museum_Section_names[12] = "Storeroom"
-
+	_Museum_Section_names[13] = "Miscellaneous"
+	
 	_Museum_Section_States = new string[128]
 	_Museum_Section_States[0] = "ArmoryTracking"
 	_Museum_Section_States[1] = "DaedricGalleryTracking"
@@ -3411,21 +2732,8 @@ Function Build_Arrays()
 	_Museum_Section_States[10] = "NaturalScienceTracking"
 	_Museum_Section_States[11] = "SafehouseTracking"
 	_Museum_Section_States[12] = "StoreroomTracking"
-	
-	_Museum_Section_names2 = new string[128]
-	_Museum_Section_names2[0] = "Exploration"
-	_Museum_Section_names2[1] = "Misc"
-	_Museum_Section_names2[2] = "Quest"
-	_Museum_Section_names2[3] = "Skill"
-	_Museum_Section_names2[4] = "Thane"
+	_Museum_Section_States[13] = "MiscTracking"
 
-	_Museum_Section_States2 = new string[128]
-	_Museum_Section_States2[0] = "ExplorationTracking"
-	_Museum_Section_States2[1] = "MiscTracking"
-	_Museum_Section_States2[2] = "QuestTracking"
-	_Museum_Section_States2[3] = "SkillTracking"
-	_Museum_Section_States2[4] = "ThaneTracking"
-	
 	RN_Ach_Highlight = new string[128]
 	RN_Ach_Highlight[0] = "Reach a total of 500 displays in the Museum"
 	RN_Ach_Highlight[1] = "Reach a total of 750 displays in the Museum\n *Completing this achievement rewards a unique displayable item"
@@ -3611,7 +2919,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 	
 	Int Index
 	
-	if _ModName == "Heavy Armoury"
+	if _ModName == "Heavy Armory"
 		
 		Index = _SectionName.length
 		Index_Section = Index
@@ -3621,7 +2929,7 @@ Function AddSectionSupport(Formlist Count, Formlist Total, Formlist Complete, St
 			RN_Section_Complete_Array[Index] = Complete.GetAt(Index) as GlobalVariable
 			RN_Section_Count_Array[Index] = Count.GetAt(Index) as GlobalVariable
 			RN_Section_Total_Array[Index] = Total.GetAt(Index) as GlobalVariable
-			TCCDebug.Log("MCM Registered Heavy Armoury Section [" + _SectionName[Index] + "] at position " + Index, 0)
+			TCCDebug.Log("MCM Registered Heavy Armory Section [" + _SectionName[Index] + "] at position " + Index, 0)
 		endWhile
 
 		RN_Section_ItemsList = ItemsList
@@ -3692,6 +3000,944 @@ Function BuildPatchArray(bool CreateArrays, bool UpdateRegistrations, bool Updat
 		API.UpdateTracking()
 	endif
 endFunction
+
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;--------------------------------------------------------------------------------- Script End ------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------ Caching Functions --------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Bool function IsSectionCached(String RoomName)
+	
+	if (RoomName == _Museum_Section_names[0]) && (CacheArmory)
+		return true
+	elseif (RoomName == _Museum_Section_names[1]) && (CacheDaedricGallery)
+		return true	
+	elseif (RoomName == _Museum_Section_names[2]) && (CacheDragonbornhall)
+		return true
+	elseif (RoomName == _Museum_Section_names[3]) && (CacheGuildhouse)
+		return true
+	elseif (RoomName == _Museum_Section_names[4]) && (CacheHallofHeroes)
+		return true
+	elseif (RoomName == _Museum_Section_names[5]) && (CacheHallofLostEmpires)
+		return true
+	elseif (RoomName == _Museum_Section_names[6]) && (CacheHallofOddities)
+		return true
+	elseif (RoomName == _Museum_Section_names[7]) && (CacheHallofSecrets)
+		return true
+	elseif (RoomName == _Museum_Section_names[8]) && (CacheHallofWonders)
+		return true
+	elseif (RoomName == _Museum_Section_names[9]) && (CacheLibrary)
+		return true
+	elseif (RoomName == _Museum_Section_names[10]) && (CacheNaturalScience)
+		return true
+	elseif (RoomName == _Museum_Section_names[11]) && (CacheSafehouse)
+		return true
+	elseif (RoomName == _Museum_Section_names[12]) && (CacheStoreroom)
+		return true
+	elseif (RoomName == _Museum_Section_names[13]) && (CacheMisc)
+		return true
+	endif	
+	
+	return False
+endFunction
+	
+;;-------------------------------
+
+function SetCacheDone(String RoomName)
+	
+	if (RoomName == _Museum_Section_names[0])
+		CacheArmory = true
+		CacheArmoryPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[1])
+		CacheDaedricGallery = true	
+		CacheDaedricGalleryPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[2])
+		CacheDragonbornhall = true
+		CacheDragonbornhallPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[3])
+		CacheGuildhouse = true
+		CacheGuildhousePages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[4])
+		CacheHallofHeroes = true
+		CacheHallofHeroesPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[5])
+		CacheHallofLostEmpires = true
+		CacheHallofLostEmpiresPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[6])
+		CacheHallofOddities = true
+		CacheHallofOdditiesPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[7])
+		CacheHallofSecrets = true
+		CacheHallofSecretsPages = PagesRequired
+		
+	elseif (RoomName ==_Museum_Section_names[8])
+		CacheHallofWonders = true
+		CacheHallofWondersPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[9])
+		CacheLibrary = true
+		CacheLibraryPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[10])
+		CacheNaturalScience = true
+		CacheNaturalSciencePages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[11])
+		CacheSafehouse = true
+		CacheSafehousePages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[12])
+		CacheStoreroom = true
+		CacheStoreroomPages = PagesRequired
+		
+	elseif (RoomName == _Museum_Section_names[13])
+		CacheMisc = true
+		CacheMiscPages = PagesRequired
+	endif
+endFunction
+
+;;-------------------------------
+
+function ClearCachedData(Int Index)
+
+	if (Index == 1)
+		CacheArmory = False
+		CacheArmoryPages = 0
+		
+	elseif (Index == 2)
+		CacheDaedricGallery = False	
+		CacheDaedricGalleryPages = 0
+		
+	elseif (Index == 3)
+		CacheDragonbornhall = False
+		CacheDragonbornhallPages = 0
+
+	elseif (Index == 4)
+		CacheGuildhouse = False
+		CacheGuildhousePages = 0
+
+	elseif (Index == 5)
+		CacheHallofHeroes = False
+		CacheHallofHeroesPages = 0
+
+	elseif (Index == 6)
+		CacheHallofLostEmpires = False
+		CacheHallofLostEmpiresPages = 0
+
+	elseif (Index == 7)
+		CacheHallofOddities = False
+		CacheHallofOdditiesPages = 0
+
+	elseif (Index == 8)
+		CacheHallofSecrets = False
+		CacheHallofSecretsPages = 0
+
+	elseif (Index == 9)
+		CacheHallofWonders = False
+		CacheHallofWondersPages = 0
+
+	elseif (Index == 10)
+		CacheLibrary = False
+		CacheLibraryPages = 0
+		
+	elseif (Index == 11)
+		CacheNaturalScience = False
+		CacheNaturalSciencePages = 0
+
+	elseif (Index == 12)
+		CacheSafehouse = False
+		CacheSafehousePages = 0
+
+	elseif (Index == 13)
+		CacheStoreroom = False
+		CacheStoreroomPages = 0
+
+	elseif (Index == 14)
+		CacheMisc = False
+		CacheMiscPages = 0
+	endif
+endFunction
+	
+function GetCacheData(String RoomName)
+	
+	Int Index
+	
+	if (RoomName == _Museum_Section_names[0])
+		Index = CacheArmoryPages
+		
+	elseif (RoomName == _Museum_Section_names[1])
+		CacheDaedricGallery = true	
+		Index = CacheDaedricGalleryPages
+		
+	elseif (RoomName == _Museum_Section_names[2])
+		CacheDragonbornhall = true
+		Index = CacheDragonbornhallPages
+
+	elseif (RoomName == _Museum_Section_names[3])
+		CacheGuildhouse = true
+		Index = CacheGuildhousePages
+
+	elseif (RoomName == _Museum_Section_names[4])
+		CacheHallofHeroes = true
+		Index = CacheHallofHeroesPages
+
+	elseif (RoomName == _Museum_Section_names[5])
+		CacheHallofLostEmpires = true
+		Index = CacheHallofLostEmpiresPages
+
+	elseif (RoomName == _Museum_Section_names[6])
+		CacheHallofOddities = true
+		Index = CacheHallofOdditiesPages
+
+	elseif (RoomName == _Museum_Section_names[7])
+		CacheHallofSecrets = true
+		Index = CacheHallofSecretsPages
+
+	elseif (RoomName ==_Museum_Section_names[8])
+		CacheHallofWonders = true
+		Index = CacheHallofWondersPages
+
+	elseif (RoomName == _Museum_Section_names[9])
+		CacheLibrary = true
+		Index = CacheLibraryPages
+		
+	elseif (RoomName == _Museum_Section_names[10])
+		CacheNaturalScience = true
+		Index = CacheNaturalSciencePages
+
+	elseif (RoomName == _Museum_Section_names[11])
+		CacheSafehouse = true
+		Index = CacheSafehousePages
+
+	elseif (RoomName == _Museum_Section_names[12])
+		CacheStoreroom = true
+		Index = CacheStoreroomPages
+
+	elseif (RoomName == _Museum_Section_names[13])
+		CacheMisc = true
+		Index = CacheMiscPages
+	endif
+	
+	LoadPages(Index)
+endFunction
+
+function LoadPages(Int Index)
+	
+	if (Index == 10)
+		Page1 = True
+		Page2 = True
+		Page3 = True
+		Page4 = True
+		Page5 = True
+		Page6 = True
+		Page7 = True
+		Page8 = True
+		Page9 = True
+		Page10 = True
+	
+	elseif (Index == 9)
+		Page1 = True
+		Page2 = True
+		Page3 = True
+		Page4 = True
+		Page5 = True
+		Page6 = True
+		Page7 = True
+		Page8 = True
+		Page9 = True
+		Page10 = False	
+
+	elseif (Index == 8)
+		Page1 = True
+		Page2 = True
+		Page3 = True
+		Page4 = True
+		Page5 = True
+		Page6 = True
+		Page7 = True
+		Page8 = True
+		Page9 = False
+		Page10 = False
+
+	elseif (Index == 7)
+		Page1 = True
+		Page2 = True
+		Page3 = True
+		Page4 = True
+		Page5 = True
+		Page6 = True
+		Page7 = True
+		Page8 = False
+		Page9 = False
+		Page10 = False
+
+	elseif (Index == 6)
+		Page1 = True
+		Page2 = True
+		Page3 = True
+		Page4 = True
+		Page5 = True
+		Page6 = True
+		Page7 = False
+		Page8 = False
+		Page9 = False
+		Page10 = False
+
+	elseif (Index == 5)
+		Page1 = True
+		Page2 = True
+		Page3 = True
+		Page4 = True
+		Page5 = True
+		Page6 = False
+		Page7 = False
+		Page8 = False
+		Page9 = False
+		Page10 = False
+
+	elseif (Index == 4)
+		Page1 = True
+		Page2 = True
+		Page3 = True
+		Page4 = True
+		Page5 = False
+		Page6 = False
+		Page7 = False
+		Page8 = False
+		Page9 = False
+		Page10 = False	
+
+	elseif (Index == 3)
+		Page1 = True
+		Page2 = True
+		Page3 = True
+		Page4 = False
+		Page5 = False
+		Page6 = False
+		Page7 = False
+		Page8 = False
+		Page9 = False
+		Page10 = False
+
+	elseif (Index == 2)
+		Page1 = True
+		Page2 = True
+		Page3 = False
+		Page4 = False
+		Page5 = False
+		Page6 = False
+		Page7 = False
+		Page8 = False
+		Page9 = False
+		Page10 = False
+
+	elseif (Index == 1)
+		Page1 = True
+		Page2 = False
+		Page3 = False
+		Page4 = False
+		Page5 = False
+		Page6 = False
+		Page7 = False
+		Page8 = False
+		Page9 = False
+		Page10 = False
+	endIf
+endfunction
+
+;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------- Script End ------------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;;----------------------------------------------------------------------------- Tracking Functions --------------------------------------------------------------------------------------------------------
+;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Function SetupPage(Quest Patch, String _Name, Formlist _Items = None, Formlist _Displays = None)
+
+	TrackedNames = new string[128]
+	TrackedNames2 = new string[128]
+	TrackedNames3 = new string[128]
+	TrackedNames4 = new string[128]
+	TrackedNames5 = new string[128]
+	TrackedNames6 = new string[128]
+	TrackedNames7 = new string[128]
+	TrackedNames8 = new string[128]
+	TrackedNames9 = new string[128]
+	TrackedNames10 = new string[128]
+	TrackedDisplays = new objectreference[128]
+	TrackedDisplays2 = new objectreference[128]
+	TrackedDisplays3 = new objectreference[128]
+	TrackedDisplays4 = new objectreference[128]
+	TrackedDisplays5 = new objectreference[128]
+	TrackedDisplays6 = new objectreference[128]
+	TrackedDisplays7 = new objectreference[128]
+	TrackedDisplays8 = new objectreference[128]
+	TrackedDisplays9 = new objectreference[128]
+	TrackedDisplays10 = new objectreference[128]	
+	
+	TrackedQuest = Patch
+	TrackedPatch = _Name
+	
+	Page1 = True
+	Page2 = False
+	Page3 = False
+	Page4 = False
+	Page5 = False
+	Page6 = False
+	Page7 = False
+	Page8 = False
+	Page9 = False
+	Page10 = False
+	
+	HEADERSREQUIRED = False
+	
+	if (Patch)
+		SetTrackerArray()
+	else
+		SetTrackerSection(_Items, _Displays)
+	endif
+
+	SetTitleText("=== Finalizing ===")
+	
+	AddDynamicPagesList()
+	
+	ShowMessage(TrackedPatch + " Display Tracking Ready!", false, "Ok")
+	
+	if Page2 || Page3 || Page4 || Page5
+		SetTitleText("=== please Re-Enter The MCM ===")
+	else
+		SetTitleText(CurrentPage)
+	endif
+endFunction
+
+;;-------------------------------
+
+Function SetupAPIPage(String _Name = "", Formlist[] DisplayList, Formlist[] ItemList, String[] Header)
+	
+	TrackedNames = new string[128]
+	TrackedNames2 = new string[128]
+	TrackedNames3 = new string[128]
+	TrackedNames4 = new string[128]
+	TrackedNames5 = new string[128]
+	TrackedNames6 = new string[128]
+	TrackedNames7 = new string[128]
+	TrackedNames8 = new string[128]
+	TrackedNames9 = new string[128]
+	TrackedNames10 = new string[128]
+	TrackedDisplays = new objectreference[128]
+	TrackedDisplays2 = new objectreference[128]
+	TrackedDisplays3 = new objectreference[128]
+	TrackedDisplays4 = new objectreference[128]
+	TrackedDisplays5 = new objectreference[128]
+	TrackedDisplays6 = new objectreference[128]
+	TrackedDisplays7 = new objectreference[128]
+	TrackedDisplays8 = new objectreference[128]
+	TrackedDisplays9 = new objectreference[128]
+	TrackedDisplays10 = new objectreference[128]	
+	
+	TrackedQuest = None
+	TrackedPatch = _Name
+	
+	Page1 = True
+	Page2 = False
+	Page3 = False
+	Page4 = False
+	Page5 = False
+	Page6 = False
+	Page7 = False
+	Page8 = False
+	Page9 = False
+	Page10 = False
+		
+	HEADERSREQUIRED = True
+
+	if IsSectionCached(_Name)
+		SetTitleText("=== Loading Cache ===")
+		MCMCache.LoadCache(_Name)
+		GetCacheData(_Name)
+	else
+		SetTrackerDisplays(DisplayList, ItemList, Header, _Name)
+		SetTitleText("=== Caching Displays ===")
+		MCMCache.CacheDisplays(_Name)
+		SetCacheDone(_Name)
+	endIf
+	
+	SetTitleText("=== Finalizing ===")
+	
+	AddDynamicPagesList()
+	
+	ShowMessage(TrackedPatch + " Display Tracking Ready!", false, "Ok")
+	
+	if Page2 || Page3 || Page4 || Page5 || Page6 || Page7 || Page8 || Page9 || Page10
+		SetTitleText("=== please Re-Enter The MCM ===")
+	else
+		SetTitleText(CurrentPage)
+	endif
+endFunction
+
+;;-------------------------------
+
+Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
+	
+	SetTitleText("=== Loading ===")
+	Int ArrayPos = 0
+	Int FillSection = 0
+	
+	Formlist flist = AfListA as Formlist
+	Formlist Dlist = afListB as Formlist					
+		
+	Int Index = 0
+	While Index < Dlist.GetSize()		
+
+		if ArrayPos >= 125 && !Page2
+			SetTitleText("=== Building Page 2 ===")
+			FillSection = 2
+			Page2 = True
+			ArrayPos = 0
+
+		elseif ArrayPos >= 125 && !Page3
+			SetTitleText("=== Building Page 3 ===")
+			FillSection = 3
+			Page3 = True
+			ArrayPos = 0
+
+		elseif ArrayPos >= 125 && !Page4
+			SetTitleText("=== Building Page 4 ===")
+			FillSection = 4		
+			Page4 = True
+			ArrayPos = 0
+
+		elseif ArrayPos >= 125 && !Page5
+			SetTitleText("=== Building Page 5 ===")
+			FillSection = 5
+			Page5 = True
+			ArrayPos = 0
+		endif
+		
+		Form fDisp = Dlist.GetAt(Index)
+		Form fItem = flist.GetAt(Index)
+		ObjectReference DispRef = None	
+	
+		if fDisp as FormList
+			FormList NestedList = fDisp as FormList
+			int Index3 = NestedList.GetSize()
+			while Index3 && !DispRef
+				Index3 -= 1
+				ObjectReference TDisp = NestedList.GetAt(Index3) as ObjectReference
+				if TDisp && TDisp.IsEnabled()
+					DispRef = TDisp
+					if fItem as FormList
+						fItem = (fItem as Formlist).GetAt(Index3)
+					endif
+				endif
+			endwhile
+			if !DispRef
+				DispRef = (NestedList.GetAt(0) as ObjectReference)
+			endif
+		elseif fDisp 
+			DispRef = fDisp as ObjectReference
+		endif
+
+		String DispName
+		if fItem
+			if fItem as FormList
+				DispName = (fItem as FormList).GetAt(0).GetName()
+			else
+				DispName = fItem.GetName()
+			endif
+		else
+			DispName = "!Error"
+		endif
+			
+		if FillSection == 5
+			TrackedNames5[ArrayPos] = DispName
+			TrackedDisplays5[ArrayPos] = DispRef
+			ArrayPos += 1
+			
+		elseif FillSection == 4
+			TrackedNames4[ArrayPos] = DispName
+			TrackedDisplays4[ArrayPos] = DispRef
+			ArrayPos += 1
+			
+		elseif FillSection == 3
+			TrackedNames3[ArrayPos] = DispName
+			TrackedDisplays3[ArrayPos] = DispRef
+			ArrayPos += 1
+			
+		elseif FillSection == 2
+			TrackedNames2[ArrayPos] = DispName
+			TrackedDisplays2[ArrayPos] = DispRef
+			ArrayPos += 1	
+			
+		else
+			TrackedNames[ArrayPos] = DispName
+			TrackedDisplays[ArrayPos] = DispRef
+			ArrayPos += 1				
+		endif
+			
+		Index += 1
+	endwhile
+endFunction
+
+;;-------------------------------
+
+Function SetTrackerDisplays(Formlist[] DisplayArray = None, FormList[] NamesArray = None, String[] Header = None, String RoomName)
+		
+	SetTitleText("=== Building Page 1 ===")
+	Int ArrayPos = 0
+	Int FillSection = 0
+	
+	Int Array = 0
+	Int ArrayLength
+	Bool TrackPatches
+	
+	PagesRequired = 1
+	
+	While (Array < DisplayArray.Length) && (DisplayArray[Array] != None)
+
+		if FillSection == 10
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames10[ArrayPos] = Header[Array]
+			TrackedDisplays10[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1
+
+		elseif FillSection == 9
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames9[ArrayPos] = Header[Array]
+			TrackedDisplays9[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1
+
+		elseif FillSection == 8
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames8[ArrayPos] = Header[Array]
+			TrackedDisplays8[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1
+
+		elseif FillSection == 7
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames7[ArrayPos] = Header[Array]
+			TrackedDisplays7[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1
+
+		elseif FillSection == 6
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames6[ArrayPos] = Header[Array]
+			TrackedDisplays6[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1
+			
+		elseif FillSection == 5
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames5[ArrayPos] = Header[Array]
+			TrackedDisplays5[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1
+			
+		elseif FillSection == 4
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames4[ArrayPos] = Header[Array]
+			TrackedDisplays4[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1
+			
+		elseif FillSection == 3
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames3[ArrayPos] = Header[Array]
+			TrackedDisplays3[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1	
+			
+		elseif FillSection == 2
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames2[ArrayPos] = Header[Array]
+			TrackedDisplays2[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1
+			
+		else
+			if ArrayPos	!= 0
+				ArrayPos += 1
+			endif
+			
+			TrackedNames[ArrayPos] = Header[Array]
+			TrackedDisplays[ArrayPos] = TCC_HEADER_TO_REPLACE
+			ArrayPos += 1				
+		endif		
+		
+		Formlist flist = NamesArray[Array] as Formlist
+		Formlist Dlist = DisplayArray[Array] as Formlist		
+			
+		Int Index = 0
+		While Index < Dlist.GetSize()		
+
+			if ArrayPos > 126 && !Page2
+				SetTitleText("=== Building Page 2 ===")
+				FillSection = 2
+				Page2 = True
+				PagesRequired = 2
+				ArrayPos = 0
+
+			elseif ArrayPos > 126 && !Page3
+				SetTitleText("=== Building Page 3 ===")
+				FillSection = 3
+				Page3 = True
+				PagesRequired = 3
+				ArrayPos = 0
+
+			elseif ArrayPos > 126 && !Page4					
+				SetTitleText("=== Building Page 4 ===")
+				FillSection = 4		
+				Page4 = True
+				PagesRequired = 4
+				ArrayPos = 0
+
+			elseif ArrayPos > 126 && !Page5
+				SetTitleText("=== Building Page 5 ===")
+				FillSection = 5
+				Page5 = True
+				PagesRequired = 5
+				ArrayPos = 0
+
+			elseif ArrayPos > 126 && !Page6
+				SetTitleText("=== Building Page 6 ===")
+				FillSection = 6
+				Page6 = True
+				PagesRequired = 6
+				ArrayPos = 0
+
+			elseif ArrayPos > 126 && !Page7
+				SetTitleText("=== Building Page 7 ===")
+				FillSection = 7
+				Page7 = True
+				PagesRequired = 7
+				ArrayPos = 0
+
+			elseif ArrayPos > 126 && !Page8
+				SetTitleText("=== Building Page 8 ===")
+				FillSection = 8
+				Page8 = True
+				PagesRequired = 8
+				ArrayPos = 0
+			elseif ArrayPos > 126 && !Page9
+				SetTitleText("=== Building Page 9 ===")
+				FillSection = 9
+				Page9 = True
+				PagesRequired = 9
+				ArrayPos = 0
+
+			elseif ArrayPos > 126 && !Page10
+				SetTitleText("=== Building Page 10 ===")
+				FillSection = 10
+				Page10 = True
+				PagesRequired = 10
+				ArrayPos = 0
+			endif
+			
+			Form fDisp = Dlist.GetAt(Index)
+			Form fItem = flist.GetAt(Index)
+			ObjectReference DispRef = None	
+		
+			if fDisp as FormList
+				FormList NestedList = fDisp as FormList
+				int Index3 = NestedList.GetSize()
+				while Index3 && !DispRef
+					Index3 -= 1
+					ObjectReference TDisp = NestedList.GetAt(Index3) as ObjectReference
+					if TDisp && TDisp.IsEnabled()
+						DispRef = TDisp
+						if fItem as FormList
+							fItem = (fItem as Formlist).GetAt(Index3)
+						endif
+					endif
+				endwhile
+				if !DispRef
+					DispRef = (NestedList.GetAt(0) as ObjectReference)
+				endif
+			elseif fDisp 
+				DispRef = fDisp as ObjectReference
+			endif
+
+			String DispName
+			if fItem
+				if fItem as FormList
+					DispName = (fItem as FormList).GetAt(0).GetName()
+				else
+					DispName = fItem.GetName()
+				endif
+			else
+				DispName = "!Error"
+			endif
+			
+			if FillSection == 10
+				TrackedNames10[ArrayPos] = DispName
+				TrackedDisplays10[ArrayPos] = DispRef
+				ArrayPos += 1
+
+			elseif FillSection == 9
+				TrackedNames9[ArrayPos] = DispName
+				TrackedDisplays9[ArrayPos] = DispRef
+				ArrayPos += 1
+
+			elseif FillSection == 8
+				TrackedNames8[ArrayPos] = DispName
+				TrackedDisplays8[ArrayPos] = DispRef
+				ArrayPos += 1
+
+			elseif FillSection == 7
+				TrackedNames7[ArrayPos] = DispName
+				TrackedDisplays7[ArrayPos] = DispRef
+				ArrayPos += 1
+
+			elseif FillSection == 6
+				TrackedNames6[ArrayPos] = DispName
+				TrackedDisplays6[ArrayPos] = DispRef
+				ArrayPos += 1
+				
+			elseif FillSection == 5
+				TrackedNames5[ArrayPos] = DispName
+				TrackedDisplays5[ArrayPos] = DispRef
+				ArrayPos += 1
+				
+			elseif FillSection == 4
+				TrackedNames4[ArrayPos] = DispName
+				TrackedDisplays4[ArrayPos] = DispRef
+				ArrayPos += 1
+				
+			elseif FillSection == 3
+				TrackedNames3[ArrayPos] = DispName
+				TrackedDisplays3[ArrayPos] = DispRef
+				ArrayPos += 1
+				
+			elseif FillSection == 2
+				TrackedNames2[ArrayPos] = DispName
+				TrackedDisplays2[ArrayPos] = DispRef
+				ArrayPos += 1	
+				
+			else
+				TrackedNames[ArrayPos] = DispName
+				TrackedDisplays[ArrayPos] = DispRef	
+				ArrayPos += 1
+			endif
+				
+			Index += 1
+		endwhile
+	
+		Array += 1
+	endWhile
+endFunction
+
+;;-------------------------------
+
+Function SetTrackerArray()
+	DBMSupportedModScript SupportPatch = (TrackedQuest as DBMSupportedModScript)
+	
+	SetTitleText("=== Loading ===")
+	Int ArrayPos = 0
+	Int Index = 0
+	While Index < SupportPatch.NewSectionDisplayRefLists.length
+			
+		Formlist flist = SupportPatch.NewSectionItemLists[Index] as Formlist
+		Formlist Dlist = SupportPatch.NewSectionDisplayRefLists[Index] as Formlist					
+
+		Int Index2 = 0
+		While Index2 < Dlist.GetSize()		
+
+			if ArrayPos >= 125 && !Page2
+				SetTitleText("=== Building Page 2 ===")
+				Page2 = True
+				ArrayPos = 0
+			endif
+				
+			Form fDisp = Dlist.GetAt(Index2)
+			Form fItem = flist.GetAt(Index2)
+			ObjectReference DispRef = None	
+		
+			if fDisp as FormList
+				FormList NestedList = fDisp as FormList
+				int Index3 = NestedList.GetSize()
+				while Index3 && !DispRef
+					Index3 -= 1
+					ObjectReference TDisp = NestedList.GetAt(Index3) as ObjectReference
+					if TDisp && TDisp.IsEnabled()
+						DispRef = TDisp
+						if fItem as FormList
+							fItem = (fItem as Formlist).GetAt(Index3)
+						endif
+					endif
+				endwhile
+				if !DispRef
+					DispRef = (NestedList.GetAt(0) as ObjectReference)
+				endif
+			elseif fDisp 
+				DispRef = fDisp as ObjectReference
+			endif
+
+			String DispName
+			if fItem
+				if fItem as FormList
+					DispName = (fItem as FormList).GetAt(0).GetName()
+				else
+					DispName = fItem.GetName()
+				endif
+			else
+				DispName = "!Error"
+			endif
+				
+				if !Page2
+					TrackedNames[ArrayPos] = DispName
+					TrackedDisplays[ArrayPos] = DispRef
+					ArrayPos += 1
+				else
+					TrackedNames2[ArrayPos] = DispName
+					TrackedDisplays2[ArrayPos] = DispRef
+					ArrayPos += 1				
+				endif
+				
+				Index2 += 1
+			endwhile
+		Index += 1
+	endWhile
+endFunction

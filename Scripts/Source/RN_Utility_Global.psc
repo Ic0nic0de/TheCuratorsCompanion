@@ -359,19 +359,19 @@ Int Function GetArrayPos(String _ModName) global
 	
 	elseif (_ModName == "Follower - Kaidan")
 		Return 36
-
-	elseif (_ModName == "Follower - M'rissi")
-		Return 37
 		
 	elseif (_ModName == "Forgotten Seasons")
-		Return 38
+		Return 37
 	
 	elseif (_ModName == "Fossil Mining")
-		Return 39
+		Return 38
 
 	elseif (_ModName == "Goblins")
-		Return 40
+		Return 39
 
+	elseif (_ModName == "Grandma Shirley")
+		Return 40
+		
 	elseif (_ModName == "Guards Armor Replacer")
 		Return 41
 		

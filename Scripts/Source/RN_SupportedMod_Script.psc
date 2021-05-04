@@ -16,11 +16,7 @@ RN_PatchAPI property APIScript auto
 bool property _setupDone = false auto hidden
 bool bConfigured
 bool bNotified
-
-bool bRegisterExploration
-bool bRegisterHallofWonders
-bool bRegisterQuests
-bool bRegisterSafeHouse
+bool bRegisterDisplays
 
 formlist property TCC_ItemList_Patches auto
 
@@ -66,6 +62,7 @@ formlist property _NewSectionGlobalTotal auto
 formlist property _NewSectionDisplayList auto
 formlist property _NewSectionItemsList auto
 string[] _NewSectionArrayName
+string[] _DefaultSectionArrayName
 
 Int _ReturnInt
 Int Tracker
@@ -189,21 +186,20 @@ State SettingUp
 			Tracker = 4
 			RegisterForSingleUpdate(0)
 			
-			_Index = DBM.NewSectionDisplayRefLists.length		
-			While _Index
-				_Index -= 1
+			CreateArray()
+			
+			_Index = 0		
+			While _Index < DBM.NewSectionDisplayRefLists.length
 				if DBM.NewSectionDisplayRefLists[_Index] != none 
 					_ReturnInt += _onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], _DisplayList)
 					_onConsolidateDisplaysAll(DBM.NewSectionDisplayRefLists[_Index], Util._getDisplayRoom(DBM.NewSectionRoomNames[_Index]), Util._getDisplayTotal(DBM.NewSectionRoomNames[_Index]))
-					
-					if DBM.NewSectionRoomNames[_Index] == "Safehouse"
-						bRegisterSafeHouse = (APIScript.RegisterDisplayList("Safehouse", _ModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
-					endIf
-						
-					if DBM.NewSectionRoomNames[_Index] == "Hall of Wonders"
-						bRegisterHallofWonders = (APIScript.RegisterDisplayList("Hall of Wonders", _ModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
-					endif				
+					if (_ModName == "Heavy Armory") || (_ModName == "Immersive Weapons") || (_ModName == "ESO Skyshards")
+						bRegisterDisplays = (APIScript.RegisterDisplayList(DBM.NewSectionRoomNames[_Index], _ModName + " - " + _DefaultSectionArrayName[_Index], DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
+					else
+						bRegisterDisplays = (APIScript.RegisterDisplayList(DBM.NewSectionRoomNames[_Index], _ModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
+					endIf	
 				endIf
+				_Index += 1
 			endWhile
 			
 			SectionDone += 1
@@ -221,8 +217,6 @@ State SettingUp
 					DBM_RN_ExplorationDisplays.AddForm(_Ref)
 					_Index += 1
 				EndWhile
-				
-				bRegisterExploration = (APIScript.RegisterExplorationDisplayList(_ModName, _explorationDisplays, _explorationNames))
 			endif
 			
 			SectionDone += 1
@@ -253,7 +247,6 @@ State SettingUp
 						_Index += 1
 					EndWhile
 				endif
-				bRegisterQuests = (APIScript.RegisterQuestDisplayList(_ModName, _questDisplays, _questNames))
 			endIf
 			
 			SectionDone += 1
@@ -298,32 +291,20 @@ endState
 ;;-- functions ---------------------------------------
 
 Function ResetTracking()
-	
-	bRegisterSafeHouse = False
-	bRegisterHallofWonders = False
-	bRegisterQuests = False
-	bRegisterExploration = False
 
-	Int _Index = DBM.NewSectionRoomNames.length		
-	While _Index
-		_Index -= 1
-		if DBM.NewSectionRoomNames[_Index] == "Safehouse"
-			bRegisterSafeHouse = (APIScript.RegisterDisplayList("Safehouse", _ModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
-		endIf
+	CreateArray()
+	Int _Index = 0  
+	While _Index < DBM.NewSectionDisplayRefLists.length
+		if DBM.NewSectionDisplayRefLists[_Index] != none 
+			if (_ModName == "Heavy Armory") || (_ModName == "Immersive Weapons") || (_ModName == "ESO Skyshards")
+				bRegisterDisplays = (APIScript.RegisterDisplayList(DBM.NewSectionRoomNames[_Index], _ModName + " - " + _DefaultSectionArrayName[_Index], DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
+			else
+				bRegisterDisplays = (APIScript.RegisterDisplayList(DBM.NewSectionRoomNames[_Index], _ModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
+			endIf
+		endif
 		
-		if DBM.NewSectionRoomNames[_Index] == "Hall of Wonders"
-			bRegisterHallofWonders = (APIScript.RegisterDisplayList("Hall of Wonders", _ModName, DBM.NewSectionDisplayRefLists[_Index], DBM.NewSectionItemLists[_Index]))
-		endif				
+		_Index += 1
 	endWhile
-	
-	if (_questDisplays && _questDisplays.GetSize() > 0) && (_questNames && _questNames.GetSize() > 0)
-		bRegisterQuests = (APIScript.RegisterQuestDisplayList(_ModName, _questDisplays, _questNames))
-	endif
-	
-	if (_explorationDisplays && _explorationDisplays.GetSize() > 0) && (_explorationNames && _explorationNames.GetSize() > 0)
-		bRegisterExploration = (APIScript.RegisterExplorationDisplayList(_ModName, _explorationDisplays, _explorationNames))
-	endif
-
 endFunction
 
 ;;-- functions ---------------------------------------		
@@ -341,7 +322,7 @@ function UpdateArrays()
 	MCM.AddModSupport(_GlobalComplete, _GlobalCount, _GlobalTotal, _ModName, RN_SupportedModCount, DBM)
 	
 	if (_ModName == "Heavy Armory") || (_ModName == "Immersive Weapons")
-		_CreateArray()
+		CreateArray()
 		MCM.AddSectionSupport(_NewSectionGlobalCount, _NewSectionGlobalTotal, _NewSectionGlobalComplete, _ModName, _NewSectionArrayName, _NewSectionItemsList, _NewSectionDisplayList)
 	endIf
 endfunction	
@@ -423,7 +404,7 @@ endEvent
 
 ;;-- functions ---------------------------------------	
 
-Function _CreateArray()
+Function CreateArray()
 
 	if (_ModName == "Heavy Armory")
 	
@@ -447,6 +428,27 @@ Function _CreateArray()
 		_NewSectionArrayName[16] = "Silver Set"
 		_NewSectionArrayName[17] = "Stalhrim Set"
 		_NewSectionArrayName[18] = "Steel Set"
+
+		_DefaultSectionArrayName = new string[19]
+		_DefaultSectionArrayName[0] = "Iron Set"
+		_DefaultSectionArrayName[1] = "Ancient Nord Set"
+		_DefaultSectionArrayName[2] = "Dawnguard Set"
+		_DefaultSectionArrayName[3] = "Falmer Set"
+		_DefaultSectionArrayName[4] = "Steel Set"
+		_DefaultSectionArrayName[5] = "Imperial Set"
+		_DefaultSectionArrayName[6] = "Silver Set"
+		_DefaultSectionArrayName[7] = "Forsworn Set"
+		_DefaultSectionArrayName[8] = "Dwarven Set"
+		_DefaultSectionArrayName[9] = "Nord Hero Set"
+		_DefaultSectionArrayName[10] = "Nordic Set"
+		_DefaultSectionArrayName[11] = "Orcish Set"
+		_DefaultSectionArrayName[12] = "Elven Set"
+		_DefaultSectionArrayName[13] = "Blades Set"
+		_DefaultSectionArrayName[14] = "Glass Set"
+		_DefaultSectionArrayName[15] = "Ebony Set"
+		_DefaultSectionArrayName[16] = "Stalhrim Set"
+		_DefaultSectionArrayName[17] = "Daedric Set"
+		_DefaultSectionArrayName[18] = "Dragon Set"
 		
 	elseif (_ModName == "Immersive Weapons")
 	
@@ -467,5 +469,41 @@ Function _CreateArray()
 		_NewSectionArrayName[13] = "Wolf Set"
 		_NewSectionArrayName[14] = "Daedric Gallery Set"
 		_NewSectionArrayName[15] = "Hall of Heroes Set"
+
+		_DefaultSectionArrayName = new string[16]
+		_DefaultSectionArrayName[0] = "Hall of Heroes Set"
+		_DefaultSectionArrayName[1] = "Daedric Gallery Set"
+		_DefaultSectionArrayName[2] = "Iron Set"
+		_DefaultSectionArrayName[3] = "Ancient Nord Set"
+		_DefaultSectionArrayName[4] = "Dawnguard Set"
+		_DefaultSectionArrayName[5] = "Falmer Set"
+		_DefaultSectionArrayName[6] = "Steel Set"
+		_DefaultSectionArrayName[7] = "Dwarven Set"
+		_DefaultSectionArrayName[8] = "Orcish Set"
+		_DefaultSectionArrayName[9] = "Elven Set"
+		_DefaultSectionArrayName[10] = "Wolf Set"
+		_DefaultSectionArrayName[11] = "Blades Set"
+		_DefaultSectionArrayName[12] = "Glass Set"
+		_DefaultSectionArrayName[13] = "Ebony Set"
+		_DefaultSectionArrayName[14] = "Daedric Set"
+		_DefaultSectionArrayName[15] = "Dragon Set"
+
+	elseif (_ModName == "ESO Skyshards")
+	
+		_DefaultSectionArrayName = new string[14]
+		_DefaultSectionArrayName[0] = "Blackreach"
+		_DefaultSectionArrayName[1] = "Dawnguard"
+		_DefaultSectionArrayName[2] = "Eastmarch"
+		_DefaultSectionArrayName[3] = "Falkreath"
+		_DefaultSectionArrayName[4] = "Haafingar"
+		_DefaultSectionArrayName[5] = "Hjaalmarch"
+		_DefaultSectionArrayName[6] = "The Pale"
+		_DefaultSectionArrayName[7] = "The Reach"
+		_DefaultSectionArrayName[8] = "The Rift"
+		_DefaultSectionArrayName[9] = "Solstheim"
+		_DefaultSectionArrayName[10] = "Whiterun"
+		_DefaultSectionArrayName[11] = "Winterhold"
+		_DefaultSectionArrayName[12] = "Museum"
+		_DefaultSectionArrayName[13] = "Explorers Society"
 	endIf
 endFunction
