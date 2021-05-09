@@ -246,7 +246,9 @@ ObjectReference[] CustomContainerRef
 Int[] CustomContainerPos
 
 ObjectReference TCC_HEADER_TO_REPLACE
-ObjectReference TCC_END_OF_PAGE
+
+ObjectReference[] TempDispArray
+String[] TempNameArray
 
 Bool HEADERSREQUIRED
 Int PagesRequired
@@ -1026,9 +1028,6 @@ Function BuildTrackingPage(Bool ThisPage, Bool NextPage, ObjectReference[] Displ
 			endif
 			Index +=1
 		endWhile
-		if NextPage
-			AddTextOption("Continue on the next page...", "", 1)
-		endif
 	else
 		SetTitleText(TrackedPatch)
 		SetCursorFillMode(TOP_TO_BOTTOM)
@@ -2524,10 +2523,18 @@ Event OnOptionSelect(Int _Val)
 	elseif CurrentPage == "Advanced Settings"
 		Index = CustomContainerPos.find(_Val)
 		if (Index != -1)
-			if ShowMessage("Would you like to remove " + CustomContainerRef[Index].GetDisplayName() + " from the custom storage list?", true, "Remove", "Cancel")	
-				API.EmptyContainerToPlayer(CustomContainerRef[Index])
-				API.RemoveFromTokenRefList(CustomContainerRef[Index], True)
-				ForcePageReset()
+			if ShowMessage("Would you like to Access or Remove " + CustomContainerRef[Index].GetDisplayName() + "?", true, "Access", "Remove")
+				ShowMessage("Please Exit The MCM", false, "Ok")
+				While isInMenuMode()
+					Wait(0.1)
+				endWhile
+				CustomContainerRef[Index].Activate(Game.GetPlayer())
+			else	
+				if ShowMessage("Are you sure you want to remove " + CustomContainerRef[Index].GetDisplayName() + " from the custom storage list?", true, "Remove", "Cancel")	
+					API.EmptyContainerToPlayer(CustomContainerRef[Index])
+					API.RemoveFromTokenRefList(CustomContainerRef[Index], True)
+					ForcePageReset()
+				endif
 			endif
 		endif
 		
@@ -3002,15 +3009,6 @@ Function BuildPatchArray(bool CreateArrays, bool UpdateRegistrations, bool Updat
 endFunction
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Script End ------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;------------------------------------------------------------------------------ Caching Functions --------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -3172,6 +3170,8 @@ function ClearCachedData(Int Index)
 		CacheMiscPages = 0
 	endif
 endFunction
+
+;;-------------------------------
 	
 function GetCacheData(String RoomName)
 	
@@ -3235,6 +3235,8 @@ function GetCacheData(String RoomName)
 	
 	LoadPages(Index)
 endFunction
+
+;;-------------------------------
 
 function LoadPages(Int Index)
 	
@@ -3359,15 +3361,6 @@ function LoadPages(Int Index)
 		Page10 = False
 	endIf
 endfunction
-
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-;;--------------------------------------------------------------------------------- Script End ------------------------------------------------------------------------------------------------------------
-;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
 
 ;;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------------------------------------- Tracking Functions --------------------------------------------------------------------------------------------------------
@@ -3498,47 +3491,106 @@ endFunction
 
 ;;-------------------------------
 
-Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
+Function SetTrackerArray()
+	DBMSupportedModScript SupportPatch = (TrackedQuest as DBMSupportedModScript)
+
+	TempDispArray = new objectreference[128]
+	TempNameArray = new string[128]
 	
-	SetTitleText("=== Loading ===")
-	Int ArrayPos = 0
-	Int FillSection = 0
+	Int P = 0	
+	Int A = 0
+	Int PageSet = 1
 	
-	Formlist flist = AfListA as Formlist
-	Formlist Dlist = afListB as Formlist					
+	SetNextPage(1)
+	
+	While (A < SupportPatch.NewSectionDisplayRefLists.length)
+			
+		Formlist flist = SupportPatch.NewSectionItemLists[A] as Formlist
+		Formlist Dlist = SupportPatch.NewSectionDisplayRefLists[A] as Formlist					
+
+		Int Index = 0
+		While Index < Dlist.GetSize()		
+
+			if (P >= 126)
+				PageSet += 1
+				SetNextPage(PageSet)				
+				P = 0
+			endIf
+				
+			Form fDisp = Dlist.GetAt(Index)
+			Form fItem = flist.GetAt(Index)
+			ObjectReference DispRef = None	
 		
+			if fDisp as FormList
+				FormList NestedList = fDisp as FormList
+				int Index3 = NestedList.GetSize()
+				while Index3 && !DispRef
+					Index3 -= 1
+					ObjectReference TDisp = NestedList.GetAt(Index3) as ObjectReference
+					if TDisp && TDisp.IsEnabled()
+						DispRef = TDisp
+						if fItem as FormList
+							fItem = (fItem as Formlist).GetAt(Index3)
+						endif
+					endif
+				endwhile
+				if !DispRef
+					DispRef = (NestedList.GetAt(0) as ObjectReference)
+				endif
+			elseif fDisp 
+				DispRef = fDisp as ObjectReference
+			endif
+
+			String DispName
+			if fItem
+				if fItem as FormList
+					DispName = (fItem as FormList).GetAt(0).GetName()
+				else
+					DispName = fItem.GetName()
+				endif
+			else
+				DispName = "!Error"
+			endif
+				
+			TempNameArray[P] = DispName
+			TempDispArray[P] = DispRef			
+			P += 1
+		
+			Index += 1
+		endwhile
+	
+		A += 1
+	endWhile
+endFunction
+
+;;-------------------------------
+
+Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
+
+	TempDispArray = new objectreference[128]
+	TempNameArray = new string[128]
+	
+	Int P = 0	
+	Int PageSet = 1
+	
+	SetNextPage(1)
+		
+	Formlist flist = AfListA as Formlist
+	Formlist Dlist = afListB as Formlist	
+
 	Int Index = 0
 	While Index < Dlist.GetSize()		
 
-		if ArrayPos >= 125 && !Page2
-			SetTitleText("=== Building Page 2 ===")
-			FillSection = 2
-			Page2 = True
-			ArrayPos = 0
-
-		elseif ArrayPos >= 125 && !Page3
-			SetTitleText("=== Building Page 3 ===")
-			FillSection = 3
-			Page3 = True
-			ArrayPos = 0
-
-		elseif ArrayPos >= 125 && !Page4
-			SetTitleText("=== Building Page 4 ===")
-			FillSection = 4		
-			Page4 = True
-			ArrayPos = 0
-
-		elseif ArrayPos >= 125 && !Page5
-			SetTitleText("=== Building Page 5 ===")
-			FillSection = 5
-			Page5 = True
-			ArrayPos = 0
-		endif
-		
+		if (P >= 126)
+			PageSet += 1
+			SetNextPage(PageSet)				
+			P = 0
+		endIf
+	
 		Form fDisp = Dlist.GetAt(Index)
 		Form fItem = flist.GetAt(Index)
 		ObjectReference DispRef = None	
-	
+
 		if fDisp as FormList
 			FormList NestedList = fDisp as FormList
 			int Index3 = NestedList.GetSize()
@@ -3569,33 +3621,11 @@ Function SetTrackerSection(Formlist AfListA = None, Formlist afListB = None)
 		else
 			DispName = "!Error"
 		endif
-			
-		if FillSection == 5
-			TrackedNames5[ArrayPos] = DispName
-			TrackedDisplays5[ArrayPos] = DispRef
-			ArrayPos += 1
-			
-		elseif FillSection == 4
-			TrackedNames4[ArrayPos] = DispName
-			TrackedDisplays4[ArrayPos] = DispRef
-			ArrayPos += 1
-			
-		elseif FillSection == 3
-			TrackedNames3[ArrayPos] = DispName
-			TrackedDisplays3[ArrayPos] = DispRef
-			ArrayPos += 1
-			
-		elseif FillSection == 2
-			TrackedNames2[ArrayPos] = DispName
-			TrackedDisplays2[ArrayPos] = DispRef
-			ArrayPos += 1	
-			
-		else
-			TrackedNames[ArrayPos] = DispName
-			TrackedDisplays[ArrayPos] = DispRef
-			ArrayPos += 1				
-		endif
-			
+		
+		TempNameArray[P] = DispName
+		TempDispArray[P] = DispRef			
+		P += 1
+	
 		Index += 1
 	endwhile
 endFunction
@@ -3603,178 +3633,37 @@ endFunction
 ;;-------------------------------
 
 Function SetTrackerDisplays(Formlist[] DisplayArray = None, FormList[] NamesArray = None, String[] Header = None, String RoomName)
+
+	TempDispArray = new objectreference[128]
+	TempNameArray = new string[128]
+	
+	Int P = 0	
+	Int A = 0
+	Int PageSet = 1
+	
+	SetNextPage(1)
+	
+	While (A < DisplayArray.Length) && (DisplayArray[A] != None)	
 		
-	SetTitleText("=== Building Page 1 ===")
-	Int ArrayPos = 0
-	Int FillSection = 0
-	
-	Int Array = 0
-	Int ArrayLength
-	Bool TrackPatches
-	
-	PagesRequired = 1
-	
-	While (Array < DisplayArray.Length) && (DisplayArray[Array] != None)
-
-		if FillSection == 10
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames10[ArrayPos] = Header[Array]
-			TrackedDisplays10[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1
-
-		elseif FillSection == 9
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames9[ArrayPos] = Header[Array]
-			TrackedDisplays9[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1
-
-		elseif FillSection == 8
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames8[ArrayPos] = Header[Array]
-			TrackedDisplays8[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1
-
-		elseif FillSection == 7
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames7[ArrayPos] = Header[Array]
-			TrackedDisplays7[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1
-
-		elseif FillSection == 6
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames6[ArrayPos] = Header[Array]
-			TrackedDisplays6[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1
-			
-		elseif FillSection == 5
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames5[ArrayPos] = Header[Array]
-			TrackedDisplays5[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1
-			
-		elseif FillSection == 4
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames4[ArrayPos] = Header[Array]
-			TrackedDisplays4[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1
-			
-		elseif FillSection == 3
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames3[ArrayPos] = Header[Array]
-			TrackedDisplays3[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1	
-			
-		elseif FillSection == 2
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames2[ArrayPos] = Header[Array]
-			TrackedDisplays2[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1
-			
-		else
-			if ArrayPos	!= 0
-				ArrayPos += 1
-			endif
-			
-			TrackedNames[ArrayPos] = Header[Array]
-			TrackedDisplays[ArrayPos] = TCC_HEADER_TO_REPLACE
-			ArrayPos += 1				
-		endif		
+		if P != 0
+			P += 1
+		endIf
 		
-		Formlist flist = NamesArray[Array] as Formlist
-		Formlist Dlist = DisplayArray[Array] as Formlist		
-			
+		TempNameArray[P] = Header[A]
+		TempDispArray[P] = TCC_HEADER_TO_REPLACE
+		P += 1	
+		
+		Formlist flist = NamesArray[A] as Formlist
+		Formlist Dlist = DisplayArray[A] as Formlist		
+	
 		Int Index = 0
 		While Index < Dlist.GetSize()		
 
-			if ArrayPos > 126 && !Page2
-				SetTitleText("=== Building Page 2 ===")
-				FillSection = 2
-				Page2 = True
-				PagesRequired = 2
-				ArrayPos = 0
-
-			elseif ArrayPos > 126 && !Page3
-				SetTitleText("=== Building Page 3 ===")
-				FillSection = 3
-				Page3 = True
-				PagesRequired = 3
-				ArrayPos = 0
-
-			elseif ArrayPos > 126 && !Page4					
-				SetTitleText("=== Building Page 4 ===")
-				FillSection = 4		
-				Page4 = True
-				PagesRequired = 4
-				ArrayPos = 0
-
-			elseif ArrayPos > 126 && !Page5
-				SetTitleText("=== Building Page 5 ===")
-				FillSection = 5
-				Page5 = True
-				PagesRequired = 5
-				ArrayPos = 0
-
-			elseif ArrayPos > 126 && !Page6
-				SetTitleText("=== Building Page 6 ===")
-				FillSection = 6
-				Page6 = True
-				PagesRequired = 6
-				ArrayPos = 0
-
-			elseif ArrayPos > 126 && !Page7
-				SetTitleText("=== Building Page 7 ===")
-				FillSection = 7
-				Page7 = True
-				PagesRequired = 7
-				ArrayPos = 0
-
-			elseif ArrayPos > 126 && !Page8
-				SetTitleText("=== Building Page 8 ===")
-				FillSection = 8
-				Page8 = True
-				PagesRequired = 8
-				ArrayPos = 0
-			elseif ArrayPos > 126 && !Page9
-				SetTitleText("=== Building Page 9 ===")
-				FillSection = 9
-				Page9 = True
-				PagesRequired = 9
-				ArrayPos = 0
-
-			elseif ArrayPos > 126 && !Page10
-				SetTitleText("=== Building Page 10 ===")
-				FillSection = 10
-				Page10 = True
-				PagesRequired = 10
-				ArrayPos = 0
-			endif
+			if (P >= 126)
+				PageSet += 1
+				SetNextPage(PageSet)				
+				P = 0
+			endIf
 			
 			Form fDisp = Dlist.GetAt(Index)
 			Form fItem = flist.GetAt(Index)
@@ -3811,133 +3700,64 @@ Function SetTrackerDisplays(Formlist[] DisplayArray = None, FormList[] NamesArra
 				DispName = "!Error"
 			endif
 			
-			if FillSection == 10
-				TrackedNames10[ArrayPos] = DispName
-				TrackedDisplays10[ArrayPos] = DispRef
-				ArrayPos += 1
-
-			elseif FillSection == 9
-				TrackedNames9[ArrayPos] = DispName
-				TrackedDisplays9[ArrayPos] = DispRef
-				ArrayPos += 1
-
-			elseif FillSection == 8
-				TrackedNames8[ArrayPos] = DispName
-				TrackedDisplays8[ArrayPos] = DispRef
-				ArrayPos += 1
-
-			elseif FillSection == 7
-				TrackedNames7[ArrayPos] = DispName
-				TrackedDisplays7[ArrayPos] = DispRef
-				ArrayPos += 1
-
-			elseif FillSection == 6
-				TrackedNames6[ArrayPos] = DispName
-				TrackedDisplays6[ArrayPos] = DispRef
-				ArrayPos += 1
-				
-			elseif FillSection == 5
-				TrackedNames5[ArrayPos] = DispName
-				TrackedDisplays5[ArrayPos] = DispRef
-				ArrayPos += 1
-				
-			elseif FillSection == 4
-				TrackedNames4[ArrayPos] = DispName
-				TrackedDisplays4[ArrayPos] = DispRef
-				ArrayPos += 1
-				
-			elseif FillSection == 3
-				TrackedNames3[ArrayPos] = DispName
-				TrackedDisplays3[ArrayPos] = DispRef
-				ArrayPos += 1
-				
-			elseif FillSection == 2
-				TrackedNames2[ArrayPos] = DispName
-				TrackedDisplays2[ArrayPos] = DispRef
-				ArrayPos += 1	
-				
-			else
-				TrackedNames[ArrayPos] = DispName
-				TrackedDisplays[ArrayPos] = DispRef	
-				ArrayPos += 1
-			endif
-				
+			TempNameArray[P] = DispName
+			TempDispArray[P] = DispRef			
+			P += 1
+		
 			Index += 1
 		endwhile
 	
-		Array += 1
+		A += 1
 	endWhile
 endFunction
 
 ;;-------------------------------
 
-Function SetTrackerArray()
-	DBMSupportedModScript SupportPatch = (TrackedQuest as DBMSupportedModScript)
+function SetNextPage(Int Page)
 	
-	SetTitleText("=== Loading ===")
-	Int ArrayPos = 0
-	Int Index = 0
-	While Index < SupportPatch.NewSectionDisplayRefLists.length
-			
-		Formlist flist = SupportPatch.NewSectionItemLists[Index] as Formlist
-		Formlist Dlist = SupportPatch.NewSectionDisplayRefLists[Index] as Formlist					
-
-		Int Index2 = 0
-		While Index2 < Dlist.GetSize()		
-
-			if ArrayPos >= 125 && !Page2
-				SetTitleText("=== Building Page 2 ===")
-				Page2 = True
-				ArrayPos = 0
-			endif
-				
-			Form fDisp = Dlist.GetAt(Index2)
-			Form fItem = flist.GetAt(Index2)
-			ObjectReference DispRef = None	
+	SetTitleText("=== Building Page " + Page + "  ===")
+	PagesRequired = Page
+	LoadPages(PagesRequired)
+	
+	if (Page == 1)
+		TempDispArray = TrackedDisplays
+		TempNameArray = TrackedNames
 		
-			if fDisp as FormList
-				FormList NestedList = fDisp as FormList
-				int Index3 = NestedList.GetSize()
-				while Index3 && !DispRef
-					Index3 -= 1
-					ObjectReference TDisp = NestedList.GetAt(Index3) as ObjectReference
-					if TDisp && TDisp.IsEnabled()
-						DispRef = TDisp
-						if fItem as FormList
-							fItem = (fItem as Formlist).GetAt(Index3)
-						endif
-					endif
-				endwhile
-				if !DispRef
-					DispRef = (NestedList.GetAt(0) as ObjectReference)
-				endif
-			elseif fDisp 
-				DispRef = fDisp as ObjectReference
-			endif
+	elseif (Page == 2)
+		TempDispArray = TrackedDisplays2
+		TempNameArray = TrackedNames2
 
-			String DispName
-			if fItem
-				if fItem as FormList
-					DispName = (fItem as FormList).GetAt(0).GetName()
-				else
-					DispName = fItem.GetName()
-				endif
-			else
-				DispName = "!Error"
-			endif
-				
-				if !Page2
-					TrackedNames[ArrayPos] = DispName
-					TrackedDisplays[ArrayPos] = DispRef
-					ArrayPos += 1
-				else
-					TrackedNames2[ArrayPos] = DispName
-					TrackedDisplays2[ArrayPos] = DispRef
-					ArrayPos += 1				
-				endif
-				
-				Index2 += 1
-			endwhile
-		Index += 1
-	endWhile
+	elseif (Page == 3)
+		TempDispArray = TrackedDisplays3
+		TempNameArray = TrackedNames3
+
+	elseif (Page == 4)
+		TempDispArray = TrackedDisplays4
+		TempNameArray = TrackedNames4	
+
+	elseif (Page == 5)
+		TempDispArray = TrackedDisplays5
+		TempNameArray = TrackedNames5
+
+	elseif (Page == 6)
+		TempDispArray = TrackedDisplays6
+		TempNameArray = TrackedNames6
+
+	elseif (Page == 7)
+		TempDispArray = TrackedDisplays7
+		TempNameArray = TrackedNames7
+
+	elseif (Page == 8)
+		TempDispArray = TrackedDisplays8
+		TempNameArray = TrackedNames8
+
+	elseif (Page == 9)
+		TempDispArray = TrackedDisplays9
+		TempNameArray = TrackedNames9
+
+	elseif (Page == 10)
+		TempDispArray = TrackedDisplays10
+		TempNameArray = TrackedNames10
+	endif
 endFunction
+

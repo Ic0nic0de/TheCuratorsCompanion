@@ -209,14 +209,20 @@ endFunction
 function ProcessReplica(form _ItemRelic)
 
 	if DBM_ReplicaBaseItems.HasForm(_ItemRelic)
-		dbmNew.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
-		dbmFound.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
-		dbmDisp.AddForm(ReplicaHandler.GetReplica(_ItemRelic))
+		Form rReplica = (ReplicaHandler.GetReplica(_ItemRelic))
+		if (!rReplica as Formlist)
+			dbmNew.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
+			dbmFound.RemoveAddedForm(ReplicaHandler.GetReplica(_ItemRelic))
+			dbmDisp.AddForm(ReplicaHandler.GetReplica(_ItemRelic))
+		endif
 			
 	elseif DBM_ReplicaItems.HasForm(_ItemRelic)	
-		dbmNew.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
-		dbmFound.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
-		dbmDisp.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))
+		Form rOriginal = (ReplicaHandler.GetOriginal(_ItemRelic))
+		if (!rOriginal as Formlist)
+			dbmNew.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
+			dbmFound.RemoveAddedForm(ReplicaHandler.GetOriginal(_ItemRelic))
+			dbmDisp.AddForm(ReplicaHandler.GetOriginal(_ItemRelic))
+		endif
 	endIf
 endFunction
 
