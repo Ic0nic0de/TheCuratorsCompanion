@@ -44,10 +44,7 @@ globalvariable property _GlobalCount auto
 globalvariable property _GlobalTotal auto
 
 Formlist Property _questDisplays auto
-Formlist property _questNames auto
-
 Formlist property _explorationDisplays auto
-Formlist property _explorationNames auto
 
 Int _ReturnInt
 
@@ -193,7 +190,7 @@ State SettingUp
 			Tracker = 5
 			RegisterForSingleUpdate(0)
 			
-			if (_explorationDisplays && _explorationDisplays.GetSize() > 0) && (_explorationNames && _explorationNames.GetSize() > 0)
+			if (_explorationDisplays && _explorationDisplays.GetSize() > 0)
 				_Index = 0
 				while _Index < _explorationDisplays.GetSize()
 					ObjectReference _Ref = _explorationDisplays.GetAt(_Index) as ObjectReference		
@@ -210,7 +207,7 @@ State SettingUp
 			Tracker = 999
 			RegisterForSingleUpdate(0)
 			
-			if (_questDisplays && _questDisplays.GetSize() > 0) && (_questNames && _questNames.GetSize() > 0)
+			if (_questDisplays && _questDisplays.GetSize() > 0)
 				_Index = 0
 				while _Index < _questDisplays.GetSize()
 					ObjectReference _Ref = _questDisplays.GetAt(_Index) as ObjectReference	
